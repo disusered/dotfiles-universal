@@ -5,24 +5,23 @@
 ### Packages
 
 - Document winget packages
-  - Install
-    - [ ] 7zip.7zip
-    - [ ] Docker.DockerDesktop
-    - [ ] SourceFoundry.HackFonts
-    - [ ] Zoom.Zoom
-    - [ ] Logitech.GHub
-    - [ ] Google.Chrome
-    - [ ] Google.GoogleDrive
-    - [ ] RevoUninstaller.RevoUninstaller
-    - [ ] wez.wezterm
-    - [ ] AgileBits.1Password
-    - [ ] AgileBits.1Password.CLI
-    - [ ] Microsoft.Teams
-    - [ ] Meld.Meld
+  - [x] Install
+    - [x] 7zip.7zip
+    - [x] Docker.DockerDesktop
+    - [x] SourceFoundry.HackFonts
+    - [x] Zoom.Zoom
+    - [x] Logitech.GHub
+    - [x] Google.Chrome
+    - [x] Google.GoogleDrive
+    - [x] RevoUninstaller.RevoUninstaller
+    - [x] wez.wezterm
+    - [x] AgileBits.1Password
+    - [x] AgileBits.1Password.CLI
+    - [x] Microsoft.Teams
+    - [x] Meld.Meld
   - Uninstall
-    - [ ] Microsoft.OneDrive
-    - [ ] Microsoft.Edge
-    - ???
+    - [x] Microsoft.OneDrive
+    - [x] Microsoft.Edge
   - Scoop
     - [x] Fonts
         - [x] FiraCode
