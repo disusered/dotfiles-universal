@@ -1,0 +1,7 @@
+windows:
+  links:
+    neovim.ps1: ~/.config/powershell/profile.d/neovim.ps1
+    init.lua: ~/AppData/Local/nvim/init.lua
+linux|darwin:
+  links:
+    init.lua: ~/.config/nvim/init.lua

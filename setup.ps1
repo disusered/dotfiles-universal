@@ -4,7 +4,7 @@
 
 # --- Initialization ---
 $scriptRoot = $PSScriptRoot
-$configFile = "$scriptRoot\config\packages.psd1"
+$configFile = "$scriptRoot\packages.psd1"
 $functionsFile = "$scriptRoot\modules\functions.ps1"
 
 # 1. Check if the functions file exists

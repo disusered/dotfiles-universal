@@ -43,12 +43,18 @@
 ### Look & Feel
 
 - [ ] Launch PowerShell 7 in Wezterm in new tab
-- [ ] Catpuccin <https://github.com/catppuccin/powershell>
-- [ ] Starship <https://github.com/starship/starship>
 
 ### Tools
 
-- [ ] Rotz <https://github.com/volllly/rotz>
+Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
+
+- [x] Rotz Link <https://github.com/volllly/rotz> <https://github.com/pho3nixf1re/dotfiles>
+  - [ ] Catpuccin <https://github.com/catppuccin/powershell>
+  - [ ] Starship <https://github.com/starship/starship>
+  - [ ] SSH
+    - [ ] WSL config with IdentityFile
+    - [ ] Windows config with IdentityAgent and 1Password
+  - [ ] Neovim
 - [ ] Zoxide <https://github.com/ajeetdsouza/zoxide>
 - [ ] Unix shell completion in PS <https://github.com/PowerShell/Modules/tree/master/Modules/Microsoft.PowerShell.UnixCompleters>
 - [ ] FZF <https://github.com/kelleyma49/PSFzf>
@@ -57,3 +63,5 @@
   - [ ] OmniSharp
   - [ ] Neotest
   - [ ] DAP
+
+- [ ] Replace installation script with `rotz install`
