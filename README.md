@@ -1,5 +1,10 @@
 # Dotfiles for Windows
 
+```powershell
+# Run installation script for all dependencies
+.\setup.ps1
+```
+
 ## TODO
 
 ### Packages
@@ -21,46 +26,34 @@
     - [x] Meld.Meld
   - Uninstall
     - [x] Microsoft.OneDrive
-    - [x] Microsoft.Edge
   - Scoop
     - [x] Fonts
-        - [x] FiraCode
-        - [x] CascadiaCode-NF-Mono
-        - [x] Hasklig
-        - [x] hack-font
+      - [x] FiraCode
+      - [x] CascadiaCode-NF-Mono
+      - [x] Hasklig
+      - [x] hack-font
     - [x] Apps
-        - [x] fd.exe
-        - [x] git.exe
-        - [x] neovim.exe
-        - [x] nuget.exe
-        - [x] win32yank.exe
+      - [x] fd.exe
+      - [x] git.exe
+      - [x] neovim.exe
+      - [x] nuget.exe
+      - [x] win32yank.exe
 - WinUtil <https://github.com/ChrisTitusTech/winutil>
 
 ### Look & Feel
 
 - [ ] Launch PowerShell 7 in Wezterm in new tab
-- [ ] Catpuccin
-- [ ] Rotz <https://github.com/volllly/rotz>
+- [ ] Catpuccin <https://github.com/catppuccin/powershell>
 - [ ] Starship <https://github.com/starship/starship>
-- [ ] Zoxide <https://github.com/ajeetdsouza/zoxide>
 
 ### Tools
 
+- [ ] Rotz <https://github.com/volllly/rotz>
+- [ ] Zoxide <https://github.com/ajeetdsouza/zoxide>
 - [ ] Unix shell completion in PS <https://github.com/PowerShell/Modules/tree/master/Modules/Microsoft.PowerShell.UnixCompleters>
 - [ ] FZF <https://github.com/kelleyma49/PSFzf>
-
-### Development
-
-- [ ] Git config
+- [ ] Git
 - [ ] LazyVim with PowerShell <https://www.lazyvim.org/installation>
   - [ ] OmniSharp
   - [ ] Neotest
   - [ ] DAP
-
-## Process
-
-1. Install rotz
-
-```powershell
-irm volllly.github.io/rotz/install.ps1 | iex
-```
