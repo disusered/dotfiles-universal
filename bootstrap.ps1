@@ -1,11 +1,12 @@
 # =========================================================================
 #  PowerShell Setup Script
 #  - Enforces a strict installation order:
-#    1. Scoop -> 2. Buckets -> 3. Scoop Apps -> 4. Other Apps
+#    1. Scoop -> 2. Buckets -> 3. Scoop Packages -> 4. Other Apps
 # =========================================================================
 
 #region Helper Functions
 
+# This function remains for non-Scoop programs that need a path check.
 function Ensure-ProgramInstalled {
     [CmdletBinding()]
     param (
@@ -69,6 +70,33 @@ function Ensure-ScoopBucket {
     }
 }
 
+# NEW: Unified function for all Scoop packages (apps and fonts).
+function Ensure-ScoopPackage {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Name
+    )
+    Write-Host "› Checking for Scoop package: " -NoNewline
+    Write-Host $Name -ForegroundColor DarkCyan
+
+    # Use 'scoop list' as the single source of truth for installation status.
+    if (scoop list | Select-String -Quiet -Pattern "\b$Name\b") {
+        Write-Host "  ✅ Already installed." -ForegroundColor Green
+        return
+    }
+
+    Write-Host "  ⏳ Not found. Starting installation..." -ForegroundColor Yellow
+    try {
+        scoop install $Name | Out-Null
+        Write-Host "  ✔️ Successfully installed package '$Name'." -ForegroundColor Green
+    }
+    catch {
+        Write-Host "  ❌ ERROR: Failed to install package '$Name'." -ForegroundColor Red
+        Write-Host "      $($_.Exception.Message)" -ForegroundColor DarkGray
+    }
+}
+
 #endregion
 
 # --- Configuration ---
@@ -89,38 +117,17 @@ $scoopBuckets = @(
     "versions"
 )
 
-# Group 3: Apps installed via Scoop (dependent on buckets)
-$scoopApps = @(
-    [pscustomobject]@{
-        Name          = "7-Zip"
-        ExePath       = Join-Path $env:USERPROFILE "scoop\shims\7z.exe"
-        InstallScript = { scoop install 7zip }
-    },
-    [pscustomobject]@{
-        Name          = "fd"
-        ExePath       = Join-Path $env:USERPROFILE "scoop\shims\fd.exe"
-        InstallScript = { scoop install fd }
-    },
-    [pscustomobject]@{
-        Name          = "Git"
-        ExePath       = Join-Path $env:USERPROFILE "scoop\shims\git.exe"
-        InstallScript = { scoop install git }
-    },
-    [pscustomobject]@{
-        Name          = "Neovim"
-        ExePath       = Join-Path $env:USERPROFILE "scoop\shims\nvim.exe"
-        InstallScript = { scoop install neovim }
-    },
-    [pscustomobject]@{
-        Name          = "NuGet"
-        ExePath       = Join-Path $env:USERPROFILE "scoop\shims\nuget.exe"
-        InstallScript = { scoop install nuget }
-    },
-    [pscustomobject]@{
-        Name          = "win32yank"
-        ExePath       = Join-Path $env:USERPROFILE "scoop\shims\win32yank.exe"
-        InstallScript = { scoop install win32yank }
-    }
+# NEW: Group 3 is now a single, unified list of all Scoop packages.
+$scoopPackages = @(
+    "CascadiaCode-NF-Mono",
+    "fd",
+    "FiraCode",
+    "git",
+    "hack-font",
+    "Hasklig",
+    "neovim",
+    "nuget",
+    "win32yank"
 )
 
 # Group 4: All other standalone programs
@@ -148,11 +155,13 @@ if (Get-Command scoop -ErrorAction SilentlyContinue) {
         Write-Host ""
     }
 
-    Write-Host "--- 3. Installing Scoop Applications ---" -ForegroundColor Yellow
-    foreach ($program in $scoopApps) {
-        Ensure-ProgramInstalled -Name $program.Name -ExePath $program.ExePath -InstallScript $program.InstallScript
+    # NEW: Step 3 is now a single loop for all Scoop packages.
+    Write-Host "--- 3. Installing Scoop Packages (Apps & Fonts) ---" -ForegroundColor Yellow
+    foreach ($package in $scoopPackages) {
+        Ensure-ScoopPackage -Name $package
         Write-Host ""
     }
+
 } else {
     Write-Host "--- Skipping Scoop-dependent installations because Scoop is not available. ---" -ForegroundColor Yellow
     Write-Host ""
