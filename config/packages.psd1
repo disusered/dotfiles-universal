@@ -23,7 +23,8 @@
         "Hasklig",
         "neovim",
         "nuget",
-        "win32yank"
+        "win32yank",
+        "lazygit"
     )
 
     # Group 4: All other standalone programs
