@@ -1,0 +1,5 @@
+windows:
+  installs:
+    cmd: scoop install 7zip
+    depends:
+      - /packages/scoop

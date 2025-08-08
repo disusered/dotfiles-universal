@@ -7,4 +7,4 @@ windows:
       scoop install hack-font;
       scoop install Hasklig
     depends:
-      - scoop
+      - /packages/scoop

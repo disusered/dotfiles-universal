@@ -42,6 +42,11 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
       - [x] volta
       - [x] nodejs
       - [x] eza
+      - [ ] rg
+      - [ ] fzf
+      - [ ] lazygit
+      - [ ] curl
+      - [x] zig (required for compiling TS on Windows)
 - [ ] WinUtil <https://github.com/ChrisTitusTech/winutil>
 
 ### Link
@@ -49,6 +54,8 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [x] Starship <https://github.com/starship/starship>
 - [x] Catpuccin <https://github.com/catppuccin/powershell>
 - [ ] Neovim with LazyVim <https://www.lazyvim.org/installation>
+  - [ ] Windows-specific configuration
+    - [ ] Clipboard support
 - [ ] Git
 
 ## TODO

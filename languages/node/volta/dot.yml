@@ -2,4 +2,4 @@ windows:
   installs:
     cmd: scoop install volta
     depends:
-      - /confs/scoop
+      - /packages/scoop

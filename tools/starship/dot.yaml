@@ -6,6 +6,6 @@ windows:
   installs:
     cmd: scoop install starship
     depends:
-      - /confs/fonts
+      - /tools/fonts
   links:
     starship.ps1: ~/.config/powershell/profile.d/starship.ps1

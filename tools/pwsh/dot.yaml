@@ -2,9 +2,9 @@
 windows:
   installs:
     cmd: >
-      pwsh -File $HOME/.dotfiles/confs/pwsh/install.ps1;
+      pwsh -File $HOME/.dotfiles/tools/pwsh/install.ps1;
     depends:
-      - scoop
+      - /packages/scoop
 
   links:
     profile.ps1: ~/Documents/PowerShell/profile.ps1

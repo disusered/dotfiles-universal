@@ -1,0 +1,6 @@
+windows:
+  installs:
+    cmd: scoop install curl
+    depends:
+      - /packages/scoop
+      - /tools/7zip

@@ -2,7 +2,12 @@ windows:
   installs:
     cmd: scoop install neovim
   depends:
-    - /confs/node/latest
+    - /packages/scoop
+    - /languages/zig
+    - /languages/node/latest
+    - /tools/fonts
+    - /tools/curl
+    - /tools/lazygit
   links:
     neovim.ps1: ~/.config/powershell/profile.d/neovim.ps1
     init.lua: ~/AppData/Local/nvim/init.lua
