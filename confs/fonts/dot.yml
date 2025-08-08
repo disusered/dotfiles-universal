@@ -1,0 +1,10 @@
+windows:
+  installs:
+    cmd: >
+      scoop bucket add nerd-fonts;
+      scoop install CascadiaCode-NF-Mono;
+      scoop install FiraCode;
+      scoop install hack-font;
+      scoop install Hasklig
+    depends:
+      - scoop

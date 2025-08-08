@@ -1,0 +1,11 @@
+global:
+  links:
+    starship.toml: ~/.config/starship.toml
+
+windows:
+  installs:
+    cmd: scoop install starship
+    depends:
+      - /confs/fonts
+  links:
+    starship.ps1: ~/.config/powershell/profile.d/starship.ps1
