@@ -1,0 +1,5 @@
+windows:
+  installs:
+    cmd: volta.exe install node@latest
+    depends:
+      - volta
