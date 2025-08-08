@@ -17,7 +17,12 @@ windows:
     - /tools/treesitter
     - /tools/imagemagick
     - /tools/ghostscript
+    - /languages/lua/5.1
+    - /languages/lua/luarocks
+    - /languages/lua/hererocks
     - /languages/latex/tectonic
+    - /languages/python/latest
+    - /languages/node/latest
   links:
     neovim.ps1: ~/.config/powershell/profile.d/neovim.ps1
     init.lua: ~/AppData/Local/nvim/init.lua

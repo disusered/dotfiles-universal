@@ -1,0 +1,6 @@
+windows:
+  installs:
+    cmd: scoop install luarocks
+    depends:
+      - /packages/scoop
+      - /languages/lua/5.1

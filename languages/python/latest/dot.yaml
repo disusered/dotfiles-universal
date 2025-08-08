@@ -1,6 +1,5 @@
 windows:
   installs:
-    cmd: uv tool install hererocks
+    cmd: uv python install
     depends:
       - /languages/python/uv
-      - /languages/lua/5.1
