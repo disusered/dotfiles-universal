@@ -49,6 +49,37 @@
 Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 
 - [ ] Replace installation script with `rotz install`
+  - [ ] Install
+    - [ ] 7zip.7zip
+    - [ ] Docker.DockerDesktop
+    - [ ] SourceFoundry.HackFonts
+    - [ ] Zoom.Zoom
+    - [ ] Logitech.GHub
+    - [ ] Google.Chrome
+    - [ ] Google.GoogleDrive
+    - [ ] RevoUninstaller.RevoUninstaller
+    - [ ] wez.wezterm
+    - [ ] AgileBits.1Password
+    - [ ] AgileBits.1Password.CLI
+    - [ ] Microsoft.Teams
+    - [ ] Meld.Meld
+  - Uninstall
+    - [ ] Microsoft.OneDrive
+  - Scoop
+    - [ ] Fonts
+      - [ ] FiraCode
+      - [ ] CascadiaCode-NF-Mono
+      - [ ] Hasklig
+      - [ ] hack-font
+    - [ ] Apps
+      - [ ] fd.exe
+      - [ ] git.exe
+      - [ ] neovim.exe
+      - [ ] nuget.exe
+      - [ ] win32yank.exe
+      - [x] volta
+      - [x] nodejs
+- WinUtil <https://github.com/ChrisTitusTech/winutil>
 - [x] Rotz Link <https://github.com/volllly/rotz> <https://github.com/pho3nixf1re/dotfiles>
   - [ ] Catpuccin <https://github.com/catppuccin/powershell>
   - [ ] Starship <https://github.com/starship/starship>
