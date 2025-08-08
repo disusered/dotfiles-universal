@@ -1,0 +1,7 @@
+windows:
+  installs:
+    cmd: scoop install eza
+    depends:
+      - /confs/scoop
+  links:
+    eza.ps1: ~/.config/powershell/profile.d/eza.ps1

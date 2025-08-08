@@ -26,14 +26,12 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [ ] AgileBits.1Password.CLI
     - [ ] Microsoft.Teams
     - [ ] Meld.Meld
-  - Uninstall
-    - [ ] Microsoft.OneDrive
   - Scoop
-    - [ ] Fonts
-      - [ ] FiraCode
-      - [ ] CascadiaCode-NF-Mono
-      - [ ] Hasklig
-      - [ ] hack-font
+    - [x] Fonts
+      - [x] FiraCode
+      - [x] CascadiaCode-NF-Mono
+      - [x] Hasklig
+      - [x] hack-font
     - [ ] Apps
       - [ ] fd.exe
       - [ ] git.exe
@@ -43,6 +41,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
       - [x] starship
       - [x] volta
       - [x] nodejs
+      - [x] eza
 - [ ] WinUtil <https://github.com/ChrisTitusTech/winutil>
 
 ### Link
