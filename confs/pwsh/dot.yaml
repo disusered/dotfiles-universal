@@ -3,7 +3,6 @@ windows:
   installs:
     cmd: >
       pwsh -File $HOME/.dotfiles/confs/pwsh/install.ps1;
-      New-Item -ItemType Directory -Force -Path ~/.config/powershell/profile.d -ErrorAction SilentlyContinue
     depends:
       - scoop
 

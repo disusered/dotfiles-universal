@@ -48,6 +48,7 @@
 
 Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 
+- [ ] Replace installation script with `rotz install`
 - [x] Rotz Link <https://github.com/volllly/rotz> <https://github.com/pho3nixf1re/dotfiles>
   - [ ] Catpuccin <https://github.com/catppuccin/powershell>
   - [ ] Starship <https://github.com/starship/starship>
@@ -63,5 +64,4 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [ ] OmniSharp
   - [ ] Neotest
   - [ ] DAP
-
-- [ ] Replace installation script with `rotz install`
+- [ ] Dev drive <https://learn.microsoft.com/en-us/windows/dev-drive/>
