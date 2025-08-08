@@ -1,0 +1,5 @@
+windows:
+  installs:
+    cmd: scoop install wget
+    depends:
+      - /packages/scoop

@@ -11,6 +11,13 @@ windows:
     - /tools/fzf
     - /tools/ripgrep
     - /tools/fd
+    - /tools/wget
+    - /tools/unzip
+    - /tools/gzip
+    - /tools/treesitter
+    - /tools/imagemagick
+    - /tools/ghostscript
+    - /languages/latex/tectonic
   links:
     neovim.ps1: ~/.config/powershell/profile.d/neovim.ps1
     init.lua: ~/AppData/Local/nvim/init.lua

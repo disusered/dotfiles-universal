@@ -1,0 +1,5 @@
+windows:
+  installs:
+    cmd: volta.exe install mermaid.cli
+    depends:
+      - /languages/node/latest

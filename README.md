@@ -33,9 +33,9 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
       - [x] Hasklig
       - [x] hack-font
     - [ ] Apps
-      - [ ] fd.exe
-      - [ ] git.exe
-      - [ ] neovim.exe
+      - [x] fd.exe
+      - [x] git.exe
+      - [x] neovim.exe
       - [ ] nuget.exe
       - [ ] win32yank.exe
       - [x] starship
@@ -55,6 +55,8 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [x] Catpuccin <https://github.com/catppuccin/powershell>
 - [ ] Neovim with LazyVim <https://www.lazyvim.org/installation>
   - [ ] Windows-specific configuration
+    - [x] Required dependencies
+    - [ ] LazyHealth issues
     - [ ] Clipboard support
 - [ ] Git
 
