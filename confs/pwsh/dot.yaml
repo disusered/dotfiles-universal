@@ -1,0 +1,11 @@
+# FIXME: Use winget to install powershell
+windows:
+  installs:
+    cmd: >
+      pwsh -File $HOME/.dotfiles/confs/pwsh/install.ps1;
+      New-Item -ItemType Directory -Force -Path ~/.config/powershell/profile.d -ErrorAction SilentlyContinue
+    depends:
+      - scoop
+
+  links:
+    profile.ps1: ~/Documents/PowerShell/profile.ps1

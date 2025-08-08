@@ -1,0 +1,9 @@
+windows:
+  installs:
+    cmd: >
+      Set-ExecutionPolicy RemoteSigned -Scope CurrentUser;
+      irm get.scoop.sh | iex | out-null;
+      scoop bucket add extras
+
+linux|darwin:
+  installs: false
