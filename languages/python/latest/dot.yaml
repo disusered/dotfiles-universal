@@ -3,3 +3,5 @@ windows:
     cmd: uv python install
     depends:
       - /languages/python/uv
+  links:
+    python.ps1: ~/.config/powershell/profile.d/python.ps1
