@@ -4,3 +4,4 @@ windows:
     depends:
       - /languages/python/uv
       - /languages/lua/5.1
+      - /languages/lua/luarocks
