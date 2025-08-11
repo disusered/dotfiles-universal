@@ -61,7 +61,8 @@ FIX PYTHON IN VIM: <https://github.com/mason-org/mason.nvim/issues/1753>
     - [x] Required dependencies
     - [ ] LazyHealth issues
     - [ ] Clipboard support
-- [ ] Git
+- [x] Git
+- [x] LazyGit
 
 ## TODO
 

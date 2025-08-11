@@ -1,0 +1,13 @@
+*~
+.DS_Store
+.local-vimrc
+Session.vim
+*.py.orig
+requests.sh
+swatch*
+*.ropeproject
+*.pgsql
+.neoconf.json
+pr
+.aider*
+!confs/aider/.aider.conf.yml

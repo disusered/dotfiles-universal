@@ -3,3 +3,6 @@ windows:
     cmd: scoop install git
     depends:
       - /packages/scoop
+  links:
+    gitconfig: ~/.gitconfig
+    gitignore: ~/.gitignore_global
