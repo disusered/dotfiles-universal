@@ -110,4 +110,4 @@
 		bold yellow => syntax "#544f4e"
 	# Should match the name of the bat theme
   # bat --list-themes
-	syntax-theme = Catppuccin-mocha
+	syntax-theme = Catppuccin Mocha
