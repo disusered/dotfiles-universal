@@ -1,7 +1,5 @@
 # PowerShell Profile Script for uv-Managed Python
 
-Write-Host "Loading uv Python environment..." -ForegroundColor DarkCyan
-
 try {
     # Get the path to the uv-managed python.exe using the correct 'find' subcommand.
     # The .Trim() removes any leading/trailing whitespace from the command output.
@@ -15,9 +13,6 @@ try {
         Set-Alias -Name python -Value $uvPythonPath -Option AllScope -Force
         Set-Alias -Name python3 -Value $uvPythonPath -Option AllScope -Force
         Set-Alias -Name python.exe -Value $uvPythonPath -Option AllScope -Force
-
-        Write-Host "Aliases 'python' and 'python3' now point to:" -ForegroundColor Green
-        Write-Host "-> $uvPythonPath" -ForegroundColor Green
     }
     else {
         # This can happen if `uv` is installed but no Python version has been installed via `uv python install`.
