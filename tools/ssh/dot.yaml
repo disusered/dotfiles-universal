@@ -1,0 +1,3 @@
+windows:
+  links:
+    allowed_signers: ~/.ssh/allowed_signers

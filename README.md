@@ -67,7 +67,6 @@ FIX PYTHON IN VIM: <https://github.com/mason-org/mason.nvim/issues/1753>
 - [x] Bat
 - [x] Eza
 - [x] Zoxide
-- [ ] Ripgrep
 
 ## TODO
 
@@ -75,12 +74,12 @@ FIX PYTHON IN VIM: <https://github.com/mason-org/mason.nvim/issues/1753>
 - [x] Zoxide <https://github.com/ajeetdsouza/zoxide>
 - [ ] Unix shell completion in PS <https://github.com/PowerShell/Modules/tree/master/Modules/Microsoft.PowerShell.UnixCompleters>
 - [ ] LazyVim with PowerShell
-  - [ ] OmniSharp
+  - [x] OmniSharp
   - [ ] Neotest
   - [ ] DAP
 - [ ] Dev drive <https://learn.microsoft.com/en-us/windows/dev-drive/>
 - [ ] SSH (eval agent in wsl, 1Password agent in Windows)
-  - [ ] WSL config with IdentityFile
+  - [x] WSL config with IdentityFile
   - [ ] Windows config with IdentityAgent and 1Password
 - [ ] Neotest in Windows
 - [x] Param completion
