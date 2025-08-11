@@ -6,3 +6,4 @@ windows:
   links:
     gitconfig: ~/.gitconfig
     gitignore: ~/.gitignore_global
+    git_alias.ps1: ~/.config/powershell/profile.d/git_alias.ps1

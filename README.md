@@ -78,4 +78,7 @@ FIX PYTHON IN VIM: <https://github.com/mason-org/mason.nvim/issues/1753>
   - [ ] WSL config with IdentityFile
   - [ ] Windows config with IdentityAgent and 1Password
 - [ ] Neotest in Windows
-- [ ] Param completion
+- [x] Param completion
+- [x] Git log interactive
+- [x] Delta for git pager
+- [ ] Bat theme for Git
