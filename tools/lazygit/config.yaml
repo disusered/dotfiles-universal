@@ -1,6 +1,35 @@
+# Use flatten.nvim because nvim-remote does not work on Windows
 os:
-  editPreset: "nvim-remote"
+  edit: "nvim {{filename}}"
+  editAtLine: "nvim +{{line}} {{filename}}"
+  editAtLineAndWait: "nvim +{{line}} {{filename}}"
+  # Whether lazygit suspends until an edit process returns
+  # editInTerminal: true
+# Use Git Delta for diffs
+git:
+  paging:
+    colorArg: always
+    pager: delta --features lazygit
+# Use neovim for writing commit messages by default
+keybinding:
+  files:
+    commitChanges: C # using the interactive commit dialog
+    commitChangesWithEditor: c # using neovim
+  commits:
+    openLogMenu: <c-g>
+# Do not prompt after git commands
+promptToReturnFromSubprocess: false
+notARepository: "quit"
 gui:
+  # UI
+  showRandomTip: false
+  disableStartupPopups: true
+  showBottomLine: true
+  showCommandLog: false
+  nerdFontsVersion: "3"
+  showFileIcons: true
+  border: single
+  # Theme (Cattpuccin Mocha)
   theme:
     activeBorderColor:
       - "#89b4fa"
@@ -24,7 +53,3 @@ gui:
 
   authorColors:
     "*": "#b4befe"
-git:
-  paging:
-    colorArg: always
-    pager: delta --features lazygit

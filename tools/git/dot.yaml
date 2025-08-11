@@ -1,9 +1,10 @@
 windows:
   installs:
-    cmd: winget install --id Git.Git -e --source winget
+    cmd: >
+      pwsh -File $HOME/.dotfiles/tools/git/install.ps1;
     depends:
       - /packages/scoop
   links:
     gitconfig: ~/.gitconfig
     gitignore: ~/.gitignore_global
-    git_alias.ps1: ~/.config/powershell/profile.d/git_alias.ps1
+    git.ps1: ~/.config/powershell/profile.d/git.ps1
