@@ -1,0 +1,17 @@
+windows:
+  installs:
+    cmd: scoop install yazi
+    depends:
+      - /packages/scoop
+      - /tools/ffmpeg
+      - /tools/7zip
+      - /tools/jq
+      - /tools/poppler
+      - /tools/fd
+      - /tools/ripgrep
+      - /tools/fzf
+      - /tools/zoxide
+      - /tools/resvg
+      - /tools/imagemagick
+  links:
+    yazi.ps1: ~/.config/powershell/profile.d/yazi.ps1

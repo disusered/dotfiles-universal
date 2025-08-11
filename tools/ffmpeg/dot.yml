@@ -1,0 +1,5 @@
+windows:
+  installs:
+    cmd: scoop install ffmpeg
+    depends:
+      - /packages/scoop

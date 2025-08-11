@@ -1,6 +1,6 @@
 windows:
   installs:
-    cmd: scoop install git
+    cmd: winget install --id Git.Git -e --source winget
     depends:
       - /packages/scoop
   links:

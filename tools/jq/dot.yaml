@@ -1,0 +1,5 @@
+windows:
+  installs:
+    cmd: scoop install jq
+    depends:
+      - /packages/scoop

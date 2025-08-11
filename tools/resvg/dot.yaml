@@ -1,0 +1,3 @@
+windows:
+  installs:
+    cmd: scoop install resvg
