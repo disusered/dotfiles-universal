@@ -50,6 +50,7 @@ FIX PYTHON IN VIM: <https://github.com/mason-org/mason.nvim/issues/1753>
       - [x] curl
       - [x] zig (required for compiling TS on Windows)
       - [x] zoxide
+      - [x] bat
 - [ ] WinUtil <https://github.com/ChrisTitusTech/winutil>
 
 ### Link
@@ -63,6 +64,10 @@ FIX PYTHON IN VIM: <https://github.com/mason-org/mason.nvim/issues/1753>
     - [ ] Clipboard support
 - [x] Git
 - [x] LazyGit
+- [x] Bat
+- [x] Eza
+- [x] Zoxide
+- [ ] Ripgrep
 
 ## TODO
 
@@ -80,5 +85,6 @@ FIX PYTHON IN VIM: <https://github.com/mason-org/mason.nvim/issues/1753>
 - [ ] Neotest in Windows
 - [x] Param completion
 - [x] Git log interactive
+- [ ] Git allowed signers file for Windows
 - [x] Delta for git pager
 - [ ] Bat theme for Git

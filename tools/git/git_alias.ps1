@@ -1,8 +1,6 @@
-# Simple Aliases
-Set-Alias -Name g -Value git
-
 # Aliases with arguments (as functions)
 # The $args variable passes along any additional arguments you type
+function g { git $args }
 function gcp { git cherry-pick $args }
 function gs  { git s $args }
 function gb  { git b $args }

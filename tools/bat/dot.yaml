@@ -1,0 +1,8 @@
+windows:
+  installs:
+    cmd: scoop install bat
+    depends:
+      - /packages/scoop
+  links:
+    bat.ps1: ~/.config/powershell/profile.d/bat.ps1
+    themes: ~/AppData/Local/bat/themes
