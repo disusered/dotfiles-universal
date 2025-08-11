@@ -3,3 +3,5 @@ windows:
     cmd: scoop install lazygit
     depends:
       - /packages/scoop
+  links:
+    config.yaml: ~/AppData/Local/lazygit/config.yml
