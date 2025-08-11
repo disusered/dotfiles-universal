@@ -44,11 +44,12 @@ FIX PYTHON IN VIM: <https://github.com/mason-org/mason.nvim/issues/1753>
       - [x] volta
       - [x] nodejs
       - [x] eza
-      - [ ] rg
-      - [ ] fzf
-      - [ ] lazygit
-      - [ ] curl
+      - [x] rg
+      - [x] fzf
+      - [x] lazygit
+      - [x] curl
       - [x] zig (required for compiling TS on Windows)
+      - [x] zoxide
 - [ ] WinUtil <https://github.com/ChrisTitusTech/winutil>
 
 ### Link
@@ -65,16 +66,15 @@ FIX PYTHON IN VIM: <https://github.com/mason-org/mason.nvim/issues/1753>
 ## TODO
 
 - [x] Launch PowerShell 7 in Wezterm in new tab
+- [x] Zoxide <https://github.com/ajeetdsouza/zoxide>
+- [ ] Unix shell completion in PS <https://github.com/PowerShell/Modules/tree/master/Modules/Microsoft.PowerShell.UnixCompleters>
 - [ ] LazyVim with PowerShell
   - [ ] OmniSharp
   - [ ] Neotest
   - [ ] DAP
-- [ ] Unix shell completion in PS <https://github.com/PowerShell/Modules/tree/master/Modules/Microsoft.PowerShell.UnixCompleters>
-- [ ] FZF <https://github.com/kelleyma49/PSFzf>
-- [ ] Zoxide <https://github.com/ajeetdsouza/zoxide>
 - [ ] Dev drive <https://learn.microsoft.com/en-us/windows/dev-drive/>
-- [ ] SSH
+- [ ] SSH (eval agent in wsl, 1Password agent in Windows)
   - [ ] WSL config with IdentityFile
   - [ ] Windows config with IdentityAgent and 1Password
-- [ ] Neotest
+- [ ] Neotest in Windows
 - [ ] Param completion
