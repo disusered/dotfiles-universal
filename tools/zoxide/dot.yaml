@@ -1,0 +1,7 @@
+windows:
+  installs:
+    cmd: scoop install zoxide
+    depends:
+      - /packages/scoop
+  links:
+    zoxide.ps1: ~/.config/powershell/profile.d/zoxide.ps1

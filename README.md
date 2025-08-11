@@ -9,6 +9,8 @@
 
 Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 
+FIX PYTHON IN VIM: <https://github.com/mason-org/mason.nvim/issues/1753>
+
 ### Install
 
 - [ ] Replace installation script with `rotz install`
@@ -62,7 +64,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 
 ## TODO
 
-- [ ] Launch PowerShell 7 in Wezterm in new tab
+- [x] Launch PowerShell 7 in Wezterm in new tab
 - [ ] LazyVim with PowerShell
   - [ ] OmniSharp
   - [ ] Neotest
@@ -74,3 +76,5 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [ ] SSH
   - [ ] WSL config with IdentityFile
   - [ ] Windows config with IdentityAgent and 1Password
+- [ ] Neotest
+- [ ] Param completion
