@@ -1,0 +1,5 @@
+windows:
+  installs:
+    cmd: rustup toolchain install stable
+    depends:
+      - /languages/rust/rustup
