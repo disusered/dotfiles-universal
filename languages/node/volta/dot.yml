@@ -1,5 +1,0 @@
-windows:
-  installs:
-    cmd: scoop install volta
-    depends:
-      - /packages/scoop

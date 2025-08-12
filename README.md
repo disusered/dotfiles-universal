@@ -41,7 +41,7 @@ FIX PYTHON IN VIM: <https://github.com/mason-org/mason.nvim/issues/1753>
       - [ ] nuget.exe
       - [ ] win32yank.exe
       - [x] starship
-      - [x] volta
+      - [x] mise
       - [x] nodejs
       - [x] eza
       - [x] rg

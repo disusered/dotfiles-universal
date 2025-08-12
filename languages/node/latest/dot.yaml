@@ -1,5 +1,5 @@
 windows:
   installs:
-    cmd: volta.exe install node@latest
+    cmd: mise use --global node@latest
     depends:
-      - /languages/node/volta
+      - /tools/mise
