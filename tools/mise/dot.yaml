@@ -1,0 +1,7 @@
+windows:
+  installs:
+    cmd: >
+      pwsh -File $HOME/.dotfiles/tools/mise/install.ps1;
+    depends:
+      - /packages/scoop
+      - /tools/pwsh

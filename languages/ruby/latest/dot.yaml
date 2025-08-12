@@ -1,0 +1,5 @@
+windows:
+  installs:
+    cmd: mise use --global ruby@latest
+    depends:
+      - /tools/mise
