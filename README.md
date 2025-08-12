@@ -33,10 +33,11 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
       - [x] Hasklig
       - [x] hack-font
     - [ ] Apps
+      - [x] dotnet
       - [x] fd.exe
       - [x] git.exe
       - [x] neovim.exe
-      - [ ] nuget.exe
+      - [x] nuget.exe
       - [ ] win32yank.exe
       - [x] starship
       - [x] mise
@@ -54,23 +55,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
       - [x] python
       - [x] golang
       - [x] node
-
 - [ ] WinUtil <https://github.com/ChrisTitusTech/winutil>
-
-### Link
-
-- [x] Starship <https://github.com/starship/starship>
-- [x] Catpuccin <https://github.com/catppuccin/powershell>
-- [ ] Neovim with LazyVim <https://www.lazyvim.org/installation>
-  - [ ] Windows-specific configuration
-    - [x] Required dependencies
-    - [ ] LazyHealth issues
-    - [x] Clipboard support
-- [x] Git
-- [x] LazyGit
-- [x] Bat
-- [x] Eza
-- [x] Zoxide
 
 ## TODO
 

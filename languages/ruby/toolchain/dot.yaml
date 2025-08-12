@@ -1,0 +1,6 @@
+windows:
+  installs:
+    cmd: ridk install 3; ridk enable
+    depends:
+      - /languages/ruby/latest
+      - /tools/msys2

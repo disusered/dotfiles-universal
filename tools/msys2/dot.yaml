@@ -1,0 +1,5 @@
+windows:
+  installs:
+    cmd: scoop install msys2; msys2
+    depends:
+      - /packages/scoop

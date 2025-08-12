@@ -7,3 +7,4 @@ windows:
       - /tools/pwsh
   links:
     shims.ps1: ~/.config/powershell/profile.d/shims.ps1
+    config.toml: ~/.config/mise/config.toml
