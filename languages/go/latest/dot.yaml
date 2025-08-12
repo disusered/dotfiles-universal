@@ -1,5 +1,5 @@
 windows:
   installs:
-    cmd: mise use --global python@latest
+    cmd: mise use --global go@latest
     depends:
       - /tools/mise
