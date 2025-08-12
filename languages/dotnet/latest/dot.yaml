@@ -1,0 +1,4 @@
+windows:
+  installs:
+    cmd: >
+      pwsh -File $HOME/.dotfiles/languages/dotnet/latest/install.ps1;
