@@ -1,25 +1,19 @@
-# The parameters for the winget command
-$wingetParams = @{
-    Id                      = "Git.Git"
-    Source                  = "winget"
-    Exact                   = $true
-    AcceptPackageAgreements = $true
-    AcceptSourceAgreements  = $true
-}
+# Centralize the package ID and source for easy changes
+$packageId = "Git.Git"
+$sourceName = "winget"
 
-# Check if the package is already installed by listing it
-Write-Host "Checking for existing installation of $($wingetParams.Id)..."
-$installedPackage = winget list @wingetParams
+# Check if the package is already installed
+Write-Host "Checking for existing installation of $packageId..."
+winget list --id $packageId --source $sourceName | Out-Null
 
-# The 'list' command's output includes the package ID if it's found.
-# If not found, it prints a "No installed package found..." message.
-if ($installedPackage -like "*$($wingetParams.Id)*") {
-    Write-Host "$($wingetParams.Id) is already installed. Checking for upgrades..."
-    winget upgrade @wingetParams
+# Check the exit code of the last command. 0 means success (package found).
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "$packageId is already installed. Checking for upgrades..."
+    winget upgrade --id $packageId --source $sourceName --accept-package-agreements --accept-source-agreements
 }
 else {
-    Write-Host "$($wingetParams.Id) not found. Installing now..."
-    winget install @wingetParams
+    Write-Host "$packageId not found. Installing now..."
+    winget install --id $packageId --source $sourceName --accept-package-agreements --accept-source-agreements
 }
 
 Write-Host "Git installation script finished."
