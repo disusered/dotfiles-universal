@@ -2,8 +2,6 @@ windows:
   installs:
     cmd: >
       pwsh -File $HOME/.dotfiles/tools/git/install.ps1;
-    depends:
-      - /packages/scoop
   links:
     gitconfig: ~/.gitconfig
     gitignore: ~/.gitignore_global

@@ -9,8 +9,6 @@
 
 Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 
-FIX PYTHON IN VIM: <https://github.com/mason-org/mason.nvim/issues/1753>
-
 ### Install
 
 - [ ] Replace installation script with `rotz install`
@@ -51,6 +49,12 @@ FIX PYTHON IN VIM: <https://github.com/mason-org/mason.nvim/issues/1753>
       - [x] zig (required for compiling TS on Windows)
       - [x] zoxide
       - [x] bat
+      - [x] rust
+      - [x] ruby
+      - [x] python
+      - [x] golang
+      - [x] node
+
 - [ ] WinUtil <https://github.com/ChrisTitusTech/winutil>
 
 ### Link
@@ -61,7 +65,7 @@ FIX PYTHON IN VIM: <https://github.com/mason-org/mason.nvim/issues/1753>
   - [ ] Windows-specific configuration
     - [x] Required dependencies
     - [ ] LazyHealth issues
-    - [ ] Clipboard support
+    - [x] Clipboard support
 - [x] Git
 - [x] LazyGit
 - [x] Bat
@@ -84,6 +88,6 @@ FIX PYTHON IN VIM: <https://github.com/mason-org/mason.nvim/issues/1753>
 - [ ] Neotest in Windows
 - [x] Param completion
 - [x] Git log interactive
-- [ ] Git allowed signers file for Windows
+- [x] Git allowed signers file for Windows
 - [x] Delta for git pager
-- [ ] Bat theme for Git
+- [x] Bat theme for Git
