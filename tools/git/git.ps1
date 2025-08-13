@@ -2,6 +2,9 @@
 # Find git.exe on your system. This works for Winget, Scoop, or standard installs.
 $gitCommand = Get-Command git.exe -ErrorAction SilentlyContinue
 
+# Remove existing gp alias
+Remove-Alias -Name gp -Force
+
 if ($gitCommand) {
     # Get the main installation directory (e.g., 'C:\Program Files\Git')
     $gitRootPath = Split-Path -Path (Split-Path -Path $gitCommand.Source -Parent) -Parent
