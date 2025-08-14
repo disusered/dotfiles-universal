@@ -1,0 +1,10 @@
+global:
+  installs:
+    cmd: uv tool install --force --python python3.12 --with pip aider-chat@latest
+    depends:
+      - /languages/python/uv
+  links:
+    aider.conf.yml: ~/.aider.conf.yml
+windows:
+  links:
+    aider.ps1: ~/.config/powershell/profile.d/aider.ps1
