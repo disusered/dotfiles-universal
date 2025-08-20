@@ -8,8 +8,8 @@ windows:
 linux:
   installs:
     cmd: brew install eza
-  depends:
-    - /tools/zsh
-    - /packages/homebrew
+    depends:
+      - /tools/zsh
+      - /packages/homebrew
   links:
     eza.zsh: ~/.config/zsh/0050_eza.zsh

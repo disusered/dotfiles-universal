@@ -1,3 +1,6 @@
+linux|darwin:
+  installs: false
+  links: false
 windows:
   installs:
     cmd: scoop install msys2; msys2
