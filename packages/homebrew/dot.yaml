@@ -8,5 +8,7 @@ linux:
       sudo dnf install procps-ng curl file -y && \
       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   depends:
-    - /tools/git
     - /tools/zsh
+    - /tools/git
+  links:
+    homebrew.zsh: ~/.config/zsh/0010_homebrew.zsh
