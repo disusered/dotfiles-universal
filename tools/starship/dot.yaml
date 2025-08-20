@@ -1,3 +1,7 @@
+global:
+  links:
+    starship.toml: ~/.config/starship.toml
+
 linux:
   installs:
     cmd: brew install starship
@@ -5,7 +9,7 @@ linux:
       - /tools/zsh
       - /packages/homebrew
   links:
-    starship.toml: ~/.config/starship.toml
+    starship.zsh: ~/.config/zsh/0150_starship.zsh
 
 windows:
   installs:
