@@ -1,4 +1,9 @@
-global:
+linux:
+  installs:
+    cmd: brew install starship
+    depends:
+      - /tools/zsh
+      - /packages/homebrew
   links:
     starship.toml: ~/.config/starship.toml
 
