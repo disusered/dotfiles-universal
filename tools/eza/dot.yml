@@ -5,3 +5,11 @@ windows:
       - /packages/scoop
   links:
     eza.ps1: ~/.config/powershell/profile.d/eza.ps1
+linux:
+  installs:
+    cmd: brew install eza
+  depends:
+    - /tools/zsh
+    - /packages/homebrew
+  links:
+    eza.zsh: ~/.config/zsh/0050_eza.zsh
