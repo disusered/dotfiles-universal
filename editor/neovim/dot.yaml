@@ -1,29 +1,58 @@
+# TODO: set EDITOR and any required vim alias
+linux|darwin:
+  installs:
+    cmd: brew install neovim
+    depends:
+      - /packages/homebrew
+      - /tools/git
+      - /tools/fonts
+      - /tools/lazygit
+      - /languages/zig
+      - /tools/curl
+      - /tools/fzf
+      - /tools/ripgrep
+      - /tools/fd
+      - /tools/wget
+      - /tools/unzip
+      - /tools/gzip
+      - /tools/treesitter
+      - /tools/imagemagick
+      - /tools/ghostscript
+      - /languages/lua/5.1
+      - /languages/lua/luarocks
+      - /languages/lua/hererocks
+      - /languages/latex/tectonic
+      - /languages/python/latest
+      - /languages/node/latest
 windows:
   installs:
     cmd: scoop install neovim
-  depends:
-    - /packages/scoop
-    - /tools/git
-    - /tools/fonts
-    - /tools/lazygit
-    - /languages/zig
-    - /tools/curl
-    - /tools/fzf
-    - /tools/ripgrep
-    - /tools/fd
-    - /tools/wget
-    - /tools/unzip
-    - /tools/gzip
-    - /tools/treesitter
-    - /tools/imagemagick
-    - /tools/ghostscript
-    - /languages/lua/5.1
-    - /languages/lua/luarocks
-    - /languages/lua/hererocks
-    - /languages/latex/tectonic
-    - /languages/python/latest
-    - /languages/node/latest
+    depends:
+      - /packages/scoop
+      - /tools/git
+      - /tools/fonts
+      - /tools/lazygit
+      - /languages/zig
+      - /tools/curl
+      - /tools/fzf
+      - /tools/ripgrep
+      - /tools/fd
+      - /tools/wget
+      - /tools/unzip
+      - /tools/gzip
+      - /tools/treesitter
+      - /tools/imagemagick
+      - /tools/ghostscript
+      - /languages/lua/5.1
+      - /languages/lua/luarocks
+      - /languages/lua/hererocks
+      - /languages/latex/tectonic
+      - /languages/python/latest
+      - /languages/node/latest
   links:
     neovim.ps1: ~/.config/powershell/profile.d/neovim.ps1
+
+global:
+  links:
     init.lua: ~/AppData/Local/nvim/init.lua
     lua: ~/AppData/Local/nvim/lua
