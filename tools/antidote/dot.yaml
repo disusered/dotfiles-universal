@@ -1,0 +1,5 @@
+linux:
+  installs:
+    cmd: brew install antidote
+  depends:
+    - /tools/zsh
