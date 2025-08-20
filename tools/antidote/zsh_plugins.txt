@@ -1,0 +1,19 @@
+# .zsh_plugins.txt - comments begin with "#"
+
+# Basic Zsh plugins are defined in user/repo format
+jeffreytse/zsh-vi-mode
+
+# set up Zsh completions with plugins
+mattmc3/ez-compinit
+zsh-users/zsh-completions kind:fpath path:src
+
+# or lighter-weight ones like zsh-utils
+# belak/zsh-utils path:editor
+# belak/zsh-utils path:history
+# belak/zsh-utils path:prompt
+# belak/zsh-utils path:utility
+
+zsh-users/zsh-history-substring-search
+zdharma/fast-syntax-highlighting
+zsh-users/zsh-autosuggestions
+z-shell/zsh-eza

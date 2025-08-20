@@ -3,3 +3,7 @@ linux:
     cmd: brew install antidote
   depends:
     - /tools/zsh
+    - /packages/homebrew
+  links:
+    antidote.zsh: ~/.config/zsh/0100_antidote.zsh
+    zsh_plugins.txt: ~/.zsh_plugins.txt

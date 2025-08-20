@@ -101,3 +101,6 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [ ] Neovim show selection stats (lines, words, characters) in statusline
 - [ ] WSL config <https://learn.microsoft.com/en-us/windows/wsl/wsl-config>
 - [ ] Linux variant
+- [ ] ZSH
+  - [ ] Zfunc <https://github.com/mattmc3/zfunctions/tree/main>
+  - [ ] ZSH Utils (belak/zsh-utils)
