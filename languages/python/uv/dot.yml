@@ -3,3 +3,8 @@ windows:
     cmd: scoop install uv
     depends:
       - /packages/scoop
+linux:
+  installs:
+    cmd: brew install uv
+    depends:
+      - /packages/homebrew
