@@ -1,0 +1,3 @@
+linux:
+  links:
+    rotz.zsh: ~/.config/zsh/0005_rotz.zsh

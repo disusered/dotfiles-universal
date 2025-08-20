@@ -1,3 +1,7 @@
+global:
+  links:
+    init.lua: ~/AppData/Local/nvim/init.lua
+    lua: ~/AppData/Local/nvim/lua
 # TODO: set EDITOR and any required vim alias
 linux|darwin:
   installs:
@@ -51,8 +55,3 @@ windows:
       - /languages/node/latest
   links:
     neovim.ps1: ~/.config/powershell/profile.d/neovim.ps1
-
-global:
-  links:
-    init.lua: ~/AppData/Local/nvim/init.lua
-    lua: ~/AppData/Local/nvim/lua
