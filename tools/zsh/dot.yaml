@@ -1,0 +1,9 @@
+linux:
+  installs:
+    cmd: |
+      sudo dnf install util-linux zsh -y && \
+      command -v zsh | sudo tee -a /etc/shells && \
+      sudo chsh -s $(which zsh) carlos
+  links:
+    zshrc: ~/.zshrc
+    confs: ~/.config/zsh

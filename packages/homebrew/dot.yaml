@@ -1,3 +1,5 @@
+windows:
+  installs: false
 linux:
   installs:
     cmd: |
@@ -7,3 +9,4 @@ linux:
       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   depends:
     - /tools/git
+    - /tools/zsh
