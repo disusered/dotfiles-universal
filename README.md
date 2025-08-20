@@ -1,8 +1,25 @@
-# Dotfiles for Windows
+# Universal Dotfiles
+
+**Linux/Mac**
+
+```sh
+# Install dependencies for Rotz
+sudo dnf update -y && sudo dnf install -y git
+
+# Install Rotz
+curl -fsSL volllly.github.io/rotz/install.sh | sh
+
+# Clone the dotfiles repository
+~/.rotz/bin/rotz clone https://github.com/disusered/dotfiles-universal.git
+
+# Install dotfiles
+~/.rotz/bin/rotz install
+```
+
+**Windows**
 
 ```powershell
-# Run installation script for all dependencies
-.\setup.ps1
+irm volllly.github.io/rotz/install.ps1 | iex
 ```
 
 ## Rotz
@@ -38,7 +55,6 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
       - [x] git.exe
       - [x] neovim.exe
       - [x] nuget.exe
-      - [ ] win32yank.exe
       - [x] starship
       - [x] mise
       - [x] nodejs
@@ -55,6 +71,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
       - [x] python
       - [x] golang
       - [x] node
+      - [ ] win32yank.exe
 - [ ] WinUtil <https://github.com/ChrisTitusTech/winutil>
 
 ## TODO
@@ -62,17 +79,25 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [x] Launch PowerShell 7 in Wezterm in new tab
 - [x] Zoxide <https://github.com/ajeetdsouza/zoxide>
 - [ ] Unix shell completion in PS <https://github.com/PowerShell/Modules/tree/master/Modules/Microsoft.PowerShell.UnixCompleters>
-- [ ] LazyVim with PowerShell
-  - [x] OmniSharp
-  - [ ] Neotest
-  - [ ] DAP
 - [ ] Dev drive <https://learn.microsoft.com/en-us/windows/dev-drive/>
 - [ ] SSH (eval agent in wsl, 1Password agent in Windows)
-  - [x] WSL config with IdentityFile
+  - [ ] WSL config with ssh agent
   - [ ] Windows config with IdentityAgent and 1Password
-- [ ] Neotest in Windows
+- [x] Neotest in Windows
 - [x] Param completion
 - [x] Git log interactive
 - [x] Git allowed signers file for Windows
 - [x] Delta for git pager
 - [x] Bat theme for Git
+- [ ] Starship indicate inside container
+- [ ] Starship give Docker context
+- [ ] Starship show sudo status
+- [ ] Wezterm hyperlinks <https://wezterm.org/recipes/hyperlinks.html#requirements>
+  - [ ] xdgopen -> wslview or wsl-open <https://github.com/4U6U57/wsl-open>
+  - [ ] Eza
+  - [ ] Delta
+  - [ ] Yazi/Ranger
+- [ ] Neovim wrap sidebar icon like screenshot
+- [ ] Neovim show selection stats (lines, words, characters) in statusline
+- [ ] WSL config <https://learn.microsoft.com/en-us/windows/wsl/wsl-config>
+- [ ] Linux variant

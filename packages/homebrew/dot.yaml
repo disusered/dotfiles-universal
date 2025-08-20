@@ -1,0 +1,9 @@
+linux:
+  installs:
+    cmd: |
+      sudo dnf update -y && \
+      sudo dnf group install development-tools -y && \
+      sudo dnf install procps-ng curl file -y && \
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  depends:
+    - /tools/git

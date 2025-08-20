@@ -1,8 +1,13 @@
+global:
+  links:
+    gitconfig: ~/.gitconfig
+    gitignore: ~/.gitignore_global
 windows:
   installs:
     cmd: >
       pwsh -File $HOME/.dotfiles/tools/git/install.ps1;
   links:
-    gitconfig: ~/.gitconfig
-    gitignore: ~/.gitignore_global
     git.ps1: ~/.config/powershell/profile.d/git.ps1
+linux:
+  installs:
+    cmd: sudo dnf install git
