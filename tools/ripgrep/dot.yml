@@ -13,5 +13,6 @@ linux:
       - /tools/bat
       - /tools/delta
   links:
+    fn_rgi.zsh: ~/.config/zsh/functions/rgi
     ripgrep.zsh: ~/.config/zsh/0190_ripgrep.zsh
     ripgreprc: ~/.config/ripgrep/ripgreprc

@@ -74,7 +74,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
       - [ ] win32yank.exe
 - [ ] WinUtil <https://github.com/ChrisTitusTech/winutil>
 
-## Windows
+## Etc
 
 - [x] Launch PowerShell 7 in Wezterm in new tab
 - [x] Zoxide <https://github.com/ajeetdsouza/zoxide>
@@ -89,9 +89,6 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [x] Git allowed signers file for Windows
 - [x] Delta for git pager
 - [x] Bat theme for Git
-
-## Port
-
 - [ ] Starship indicate inside container
 - [ ] Starship give Docker context
 - [ ] Starship show sudo status
@@ -103,7 +100,9 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [ ] Neovim wrap sidebar icon like screenshot
 - [ ] Neovim show selection stats (lines, words, characters) in statusline
 - [ ] WSL config <https://learn.microsoft.com/en-us/windows/wsl/wsl-config>
-- [ ] Linux variant
+
+## Port
+
 - [ ] Languages
   - [ ] Mise
   - [ ] Ruby
@@ -115,6 +114,9 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [ ] Csharpier
     - [ ] Nuget
     - [ ] Zsh completions
+- [ ] Neovim
+  - [ ] Install
+  - [ ] Lazyvim dependencies
 - [ ] ZSH
   - [x] .zshenv
   - [x] Zinit replacement (Antidote)

@@ -1,5 +1,4 @@
 windows:
   shell_command: pwsh -NoProfile -C {{ quote "" cmd }}
-linux|darwin:
-  shell_command: bash -c {{ quote "" cmd }}
-  link_type: hard
+linux:
+  link_type: Hard
