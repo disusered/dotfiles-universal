@@ -3,3 +3,8 @@ windows:
     cmd: scoop install tree-sitter
     depends:
       - /packages/scoop
+linux:
+  installs:
+    cmd: brew install tree-sitter
+    depends:
+      - /packages/homebrew

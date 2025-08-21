@@ -3,3 +3,6 @@ windows:
     cmd: scoop install unzip
     depends:
       - /packages/scoop
+linux:
+  installs:
+    cmd: sudo dnf install unzip -y

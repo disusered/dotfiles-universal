@@ -1,13 +1,10 @@
-# TODO: set EDITOR and any required vim alias
 linux|darwin:
   installs:
     cmd: brew install neovim
     depends:
       - /packages/homebrew
       - /tools/git
-      - /tools/fonts
       - /tools/lazygit
-      - /languages/zig
       - /tools/curl
       - /tools/fzf
       - /tools/ripgrep
@@ -18,12 +15,18 @@ linux|darwin:
       - /tools/treesitter
       - /tools/imagemagick
       - /tools/ghostscript
-      - /languages/lua/5.1
-      - /languages/lua/luarocks
-      - /languages/lua/hererocks
-      - /languages/latex/tectonic
-      - /languages/python/latest
-      - /languages/node/latest
+      # - /languages/lua/5.1
+      # - /languages/lua/luarocks
+      # - /languages/lua/hererocks
+      # - /languages/latex/tectonic
+      # - /languages/python/latest
+      # - /languages/node/latest
+      # TODO: Enable when platform-specific fonts are used for Wezterm
+      # - /tools/fonts
+  links:
+    neovim.zsh: ~/.config/zsh/0020_neovim.zsh
+    init.lua: ~/.config/nvim/init.lua
+    lua: ~/.config/nvim/lua
 windows:
   installs:
     cmd: scoop install neovim

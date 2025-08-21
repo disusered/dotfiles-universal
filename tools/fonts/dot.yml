@@ -8,3 +8,6 @@ windows:
       scoop install Hasklig
     depends:
       - /packages/scoop
+# TODO: Add required fonts for platform-specific Wezterm
+linux|darwin:
+  installs: false

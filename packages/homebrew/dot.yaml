@@ -5,10 +5,11 @@ linux:
     cmd: |
       sudo dnf update -y && \
       sudo dnf group install development-tools -y && \
-      sudo dnf install procps-ng curl file -y && \
+      sudo dnf install procps-ng file -y && \
       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     depends:
       - /tools/zsh
       - /tools/git
+      - /tools/curl
   links:
     homebrew.zsh: ~/.config/zsh/0010_homebrew.zsh

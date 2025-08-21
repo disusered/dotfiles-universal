@@ -3,3 +3,6 @@ windows:
     cmd: scoop install wget
     depends:
       - /packages/scoop
+linux:
+  installs:
+    cmd: sudo dnf install wget -y

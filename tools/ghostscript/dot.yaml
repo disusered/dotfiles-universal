@@ -3,3 +3,8 @@ windows:
     cmd: scoop install ghostscript
     depends:
       - /packages/scoop
+linux:
+  installs:
+    cmd: brew install ghostscript
+    depends:
+      - /packages/homebrew

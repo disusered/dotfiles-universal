@@ -1,3 +1,5 @@
+export PAGER='less'
+
 # ZSH environment variable for temporary files
 export TMPDIR="/tmp"
 

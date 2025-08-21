@@ -4,3 +4,6 @@ windows:
     depends:
       - /packages/scoop
       - /tools/7zip
+linux:
+  installs:
+    cmd: sudo dnf install curl -y

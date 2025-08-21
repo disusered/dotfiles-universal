@@ -3,3 +3,5 @@ windows:
     cmd: scoop install zig
     depends:
       - /packages/scoop
+linux|darwin:
+  installs: false

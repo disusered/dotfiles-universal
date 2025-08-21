@@ -10,7 +10,7 @@ windows:
     git.ps1: ~/.config/powershell/profile.d/git.ps1
 linux:
   installs:
-    cmd: sudo dnf install git
+    cmd: sudo dnf install git -y
   links:
     git.zsh: ~/.config/zsh/0015_git.zsh
     fn_gli.zsh: ~/.config/zsh/functions/gli

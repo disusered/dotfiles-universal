@@ -3,3 +3,8 @@ windows:
     cmd: scoop install imagemagick
     depends:
       - /packages/scoop
+linux:
+  installs:
+    cmd: brew install imagemagick
+    depends:
+      - /packages/homebrew

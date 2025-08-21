@@ -3,3 +3,6 @@ windows:
     cmd: scoop install gzip
     depends:
       - /packages/scoop
+linux:
+  installs:
+    cmd: sudo dnf install gzip -y
