@@ -1,0 +1,9 @@
+### $ZFUNCDIR/up
+# goes up any number of directories
+if [[ "$#" < 1 ]] ; then
+    cd ..
+else
+    local rpt=$(printf "%${1}s")
+    local cdstr=${rpt// /..\/}
+    cd $cdstr
+fi

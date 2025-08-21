@@ -13,3 +13,4 @@ linux:
     cmd: sudo dnf install git
   links:
     git.zsh: ~/.config/zsh/0015_git.zsh
+    fn_gli.zsh: ~/.config/zsh/functions/gli

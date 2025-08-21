@@ -3,6 +3,7 @@ linux:
     cmd: |
       sudo dnf install util-linux zsh -y && \
       command -v zsh | sudo tee -a /etc/shells && \
+      mkdir -p ~/.config/zsh/functions && \
       sudo chsh -s $(which zsh) carlos
   links:
     zshrc: ~/.zshrc

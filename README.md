@@ -173,4 +173,3 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [x] Alias
   - [ ] New
     - [ ] Zfunc <https://github.com/mattmc3/zfunctions/tree/main>
-    - [ ] ZSH Utils (belak/zsh-utils)
