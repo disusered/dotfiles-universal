@@ -130,9 +130,12 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [x] Completions
   - [x] Starship
   - [x] History options
+  - [ ] WSL
+    - [ ] Alias
+    - [ ] win32yank
+    - [ ] xdgopen shim
   - [ ] Custom aliases
     - [x] Eza
-    - [ ] WSL
   - [ ] Yazi
     - [ ] Install
     - [ ] Config

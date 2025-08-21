@@ -7,3 +7,8 @@ windows:
   links:
     shims.ps1: ~/.config/powershell/profile.d/shims.ps1
     config.toml: ~/.config/mise/config.toml
+linux:
+  installs:
+    cmd: brew install mise
+    depends:
+      - /packages/homebrew

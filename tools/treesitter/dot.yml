@@ -5,6 +5,6 @@ windows:
       - /packages/scoop
 linux:
   installs:
-    cmd: brew install tree-sitter
+    cmd: brew install tree-sitter-cli
     depends:
       - /packages/homebrew
