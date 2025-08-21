@@ -1,17 +1,17 @@
 # .zsh_plugins.txt - comments begin with "#"
 
-# Allow using Oh My Zsh plugins with Antidote
-getantidote/use-omz
+# wrap compinit to allow queueing calls to compdef. this plugin runs compinit
+# after all compdefs are registered.
+mattmc3/ez-compinit
 
-# Cross-platform clipboard support
-ohmyzsh/ohmyzsh path:lib/clipboard
+# Completion libraries
+zsh-users/zsh-completions kind:fpath path:src
 
-# Basic Zsh plugins are defined in user/repo format
+# Vi-mode
 jeffreytse/zsh-vi-mode
 
-# set up Zsh completions with plugins
-mattmc3/ez-compinit
-zsh-users/zsh-completions kind:fpath path:src
+# Cross-platform clipboard
+zpm-zsh/clipboard
 
 # or lighter-weight ones like zsh-utils
 # belak/zsh-utils path:editor
@@ -19,6 +19,6 @@ zsh-users/zsh-completions kind:fpath path:src
 # belak/zsh-utils path:prompt
 # belak/zsh-utils path:utility
 
+# Fish-like plugins
 zsh-users/zsh-history-substring-search
 zdharma/fast-syntax-highlighting
-zsh-users/zsh-autosuggestions
