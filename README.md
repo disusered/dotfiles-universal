@@ -74,7 +74,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
       - [ ] win32yank.exe
 - [ ] WinUtil <https://github.com/ChrisTitusTech/winutil>
 
-## TODO
+## Windows
 
 - [x] Launch PowerShell 7 in Wezterm in new tab
 - [x] Zoxide <https://github.com/ajeetdsouza/zoxide>
@@ -89,6 +89,9 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [x] Git allowed signers file for Windows
 - [x] Delta for git pager
 - [x] Bat theme for Git
+
+## Port
+
 - [ ] Starship indicate inside container
 - [ ] Starship give Docker context
 - [ ] Starship show sudo status
@@ -113,6 +116,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [ ] Nuget
     - [ ] Zsh completions
 - [ ] ZSH
+  - [x] .zshenv
   - [x] Zinit replacement (Antidote)
   - [x] Wezterm escape sequences
   - [x] Clipcopy
@@ -126,9 +130,15 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [x] History options
   - [ ] Custom aliases
     - [x] Eza
-    - [ ] Ranger/Yazi
-    - [ ] Httpie
     - [ ] WSL
+  - [ ] Yazi
+    - [ ] Install
+    - [ ] Config
+    - [ ] Catppuccin theme
+    - [ ] ZSH alias
+  - [ ] Httpie
+    - [ ] Install
+    - [ ] ZSH alias
   - [ ] Ripgrep
     - [ ] Install
     - [ ] ZSH functions
@@ -137,10 +147,10 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [x] Install
     - [x] Default options
     - [x] Shell intergration
-  - [ ] Bat
-    - [ ] Install
-    - [ ] ZSH alias
-    - [ ] Catpuccin
+  - [x] Bat
+    - [x] Install
+    - [x] ZSH alias
+    - [x] Catpuccin
   - [ ] Git
     - [x] Git config
     - [x] Git ignore
@@ -149,7 +159,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [x] Git alias
     - [x] Git completion
     - [x] Git functions
-    - [ ] Default options
+    - [x] Default options
   - [ ] Delta
     - [ ] Install
     - [ ] Git

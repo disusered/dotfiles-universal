@@ -6,3 +6,13 @@ windows:
   links:
     bat.ps1: ~/.config/powershell/profile.d/bat.ps1
     themes: ~/AppData/Local/bat/themes
+linux:
+  installs:
+    cmd: brew install bat && bat cache --build
+    depends:
+      - /packages/homebrew
+      - /tools/zsh
+  links:
+    bat.zsh: ~/.config/zsh/0180_bat.zsh
+    config: ~/.config/bat/config
+    themes: ~/.config/bat/themes
