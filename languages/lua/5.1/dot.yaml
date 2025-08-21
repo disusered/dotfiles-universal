@@ -3,3 +3,8 @@ windows:
     cmd: scoop install lua51
     depends:
       - /packages/scoop
+linux:
+  installs:
+    cmd: sudo dnf install compat-lua -y
+  links:
+    lua.zsh: ~/.config/zsh/0025_lua.zsh
