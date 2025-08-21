@@ -108,23 +108,25 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [ ] Node
   - [ ] Csharp
   - [ ] Rust
+  - [ ] Dotnet
+    - [ ] Csharpier
+    - [ ] Nuget
+    - [ ] Zsh completions
 - [ ] ZSH
   - [x] Zinit replacement (Antidote)
   - [x] Wezterm escape sequences
-  - [ ] Custom ZSH functions
-  - [ ] Vi-mode
-    - [ ] Plugin
-    - [ ] Keybindings
-      - [ ] History substring search
-      - [ ] Paste with p
+  - [x] Clipcopy
+  - [x] Vi-mode
+    - [x] Plugin
+    - [x] Keybindings
+      - [x] History substring search
+      - [x] Paste with p
   - [ ] FZF plugin
   - [ ] Completions
   - [x] Starship
   - [x] History options
   - [ ] Custom aliases
     - [x] Eza
-    - [x] Git
-    - [ ] Bat
     - [ ] Ranger/Yazi
     - [ ] Ripgrep
     - [ ] Httpie
@@ -132,13 +134,22 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [ ] New
     - [ ] Zfunc <https://github.com/mattmc3/zfunctions/tree/main>
     - [ ] ZSH Utils (belak/zsh-utils)
-  - [ ] Delta
-    - [ ] Install
-    - [ ] Git
   - [ ] Bat
     - [ ] Install
     - [ ] ZSH alias
     - [ ] Catpuccin
+  - [ ] Git
+    - [x] Git config
+    - [x] Git ignore
+    - [x] Git allowed signers
+    - [ ] Git Delta
+    - [x] Git alias
+    - [x] Git completion
+    - [ ] Git functions
+  - [ ] Delta
+    - [ ] Install
+    - [ ] Git
+    - [ ] Bat
   - [ ] Zoxide
     - [ ] Install
     - [ ] Init

@@ -1,5 +1,11 @@
 # .zsh_plugins.txt - comments begin with "#"
 
+# Allow using Oh My Zsh plugins with Antidote
+getantidote/use-omz
+
+# Cross-platform clipboard support
+ohmyzsh/ohmyzsh path:lib/clipboard
+
 # Basic Zsh plugins are defined in user/repo format
 jeffreytse/zsh-vi-mode
 
