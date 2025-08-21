@@ -8,3 +8,6 @@ linux:
     cmd: brew install fzf
     depends:
       - /packages/homebrew
+      - /tools/zsh
+  links:
+    fzf.zsh: ~/.config/zsh/0170_fzf.zsh

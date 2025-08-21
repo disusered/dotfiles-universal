@@ -127,12 +127,16 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [ ] Custom aliases
     - [x] Eza
     - [ ] Ranger/Yazi
-    - [ ] Ripgrep
     - [ ] Httpie
     - [ ] WSL
-  - [ ] Fzf
+  - [ ] Ripgrep
+    - [ ] Install
+    - [ ] ZSH functions
+    - [ ] Default options
+  - [x] Fzf
     - [x] Install
-    - [ ] ZSH
+    - [x] Default options
+    - [x] Shell intergration
   - [ ] Bat
     - [ ] Install
     - [ ] ZSH alias
@@ -144,7 +148,8 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [ ] Git Delta
     - [x] Git alias
     - [x] Git completion
-    - [ ] Git functions
+    - [x] Git functions
+    - [ ] Default options
   - [ ] Delta
     - [ ] Install
     - [ ] Git
