@@ -3,3 +3,15 @@ windows:
     cmd: scoop install ripgrep
     depends:
       - /packages/scoop
+      - /tools/bat
+      - /tools/delta
+linux:
+  installs:
+    cmd: brew install ripgrep
+    depends:
+      - /packages/homebrew
+      - /tools/bat
+      - /tools/delta
+  links:
+    ripgrep.zsh: ~/.config/zsh/0190_ripgrep.zsh
+    ripgreprc: ~/.config/ripgrep/ripgreprc
