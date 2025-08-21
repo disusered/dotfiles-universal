@@ -1,0 +1,3 @@
+linux:
+  links:
+    wezterm.zsh: ~/.config/zsh/0003_wezterm.zsh
