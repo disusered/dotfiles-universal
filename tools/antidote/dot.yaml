@@ -5,5 +5,7 @@ linux:
       - /tools/zsh
       - /packages/homebrew
   links:
-    antidote.zsh: ~/.config/zsh/0100_antidote.zsh
     zsh_plugins.txt: ~/.zsh_plugins.txt
+    antidote.zsh: ~/.config/zsh/0100_antidote.zsh
+    vi.zsh: ~/.config/zsh/0110_vi_bindkey.zsh
+    history.zsh: ~/.config/zsh/0120_history_subtring_search.zsh
