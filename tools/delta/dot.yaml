@@ -3,3 +3,10 @@ windows:
     cmd: scoop install delta
     depends:
       - /packages/scoop
+linux:
+  installs:
+    cmd: brew install delta
+    depends:
+      - /packages/homebrew
+      - /tools/bat
+      - /tools/git
