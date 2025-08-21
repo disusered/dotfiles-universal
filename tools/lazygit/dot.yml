@@ -3,5 +3,18 @@ windows:
     cmd: scoop install lazygit
     depends:
       - /packages/scoop
+      - /tools/delta
+      - /tools/bat
+      - /tools/git
   links:
     config.yaml: ~/AppData/Local/lazygit/config.yml
+linux:
+  installs:
+    cmd: brew install lazygit
+    depends:
+      - /packages/homebrew
+      - /tools/delta
+      - /tools/bat
+      - /tools/git
+  links:
+    config.yaml: ~/.config/lazygit/config.yml

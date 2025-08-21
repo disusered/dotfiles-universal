@@ -139,10 +139,10 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [ ] Httpie
     - [ ] Install
     - [ ] ZSH alias
-  - [ ] Ripgrep
-    - [ ] Install
-    - [ ] ZSH functions
-    - [ ] Default options
+  - [x] Ripgrep
+    - [x] Install
+    - [x] ZSH functions
+    - [x] Default options
   - [x] Fzf
     - [x] Install
     - [x] Default options
@@ -151,19 +151,22 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [x] Install
     - [x] ZSH alias
     - [x] Catpuccin
-  - [ ] Git
+  - [x] Git
     - [x] Git config
     - [x] Git ignore
     - [x] Git allowed signers
-    - [ ] Git Delta
+    - [x] Git Delta
     - [x] Git alias
     - [x] Git completion
     - [x] Git functions
     - [x] Default options
-  - [ ] Delta
-    - [ ] Install
-    - [ ] Git
-    - [ ] Bat
+  - [x] Lazygit
+    - [x] Install
+    - [x] Config
+  - [x] Delta
+    - [x] Install
+    - [x] Git
+    - [x] Bat
   - [x] Zoxide
     - [x] Install
     - [x] Init
