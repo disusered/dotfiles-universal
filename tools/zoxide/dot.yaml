@@ -3,5 +3,14 @@ windows:
     cmd: scoop install zoxide
     depends:
       - /packages/scoop
+      - /packages/fzf
   links:
     zoxide.ps1: ~/.config/powershell/profile.d/zoxide.ps1
+linux:
+  installs:
+    cmd: brew install zoxide
+    depends:
+      - /packages/homebrew
+      - /tools/fzf
+  links:
+    zoxide.zsh: ~/.config/zsh/0160_zoxide.zsh

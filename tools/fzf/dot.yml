@@ -3,3 +3,8 @@ windows:
     cmd: scoop install fzf
     depends:
       - /packages/scoop
+linux:
+  installs:
+    cmd: brew install fzf
+    depends:
+      - /packages/homebrew

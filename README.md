@@ -121,8 +121,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [x] Keybindings
       - [x] History substring search
       - [x] Paste with p
-  - [ ] FZF plugin
-  - [ ] Completions
+  - [x] Completions
   - [x] Starship
   - [x] History options
   - [ ] Custom aliases
@@ -131,9 +130,9 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [ ] Ripgrep
     - [ ] Httpie
     - [ ] WSL
-  - [ ] New
-    - [ ] Zfunc <https://github.com/mattmc3/zfunctions/tree/main>
-    - [ ] ZSH Utils (belak/zsh-utils)
+  - [ ] Fzf
+    - [x] Install
+    - [ ] ZSH
   - [ ] Bat
     - [ ] Install
     - [ ] ZSH alias
@@ -150,7 +149,10 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [ ] Install
     - [ ] Git
     - [ ] Bat
-  - [ ] Zoxide
-    - [ ] Install
-    - [ ] Init
-    - [ ] Alias
+  - [x] Zoxide
+    - [x] Install
+    - [x] Init
+    - [x] Alias
+  - [ ] New
+    - [ ] Zfunc <https://github.com/mattmc3/zfunctions/tree/main>
+    - [ ] ZSH Utils (belak/zsh-utils)
