@@ -6,6 +6,7 @@ linux:
       sudo chsh -s $(which zsh) carlos
   links:
     zshrc: ~/.zshrc
+    zshenv: ~/.zshenv
     platforms.zsh: ~/.config/zsh/0000_platforms.zsh
     history.zsh: ~/.config/zsh/0001_history.zsh
     ulimit.zsh: ~/.config/zsh/0002_ulimit.zsh

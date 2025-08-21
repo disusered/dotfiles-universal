@@ -23,6 +23,11 @@ alias gfm='git fm'
 alias gr='git r'
 alias gco='git co'
 
+# Git log options
+export GIT_LOG_STYLE_BASIC="%C(magenta bold)%h%C(reset) %C(auto)%d%C(reset) %s"
+export GIT_LOG_STYLE_COMPLEX="%C(magenta bold)%h%C(reset) %C(blue bold)%aN%C(reset) %C(auto)%d%C(reset) %s %C(8)(%cr)%C(reset)"
+export GIT_LOG_STYLE=$GIT_LOG_STYLE_COMPLEX
+
 # Git Log Interactive
 # https://gist.github.com/junegunn/f4fca918e937e6bf5bad
 gli() {
