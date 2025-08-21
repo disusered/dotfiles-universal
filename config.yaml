@@ -1,4 +1,2 @@
 windows:
   shell_command: pwsh -NoProfile -C {{ quote "" cmd }}
-linux:
-  link_type: Hard

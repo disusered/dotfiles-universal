@@ -7,9 +7,6 @@ mattmc3/ez-compinit
 # Completion libraries
 zsh-users/zsh-completions kind:fpath path:src
 
-# Lazy loading of functions
-mattmc3/zfunctions
-
 # Vi-mode
 jeffreytse/zsh-vi-mode
 
