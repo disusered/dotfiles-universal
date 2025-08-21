@@ -4,9 +4,3 @@ windows:
     depends:
       - /packages/scoop
       - /languages/lua/5.1
-linux:
-  installs:
-    cmd: brew install luarocks
-    depends:
-      - /packages/homebrew
-      - /languages/lua/5.1
