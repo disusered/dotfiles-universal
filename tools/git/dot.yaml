@@ -11,3 +11,5 @@ windows:
 linux:
   installs:
     cmd: sudo dnf install git
+  links:
+    git.zsh: ~/.config/zsh/0015_git.zsh

@@ -101,6 +101,45 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [ ] Neovim show selection stats (lines, words, characters) in statusline
 - [ ] WSL config <https://learn.microsoft.com/en-us/windows/wsl/wsl-config>
 - [ ] Linux variant
+- [ ] Languages
+  - [ ] Mise
+  - [ ] Ruby
+  - [ ] Deno
+  - [ ] Node
+  - [ ] Csharp
+  - [ ] Rust
 - [ ] ZSH
-  - [ ] Zfunc <https://github.com/mattmc3/zfunctions/tree/main>
-  - [ ] ZSH Utils (belak/zsh-utils)
+  - [x] Zinit replacement (Antidote)
+  - [x] Wezterm escape sequences
+  - [ ] Custom ZSH functions
+  - [ ] Vi-mode
+    - [ ] Plugin
+    - [ ] Keybindings
+      - [ ] History substring search
+      - [ ] Paste with p
+  - [ ] FZF plugin
+  - [ ] Completions
+  - [x] Starship
+  - [x] History options
+  - [ ] Custom aliases
+    - [x] Eza
+    - [x] Git
+    - [ ] Bat
+    - [ ] Ranger/Yazi
+    - [ ] Ripgrep
+    - [ ] Httpie
+    - [ ] WSL
+  - [ ] New
+    - [ ] Zfunc <https://github.com/mattmc3/zfunctions/tree/main>
+    - [ ] ZSH Utils (belak/zsh-utils)
+  - [ ] Delta
+    - [ ] Install
+    - [ ] Git
+  - [ ] Bat
+    - [ ] Install
+    - [ ] ZSH alias
+    - [ ] Catpuccin
+  - [ ] Zoxide
+    - [ ] Install
+    - [ ] Init
+    - [ ] Alias
