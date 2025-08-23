@@ -1,0 +1,114 @@
+[user]
+	name = Carlos Rosquillas
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN0ymLThQeG/B8GhYqrOUdjr2yydERDzP94yU9LT9o+N
+	email = crosquillas@gmail.com
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = "/mnt/c/Users/carlo/AppData/Local/1Password/app/8/op-ssh-sign-wsl"
+	allowedSignersFile = ~/.ssh/allowed_signers
+[commit]
+	gpgsign = true
+[advice]
+	statusHints = true
+[color]
+	ui = true
+	status = always
+[core]
+  pager = delta
+	quotepath = false
+	editor = nvim
+	autocrlf = input
+	trustctime = false
+	sshCommand = ssh.exe
+	excludesfile = ~/.gitignore_global
+[pretty]
+	basic = %C(magenta bold)%h%C(reset) %C(auto)%d%C(reset) %s
+	extended = %C(magenta bold)%h%C(reset)  %C(blue bold)%aN%C(reset) %C(auto)%d%C(reset) %s %C(8)(%cr)%C(reset)
+	reflog = %C(magenta bold)%h%C(reset)  %C(blue bold)%gd%C(reset) %gs %C(8)(%cr)%C(reset)
+[alias]
+	l = log --graph --color --pretty=extended --abbrev-commit --date=relative --branches --remotes --tags --oneline --decorate
+	s = status --short --branch
+	b = branch
+	bc = checkout -b
+	c = commit --verbose
+	ca = commit --verbose --amend
+	cm = commit --message
+	g = grep --break --heading --line-number
+	a = add
+	p = push
+	pf = push --force
+	d = diff --no-ext-diff
+	dt = difftool
+	m = merge
+	mt = mergetool
+	f = fetch
+	fm = pull
+	co = checkout
+[grep]
+	lineNumber = true
+[branch]
+	autosetuprebase = always
+[rerere]
+	enabled = true
+[status]
+	submoduleSummary = true
+[init]
+	defaultBranch = main
+	trustExitCode = true
+[pull]
+	rebase = true
+[diff]
+	tool = meld
+[difftool "meld"]
+	cmd = meld.exe "$LOCAL" "$REMOTE"
+[merge]
+  conflictstyle = zdiff3
+	tool = meld
+[mergetool "meld"]
+	cmd = meld.exe --auto-merge "$LOCAL" "$BASE" "$REMOTE" --output "$MERGED"
+	trustExitCode = true
+[interactive]
+  diffFilter = delta --color-only
+[delta]
+  features = catppuccin-mocha shell
+[delta "shell"]
+  navigate = true  # use n and N to move between diff sections
+  side-by-side = true
+[delta "lazygit"]
+  features = catppuccin-mocha
+  navigate = false
+  side-by-side = false
+  paging = never
+[delta "catppuccin-mocha"] # https://github.com/catppuccin/delta
+  true-color = always
+	blame-palette = "#1e1e2e #181825 #11111b #313244 #45475a"
+	commit-decoration-style = "#6c7086" bold box ul
+	dark = true
+	file-decoration-style = "#6c7086"
+	file-style = "#cdd6f4"
+	hunk-header-decoration-style = "#6c7086" box ul
+	hunk-header-file-style = bold
+	hunk-header-line-number-style = bold "#a6adc8"
+	hunk-header-style = file line-number syntax
+	line-numbers-left-style = "#6c7086"
+	line-numbers-minus-style = bold "#f38ba8"
+	line-numbers-plus-style = bold "#a6e3a1"
+	line-numbers-right-style = "#6c7086"
+	line-numbers-zero-style = "#6c7086"
+	# 25% red 75% base
+	minus-emph-style = bold syntax "#53394c"
+	# 10% red 90% base
+	minus-style = syntax "#34293a"
+	# 25% green 75% base
+	plus-emph-style = bold syntax "#404f4a"
+	# 10% green 90% base
+	plus-style = syntax "#2c3239"
+	map-styles = \
+		bold purple => syntax "#494060", \
+		bold blue => syntax "#384361", \
+		bold cyan => syntax "#384d5d", \
+		bold yellow => syntax "#544f4e"
+	# Should match the name of the bat theme
+  # bat --list-themes
+	syntax-theme = Catppuccin Mocha

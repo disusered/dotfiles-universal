@@ -1,15 +1,17 @@
 global:
   links:
-    gitconfig: ~/.gitconfig
     gitignore: ~/.gitignore_global
 windows:
   installs:
     cmd: >
       pwsh -File $HOME/.dotfiles/tools/git/install.ps1;
   links:
+    gitconfig_windows: ~/.gitconfig
     git.ps1: ~/.config/powershell/profile.d/git.ps1
 linux:
   installs:
     cmd: sudo dnf install git -y
   links:
+    # TODO: Detect WSL with advanced identifier
+    gitconfig_wsl: ~/.gitconfig
     git.zsh: ~/.config/zsh/0015_git.zsh
