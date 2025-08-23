@@ -1,0 +1,5 @@
+global:
+  installs:
+    cmd: rustup component add rustfmt
+    depends:
+      - /languages/rust/rustup

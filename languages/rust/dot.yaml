@@ -1,5 +1,5 @@
 global:
   installs:
-    cmd: rustup toolchain install stable
+    cmd: rustup toolchain install stable && rustup component add rustfmt
     depends:
       - /languages/rust/rustup

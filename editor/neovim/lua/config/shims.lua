@@ -3,12 +3,12 @@ if vim.loop.os_uname().sysname == "Windows_NT" then
   vim.env.PATH = vim.env.HOME .. "\\AppData\\Local\\mise\\shims:" .. vim.env.PATH
 else
   -- Additional paths for non-Windows systems
-  local mise_path = "/.local/share/mise/shims:"
-  local mason_path = vim.fn.stdpath("data") .. "/mason:"
-  local rocks_path = vim.fn.stdpath("data") .. "/lazy-rocks/hererocks/bin:"
+  local mise_path = vim.env.HOME .. "/.local/share/mise/shims"
+  local mason_path = vim.fn.stdpath("data") .. "/mason"
+  local rocks_path = vim.fn.stdpath("data") .. "/lazy-rocks/hererocks/bin"
 
   local path_parts = {
-    vim.env.HOME .. "/.local/share/mise/shims",
+    mise_path,
     rocks_path,
     mason_path,
     -- retain the existing PATH

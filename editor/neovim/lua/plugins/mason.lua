@@ -1,33 +1,67 @@
 return {
   "williamboman/mason.nvim",
   version = "1.11.0",
-  config = function()
-    -- Add the path to lazy's luarocks
-    local mason_path = vim.fn.stdpath("data") .. "/mason"
-    local rocks_path = vim.fn.stdpath("data") .. "/lazy-rocks/hererocks/bin"
-    vim.env.PATH = rocks_path .. ":" .. mason_path .. "/bin:" .. vim.env.PATH
-  end,
-  opts = function()
-    -- Base list of packages to install on all systems
-    local ensure_installed = {
+  opts = function(_, opts)
+    -- Guard clause to ensure opts and opts.ensure_installed are tables
+    opts.ensure_installed = opts.ensure_installed or {}
+
+    vim.list_extend(opts.ensure_installed, {
+      -- Astro
+      "astro-language-server",
+      -- Bash / Shell
       "bash-language-server",
+      "shfmt", -- Formatter
+      -- C#
+      "csharpier", -- Formatter
+      -- CSS / HTML
       "css-lsp",
       "html-lsp",
+      "emmet-language-server", -- HTML/CSS abbreviation expander
+      -- Docker
+      "hadolint", -- Linter
+      -- Elixir
+      "elixir-ls",
+      -- JavaScript / TypeScript
       "eslint-lsp",
-      "markdown-toc",
-      "markdownlint-cli2",
-      "prettier",
-      "prettierd",
-      "sqlfluff",
-    }
+      "js-debug-adapter",
+      -- JSON
+      "json-lsp",
+      -- Lua
+      "lua-language-server",
+      "stylua", -- Formatter
+      -- Markdown
+      "markdown-toc", -- Table of contents generator
+      "markdownlint-cli2", -- Linter
+      -- Makefiles
+      "checkmake", -- Linter
+      -- Python
+      "pyright", -- Language server
+      "ruff", -- Linter and formatter
+      "black", -- Formatter
+      "isort", -- Import sorter
+      "flake8", -- Linter
+      "debugpy", -- Debugger
+      -- Ruby
+      "solargraph", -- Language server
+      "erb-lint", -- ERB linter
+      "erb-formatter", -- ERB formatter
+      -- Rust
+      "rust-analyzer",
+      -- "rustfmt", -- Formatter, installed via rustup now
+      -- SQL
+      "sqlfluff", -- Linter and formatter
+      -- TOML
+      "taplo", -- Formatter and linter
+      -- Vue
+      "vue-language-server",
+      -- Web Development Formatters
+      "prettier", -- General purpose formatter
+      "prettierd", -- Daemonized for speed
+    })
 
     -- Conditionally add 'checkmake' if the OS is not Windows
     if not vim.fn.has("win32") then
-      table.insert(ensure_installed, "checkmake")
+      vim.list_extend(opts.ensure_installed, { "checkmake" })
     end
-
-    return {
-      ensure_installed = ensure_installed,
-    }
   end,
 }
