@@ -8,3 +8,5 @@ linux:
     cmd: brew install uv
     depends:
       - /packages/homebrew
+  links:
+    uv.zsh: ~/.config/zsh/0300_uv.zsh
