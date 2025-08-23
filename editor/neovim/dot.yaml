@@ -15,12 +15,11 @@ linux|darwin:
       - /tools/treesitter
       - /tools/imagemagick
       - /tools/ghostscript
-      # - /languages/lua/5.1
-      # - /languages/lua/luarocks
-      # - /languages/lua/hererocks
-      # - /languages/latex/tectonic
-      # - /languages/python/latest
-      # - /languages/node/latest
+      - /languages/lua/5.1
+      - /languages/lua/hererocks
+      - /languages/latex/tectonic
+      - /languages/python/latest
+      - /languages/node/latest
       # TODO: Enable when platform-specific fonts are used for Wezterm
       # - /tools/fonts
   links:

@@ -4,3 +4,5 @@ windows:
     depends:
       - /packages/scoop
       - /languages/lua/5.1
+linux:
+  installs: false # already installed by hererocks

@@ -3,3 +3,8 @@ windows:
     cmd: scoop install lua51
     depends:
       - /packages/scoop
+linux:
+  installs:
+    cmd: hererocks ~/.local/share/nvim/lazy-rocks/hererocks -l 5.1 -r latest
+    depends:
+      - /languages/lua/hererocks
