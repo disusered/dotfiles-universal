@@ -8,3 +8,6 @@ global:
 windows:
   links:
     aider.ps1: ~/.config/powershell/profile.d/aider.ps1
+linux:
+  links:
+    aider.zsh: ~/.config/zsh/-3050_aider.zsh
