@@ -1,6 +1,9 @@
 -- Prepend mise shims to PATH
--- TODO: Only do this for windows
-vim.env.PATH = vim.env.HOME .. "\\AppData\\Local\\mise\\shims:" .. vim.env.PATH
+if vim.loop.os_uname().sysname == "Windows_NT" then
+  vim.env.PATH = vim.env.HOME .. "\\AppData\\Local\\mise\\shims:" .. vim.env.PATH
+else
+  vim.env.PATH = vim.env.HOME .. "/.local/share/mise/shims:" .. vim.env.PATH
+end
 
 require("config.lazy")
 

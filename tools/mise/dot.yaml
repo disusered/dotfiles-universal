@@ -1,3 +1,6 @@
+global:
+  links:
+    config.toml: ~/.config/mise/config.toml
 windows:
   installs:
     cmd: pwsh -File $HOME/.dotfiles/tools/mise/install.ps1;
@@ -6,9 +9,8 @@ windows:
       - /tools/pwsh
   links:
     shims.ps1: ~/.config/powershell/profile.d/shims.ps1
-    config.toml: ~/.config/mise/config.toml
 linux:
   installs:
-    cmd: brew install mise
-    depends:
-      - /packages/homebrew
+    cmd: curl https://mise.run | sh
+  links:
+    mise.zsh: ~/.config/zsh/0500_mise.zsh
