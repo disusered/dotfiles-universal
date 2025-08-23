@@ -2,3 +2,11 @@ windows:
   installs:
     cmd: >
       pwsh -File $HOME/.dotfiles/languages/dotnet/latest/install.ps1;
+linux:
+  installs:
+    cmd: |
+      sudo dnf install -y \
+      dotnet-sdk-9.0 \
+      dotnet-sdk-8.0 \
+      aspnetcore-runtime-9.0 \
+      aspnetcore-runtime-8.0

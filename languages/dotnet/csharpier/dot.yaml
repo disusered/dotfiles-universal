@@ -1,4 +1,4 @@
-windows:
+global:
   installs:
     cmd: dotnet.exe tool install --global csharpier
     depends:
