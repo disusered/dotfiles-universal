@@ -2,7 +2,7 @@
 os:
   editPreset: "nvim-remote"
   # Whether lazygit suspends until an edit process returns
-  # editInTerminal: true
+  editInTerminal: true
 # Use Git Delta for diffs
 git:
   paging:
