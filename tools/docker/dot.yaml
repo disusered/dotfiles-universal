@@ -1,0 +1,9 @@
+windows:
+  installs: false
+# -- TODO: Only for WSL
+linux:
+  installs:
+    cmd: |
+      sudo groupadd docker || true && \
+      sudo usermod -aG docker $USER && \
+      newgrp docker
