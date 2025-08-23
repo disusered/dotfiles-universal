@@ -108,14 +108,20 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [ ] Deno
   - [x] Node
   - [ ] Csharp
-  - [ ] Rust
+  - [x] Rust
+  - [ ] Latex
+    - [ ] pdflatex
+    - [ ] tectonic
+    - [ ] latexmk
+  - [ ] Mermaid
+    - [ ] mmdc
   - [ ] Dotnet
     - [ ] Csharpier
     - [ ] Nuget
     - [ ] Zsh completions
 - [ ] Neovim
   - [x] Install
-  - [ ] Lazyvim dependencies
+  - [x] Lazyvim dependencies
 - [ ] ZSH
   - [x] .zshenv
   - [x] Zinit replacement (Antidote)
