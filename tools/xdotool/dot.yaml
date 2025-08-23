@@ -1,0 +1,5 @@
+windows:
+  installs: false
+linux:
+  installs:
+    cmd: command -v xdotool &>/dev/null || sudo dnf install -y xdotool

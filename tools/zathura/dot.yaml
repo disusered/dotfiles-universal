@@ -1,0 +1,7 @@
+windows:
+  installs: false
+linux:
+  installs:
+    cmd: command -v zathura &>/dev/null || sudo dnf install -y zathura zathura-pdf-mupdf
+    depends:
+      - /tools/xdotool

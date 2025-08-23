@@ -96,30 +96,25 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [ ] xdgopen -> wslview or wsl-open <https://github.com/4U6U57/wsl-open>
   - [ ] Eza
   - [ ] Delta
-  - [ ] Yazi/Ranger
 - [ ] Neovim wrap sidebar icon like screenshot
 - [ ] Neovim show selection stats (lines, words, characters) in statusline
 - [ ] WSL config <https://learn.microsoft.com/en-us/windows/wsl/wsl-config>
 
 ## Port
 
-- [ ] Languages
-  - [ ] Ruby
-  - [ ] Deno
+- [x] Languages
+  - [x] Ruby
   - [x] Node
-  - [ ] Csharp
+  - [x] Csharp
+    - [x] nuget
+    - [x] csharpier
   - [x] Rust
-  - [ ] Latex
-    - [ ] pdflatex
-    - [ ] tectonic
-    - [ ] latexmk
-  - [ ] Mermaid
-    - [ ] mmdc
-  - [ ] Dotnet
-    - [ ] Csharpier
-    - [ ] Nuget
-    - [ ] Zsh completions
-- [ ] Neovim
+  - [x] Latex
+    - [x] tectonic
+    - [x] latexmk
+  - [x] Mermaid
+    - [x] mmdc
+- [x] Neovim
   - [x] Install
   - [x] Lazyvim dependencies
 - [ ] ZSH
@@ -136,16 +131,11 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [x] Starship
   - [x] History options
   - [ ] WSL
-    - [ ] Alias
+    - [ ] Aliases (op.exe, )
     - [ ] win32yank
-    - [ ] xdgopen shim
+    - [ ] xdgopen -> wslview shim
   - [ ] Custom aliases
     - [x] Eza
-  - [ ] Yazi
-    - [ ] Install
-    - [ ] Config
-    - [ ] Catppuccin theme
-    - [ ] ZSH alias
   - [ ] Httpie
     - [ ] Install
     - [ ] ZSH alias
@@ -181,5 +171,3 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [x] Install
     - [x] Init
     - [x] Alias
-  - [ ] New
-    - [ ] Zfunc <https://github.com/mattmc3/zfunctions/tree/main>
