@@ -10,7 +10,7 @@ windows:
     git.ps1: ~/.config/powershell/profile.d/git.ps1
 linux:
   installs:
-    cmd: sudo dnf install git -y
+    cmd: command -v git &>/dev/null || sudo dnf install git -y
   links:
     # TODO: Detect WSL with advanced identifier
     gitconfig_wsl: ~/.gitconfig

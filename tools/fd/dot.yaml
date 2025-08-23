@@ -5,4 +5,4 @@ windows:
       - /packages/scoop
 linux:
   installs:
-    cmd: sudo dnf install fd-find -y
+    cmd: command -v fd &>/dev/null || sudo dnf install fd-find -y

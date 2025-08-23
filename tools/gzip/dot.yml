@@ -5,4 +5,4 @@ windows:
       - /packages/scoop
 linux:
   installs:
-    cmd: sudo dnf install gzip -y
+    cmd: command -v gzip &>/dev/null || sudo dnf install gzip -y

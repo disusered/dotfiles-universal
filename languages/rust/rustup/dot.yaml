@@ -4,6 +4,6 @@ windows:
       pwsh -File $HOME/.dotfiles/languages/rust/rustup/install.ps1;
 linux:
   installs:
-    cmd: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    cmd: command -v rustup &>/dev/null || curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
   links:
     rust.zsh: ~/.config/zsh/0400_rust.zsh

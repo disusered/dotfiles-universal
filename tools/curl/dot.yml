@@ -6,4 +6,4 @@ windows:
       - /tools/7zip
 linux:
   installs:
-    cmd: sudo dnf install curl -y
+    cmd: command -v curl &>/dev/null || sudo dnf install curl -y
