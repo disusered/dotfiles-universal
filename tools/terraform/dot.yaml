@@ -1,0 +1,5 @@
+linux:
+  installs:
+    cmd: brew install terraform
+  depends:
+    - /packages/homebrew
