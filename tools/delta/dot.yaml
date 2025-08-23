@@ -10,3 +10,5 @@ linux:
       - /packages/homebrew
       - /tools/bat
       - /tools/git
+  links:
+    delta.zsh: ~/.config/zsh/0025_delta.zsh

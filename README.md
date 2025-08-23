@@ -89,13 +89,14 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [x] Git allowed signers file for Windows
 - [x] Delta for git pager
 - [x] Bat theme for Git
-- [ ] Starship indicate inside container
-- [ ] Starship give Docker context
+- [x] Wezterm hyperlinks <https://wezterm.org/recipes/hyperlinks.html#requirements>
+  - [x] xdgopen -> wslview or wsl-open <https://github.com/4U6U57/wsl-open>
+  - [x] Eza
+  - [x] Delta
+  - [x] Ripgrep
+  - [x] Explorer
+  - [x] Neovim
 - [ ] Starship show sudo status
-- [ ] Wezterm hyperlinks <https://wezterm.org/recipes/hyperlinks.html#requirements>
-  - [ ] xdgopen -> wslview or wsl-open <https://github.com/4U6U57/wsl-open>
-  - [ ] Eza
-  - [ ] Delta
 - [ ] Neovim wrap sidebar icon like screenshot
 - [ ] Neovim show selection stats (lines, words, characters) in statusline
 - [ ] WSL config <https://learn.microsoft.com/en-us/windows/wsl/wsl-config>
