@@ -100,6 +100,11 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [ ] Neovim wrap sidebar icon like screenshot
 - [ ] Neovim show selection stats (lines, words, characters) in statusline
 - [ ] WSL config <https://learn.microsoft.com/en-us/windows/wsl/wsl-config>
+- [ ] Kulala
+  - [x] Plugin
+  - [x] LSP
+  - [x] Formatter
+  - [ ] Dependencies <https://neovim.getkulala.net/docs/getting-started/requirements>
 
 ## WSL
 
