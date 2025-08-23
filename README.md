@@ -104,10 +104,9 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 ## Port
 
 - [ ] Languages
-  - [ ] Mise
   - [ ] Ruby
   - [ ] Deno
-  - [ ] Node
+  - [x] Node
   - [ ] Csharp
   - [ ] Rust
   - [ ] Dotnet
@@ -115,7 +114,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [ ] Nuget
     - [ ] Zsh completions
 - [ ] Neovim
-  - [ ] Install
+  - [x] Install
   - [ ] Lazyvim dependencies
 - [ ] ZSH
   - [x] .zshenv

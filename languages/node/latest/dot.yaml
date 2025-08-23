@@ -3,3 +3,8 @@ windows:
     cmd: mise use --global node@latest
     depends:
       - /tools/mise
+linux:
+  installs:
+    cmd: volta install node
+    depends:
+      - /languages/node/volta
