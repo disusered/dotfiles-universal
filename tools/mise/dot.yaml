@@ -11,6 +11,6 @@ windows:
     shims.ps1: ~/.config/powershell/profile.d/shims.ps1
 linux:
   installs:
-    cmd: curl https://mise.run | sh
+    cmd: command -v mise &>/dev/null || curl https://mise.run | sh
   links:
     mise.zsh: ~/.config/zsh/0500_mise.zsh

@@ -1,4 +1,4 @@
-windows:
+global:
   installs:
     cmd: mise use --global go@latest
     depends:
