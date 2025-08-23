@@ -17,6 +17,8 @@ keybinding:
     commitChangesWithEditor: c # using neovim
   commits:
     openLogMenu: <c-g>
+    renameCommit: R
+    renameCommitWithEditor: r
 # Do not prompt after git commands
 promptToReturnFromSubprocess: false
 notARepository: "quit"
@@ -29,6 +31,8 @@ gui:
   nerdFontsVersion: "3"
   showFileIcons: true
   border: single
+  skipRewordInEditorWarning: true
+  skipAmendWarning: true
   # Theme (Cattpuccin Mocha)
   theme:
     activeBorderColor:

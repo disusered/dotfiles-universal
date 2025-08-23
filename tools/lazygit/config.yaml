@@ -2,7 +2,7 @@
 os:
   editPreset: "nvim-remote"
   # Whether lazygit suspends until an edit process returns
-  editInTerminal: true
+  editInTerminal: false
 # Use Git Delta for diffs
 git:
   paging:
@@ -15,6 +15,8 @@ keybinding:
     commitChangesWithEditor: c # using neovim
   commits:
     openLogMenu: <c-g>
+    renameCommit: R
+    renameCommitWithEditor: r
 # Do not prompt after git commands
 promptToReturnFromSubprocess: false
 notARepository: "quit"
@@ -27,6 +29,8 @@ gui:
   nerdFontsVersion: "3"
   showFileIcons: true
   border: single
+  skipRewordInEditorWarning: true
+  skipAmendWarning: true
   # Theme (Cattpuccin Mocha)
   theme:
     activeBorderColor:
