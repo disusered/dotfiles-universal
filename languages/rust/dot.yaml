@@ -1,4 +1,4 @@
-windows:
+global:
   installs:
     cmd: rustup toolchain install stable
     depends:

@@ -16,4 +16,4 @@ else {
     winget install --id $packageId --source $sourceName --accept-package-agreements --accept-source-agreements
 }
 
-Write-Host "Git installation script finished."
+Write-Host "Rust installation script finished."
