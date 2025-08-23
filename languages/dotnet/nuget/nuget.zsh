@@ -1,0 +1,1 @@
+alias nuget="dotnet nuget"

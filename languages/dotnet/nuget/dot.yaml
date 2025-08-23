@@ -1,0 +1,9 @@
+windows:
+  installs:
+    cmd: scoop install nuget
+    depends:
+      - /packages/scoop
+linux:
+  installs: false
+  links:
+    nuget.zsh: ~/.config/zsh/0600_nuget.zsh

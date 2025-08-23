@@ -1,5 +1,10 @@
-global:
+windows:
   installs:
     cmd: dotnet.exe tool install --global csharpier
+    depends:
+      - /languages/dotnet/latest
+linux:
+  installs:
+    cmd: dotnet tool install --global csharpier
     depends:
       - /languages/dotnet/latest

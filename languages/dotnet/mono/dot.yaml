@@ -1,0 +1,5 @@
+windows:
+  installs: false
+linux:
+  installs:
+    cmd: sudo dnf install mono-devel -y
