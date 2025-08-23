@@ -3,4 +3,4 @@ windows:
 # TODO: Only for WSL Linux
 linux:
   installs:
-    cmd: curl -sL https://raw.githubusercontent.com/wslutilities/wslu/master/extras/scripts/wslu-install | bash
+    cmd: command -v wslview &>/dev/null || curl -sL https://raw.githubusercontent.com/wslutilities/wslu/master/extras/scripts/wslu-install | bash
