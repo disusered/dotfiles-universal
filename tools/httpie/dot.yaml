@@ -1,0 +1,8 @@
+linux:
+  installs:
+    cmd: brew install httpie
+    depends:
+      - /packages/homebrew
+      - /tools/jq
+windows:
+  installs: false

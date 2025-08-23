@@ -3,3 +3,8 @@ windows:
     cmd: scoop install jq
     depends:
       - /packages/scoop
+linux:
+  installs:
+    cmd: brew install jq
+    depends:
+      - /packages/homebrew

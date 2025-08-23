@@ -100,9 +100,9 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [ ] Neovim show selection stats (lines, words, characters) in statusline
 - [ ] WSL config <https://learn.microsoft.com/en-us/windows/wsl/wsl-config>
 
-## Port
+## WSL
 
-- [ ] Docker
+- [x] Docker
 - [x] Languages
   - [x] Ruby
   - [x] Node
@@ -118,7 +118,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [x] Neovim
   - [x] Install
   - [x] Lazyvim dependencies
-- [ ] ZSH
+- [x] ZSH
   - [x] .zshenv
   - [x] Zinit replacement (Antidote)
   - [x] Wezterm escape sequences
@@ -131,15 +131,13 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [x] Completions
   - [x] Starship
   - [x] History options
-  - [ ] WSL
-    - [ ] Aliases (op.exe, )
-    - [ ] win32yank
-    - [ ] xdgopen -> wslview shim
-  - [ ] Custom aliases
+  - [x] WSL
+    - [x] win32yank (pbcopy/pbpaste)
+    - [x] xdgopen -> wslview shim
+  - [x] Custom aliases
     - [x] Eza
-  - [ ] Httpie
-    - [ ] Install
-    - [ ] ZSH alias
+  - [x] Httpie
+    - [x] Install
   - [x] Ripgrep
     - [x] Install
     - [x] ZSH functions
