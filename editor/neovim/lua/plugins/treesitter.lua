@@ -31,6 +31,8 @@ return {
       "markdown_inline",
       "typst",
       "powershell",
+      "norg",
+      "svelte",
     })
   end,
 }
