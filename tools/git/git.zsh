@@ -29,7 +29,7 @@ export GIT_LOG_STYLE_COMPLEX="%C(magenta bold)%h%C(reset) %C(blue bold)%aN%C(res
 export GIT_LOG_STYLE=$GIT_LOG_STYLE_COMPLEX
 
 # Git Log Interactive
-# https://gist.github.com/junegunn/f4fca918e937e6bf5bad
+# https://gist.github/junegunn/f4fca918e937e6bf5bad
 function gli() {
   local out shas sha q k
   while out=$(
@@ -41,18 +41,19 @@ function gli() {
     shas=$(sed '1,2d;s/^[^a-z0-9]*//;/^$/d' <<< "$out" | awk '{print $1}')
     [ -z "$shas" ] && continue
     if [ "$k" = ctrl-d ]; then
-      nvim fugitive://$(git rev-parse --show-toplevel)/.git//$(git rev-parse $shas)
+      # Git will now handle the pager correctly via delta's new config
+      git show $shas
+      break
     elif [ "$k" = ctrl-i ]; then
       git rebase --interactive $shas
-      break
     elif [ "$k" = ctrl-c ]; then
-      echo $shas | tr -d '\n' | clipcopy
+      echo $shas | tr -d '\n' | pbcopy
       break
     elif [ "$k" = ctrl-r ]; then
       git reset --hard $shas
     else
       for sha in $shas; do
-        git show --color=always $sha
+        git show $sha
       done
     fi
   done
