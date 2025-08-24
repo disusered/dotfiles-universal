@@ -15,6 +15,7 @@ linux|darwin:
       - /tools/treesitter
       - /tools/imagemagick
       - /tools/ghostscript
+      - /tools/postgresql
       - /languages/lua/5.1
       - /languages/lua/hererocks
       - /languages/latex/tectonic
