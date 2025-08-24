@@ -3,7 +3,7 @@ windows:
     cmd: scoop install zoxide
     depends:
       - /packages/scoop
-      - /packages/fzf
+      - /tools/fzf
   links:
     zoxide.ps1: ~/.config/powershell/profile.d/zoxide.ps1
 linux:
