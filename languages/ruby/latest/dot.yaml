@@ -3,3 +3,6 @@ global:
     cmd: mise use --global ruby@latest
     depends:
       - /tools/mise
+      - /tools/imagemagick
+      - /tools/postgresql
+      - /packages/homebrew

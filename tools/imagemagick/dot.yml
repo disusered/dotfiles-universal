@@ -5,6 +5,4 @@ windows:
       - /packages/scoop
 linux:
   installs:
-    cmd: brew install imagemagick
-    depends:
-      - /packages/homebrew
+    cmd: sudo dnf install ImageMagick ImageMagick-devel -y

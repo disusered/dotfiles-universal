@@ -2,6 +2,6 @@ windows:
   installs: false
 linux:
   installs:
-    cmd: sudo dnf install postgresql -y
+    cmd: sudo dnf install postgresql libpq-devel -y
   links:
     psqlrc: ~/.psqlrc

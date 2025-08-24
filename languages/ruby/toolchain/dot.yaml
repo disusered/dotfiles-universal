@@ -6,6 +6,7 @@ windows:
       - /tools/msys2
 linux:
   installs:
-    cmd: sudo dnf install libpq-devel glib2-devel poppler-glib-devel cairo-devel ruby-devel -y
+    cmd: sudo dnf install ruby-devel -y
     depends:
       - /tools/imagemagick
+      - /tools/postgresql

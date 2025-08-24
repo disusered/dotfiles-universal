@@ -5,6 +5,4 @@ windows:
       - /packages/scoop
 linux:
   installs:
-    cmd: brew install ghostscript
-    depends:
-      - /packages/homebrew
+    cmd: sudo dnf install ghostscript -y
