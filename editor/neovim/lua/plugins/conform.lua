@@ -15,19 +15,6 @@ return {
         "Invoke-Formatter -ScriptDefinition ($input | Join-String -Separator `n)",
       },
       stdin = true,
-      -- FIXME: Properly escape range arguments for Neovim
-      -- range_args = function(ctx)
-      --   return {
-      --     "-Range",
-      --     string.format(
-      --       "@(%d,%d,%d,%d)",
-      --       ctx.range.start.row,
-      --       ctx.range.start.col,
-      --       ctx.range.end.row,
-      --       ctx.range.end.col
-      --     ),
-      --   }
-      -- end,
     }
 
     -- Define the custom csharpier formatter, preserving your logic
