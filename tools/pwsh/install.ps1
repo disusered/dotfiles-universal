@@ -49,6 +49,7 @@ elseif ($IsWindows) {
 # Define a list of essential modules to ensure are installed.
 $modulesToInstall = @(
     'PSReadline',
+    'PSScriptAnalyzer',
     'Sudo'
 )
 
