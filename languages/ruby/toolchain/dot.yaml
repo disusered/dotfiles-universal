@@ -4,3 +4,8 @@ windows:
     depends:
       - /languages/ruby/latest
       - /tools/msys2
+linux:
+  installs:
+    cmd: sudo dnf install libpq-devel glib2-devel poppler-glib-devel cairo-devel ruby-devel -y
+    depends:
+      - /tools/imagemagick
