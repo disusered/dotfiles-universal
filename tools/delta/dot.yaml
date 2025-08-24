@@ -1,6 +1,6 @@
 windows:
   installs:
-    cmd: scoop install delta
+    cmd: scoop install delta less
     depends:
       - /packages/scoop
 linux:
