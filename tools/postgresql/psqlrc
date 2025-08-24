@@ -1,0 +1,20 @@
+-- Create a prompt with host, database name, date, and time
+\set PROMPT1 '%m@%/ %`date "+%Y-%m-%d %H:%M:%S"` '
+
+-- Turn quiet mode on to suppress informational messages
+\set QUIET on
+
+-- Always show query time
+\timing
+
+--Outline table borders and separators using Unicode characters
+\pset linestyle unicode
+
+-- Creates a history file for each database in your config directory CHECK IF THIS IS RIGHT
+\set HISTFILE ~/.config/psql/psql_history-:DBNAME
+
+-- Number of commands to save in history
+\set HISTSIZE 2000
+
+--Automatically format expanded display for wide columns
+\x auto

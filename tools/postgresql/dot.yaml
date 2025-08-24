@@ -3,3 +3,5 @@ windows:
 linux:
   installs:
     cmd: sudo dnf install postgresql -y
+  links:
+    psqlrc: ~/.psqlrc
