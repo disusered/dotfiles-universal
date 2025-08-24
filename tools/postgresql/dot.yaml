@@ -1,7 +1,11 @@
+global:
+  links:
+    psqlrc: ~/.psqlrc
 windows:
-  installs: false
+  installs:
+    cmd: scoop install main/postgresql
+    depends:
+      - /packages/scoop
 linux:
   installs:
     cmd: sudo dnf install postgresql libpq-devel -y
-  links:
-    psqlrc: ~/.psqlrc
