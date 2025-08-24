@@ -1,3 +1,4 @@
+export EZA_CONFIG_DIR="$HOME/.config/eza"
 
 if (( $+commands[eza] )); then
   typeset enable_autocd=0

@@ -1,5 +1,8 @@
 $env:EDITOR = 'nvim'
 
+# Allow setting themes
+$env:EZA_CONFIG_DIR = "$env:USERPROFILE\.config\eza"
+
 # Use the same aliases as zsh-eza
 # https://github.com/z-shell/zsh-eza?tab=readme-ov-file#aliases
 

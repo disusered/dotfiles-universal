@@ -1,3 +1,6 @@
+global:
+  links:
+    catppuccin.yml: ~/.config/eza/theme.yml
 windows:
   installs:
     cmd: scoop install eza

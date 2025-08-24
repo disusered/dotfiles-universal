@@ -3,6 +3,8 @@ windows:
     cmd: scoop install fzf
     depends:
       - /packages/scoop
+  links:
+    fzf.ps1: ~/.config/powershell/profile.d/fzf.ps1
 linux:
   installs:
     cmd: brew install fzf
