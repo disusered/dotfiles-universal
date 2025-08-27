@@ -1,0 +1,10 @@
+windows:
+  installs:
+    cmd: dotnet.exe tool install --global dotnet-ef
+    depends:
+      - /languages/dotnet/latest
+linux:
+  installs:
+    cmd: dotnet tool install --global dotnet-ef
+    depends:
+      - /languages/dotnet/latest
