@@ -1,0 +1,10 @@
+windows:
+  installs:
+    cmd: scoop install extras/opencode
+    depends:
+      - /packages/scoop
+linux:
+  installs:
+    cmd: brew install opencode
+    depends:
+      - /packages/homebrew
