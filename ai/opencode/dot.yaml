@@ -5,6 +5,6 @@ windows:
       - /packages/scoop
 linux:
   installs:
-    cmd: brew install opencode
+    cmd: brew install sst/tap/opencode
     depends:
       - /packages/homebrew
