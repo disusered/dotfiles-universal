@@ -1,0 +1,5 @@
+global:
+  installs:
+    cmd: npm install -g mcp-chrome-bridge
+    depends:
+      - /languages/node/latest
