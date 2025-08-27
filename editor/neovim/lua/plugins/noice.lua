@@ -18,7 +18,7 @@ return {
   },
   keys = {
     {
-      "<leader>cp",
+      "<leader>cP",
       function()
         vim.lsp.buf.signature_help()
       end,
