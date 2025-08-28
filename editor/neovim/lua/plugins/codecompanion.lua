@@ -63,8 +63,24 @@ return {
               defaults = {
                 -- auth_method = "gemini-api-key", -- "oauth-personal" | "gemini-api-key" | "vertex-ai"
                 auth_method = "oauth-personal",
+                -- TODO: Update docs
                 -- TODO: These should be project-specific, or at least use Gemini's local settings
                 mcpServers = {
+                  -- Browser control
+                  {
+                    name = "chrome-mcp-server",
+                    command = "npx",
+                    args = { "-y", "mcp-remote", "http://127.0.0.1:12306/mcp" },
+                    env = {},
+                  },
+                  -- Confluence/Jira
+                  {
+                    name = "atlassian",
+                    command = "npx",
+                    args = { "-y", "mcp-remote", "https://mcp.atlassian.com/v1/sse" },
+                    env = {},
+                  },
+                  -- Postgres for BrillAI
                   {
                     name = "postgres",
                     command = "uv",

@@ -1,5 +1,7 @@
+# TODO: No need to install in WSL
+# Chromium: mkdir -p ~/.config/chromium/NativeMessagingHosts/ && cp ~/.config/{google-chrome,chromium}/NativeMessagingHosts/com.chromemcp.nativehost.json
 global:
   installs:
-    cmd: npm install -g mcp-chrome-bridge
+    cmd: npm install -g mcp-chrome-bridge && mcp-chrome-bridge register
     depends:
       - /languages/node/latest
