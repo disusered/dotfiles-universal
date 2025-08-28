@@ -63,6 +63,25 @@ return {
               defaults = {
                 -- auth_method = "gemini-api-key", -- "oauth-personal" | "gemini-api-key" | "vertex-ai"
                 auth_method = "oauth-personal",
+                -- TODO: These should be project-specific, or at least use Gemini's local settings
+                mcpServers = {
+                  {
+                    name = "postgres",
+                    command = "uv",
+                    args = {
+                      "tool",
+                      "run",
+                      "postgres-mcp",
+                      "--access-mode=unrestricted",
+                    },
+                    env = {
+                      {
+                        name = "DATABASE_URI",
+                        value = "postgresql://postgres:admin@localhost:5432/brillai",
+                      },
+                    },
+                  },
+                },
               },
             })
           end,
