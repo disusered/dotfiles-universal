@@ -1,7 +1,9 @@
--- TODO: MCPhub
--- https://codecompanion.olimorris.dev/installation.html#installing-extensions
+-- TODO: MCP
+-- https://codecompanion.olimorris.dev/installation.html#installing-extensions or ACP Gemini
 
--- TODO: ACP
+-- TODO: VectorCode
+-- https://github.com/Davidyz/VectorCode/blob/main/docs/cli.md#installation
+-- https://github.com/Davidyz/VectorCode/blob/main/docs/neovim/README.md
 return {
   {
     "olimorris/codecompanion.nvim",
@@ -13,6 +15,58 @@ return {
       -- NOTE: The log_level is in `opts.opts`
       opts = {
         log_level = "DEBUG", -- or "TRACE"
+      },
+
+      display = {
+        action_palette = {
+          provider = "snacks", -- Can be "default", "telescope", "fzf_lua", "mini_pick" or "snacks". If not specified, the plugin will autodetect installed providers.
+          opts = {
+            show_default_actions = true, -- Show the default actions in the action palette?
+            show_default_prompt_library = true, -- Show the default prompt library in the action palette?
+            title = "CodeCompanion actions", -- The title of the action palette
+          },
+        },
+      },
+
+      -- Strategies
+      strategies = {
+        chat = {
+          adapter = "gemini_cli",
+        },
+        inline = {
+          adapter = "gemini_cli",
+        },
+        cmd = {
+          adapter = "gemini_cli",
+        },
+      },
+
+      -- Adapters
+      adapters = {
+        acp = {
+          gemini_cli = function()
+            return require("codecompanion.adapters").extend("gemini_cli", {
+              commands = {
+                flash = {
+                  "gemini",
+                  "--experimental-acp",
+                  "-m",
+                  "gemini-2.5-flash",
+                },
+                pro = {
+                  "gemini",
+                  "--experimental-acp",
+                  "-m",
+                  "gemini-2.5-pro",
+                },
+              },
+              defaults = {
+                -- auth_method = "gemini-api-key", -- "oauth-personal" | "gemini-api-key" | "vertex-ai"
+                auth_method = "oauth-personal",
+              },
+            })
+          end,
+        },
       },
     },
   },
