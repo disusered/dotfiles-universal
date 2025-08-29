@@ -24,6 +24,33 @@ return {
       end,
       desc = "Disable cursorline for csvview",
     })
+
+    -- Use snacks to create a toggle for csvview for the specific buffer
+    vim.api.nvim_create_autocmd("User", {
+      pattern = "VeryLazy",
+      callback = function()
+        local Snacks = require("snacks")
+
+        Snacks.toggle
+          .new({
+            name = "Render Markdown",
+            get = function()
+              local bufnr = vim.api.nvim_get_current_buf()
+              return require("csvview").is_enabled(bufnr)
+            end,
+            set = function(enabled)
+              local bufnr = vim.api.nvim_get_current_buf()
+              local c = require("csvview")
+              if enabled then
+                c.enable(bufnr)
+              else
+                c.disable(bufnr)
+              end
+            end,
+          })
+          :map("<leader>uv")
+      end,
+    })
   end,
   ---@module "csvview"
   ---@type CsvView.Options
@@ -41,30 +68,4 @@ return {
       jump_prev_row = { "<S-Enter>", mode = { "n", "v" } },
     },
   },
-  keys = function()
-    local csvview = require("csvview")
-    local wk = require("which-key")
-    wk.add({
-      {
-        "<leader>uv",
-        function()
-          if csvview.is_enabled() then
-            csvview.disable()
-          else
-            csvview.enable()
-          end
-        end,
-        desc = function()
-          return csvview.is_enabled() and "Disable CSV View" or "Enable CSV View"
-        end,
-        icon = function()
-          if csvview.is_enabled() then
-            return { icon = "", color = "green" }
-          else
-            return { icon = "", color = "yellow" }
-          end
-        end,
-      },
-    })
-  end,
 }
