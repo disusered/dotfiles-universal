@@ -124,10 +124,11 @@ return {
   -- https://codecompanion.olimorris.dev/installation.html#render-markdown-nvim
   {
     "MeanderingProgrammer/render-markdown.nvim",
-    ft = {
-      -- "markdown",
-      "codecompanion",
-    },
+    ft = function()
+      return {
+        "codecompanion",
+      }
+    end,
   },
   -- TODO: Paste images
   -- https://codecompanion.olimorris.dev/installation.html#img-clip-nvim
