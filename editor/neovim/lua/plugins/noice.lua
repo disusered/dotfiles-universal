@@ -19,6 +19,20 @@ return {
       inc_rename = false,
     },
     routes = {
+      {
+        filter = {
+          event = "notify",
+          find = "^🤖",
+        },
+        view = "mini",
+      },
+      {
+        filter = {
+          event = "msg_show",
+          find = "^🤖",
+        },
+        view = "mini",
+      },
       -- Send docker-compose DB notifications to mini view
       {
         filter = {

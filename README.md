@@ -103,6 +103,8 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [ ] Workspaces
   - [x] Disable render markdown in non-CodeCompanion windows
   - [ ] Inline prompt improvements
+  - [x] Progress
+
 - [ ] Kulala
   - [x] Plugin
   - [x] LSP

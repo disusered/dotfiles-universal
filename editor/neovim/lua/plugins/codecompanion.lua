@@ -10,6 +10,7 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
+      "folke/noice.nvim",
     },
     init = function()
       -- Use snacks to create a toggle for CodeCompanion chat
@@ -45,8 +46,8 @@ return {
       })
     end,
     config = function(_, opts)
-      local spinner = require("plugins.codecompanion.spinner")
-      spinner:init()
+      local notifications = require("plugins.codecompanion.notifications")
+      notifications:init()
 
       -- Setup the entire opts table
       require("codecompanion").setup(opts)
@@ -159,7 +160,7 @@ return {
           gemini_cli = function()
             return require("codecompanion.adapters").extend("gemini_cli", {
               commands = {
-                flash = {
+                default = {
                   "gemini",
                   "--experimental-acp",
                   "-m",
