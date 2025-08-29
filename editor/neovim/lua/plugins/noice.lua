@@ -19,12 +19,28 @@ return {
       inc_rename = false,
     },
     routes = {
+      -- Send docker-compose DB notifications to mini view
+      {
+        filter = {
+          event = "msg_show",
+          find = "docker%-compose%.yml",
+        },
+        view = "mini",
+      },
       {
         filter = {
           event = "notify",
           find = "docker%-compose%.yml",
         },
         view = "mini",
+      },
+      -- Send long print messages to popup view
+      {
+        filter = {
+          event = "msg_show",
+          min_height = 10,
+        },
+        view = "popup",
       },
     },
   },
