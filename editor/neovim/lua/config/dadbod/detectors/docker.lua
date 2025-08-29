@@ -25,13 +25,14 @@ end
 
 function M.find()
   local compose_path = vim.fn.findfile("docker-compose.yml", ".;") or vim.fn.findfile("docker-compose.yaml", ".;")
-  if not compose_path then
+  if not compose_path or compose_path == "" then
+    vim.notify("  No docker-compose.yml found in current or parent directories.", vim.log.levels.INFO)
     return nil
   end
 
   local ok, compose_data = pcall(vim.fn["rails#yaml_parse_file"], compose_path)
   if not ok or type(compose_data) ~= "table" then
-    vim.notify("Failed to parse docker-compose.yml. Is vim-rails installed?", vim.log.levels.WARN)
+    vim.notify("  Failed to parse docker-compose.yml. Check file format.", vim.log.levels.WARN)
     return nil
   end
 
@@ -116,7 +117,7 @@ function M.find()
     end)
     -- ADD THIS LINE BACK IN
     vim.notify(
-      "Found " .. #connections .. " Docker database connections.",
+      "  Found " .. #connections .. " Docker database connections in docker-compose.yml.",
       vim.log.levels.INFO,
       { title = "vim-dadbod-ui" }
     )

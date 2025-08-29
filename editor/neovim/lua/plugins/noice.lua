@@ -11,9 +11,21 @@ return {
       enabled = true,
       view = "cmdline",
     },
+    messages = {
+      enabled = true,
+    },
     presets = {
       -- Don't use Noice's rename prompt
       inc_rename = false,
+    },
+    routes = {
+      {
+        filter = {
+          event = "notify",
+          find = "docker%-compose%.yml",
+        },
+        view = "mini",
+      },
     },
   },
   keys = {
