@@ -1,37 +1,6 @@
 return {
   "nvim-lualine/lualine.nvim",
   opts = function(_, opts)
-    -- Define the Code Companion Spinner Component ##
-    local code_companion_status = {
-      processing = false,
-      spinner_index = 1,
-      spinner_symbols = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" },
-    }
-
-    -- Create autocommands to toggle the spinner's visibility and animation
-    local group = vim.api.nvim_create_augroup("CodeCompanionHooks", { clear = true })
-    vim.api.nvim_create_autocmd({ "User" }, {
-      pattern = "CodeCompanionRequest*",
-      group = group,
-      callback = function(request)
-        if request.match == "CodeCompanionRequestStarted" then
-          code_companion_status.processing = true
-        elseif request.match == "CodeCompanionRequestFinished" then
-          code_companion_status.processing = false
-        end
-      end,
-    })
-
-    -- This is the function that lualine will call to get the spinner's current state
-    local function get_spinner()
-      if code_companion_status.processing then
-        local len = #code_companion_status.spinner_symbols
-        code_companion_status.spinner_index = (code_companion_status.spinner_index % len) + 1
-        return code_companion_status.spinner_symbols[code_companion_status.spinner_index]
-      end
-      return "" -- Return an empty string when not processing to hide the component
-    end
-
     opts.options.component_separators = ""
     opts.options.section_separators = { left = "", right = "" }
 
@@ -71,16 +40,12 @@ return {
       },
     }
 
-    -- ## 3. Add the Spinner to the 'lualine_x' Section ##
     opts.sections.lualine_x = {
-      -- Spinner Component (will only show when active)
-      get_spinner,
-
       -- DAP
       Snacks.profiler.status(),
       {
         function()
-          return " " .. require("dap").status()
+          return "  " .. require("dap").status()
         end,
         cond = function()
           return package.loaded["dap"] and require("dap").status() ~= ""

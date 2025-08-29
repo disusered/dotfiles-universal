@@ -44,6 +44,13 @@ return {
         end,
       })
     end,
+    config = function(_, opts)
+      local spinner = require("plugins.codecompanion.spinner")
+      spinner:init()
+
+      -- Setup the entire opts table
+      require("codecompanion").setup(opts)
+    end,
     keys = {
       { "<leader>a", "", desc = "+ai", mode = { "n", "v" } },
       {
@@ -59,15 +66,6 @@ return {
         function()
           return require("codecompanion").close_last_chat()
         end,
-        desc = "Clear (CodeCompanion)",
-        mode = { "n", "v" },
-      },
-      {
-        "<leader>ad",
-        function()
-          return require("codecompanion").close_last_chat()
-        end,
-        desc = "Delete Chat (CodeCompanion)",
         mode = { "n", "v" },
       },
       {
@@ -133,6 +131,17 @@ return {
             send = {
               modes = { n = "<CR>", i = "<C-s>" },
               opts = {},
+            },
+          },
+          actions = {
+            send = {
+              callback = function(chat)
+                vim.cmd("stopinsert")
+                chat:submit()
+                chat:add_buf_message({ role = "llm", content = "" })
+              end,
+              index = 1,
+              description = "Send",
             },
           },
         },
