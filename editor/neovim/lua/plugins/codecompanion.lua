@@ -18,33 +18,19 @@ return {
         callback = function()
           local Snacks = require("snacks")
 
-          -- Variable to track chat state
-          local is_chat_open = false
-
-          -- Autocommands to update the state
-          local group = vim.api.nvim_create_augroup("CodeCompanionSnacksToggle", { clear = true })
-          vim.api.nvim_create_autocmd("User", {
-            pattern = "CodeCompanionChatOpened",
-            group = group,
-            callback = function()
-              is_chat_open = true
-            end,
-          })
-          vim.api.nvim_create_autocmd("User", {
-            pattern = { "CodeCompanionChatHidden", "CodeCompanionChatClosed" },
-            group = group,
-            callback = function()
-              is_chat_open = false
-            end,
-          })
-
           Snacks.toggle.new({
             id = "codecompanion_chat",
             name = "CodeCompanion Chat",
             notify = false,
             get = function()
-              -- Return the state we are tracking
-              return is_chat_open
+              -- Check if a codecompanion buffer is visible in any window
+              for _, win in ipairs(vim.api.nvim_list_wins()) do
+                local bufnr = vim.api.nvim_win_get_buf(win)
+                if vim.bo[bufnr].filetype == "codecompanion" then
+                  return true
+                end
+              end
+              return false
             end,
             set = function(enabled)
               -- Use the correct functions to open/close
@@ -59,7 +45,6 @@ return {
       })
     end,
     keys = {
-      { "<c-s>", "<CR>", ft = "codecompanion", desc = "Submit Prompt", remap = true },
       { "<leader>a", "", desc = "+ai", mode = { "n", "v" } },
       {
         "<leader>aa",
@@ -86,18 +71,18 @@ return {
         mode = { "n", "v" },
       },
       {
-        "<leader>af",
+        "<leader>av",
         function()
-          local file = vim.fn.expand("%:p")
-          if file and file ~= "" then
-            require("codecompanion").add(file)
-            vim.notify("Added " .. file .. " to CodeCompanion context")
+          local selection = vim.fn.expand("%:p")
+          if selection and selection ~= "" then
+            require("codecompanion").add({ source = selection })
+            vim.notify("Added " .. selection .. " to CodeCompanion context")
           else
-            vim.notify("No file to add to context", vim.log.levels.WARN)
+            vim.notify("No selection to add to context", vim.log.levels.WARN)
           end
         end,
-        desc = "Add File (CodeCompanion)",
-        mode = { "n", "v" },
+        desc = "Add Selection (CodeCompanion)",
+        mode = { "v" },
       },
       {
         "<leader>aq",
@@ -144,6 +129,12 @@ return {
       strategies = {
         chat = {
           adapter = "gemini_cli",
+          keymaps = {
+            send = {
+              modes = { n = "<CR>", i = "<C-s>" },
+              opts = {},
+            },
+          },
         },
         inline = {
           adapter = "gemini_cli",
