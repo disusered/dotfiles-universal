@@ -33,7 +33,7 @@ return {
 
         Snacks.toggle
           .new({
-            name = "Render Markdown",
+            name = "Toggle CSV View",
             get = function()
               local bufnr = vim.api.nvim_get_current_buf()
               return require("csvview").is_enabled(bufnr)

@@ -1,6 +1,6 @@
 # Universal Dotfiles
 
-**Linux/Mac**
+## Linux/Mac
 
 ```sh
 # Install dependencies for Rotz
@@ -16,7 +16,7 @@ curl -fsSL volllly.github.io/rotz/install.sh | sh
 ~/.rotz/bin/rotz install
 ```
 
-**Windows**
+## Windows
 
 ```powershell
 irm volllly.github.io/rotz/install.ps1 | iex
@@ -78,11 +78,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 
 - [x] Launch PowerShell 7 in Wezterm in new tab
 - [x] Zoxide <https://github.com/ajeetdsouza/zoxide>
-- [ ] Unix shell completion in PS <https://github.com/PowerShell/Modules/tree/master/Modules/Microsoft.PowerShell.UnixCompleters>
-- [ ] Dev drive <https://learn.microsoft.com/en-us/windows/dev-drive/>
-- [ ] SSH (eval agent in wsl, 1Password agent in Windows)
-  - [ ] WSL config with ssh agent
-  - [ ] Windows config with IdentityAgent and 1Password
+- [ ] %LOCALAPPDATA% for windows links
 - [x] Neotest in Windows
 - [x] Param completion
 - [x] Git log interactive
@@ -98,13 +94,25 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [x] Neovim
 - [ ] Starship show sudo status
 - [ ] Neovim wrap sidebar icon like screenshot
-- [ ] Neovim show selection stats (lines, words, characters) in statusline
+- [ ] Neovim show selection stats (lines, words, characters) in statusline for Markdown
 - [ ] WSL config <https://learn.microsoft.com/en-us/windows/wsl/wsl-config>
+- [x] CodeCompanion
+  - [x] Gemini CLI with ACP
+  - [x] Gemini MCP with ACP
+  - [x] Keymaps derived from Lazyvim AI extras
+  - [ ] Workspaces
+  - [x] Disable render markdown in non-CodeCompanion windows
+  - [ ] Inline prompt improvements
 - [ ] Kulala
   - [x] Plugin
   - [x] LSP
   - [x] Formatter
   - [ ] Dependencies <https://neovim.getkulala.net/docs/getting-started/requirements>
+- [ ] Unix shell completion in PS <https://github.com/PowerShell/Modules/tree/master/Modules/Microsoft.PowerShell.UnixCompleters>
+- [ ] Dev drive <https://learn.microsoft.com/en-us/windows/dev-drive/>
+- [ ] SSH (eval agent in wsl, 1Password agent in Windows)
+  - [ ] WSL config with ssh agent
+  - [ ] Windows config with IdentityAgent and 1Password
 
 ## WSL
 
