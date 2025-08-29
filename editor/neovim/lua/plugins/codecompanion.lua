@@ -11,6 +11,54 @@ return {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
     },
+    init = function()
+      -- Use snacks to create a toggle for CodeCompanion chat
+      vim.api.nvim_create_autocmd("User", {
+        pattern = "VeryLazy",
+        callback = function()
+          local Snacks = require("snacks")
+
+          -- Variable to track chat state
+          local is_chat_open = false
+
+          -- Autocommands to update the state
+          local group = vim.api.nvim_create_augroup("CodeCompanionSnacksToggle", { clear = true })
+          vim.api.nvim_create_autocmd("User", {
+            pattern = "CodeCompanionChatOpened",
+            group = group,
+            callback = function()
+              is_chat_open = true
+            end,
+          })
+          vim.api.nvim_create_autocmd("User", {
+            pattern = { "CodeCompanionChatHidden", "CodeCompanionChatClosed" },
+            group = group,
+            callback = function()
+              is_chat_open = false
+            end,
+          })
+
+          Snacks.toggle
+            .new({
+              name = "CodeCompanion Chat",
+              notify = false,
+              get = function()
+                -- Return the state we are tracking
+                return is_chat_open
+              end,
+              set = function(enabled)
+                -- Use the correct functions to open/close
+                if enabled then
+                  require("codecompanion").chat()
+                else
+                  require("codecompanion").close_last_chat()
+                end
+              end,
+            })
+            :map("<leader>aa")
+        end,
+      })
+    end,
     opts = {
       -- NOTE: The log_level is in `opts.opts`
       opts = {
