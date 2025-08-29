@@ -11,3 +11,4 @@ swatch*
 pr
 .aider*
 !confs/aider/.aider.conf.yml
+opencode.jsonc
