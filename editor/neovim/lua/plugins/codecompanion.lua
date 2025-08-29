@@ -38,27 +38,90 @@ return {
             end,
           })
 
-          Snacks.toggle
-            .new({
-              name = "CodeCompanion Chat",
-              notify = false,
-              get = function()
-                -- Return the state we are tracking
-                return is_chat_open
-              end,
-              set = function(enabled)
-                -- Use the correct functions to open/close
-                if enabled then
-                  require("codecompanion").chat()
-                else
-                  require("codecompanion").close_last_chat()
-                end
-              end,
-            })
-            :map("<leader>aa")
+          Snacks.toggle.new({
+            id = "codecompanion_chat",
+            name = "CodeCompanion Chat",
+            notify = false,
+            get = function()
+              -- Return the state we are tracking
+              return is_chat_open
+            end,
+            set = function(enabled)
+              -- Use the correct functions to open/close
+              if enabled then
+                require("codecompanion").chat()
+              else
+                require("codecompanion").close_last_chat()
+              end
+            end,
+          })
         end,
       })
     end,
+    keys = {
+      { "<c-s>", "<CR>", ft = "codecompanion", desc = "Submit Prompt", remap = true },
+      { "<leader>a", "", desc = "+ai", mode = { "n", "v" } },
+      {
+        "<leader>aa",
+        function()
+          require("snacks").toggle.get("codecompanion_chat"):toggle()
+        end,
+        desc = "Toggle (CodeCompanion)",
+        mode = { "n", "v" },
+      },
+      {
+        "<leader>ax",
+        function()
+          return require("codecompanion").close_last_chat()
+        end,
+        desc = "Clear (CodeCompanion)",
+        mode = { "n", "v" },
+      },
+      {
+        "<leader>ad",
+        function()
+          return require("codecompanion").close_last_chat()
+        end,
+        desc = "Delete Chat (CodeCompanion)",
+        mode = { "n", "v" },
+      },
+      {
+        "<leader>af",
+        function()
+          local file = vim.fn.expand("%:p")
+          if file and file ~= "" then
+            require("codecompanion").add(file)
+            vim.notify("Added " .. file .. " to CodeCompanion context")
+          else
+            vim.notify("No file to add to context", vim.log.levels.WARN)
+          end
+        end,
+        desc = "Add File (CodeCompanion)",
+        mode = { "n", "v" },
+      },
+      {
+        "<leader>aq",
+        function()
+          vim.ui.input({
+            prompt = "Quick Chat: ",
+          }, function(input)
+            if input and input ~= "" then
+              require("codecompanion").cmd(input)
+            end
+          end)
+        end,
+        desc = "Quick Chat (CodeCompanion)",
+        mode = { "n", "v" },
+      },
+      {
+        "<leader>ap",
+        function()
+          require("codecompanion").actions()
+        end,
+        desc = "Prompt Actions (CodeCompanion)",
+        mode = { "n", "v" },
+      },
+    },
     opts = {
       -- NOTE: The log_level is in `opts.opts`
       opts = {
@@ -67,7 +130,8 @@ return {
 
       display = {
         action_palette = {
-          provider = "snacks", -- Can be "default", "telescope", "fzf_lua", "mini_pick" or "snacks". If not specified, the plugin will autodetect installed providers.
+          -- FIXME: snacks does not work with chat selector
+          provider = "default", -- Can be "default", "telescope", "fzf_lua", "mini_pick" or "snacks". If not specified, the plugin will autodetect installed providers.
           opts = {
             show_default_actions = true, -- Show the default actions in the action palette?
             show_default_prompt_library = true, -- Show the default prompt library in the action palette?
