@@ -1,0 +1,7 @@
+windows:
+  installs:
+    cmd: scoop install win32yank
+    depends:
+      - /packages/scoop
+linux|darwin:
+  installs: false

@@ -49,7 +49,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
       - [x] CascadiaCode-NF-Mono
       - [x] Hasklig
       - [x] hack-font
-    - [ ] Apps
+    - [x] Apps
       - [x] dotnet
       - [x] fd.exe
       - [x] git.exe
@@ -71,7 +71,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
       - [x] python
       - [x] golang
       - [x] node
-      - [ ] win32yank.exe
+      - [x] win32yank.exe
 - [ ] WinUtil <https://github.com/ChrisTitusTech/winutil>
 
 ## Etc
