@@ -109,6 +109,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [x] LSP
   - [x] Formatter
   - [x] Dependencies <https://neovim.getkulala.net/docs/getting-started/requirements>
+- [x] Rancher Desktop WSL integration <https://docs.rancherdesktop.io/getting-started/wsl-integration/>
 - [ ] Unix shell completion in PS <https://github.com/PowerShell/Modules/tree/master/Modules/Microsoft.PowerShell.UnixCompleters>
 - [ ] Dev drive <https://learn.microsoft.com/en-us/windows/dev-drive/>
 - [ ] SSH (eval agent in wsl, 1Password agent in Windows)
