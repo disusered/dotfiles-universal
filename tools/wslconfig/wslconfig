@@ -1,0 +1,4 @@
+[wsl2]
+memory=24GB
+swap=12GB
+guiApplications=true

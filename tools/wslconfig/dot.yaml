@@ -1,0 +1,7 @@
+linux|darwin:
+  installs: false
+windows:
+  installs: false
+  links:
+    wslconfig: >-
+      {{ env.UserProfile }}/.wslconfig
