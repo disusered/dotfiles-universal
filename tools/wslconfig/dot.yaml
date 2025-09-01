@@ -3,7 +3,5 @@ linux|darwin:
 windows:
   installs: false
   links:
-    wslconfig: >-
-      {{ env.UserProfile }}/.wslconfig
-    wslgconfig: >-
-      {{ env.AppData }}/.wslgconfig
+    wslconfig: ~/.wslconfig
+    wslgconfig: ~/.wslgconfig

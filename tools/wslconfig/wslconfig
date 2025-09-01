@@ -1,4 +1,16 @@
 [wsl2]
-memory=24GB
-swap=12GB
 guiApplications=true
+
+# https://learn.microsoft.com/en-us/windows/wsl/wsl-config#example-wslconf-file
+# Per-distro settings go in /etc/wsl.conf
+
+# WSL2-specific options
+[wsl2]
+#processors = 4            # Makes the WSL 2 VM use two virtual processors
+memory = 24GB              # Limits VM memory in WSL 2
+swap=12GB                  # Increases the size of the swap file
+#localhostforwarding=true  # bind WSL 2 localhost to Windows localhost
+
+# Docker WSL - https://docs.docker.com/desktop/features/wsl/
+[experimental]
+autoMemoryReclaim = DropCache
