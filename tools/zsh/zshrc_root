@@ -1,0 +1,2 @@
+# Include local configuration
+for zshSource in ~/.config/zsh/*zsh; do source $zshSource; done

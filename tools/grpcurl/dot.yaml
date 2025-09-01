@@ -1,0 +1,10 @@
+windows:
+  installs:
+    cmd: scoop install main/grpcurl
+    depends:
+      - /packages/scoop
+linux:
+  installs:
+    cmd: brew install grpcurl
+    depends:
+      - /packages/homebrew

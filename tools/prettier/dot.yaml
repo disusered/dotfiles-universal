@@ -1,0 +1,5 @@
+global:
+  installs:
+    cmd: npm install -g prettier
+    depends:
+      - /languages/node/latest

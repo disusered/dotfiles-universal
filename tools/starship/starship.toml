@@ -7,6 +7,7 @@ palette = "catppuccin_mocha"
 # Pure preset
 format = """
 $shell\
+$sudo\
 $directory\
 $git_branch\
 $git_metrics\
@@ -47,6 +48,11 @@ powershell_indicator = ' '
 style = 'cyan bold'
 disabled = false
 
+[sudo]
+format = '[$symbol]($style)'
+symbol = "󱀊  "
+disabled = false
+
 [directory]
 read_only = " 󰌾"
 truncation_length = 4
@@ -79,9 +85,9 @@ style = "yellow"
 
 [memory_usage]
 disabled = false
-threshold = 75 # only show if memory usage is above this percentage
+threshold = 75                                   # only show if memory usage is above this percentage
 symbol = '󰍛 '
-format='$symbol [${ram}( | ${swap})]($style) '
+format = '$symbol [${ram}( | ${swap})]($style) '
 style = 'bold dimmed red'
 
 [time]

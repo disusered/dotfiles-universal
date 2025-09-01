@@ -92,7 +92,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [x] Ripgrep
   - [x] Explorer
   - [x] Neovim
-- [ ] Starship show sudo status
+- [x] Starship show sudo status
 - [ ] Neovim wrap sidebar icon like screenshot
 - [ ] Neovim show selection stats (lines, words, characters) in statusline for Markdown
 - [ ] WSL config <https://learn.microsoft.com/en-us/windows/wsl/wsl-config>
@@ -104,12 +104,11 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [x] Disable render markdown in non-CodeCompanion windows
   - [ ] Inline prompt improvements
   - [x] Progress
-
-- [ ] Kulala
+- [x] Kulala
   - [x] Plugin
   - [x] LSP
   - [x] Formatter
-  - [ ] Dependencies <https://neovim.getkulala.net/docs/getting-started/requirements>
+  - [x] Dependencies <https://neovim.getkulala.net/docs/getting-started/requirements>
 - [ ] Unix shell completion in PS <https://github.com/PowerShell/Modules/tree/master/Modules/Microsoft.PowerShell.UnixCompleters>
 - [ ] Dev drive <https://learn.microsoft.com/en-us/windows/dev-drive/>
 - [ ] SSH (eval agent in wsl, 1Password agent in Windows)
