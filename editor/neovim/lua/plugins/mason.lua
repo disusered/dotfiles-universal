@@ -57,6 +57,8 @@ return {
       -- Web Development Formatters
       "prettier", -- General purpose formatter
       "prettierd", -- Daemonized for speed
+      -- AI
+      "vectorcode", -- Process local files for AI code assistance
     })
 
     -- Conditionally add 'checkmake' if the OS is not Windows

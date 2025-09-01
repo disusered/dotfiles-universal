@@ -1,19 +1,19 @@
--- TODO: MCP
--- https://codecompanion.olimorris.dev/installation.html#installing-extensions or ACP Gemini
-
--- TODO: VectorCode
+-- TODO: VectorCode (Done)
 -- https://github.com/Davidyz/VectorCode/blob/main/docs/cli.md#installation
 -- https://github.com/Davidyz/VectorCode/blob/main/docs/neovim/README.md
 return {
   {
     "olimorris/codecompanion.nvim",
+
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
+      "Davidyz/VectorCode",
       "folke/noice.nvim",
     },
+
+    -- Use snacks to create a toggle for CodeCompanion chat
     init = function()
-      -- Use snacks to create a toggle for CodeCompanion chat
       vim.api.nvim_create_autocmd("User", {
         pattern = "VeryLazy",
         callback = function()
@@ -45,13 +45,15 @@ return {
         end,
       })
     end,
+
+    -- Route notifications through our custom handler
     config = function(_, opts)
       local notifications = require("plugins.codecompanion.notifications")
       notifications:init()
-
-      -- Setup the entire opts table
       require("codecompanion").setup(opts)
     end,
+
+    -- Keymaps
     keys = {
       { "<leader>a", "", desc = "+ai", mode = { "n", "v" } },
       {
@@ -106,6 +108,8 @@ return {
         mode = { "n", "v" },
       },
     },
+
+    -- Plugin options
     opts = {
       -- NOTE: The log_level is in `opts.opts`
       opts = {
@@ -164,13 +168,13 @@ return {
                   "gemini",
                   "--experimental-acp",
                   "-m",
-                  "gemini-2.5-flash",
+                  "gemini-1.5-flash", -- Updated to 1.5-flash from 2.5
                 },
                 pro = {
                   "gemini",
                   "--experimental-acp",
                   "-m",
-                  "gemini-2.5-pro",
+                  "gemini-1.5-pro", -- Updated to 1.5-pro from 2.5
                 },
               },
               defaults = {
@@ -210,10 +214,48 @@ return {
                       },
                     },
                   },
+                  -- VectorCode MCP Server
+                  -- {
+                  --   name = "vectorcode-mcp-server",
+                  --   command = "vectorcode-mcp-server",
+                  --   args = {},
+                  -- },
                 },
               },
             })
           end,
+        },
+      },
+
+      -- VectorCode Integration
+      extensions = {
+        vectorcode = {
+          opts = {
+            tool_group = {
+              enabled = true,
+              extras = {},
+              collapse = false,
+            },
+            tool_opts = {
+              ["*"] = {
+                -- TODO: Set up with LSP
+                -- Use LSP for a better experience (e.g., fidget notifications)
+                -- This will be false if `async_backend` in VectorCode setup is not "lsp".
+                use_lsp = false,
+              },
+              query = {
+                max_num = { chunk = -1, document = -1 },
+                default_num = { chunk = 50, document = 10 },
+                no_duplicate = true, -- Avoid retrieving the same files again in a chat
+                chunk_mode = false,
+                summarise = {
+                  enabled = false, -- Can be enabled dynamically by asking the LLM
+                  adapter = nil, -- Use the chat adapter by default
+                  query_augmented = true,
+                },
+              },
+            },
+          },
         },
       },
     },

@@ -32,7 +32,6 @@ function M:_update()
   local last_line = vim.api.nvim_buf_line_count(buf) - 1
   vim.api.nvim_buf_set_extmark(buf, self.namespace_id, last_line, 0, {
     virt_lines = { { { self.spinner_symbols[self.spinner_index] .. " Processing...", "Comment" } } },
-    virt_lines_above = true,
   })
 end
 
