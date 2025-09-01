@@ -54,5 +54,7 @@ windows:
       - /languages/node/latest
   links:
     neovim.ps1: ~/.config/powershell/profile.d/neovim.ps1
-    init.lua: ~/AppData/Local/nvim/init.lua
-    lua: ~/AppData/Local/nvim/lua
+    init.lua: >-
+      {{ env.LOCALAPPDATA }}/nvim/init.lua
+    lua: >-
+      {{ env.LOCALAPPDATA }}/nvim/lua

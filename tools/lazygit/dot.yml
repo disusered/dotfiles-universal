@@ -7,7 +7,8 @@ windows:
       - /tools/bat
       - /tools/git
   links:
-    config_windows.yaml: ~/AppData/Local/lazygit/config.yml
+    config_windows.yaml: >-
+      {{ env.LOCALAPPDATA }}/lazygit/config.yml
 linux:
   installs:
     cmd: brew install lazygit

@@ -7,7 +7,8 @@ windows:
       - /tools/delta
   links:
     ripgrep.ps1: ~/.config/powershell/profile.d/ripgrep.ps1
-    ripgreprc: ~/AppData/Local/ripgrep/ripgreprc
+    ripgreprc: >-
+      {{ env.LOCALAPPDATA }}/ripgrep/ripgreprc
 linux:
   installs:
     cmd: brew install ripgrep

@@ -78,7 +78,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 
 - [x] Launch PowerShell 7 in Wezterm in new tab
 - [x] Zoxide <https://github.com/ajeetdsouza/zoxide>
-- [ ] %LOCALAPPDATA% for windows links
+- [x] %LOCALAPPDATA% for windows links
 - [x] Neotest in Windows
 - [x] Param completion
 - [x] Git log interactive
