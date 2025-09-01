@@ -95,7 +95,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [x] Starship show sudo status
 - [ ] Neovim wrap sidebar icon like screenshot
 - [ ] Neovim show selection stats (lines, words, characters) in statusline for Markdown
-- [ ] WSL config <https://learn.microsoft.com/en-us/windows/wsl/wsl-config>
+- [x] WSL config <https://learn.microsoft.com/en-us/windows/wsl/wsl-config>
 - [x] CodeCompanion
   - [x] Gemini CLI with ACP
   - [x] Gemini MCP with ACP
@@ -114,6 +114,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [ ] SSH (eval agent in wsl, 1Password agent in Windows)
   - [ ] WSL config with ssh agent
   - [ ] Windows config with IdentityAgent and 1Password
+- [ ] Install and configure navi <https://github.com/denisidoro/navi>
 
 ## WSL
 

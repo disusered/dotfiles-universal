@@ -1,0 +1,8 @@
+windows:
+  installs:
+    cmd: scoop install main/rancher-compose
+    depends:
+      - /packages/scoop
+linux:
+  # TODO: Install when not in WSL
+  installs: false
