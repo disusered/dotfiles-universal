@@ -131,7 +131,7 @@ return {
       -- Strategies
       strategies = {
         chat = {
-          adapter = "gemini_cli",
+          adapter = "copilot",
           keymaps = {
             send = {
               modes = { n = "<CR>", i = "<C-s>" },
@@ -151,10 +151,10 @@ return {
           },
         },
         inline = {
-          adapter = "gemini_cli",
+          adapter = "copilot",
         },
         cmd = {
-          adapter = "gemini_cli",
+          adapter = "copilot",
         },
       },
 
