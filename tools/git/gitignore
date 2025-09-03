@@ -12,3 +12,5 @@ pr
 .aider*
 !confs/aider/.aider.conf.yml
 opencode.jsonc
+.claude/
+CLAUDE.md
