@@ -1,0 +1,10 @@
+linux|darwin:
+  installs:
+    cmd: brew install gh
+    depends:
+      - /packages/homebrew
+windows:
+  installs:
+    cmd: scoop install main/gh
+    depends:
+      - /packages/scoop
