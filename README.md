@@ -101,9 +101,15 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [x] Gemini MCP with ACP
   - [x] Keymaps derived from Lazyvim AI extras
   - [ ] Workspaces
-  - [x] Disable render markdown in non-CodeCompanion windows
+  - [ ] CodeCompanion History <https://github.com/ravitemer/codecompanion-history.nvim>
   - [ ] Inline prompt improvements
+  - [x] Disable render markdown in non-CodeCompanion windows
   - [x] Progress
+  - [ ] Anthropic oAuth <https://github.com/olimorris/codecompanion.nvim/discussions/1984>
+- [ ] Claude
+  - [ ] Claude Code
+  - [ ] Claude MCP <https://www.reddit.com/r/ClaudeAI/comments/1jf4hnt/setting_up_mcp_servers_in_claude_code_a_tech/>
+- [ ] Zed
 - [x] Kulala
   - [x] Plugin
   - [x] LSP

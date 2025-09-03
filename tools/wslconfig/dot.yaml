@@ -5,3 +5,5 @@ windows:
   links:
     wslconfig: >-
       {{ env.UserProfile }}/.wslconfig
+    wslgconfig: >-
+      {{ env.AppData }}/.wslgconfig
