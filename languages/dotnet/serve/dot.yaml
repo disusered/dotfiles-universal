@@ -1,0 +1,5 @@
+global:
+  installs:
+    cmd: dotnet tool install --global dotnet-serve
+    depends:
+      - /languages/dotnet/latest
