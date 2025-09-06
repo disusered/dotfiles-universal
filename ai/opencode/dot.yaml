@@ -1,3 +1,6 @@
+global:
+  links:
+    opencode.jsonc: ~/.config/opencode/opencode.jsonc
 windows:
   installs:
     cmd: scoop install extras/opencode

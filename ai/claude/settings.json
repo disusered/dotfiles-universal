@@ -26,7 +26,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -qE '\\.(ts|js|css)$'; then npx prettier --write \"$file_path\"; fi"
+            "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -qE '\\.(ts|js|css|html|json|yaml|md)$'; then npx prettier --write \"$file_path\"; fi"
           },
           {
             "type": "command",
@@ -35,6 +35,34 @@
           {
             "type": "command",
             "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -q '\\.cs$'; then csharpier format \"$file_path\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -q '\\.erb$'; then erb-formatter \"$file_path\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -q '\\.html\\.erb$'; then erb-formatter \"$file_path\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -q '\\.sql$'; then sqlfluff format --dialect ansi \"$file_path\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -q '\\.lua$'; then stylua \"$file_path\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -q '\\.sh$'; then shfmt -i 2 -ci -sr -br -bn -kp -l -w \"$file_path\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -q '\\.py$'; then black \"$file_path\" && isort \"$file_path\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -q '\\.rb$'; then rubocop -a \"$file_path\"; fi"
           }
         ]
       }
