@@ -22,6 +22,8 @@ return {
   },
   {
     "seblyng/roslyn.nvim",
+    ---@module 'roslyn.config'
+    ---@type RoslynNvimConfig
     ft = { "cs", "razor" },
     dependencies = {
       {
@@ -34,7 +36,7 @@ return {
     config = function()
       local mason_registry = require("mason-registry")
       local rzls_package = mason_registry.get_package("rzls")
-      local rzls_path = rzls_package:get_install_path()
+      local rzls_path = rzls_package:get_install_path() .. "/libexec"
 
       local cmd = {
         "roslyn",
