@@ -1,0 +1,7 @@
+global:
+  installs:
+    cmd: npm install -g @anthropic-ai/claude-code
+    depends:
+      - /languages/node/latest
+  links:
+    settings.json: ~/.claude/settings.json

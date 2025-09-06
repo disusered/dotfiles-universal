@@ -1,0 +1,23 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -qE '\\.(ts|js|css)$'; then npx prettier --write \"$file_path\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -q '\\.cshtml$'; then jb cleanupcode \"$file_path\"; fi"
+          },
+          {
+            "type": "command",
+            "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -q '\\.cs$'; then csharpier format \"$file_path\"; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
