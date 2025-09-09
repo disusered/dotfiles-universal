@@ -1,24 +1,4 @@
 {
-  "mcpServers": {
-    "sequential-thinking": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking"
-      ],
-      "env": {}
-    },
-    "fetch": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@kazuph/mcp-fetch"
-      ],
-      "env": {}
-    }
-  },
   "hooks": {
     "PostToolUse": [
       {
