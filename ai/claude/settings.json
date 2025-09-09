@@ -54,7 +54,7 @@
           },
           {
             "type": "command",
-            "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -q '\\.sh$'; then shfmt -i 2 -ci -sr -br -bn -kp -l -w \"$file_path\"; fi"
+            "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -q '\\.sh$'; then shfmt -i 2 -ci -sr -bn -kp - \"$file_path\"; fi"
           },
           {
             "type": "command",
