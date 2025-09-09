@@ -97,3 +97,9 @@ vim.opt.statuscolumn = [[%!v:lua.require'snacks.statuscolumn'.get()]]
 
 -- Automatically load changes to file
 vim.opt.autoread = true
+
+-- Enable local .nvim.lua/.vimrc/.exrc files
+vim.opt.exrc = true
+
+-- Disable shell and write commands in local .nvim.lua .vimrc .exrc files
+vim.opt.secure = false
