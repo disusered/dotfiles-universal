@@ -5,6 +5,8 @@ local module = {}
 
 function module.apply_to_config(config)
 	local keys = {
+		-- Shift+Enter to send literal Enter for Claude Code
+		{ key = "Enter", mods = "SHIFT", action = wezterm.action({ SendString = "\x1b\r" }) },
 		-- Add key binding for naming the current tab
 		{
 			key = "A",
