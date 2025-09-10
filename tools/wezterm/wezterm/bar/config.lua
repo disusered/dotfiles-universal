@@ -1,0 +1,113 @@
+local wez = require("wezterm")
+local utilities = require("utilities")
+
+---@private
+---@class bar.config
+local M = {}
+
+---@class option.separator
+---@field space number
+---@field left_icon string
+---@field right_icon string
+---@field field_icon string
+
+---@class option.module
+---@field enabled boolean
+---@field icon string
+---@field color number
+
+---@class option.clock : option.module
+---@field format string
+
+---@class option.modules
+---@field workspace option.module
+---@field leader option.module
+---@field pane option.module
+---@field username option.module
+---@field hostname option.module
+---@field clock option.clock
+---@field cwd option.module
+
+---@class option.padding.tabs
+---@field left number
+---@field right number
+
+---@class option.padding : option.padding.tabs
+---@field tabs option.padding.tabs
+
+---@class bar.options
+---@field position "top" | "bottom"
+---@field max_width number
+---@field separator option.separator
+---@field modules option.modules
+---@field padding option.padding
+M.options = {
+	position = "bottom",
+	max_width = 32,
+	padding = {
+		left = 1,
+		right = 1,
+		tabs = {
+			left = 1,
+			right = 2,
+		},
+	},
+	separator = {
+		space = 1,
+		left_icon = wez.nerdfonts.fa_long_arrow_right,
+		right_icon = wez.nerdfonts.fa_long_arrow_left,
+		field_icon = wez.nerdfonts.indent_line,
+	},
+	modules = {
+		workspace = {
+			enabled = true,
+			icon = wez.nerdfonts.cod_window,
+			color = 6,
+		},
+		leader = {
+			enabled = true,
+			icon = wez.nerdfonts.oct_rocket,
+			color = 1,
+		},
+		zoom = {
+			enabled = false,
+			icon = wez.nerdfonts.md_fullscreen,
+			color = 3,
+		},
+		pane = {
+			enabled = true,
+			icon = wez.nerdfonts.cod_multiple_windows,
+			color = 7,
+		},
+		username = {
+			enabled = true,
+			icon = wez.nerdfonts.fa_user,
+			color = 6,
+		},
+		hostname = {
+			enabled = true,
+			icon = wez.nerdfonts.cod_server,
+			color = 8,
+		},
+		cwd = {
+			enabled = true,
+			icon = wez.nerdfonts.oct_file_directory,
+			color = 7,
+		},
+		clock = {
+			enabled = true,
+			icon = wez.nerdfonts.md_calendar_clock,
+			format = "%H:%M",
+			color = 5,
+		},
+	},
+}
+
+---@param default bar.options
+---@param options bar.options
+---@return bar.options
+function M.extend_options(default, options)
+	return utilities._merge(default, options)
+end
+
+return M

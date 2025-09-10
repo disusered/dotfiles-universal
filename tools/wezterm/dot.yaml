@@ -1,3 +1,7 @@
 linux:
   links:
     wezterm.zsh: ~/.config/zsh/0003_wezterm.zsh
+windows:
+  links:
+    wezterm: ~/.config/wezterm
+    wezterm.lua: ~/.wezterm.lua
