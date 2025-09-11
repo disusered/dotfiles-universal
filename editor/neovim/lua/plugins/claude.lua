@@ -33,7 +33,7 @@ return {
       port_range = { min = 10000, max = 65535 },
       auto_start = true,
       log_level = "info", -- "trace", "debug", "info", "warn", "error"
-      terminal_cmd = "~/.local/share/mise/installs/node/24.7.0/bin/claude",
+      terminal_cmd = "/home/carlos/.local/share/mise/installs/node/24.7.0/bin/claude",
       -- For local installations: "~/.claude/local/claude"
       -- For native binary: use output from 'which claude'
 
@@ -49,18 +49,19 @@ return {
       terminal = {
         split_side = "right", -- "left" or "right"
         split_width_percentage = 0.30,
-        provider = "snacks", -- "auto", "snacks", "native", "external", or custom provider table
+        provider = "external", -- "auto", "snacks", "native", "external", or custom provider table
         auto_close = true,
         snacks_win_opts = {}, -- Opts to pass to `Snacks.terminal.open()` - see Floating Window section below
 
         -- Provider-specific options
-        -- TODO: Use Wezterm
         provider_opts = {
           -- Command for external terminal provider. Can be:
           -- 1. String with %s placeholder: "alacritty -e %s" (backward compatible)
           -- 2. String with two %s placeholders: "alacritty --working-directory %s -e %s" (cwd, command)
           -- 3. Function returning command: function(cmd, env) return "alacritty -e " .. cmd end
-          external_terminal_cmd = nil,
+          external_terminal_cmd = function(cmd, env)
+            return "wezterm.exe cli spawn --domain-name WSL:Fedora --cwd " .. vim.fn.getcwd()
+          end,
         },
       },
 
