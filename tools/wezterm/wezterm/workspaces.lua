@@ -7,15 +7,15 @@ function module.apply_to_config(config)
 	local win_home = wezterm.home_dir
 
 	local workspaces = {
-		{ id = "~", label = "Home (Fedora)", domain = "WSL:Fedora" },
+		-- { id = "~", label = "Home (Fedora)", domain = "WSL:Fedora" },
 		{ id = "~/.dotfiles", label = "Dotfiles (Ubuntu)", domain = "WSL:Ubuntu" },
 		{ id = "~/.dotfiles", label = "Dotfiles (Fedora)", domain = "WSL:Fedora" },
-		{ id = "~/Development/se", label = "CRI (Ubuntu)", domain = "WSL:Ubuntu" },
+		-- { id = "~/Development/se", label = "CRI (Ubuntu)", domain = "WSL:Ubuntu" },
 		{ id = "~/Development/cosmiq", label = "Cosmiq (Fedora)", domain = "WSL:Fedora" },
 		{ id = "~/Development/Brillai.API", label = "Brillai (Fedora)", domain = "WSL:Fedora" },
-		{ id = "~/Learning/", label = "Exercism (Ubuntu)", domain = "WSL:Ubuntu" },
+		-- { id = "~/Learning/", label = "Exercism (Ubuntu)", domain = "WSL:Ubuntu" },
 		{ id = win_home .. "/.dotfiles", label = "Dotfiles (Windows)", domain = "local" },
-		{ id = win_home .. "/Documents/Development/Brillai.API", label = "Brillai (Windows)", domain = "local" },
+		-- { id = win_home .. "/Documents/Development/Brillai.API", label = "Brillai (Windows)", domain = "local" },
 	}
 
 	-- Create a separate list for the InputSelector's choices.
