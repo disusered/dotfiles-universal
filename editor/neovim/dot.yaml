@@ -18,7 +18,6 @@ linux|darwin:
       - /tools/postgresql
       - /tools/grpcurl
       - /tools/websocat
-      - /tools/prettier
       - /tools/xmllint
       - /languages/lua/5.1
       - /languages/lua/hererocks
@@ -51,7 +50,6 @@ windows:
       - /tools/imagemagick
       - /tools/ghostscript
       - /tools/grpcurl
-      - /tools/prettier
       - /tools/xmllint
       - /languages/lua/5.1
       - /languages/lua/luarocks
