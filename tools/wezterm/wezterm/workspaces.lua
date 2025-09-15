@@ -10,6 +10,12 @@ function module.apply_to_config(config)
 		-- { id = "~", label = "Home (Fedora)", domain = "WSL:Fedora" },
 		{ id = "~/.dotfiles", label = "Dotfiles (Ubuntu)", domain = "WSL:Ubuntu" },
 		{ id = "~/.dotfiles", label = "Dotfiles (Fedora)", domain = "WSL:Fedora" },
+		{
+			id = "~/Learning/leetcode",
+			label = "LeetCode",
+			domain = "WSL:Fedora",
+			args = { "zsh", "-lic", "nvim leetcode.nvim" },
+		},
 		-- { id = "~/Development/se", label = "CRI (Ubuntu)", domain = "WSL:Ubuntu" },
 		{ id = "~/Development/cosmiq", label = "Cosmiq (Fedora)", domain = "WSL:Fedora" },
 		{ id = "~/Development/Brillai.API", label = "Brillai (Fedora)", domain = "WSL:Fedora" },
@@ -44,14 +50,21 @@ function module.apply_to_config(config)
 							end
 
 							if selected_ws then
+								local spawn_config = {
+									label = "Workspace: " .. selected_ws.label,
+									domain = { DomainName = selected_ws.domain },
+									cwd = selected_ws.id,
+								}
+
+								-- Add args if they exist
+								if selected_ws.args then
+									spawn_config.args = selected_ws.args
+								end
+
 								inner_window:perform_action(
 									act.SwitchToWorkspace({
 										name = selected_ws.label,
-										spawn = {
-											label = "Workspace: " .. selected_ws.label,
-											domain = { DomainName = selected_ws.domain },
-											cwd = selected_ws.id,
-										},
+										spawn = spawn_config,
 									}),
 									inner_pane
 								)
