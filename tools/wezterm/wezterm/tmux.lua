@@ -237,7 +237,7 @@ function M.apply_to_config(config, _)
 			}),
 		},
 		-- Zoom the current pane
-		{ key = "m", mods = "LEADER", action = wezterm.action.TogglePaneZoomState },
+		{ key = "z", mods = "LEADER", action = wezterm.action.TogglePaneZoomState },
 
 		-- Move pane to a new tab
 		{ key = "!", mods = "LEADER|SHIFT", action = M.action.MovePaneToNewTab },
