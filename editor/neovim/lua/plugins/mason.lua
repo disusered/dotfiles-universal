@@ -1,6 +1,5 @@
 return {
-  "williamboman/mason.nvim",
-  version = "1.11.0",
+  "mason-org/mason.nvim",
   opts = function(_, opts)
     -- Guard clause to ensure opts and opts.ensure_installed are tables
     opts.ensure_installed = opts.ensure_installed or {}
