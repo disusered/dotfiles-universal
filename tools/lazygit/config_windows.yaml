@@ -13,12 +13,12 @@ git:
 # Use neovim for writing commit messages by default
 keybinding:
   files:
-    commitChanges: C # using the interactive commit dialog
-    commitChangesWithEditor: c # using neovim
+    commitChanges: c
+    commitChangesWithEditor: C
   commits:
     openLogMenu: <c-g>
-    renameCommit: R
-    renameCommitWithEditor: r
+    renameCommit: r
+    renameCommitWithEditor: R
 # Do not prompt after git commands
 promptToReturnFromSubprocess: false
 notARepository: "quit"
