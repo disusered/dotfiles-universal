@@ -49,7 +49,7 @@ function module.apply_to_config(config)
 	config.launch_menu = {
 		{
 			label = "CRI SSH (Staging)",
-			domain = { DomainName = "WSL:Ubuntu" },
+			domain = { DomainName = "WSL:Fedora" },
 			args = { "ssh", "ser_stage" },
 		},
 	}
