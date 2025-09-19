@@ -16,6 +16,11 @@ function module.apply_to_config(config)
 			mods = "LEADER|SHIFT",
 			action = workspace_switcher.switch_to_prev_workspace(),
 		},
+		{
+			key = "Tab",
+			mods = "LEADER",
+			action = workspace_switcher.switch_to_prev_workspace(),
+		},
 	}
 
 	-- Merge the provided keys with the existing ones in the config
