@@ -16,7 +16,7 @@ function module.apply_to_config(config)
 			domain = "WSL:Fedora",
 			args = { "zsh", "-lic", "nvim leetcode.nvim" },
 		},
-		-- { id = "~/Development/se", label = "CRI (Ubuntu)", domain = "WSL:Ubuntu" },
+		{ id = "~/Development/se", label = "CRI (Fedora)", domain = "WSL:Fedora" },
 		{ id = "~/Development/cosmiq", label = "Cosmiq (Fedora)", domain = "WSL:Fedora" },
 		{ id = "~/Development/Brillai.API", label = "Brillai (Fedora)", domain = "WSL:Fedora" },
 		-- { id = "~/Learning/", label = "Exercism (Ubuntu)", domain = "WSL:Ubuntu" },
