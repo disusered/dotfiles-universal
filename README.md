@@ -96,32 +96,19 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [ ] Neovim wrap sidebar icon like screenshot
 - [ ] Neovim show selection stats (lines, words, characters) in statusline for Markdown
 - [x] WSL config <https://learn.microsoft.com/en-us/windows/wsl/wsl-config>
-- [x] CodeCompanion
-  - [x] Gemini CLI with ACP
-  - [x] Gemini MCP with ACP
-  - [x] Keymaps derived from Lazyvim AI extras
-  - [ ] Workspaces
-  - [ ] CodeCompanion History <https://github.com/ravitemer/codecompanion-history.nvim>
-  - [ ] Inline prompt improvements
-  - [x] Disable render markdown in non-CodeCompanion windows
-  - [x] Progress
-  - [ ] Anthropic oAuth <https://github.com/olimorris/codecompanion.nvim/discussions/1984>
-- [ ] Claude
-  - [ ] Claude Code
-  - [ ] Claude MCP <https://www.reddit.com/r/ClaudeAI/comments/1jf4hnt/setting_up_mcp_servers_in_claude_code_a_tech/>
-- [ ] Zed
+- [x] Claude
+  - [x] Claude Code
+  - [x] Claude MCP <https://www.reddit.com/r/ClaudeAI/comments/1jf4hnt/setting_up_mcp_servers_in_claude_code_a_tech/>
+  - [x] Claude Neovim
 - [x] Kulala
   - [x] Plugin
   - [x] LSP
   - [x] Formatter
   - [x] Dependencies <https://neovim.getkulala.net/docs/getting-started/requirements>
 - [x] Rancher Desktop WSL integration <https://docs.rancherdesktop.io/getting-started/wsl-integration/>
-- [ ] Unix shell completion in PS <https://github.com/PowerShell/Modules/tree/master/Modules/Microsoft.PowerShell.UnixCompleters>
-- [ ] Dev drive <https://learn.microsoft.com/en-us/windows/dev-drive/>
-- [ ] SSH (eval agent in wsl, 1Password agent in Windows)
-  - [ ] WSL config with ssh agent
-  - [ ] Windows config with IdentityAgent and 1Password
-- [ ] Install and configure navi <https://github.com/denisidoro/navi>
+- [x] SSH (eval agent in wsl, 1Password agent in Windows)
+  - [x] WSL config with ssh agent
+  - [x] Windows config with IdentityAgent and 1Password
 
 ## WSL
 

@@ -1,0 +1,7 @@
+linux:
+  installs:
+    cmd: sudo dnf install -y socat
+    depends:
+      - /tools/npiperelay
+  links:
+    sock.zsh: ~/.config/zsh/0014_sock.zsh
