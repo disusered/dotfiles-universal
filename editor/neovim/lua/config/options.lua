@@ -103,3 +103,8 @@ vim.opt.exrc = true
 
 -- Disable shell and write commands in local .nvim.lua .vimrc .exrc files
 vim.opt.secure = false
+
+-- LSP Server to use for Ruby.
+-- https://www.lazyvim.org/extras/lang/ruby
+vim.g.lazyvim_ruby_lsp = "solargraph"
+vim.g.lazyvim_ruby_formatter = "rubocop"
