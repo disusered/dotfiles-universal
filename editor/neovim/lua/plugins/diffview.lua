@@ -1,6 +1,6 @@
 return {
   "sindrets/diffview.nvim",
-  dependencies = { "nvim-tree/nvim-web-devicons" },
+  dependencies = { "nvim-mini/mini.icons" },
   cmd = {
     "DiffviewFileHistory",
     "DiffviewOpen",
