@@ -42,6 +42,9 @@ return {
 
       ---Highlight tailwind colors, e.g. 'bg-blue-500'
       enable_tailwind = false,
+
+      ---Exclude these filetypes from highlighting
+      exclude_filetypes = { "gitcommit", "gitrebase", "gitconfig" },
     },
   },
   {
