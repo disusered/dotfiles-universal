@@ -1,0 +1,10 @@
+linux|darwin:
+  installs:
+    cmd: brew install wader/tap/fq
+    depends:
+      - /packages/homebrew
+windows:
+  installs:
+    cmd: scoop install fq
+    depends:
+      - /packages/scoop
