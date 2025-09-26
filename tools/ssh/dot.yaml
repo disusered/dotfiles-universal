@@ -1,3 +1,6 @@
 windows:
   links:
     allowed_signers: ~/.ssh/allowed_signers
+linux:
+  links:
+    sshexe.zsh: ~/.config/zsh/0016_sshexe.zsh
