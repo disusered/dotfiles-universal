@@ -7,18 +7,19 @@ function module.apply_to_config(config)
 	local win_home = wezterm.home_dir
 
 	local workspaces = {
-		-- { id = "~", label = "Home (Fedora)", domain = "WSL:Fedora" },
-		{ id = "~/.dotfiles", label = "Dotfiles (Ubuntu)", domain = "WSL:Ubuntu" },
-		{ id = "~/.dotfiles", label = "Dotfiles (Fedora)", domain = "WSL:Fedora" },
+		-- { id = "~", label = "Home", domain = "WSL:Fedora" },
+		-- { id = "~/.dotfiles", label = "Dotfiles (Ubuntu)", domain = "WSL:Ubuntu" },
+		{ id = "~/.dotfiles", label = "Dotfiles", domain = "WSL:Fedora" },
 		{
 			id = "~/Learning/leetcode",
 			label = "LeetCode",
 			domain = "WSL:Fedora",
 			args = { "zsh", "-lic", "nvim leetcode.nvim" },
 		},
-		{ id = "~/Development/se", label = "CRI (Fedora)", domain = "WSL:Fedora" },
-		{ id = "~/Development/cosmiq", label = "Cosmiq (Fedora)", domain = "WSL:Fedora" },
-		{ id = "~/Development/Brillai.API", label = "Brillai (Fedora)", domain = "WSL:Fedora" },
+		{ id = "~/Development/se", label = "CRI", domain = "WSL:Fedora" },
+		{ id = "~/Development/SECRI/", label = "SECRI", domain = "WSL:Fedora" },
+		{ id = "~/Development/cosmiq", label = "Cosmiq", domain = "WSL:Fedora" },
+		{ id = "~/Development/Brillai.API", label = "Brillai", domain = "WSL:Fedora" },
 		-- { id = "~/Learning/", label = "Exercism (Ubuntu)", domain = "WSL:Ubuntu" },
 		{ id = win_home .. "/.dotfiles", label = "Dotfiles (Windows)", domain = "local" },
 		-- { id = win_home .. "/Documents/Development/Brillai.API", label = "Brillai (Windows)", domain = "local" },
