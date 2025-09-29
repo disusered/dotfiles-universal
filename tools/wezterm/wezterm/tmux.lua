@@ -187,8 +187,7 @@ M.action = {
 }
 
 ---@param config unknown
----@param _ { }
-function M.apply_to_config(config, _)
+function M.apply_to_config(config)
 	-- Leader key configuration
 	config.leader = { key = "b", mods = "CTRL" }
 

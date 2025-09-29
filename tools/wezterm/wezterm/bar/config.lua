@@ -12,21 +12,21 @@ local M = {}
 ---@field field_icon string
 
 ---@class option.module
----@field enabled boolean
----@field icon string
----@field color number
+---@field enabled? boolean
+---@field icon? string
+---@field color? number
 
 ---@class option.clock : option.module
 ---@field format string
 
 ---@class option.modules
----@field workspace option.module
----@field leader option.module
----@field pane option.module
----@field username option.module
----@field hostname option.module
----@field clock option.clock
----@field cwd option.module
+---@field workspace? option.module
+---@field leader? option.module
+---@field pane? option.module
+---@field username? option.module
+---@field hostname? option.module
+---@field clock? option.clock
+---@field cwd? option.module
 
 ---@class option.padding.tabs
 ---@field left number
@@ -36,11 +36,11 @@ local M = {}
 ---@field tabs option.padding.tabs
 
 ---@class bar.options
----@field position "top" | "bottom"
----@field max_width number
----@field separator option.separator
----@field modules option.modules
----@field padding option.padding
+---@field position? "top" | "bottom"
+---@field max_width? number
+---@field separator? option.separator
+---@field modules? option.modules
+---@field padding? option.padding
 M.options = {
 	position = "bottom",
 	max_width = 32,
