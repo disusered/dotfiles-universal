@@ -44,7 +44,7 @@ return {
       enable_tailwind = false,
 
       ---Exclude these filetypes from highlighting
-      exclude_filetypes = { "gitcommit", "gitrebase", "gitconfig" },
+      exclude_filetypes = { "gitcommit", "gitrebase", "gitconfig", "lazy" },
     },
   },
   {
