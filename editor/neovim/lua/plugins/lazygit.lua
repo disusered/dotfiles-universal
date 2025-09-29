@@ -19,9 +19,11 @@ local function open_lazygit_in_wezterm(cwd)
   end
 
   -- No git tab found, spawn new one
+  local nvim_addr = vim.v.servername
   local spawn_cmd = string.format(
-    "WEZTERM_LOG=error wezterm.exe cli spawn --domain-name WSL:Fedora --cwd %s -- zsh -lic 'lazygit' 2>/dev/null",
-    vim.fn.shellescape(cwd)
+    "WEZTERM_LOG=error wezterm.exe cli spawn --domain-name WSL:Fedora --cwd %s -- zsh -lic 'export NVIM=\"%s\"; lazygit' 2>/dev/null",
+    vim.fn.shellescape(cwd),
+    nvim_addr:gsub('"', '\\"')
   )
 
   -- Spawn the new tab

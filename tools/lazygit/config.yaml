@@ -1,8 +1,8 @@
-# Use flatten.nvim because nvim-remote does not work on Windows
 os:
-  editPreset: "nvim-remote"
+  edit: '[ -z "$NVIM" ] && (nvim -- {{filename}}) || (nvim --server "$NVIM" --remote-tab {{filename}})'
+  editAtLine: '[ -z "$NVIM" ] && (nvim +{{line}} -- {{filename}}) || (nvim --server "$NVIM" --remote-tab {{filename}} && nvim --server "$NVIM" --remote-send ":{{line}}<CR>")'
   # Whether lazygit suspends until an edit process returns
-  editInTerminal: false
+  editInTerminal: true
 # Use Git Delta for diffs
 git:
   paging:
