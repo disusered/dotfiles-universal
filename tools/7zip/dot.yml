@@ -3,3 +3,6 @@ windows:
     cmd: scoop install 7zip
     depends:
       - /packages/scoop
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yes | sudo pacman -S 7zip
