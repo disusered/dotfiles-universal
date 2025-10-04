@@ -1,3 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: yes | sudo pacman -S hyprland
+  links:
+    hyprland.conf: ~/.config/hypr/hyprland.conf
