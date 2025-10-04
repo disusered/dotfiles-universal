@@ -1,0 +1,3 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yes | sudo pacman -S devtools base-devel
