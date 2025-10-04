@@ -16,7 +16,7 @@ linux[whoami.distro^="Arch"]:
     depends:
       - /tools/zsh
   links:
-    zsh_plugins.txt: ~/.config/zsh/.zsh_plugins.txt
+    zsh_plugins.txt: ~/.zsh_plugins.txt
     antidote_arch.zsh: ~/.config/zsh/0100_antidote.zsh
     vi.zsh: ~/.config/zsh/0110_vi_bindkey.zsh
     history.zsh: ~/.config/zsh/0120_history_subtring_search.zsh
