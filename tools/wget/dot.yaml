@@ -3,6 +3,9 @@ windows:
     cmd: scoop install wget
     depends:
       - /packages/scoop
-linux:
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: command -v wget &>/dev/null || sudo dnf install wget -y
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yes | sudo pacman -S wget
