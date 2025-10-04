@@ -3,8 +3,11 @@ windows:
     cmd: scoop install tectonic
     depends:
       - /packages/scoop
-linux:
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install tectonic
     depends:
       - /packages/homebrew
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yes | sudo pacman -S tectonic

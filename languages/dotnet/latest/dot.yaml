@@ -2,7 +2,7 @@ windows:
   installs:
     cmd: >
       pwsh -File $HOME/.dotfiles/languages/dotnet/latest/install.ps1;
-linux:
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: |
       sudo dnf install -y \
@@ -10,3 +10,13 @@ linux:
       dotnet-sdk-8.0 \
       aspnetcore-runtime-9.0 \
       aspnetcore-runtime-8.0
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      yes | sudo pacman -S \
+        dotnet-sdk-9.0 \
+        dotnet-sdk-8.0 \
+        aspnet-runtime-9.0 \
+        aspnet-runtime-8.0
+  links:
+    dotnet.zsh: ~/.config/zsh/0500_dotnet.zsh
