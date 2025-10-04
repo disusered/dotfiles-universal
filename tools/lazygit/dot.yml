@@ -9,13 +9,18 @@ windows:
   links:
     config_windows.yaml: >-
       {{ env.LOCALAPPDATA }}/lazygit/config.yml
-linux:
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install lazygit
     depends:
       - /packages/homebrew
       - /tools/delta
-      - /tools/bat
-      - /tools/git
+  links:
+    config.yaml: ~/.config/lazygit/config.yml
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yes | sudo pacman -S lazygit
+    depends:
+      - /tools/delta
   links:
     config.yaml: ~/.config/lazygit/config.yml
