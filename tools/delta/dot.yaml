@@ -3,11 +3,19 @@ windows:
     cmd: scoop install delta less
     depends:
       - /packages/scoop
-linux:
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install delta
     depends:
       - /packages/homebrew
+      - /tools/bat
+      - /tools/git
+  links:
+    delta.zsh: ~/.config/zsh/0025_delta.zsh
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yes | sudo pacman -S git-delta
+    depends:
       - /tools/bat
       - /tools/git
   links:
