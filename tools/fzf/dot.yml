@@ -5,11 +5,15 @@ windows:
       - /packages/scoop
   links:
     fzf.ps1: ~/.config/powershell/profile.d/fzf.ps1
-linux:
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yes | sudo pacman -S fzf
+  links:
+    fzf.zsh: ~/.config/zsh/0170_fzf.zsh
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install fzf
     depends:
       - /packages/homebrew
-      - /tools/zsh
   links:
     fzf.zsh: ~/.config/zsh/0170_fzf.zsh
