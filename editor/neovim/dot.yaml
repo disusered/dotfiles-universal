@@ -1,4 +1,38 @@
-linux|darwin:
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yes | sudo pacman -S neovim
+    depends:
+      - /lib/arch
+      - /tools/ssh
+      - /tools/git
+      - /tools/curl
+      - /tools/fzf
+      - /tools/lazygit
+      - /tools/ripgrep
+      - /tools/fd
+      - /tools/wget
+      - /tools/unzip
+      - /tools/gzip
+      - /tools/treesitter
+      - /tools/imagemagick
+      - /tools/ghostscript
+      - /tools/postgresql
+      - /tools/zsh
+      - /tools/ssh
+      - /languages/python/latest
+      - /languages/lua/5.1
+      - /languages/lua/hererocks
+      - /languages/node/latest
+      - /languages/latex/tectonic
+      # TODO: Are the other latex stuff needed?
+      - /tools/grpcurl
+      - /tools/websocat
+      - /tools/xmllint
+  links:
+    neovim.zsh: ~/.config/zsh/0020_neovim.zsh
+    init.lua: ~/.config/nvim/init.lua
+    lua: ~/.config/nvim/lua
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install neovim
     depends:
@@ -19,6 +53,8 @@ linux|darwin:
       - /tools/grpcurl
       - /tools/websocat
       - /tools/xmllint
+      - /tools/zsh
+      - /tools/ssh
       - /languages/lua/5.1
       - /languages/lua/hererocks
       - /languages/latex/tectonic
