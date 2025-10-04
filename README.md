@@ -180,3 +180,17 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [x] Install
     - [x] Init
     - [x] Alias
+
+## Arch
+
+- [ ] Terminal
+  - [ ] Kitty
+    - [x] Pane management
+    - [x] Theme
+- [ ] Task launcher
+- [ ] Firefox
+  - [ ] Default browser
+- [ ] Chrome (not Chromium)
+- [ ] Wezterm Replacement
+  - [ ] Lazygit Neovim integration
+  - [ ] Claude Neovim integration
