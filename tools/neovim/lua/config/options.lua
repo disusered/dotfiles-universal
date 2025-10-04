@@ -81,19 +81,20 @@ vim.g.snacks_animate = false
 vim.opt.statuscolumn = [[%!v:lua.require'snacks.statuscolumn'.get()]]
 
 -- TODO: Set clipboard for Windows
--- Set clipboard for Windows WSL2
--- vim.g.clipboard = {
---   name = "win32yank-wsl",
---   copy = {
---     ["+"] = "win32yank.exe -i --crlf",
---     ["*"] = "win32yank.exe -i --crlf",
---   },
---   paste = {
---     ["+"] = "win32yank.exe -o --lf",
---     ["*"] = "win32yank.exe -o --lf",
---   },
---   cache_enabled = 1,
--- }
+if vim.fn.system("uname -a"):match("WSL") then
+  vim.g.clipboard = {
+    name = "win32yank-wsl",
+    copy = {
+      ["+"] = "win32yank.exe -i --crlf",
+      ["*"] = "win32yank.exe -i --crlf",
+    },
+    paste = {
+      ["+"] = "win32yank.exe -o --lf",
+      ["*"] = "win32yank.exe -o --lf",
+    },
+    cache_enabled = 1,
+  }
+end
 
 -- Automatically load changes to file
 vim.opt.autoread = true
