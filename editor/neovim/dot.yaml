@@ -24,6 +24,7 @@ linux[whoami.distro^="Arch"]:
       - /languages/lua/hererocks
       - /languages/node/latest
       - /languages/latex/tectonic
+      - /tools/fonts
       # TODO: Are the other latex stuff needed?
       - /tools/grpcurl
       - /tools/websocat

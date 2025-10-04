@@ -8,6 +8,15 @@ windows:
       scoop install Hasklig
     depends:
       - /packages/scoop
-# TODO: Add required fonts for platform-specific Wezterm
-linux|darwin:
-  installs: false
+linux[whoami.distro^="Arch"]|darwin:
+  installs:
+    cmd: >
+      sudo pacman -S --noconfirm ttf-fira-code ttf-cascadia-code-nerd otf-hasklig-nerd ttf-hack
+    depends:
+      - /lib/arch
+linux[whoami.distro^="Fedora"]:
+  installs:
+    cmd: >
+      sudo dnf install -y ttf-fira-code cascadia-code-nf-fonts
+    # TODO: Manually install Hasklig and hack-font
+
