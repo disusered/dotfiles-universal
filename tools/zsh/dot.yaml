@@ -1,10 +1,30 @@
-linux:
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: |
       sudo dnf install util-linux zsh -y && \
       command -v zsh | sudo tee -a /etc/shells && \
       mkdir -p ~/.config/zsh/functions && \
       sudo chsh -s $(which zsh) carlos
+    depends:
+      - /tools/zoxide
+      - /tools/git
+      - /tools/starship
+  links:
+    zshrc: ~/.zshrc
+    zshenv: ~/.zshenv
+    platforms.zsh: ~/.config/zsh/0000_platforms.zsh
+    history.zsh: ~/.config/zsh/0001_history.zsh
+    ulimit.zsh: ~/.config/zsh/0002_ulimit.zsh
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      yes | sudo pacman -S zsh && \
+      mkdir -p ~/.config/zsh/functions && \
+      sudo chsh -s $(which zsh) carlos
+    depends:
+      - /tools/zoxide
+      - /tools/git
+      - /tools/starship
   links:
     zshrc: ~/.zshrc
     zshenv: ~/.zshenv

@@ -1,4 +1,4 @@
-linux:
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install antidote
     depends:
@@ -7,6 +7,17 @@ linux:
   links:
     zsh_plugins.txt: ~/.zsh_plugins.txt
     antidote.zsh: ~/.config/zsh/0100_antidote.zsh
+    vi.zsh: ~/.config/zsh/0110_vi_bindkey.zsh
+    history.zsh: ~/.config/zsh/0120_history_subtring_search.zsh
+    fzf.zsh: ~/.config/zsh/0130_fzf.zsh
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: git clone --depth=1 https://github.com/mattmc3/antidote.git ${ZDOTDIR:-~}/.antidote
+    depends:
+      - /tools/zsh
+  links:
+    zsh_plugins.txt: ~/.config/zsh/.zsh_plugins.txt
+    antidote_arch.zsh: ~/.config/zsh/0100_antidote.zsh
     vi.zsh: ~/.config/zsh/0110_vi_bindkey.zsh
     history.zsh: ~/.config/zsh/0120_history_subtring_search.zsh
     fzf.zsh: ~/.config/zsh/0130_fzf.zsh
