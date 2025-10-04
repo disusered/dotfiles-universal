@@ -5,13 +5,24 @@ windows:
   installs:
     cmd: >
       pwsh -File $HOME/.dotfiles/tools/git/install.ps1;
+    depends:
+      - /tools/1password
   links:
     gitconfig_windows: ~/.gitconfig
     git.ps1: ~/.config/powershell/profile.d/git.ps1
-linux:
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: command -v git &>/dev/null || sudo dnf install git -y
   links:
-    # TODO: Detect WSL with advanced identifier
     gitconfig_wsl: ~/.gitconfig
+    git.zsh: ~/.config/zsh/0015_git.zsh
+    sshexe.zsh: ~/.config/zsh/0016_sshexe.zsh
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yes | sudo pacman -S git
+    depends:
+      - /tools/ssh
+      - /tools/1password
+  links:
+    gitconfig: ~/.gitconfig
     git.zsh: ~/.config/zsh/0015_git.zsh
