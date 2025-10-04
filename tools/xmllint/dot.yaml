@@ -3,7 +3,10 @@ windows:
     cmd: scoop install main/libxml2
     depends:
       - /packages/scoop
-linux:
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yes | sudo pacman -S libxml2
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install libxml2
     depends:

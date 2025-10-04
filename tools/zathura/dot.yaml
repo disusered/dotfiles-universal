@@ -1,6 +1,11 @@
 windows:
   installs: false
-linux:
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yes | sudo pacman -S zathura zathura-pdf-mupdf
+    depends:
+      - /tools/xdotool
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: command -v zathura &>/dev/null || sudo dnf install -y zathura zathura-pdf-mupdf
     depends:

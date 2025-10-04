@@ -1,4 +1,9 @@
-linux|darwin:
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S fq
+    depends:
+      - /tools/yay
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install wader/tap/fq
     depends:
