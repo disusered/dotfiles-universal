@@ -9,11 +9,20 @@ windows:
     ripgrep.ps1: ~/.config/powershell/profile.d/ripgrep.ps1
     ripgreprc: >-
       {{ env.LOCALAPPDATA }}/ripgrep/ripgreprc
-linux:
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install ripgrep
     depends:
       - /packages/homebrew
+      - /tools/bat
+      - /tools/delta
+  links:
+    ripgrep.zsh: ~/.config/zsh/0190_ripgrep.zsh
+    ripgreprc: ~/.config/ripgrep/ripgreprc
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yes | sudo pacman -S ripgrep
+    depends:
       - /tools/bat
       - /tools/delta
   links:
