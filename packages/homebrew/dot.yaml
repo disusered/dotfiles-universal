@@ -1,6 +1,6 @@
 windows:
   installs: false
-linux:
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: |
       sudo dnf update -y && \
