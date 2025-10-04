@@ -6,6 +6,9 @@ windows:
     cmd: scoop install main/postgresql
     depends:
       - /packages/scoop
-linux:
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: sudo dnf install postgresql libpq-devel -y
+linux[whoami.distro^="Arch"]:
+  installs:
+      cmd: yes | sudo pacman -S postgresql
