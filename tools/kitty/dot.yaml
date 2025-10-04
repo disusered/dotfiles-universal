@@ -3,3 +3,4 @@ linux[whoami.distro^="Arch"]:
     cmd: yes | sudo pacman -S kitty
   links:
     kitty.conf: ~/.config/kitty/kitty.conf
+    kitty.zsh: ~/.config/zsh/0004_kitty.zsh
