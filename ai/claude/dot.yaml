@@ -3,6 +3,8 @@ global:
     cmd: npm install -g @anthropic-ai/claude-code
     depends:
       - /languages/node/latest
+      - /ai/postgres-mcp
+      - /ai/mcp-chrome
 linux|darwin:
   links:
     settings.json: ~/.claude/settings.json
