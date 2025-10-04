@@ -1,6 +1,9 @@
 windows:
   links:
     allowed_signers: ~/.ssh/allowed_signers
-linux:
+linux[whoami.distro^="Fedora"]:
   links:
     sshexe.zsh: ~/.config/zsh/0016_sshexe.zsh
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yes | sudo pacman -S openssh
