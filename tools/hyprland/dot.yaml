@@ -1,5 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S hyprland
+    cmd: sudo pacman -S --noconfirm hyprland hyprpolkitagent xdg-desktop-portal-hyprland pipewire wireplumber qt5-wayland qt6-wayland
   links:
     hyprland.conf: ~/.config/hypr/hyprland.conf
