@@ -4,6 +4,8 @@ windows:
     depends:
       - /packages/scoop
       - /tools/7zip
-linux:
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: command -v curl &>/dev/null || sudo dnf install curl -y
+linux[whoami.distro^="Arch"]:
+  installs: yes | sudo pacman -S curl
