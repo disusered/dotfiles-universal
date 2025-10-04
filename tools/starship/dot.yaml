@@ -2,12 +2,17 @@ global:
   links:
     starship.toml: ~/.config/starship.toml
 
-linux:
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install starship
     depends:
-      - /tools/zsh
       - /packages/homebrew
+  links:
+    starship.zsh: ~/.config/zsh/0150_starship.zsh
+
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yes | sudo pacman -S starship
   links:
     starship.zsh: ~/.config/zsh/0150_starship.zsh
 
