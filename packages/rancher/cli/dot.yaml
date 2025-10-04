@@ -3,6 +3,8 @@ windows:
     cmd: scoop install main/rancher-cli
     depends:
       - /packages/scoop
-linux:
-  # TODO: Install when not in WSL
-  installs: false
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S rancher-cli-bin
+    depends:
+      - /tools/yay

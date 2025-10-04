@@ -5,6 +5,10 @@ windows:
       - /packages/scoop
       - /packages/rancher/cli
       - /packages/rancher/compose
-linux:
-  # TODO: Install when not in WSL
-  installs: false
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S rancher-desktop-bin
+    depends:
+      - /tools/yay
+      - /packages/rancher/cli
+      - /packages/rancher/compose
