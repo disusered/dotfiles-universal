@@ -1,0 +1,60 @@
+@import "mocha.css";
+
+* {
+  font-family: "Noto Sans Regular", sans-serif;
+  font-size: 14px;
+  min-height: 0;
+}
+
+window#waybar {
+  background-color: @base;
+  color: @text;
+}
+
+#workspaces {
+  background-color: @surface0;
+  margin: 5px;
+  padding: 0px 5px;
+  border-radius: 10px;
+}
+
+#workspaces button {
+  padding: 0px 15px;
+  color: @text;
+  border-radius: 10px;
+}
+
+#workspaces button.active {
+  color: @base;
+  /* TODO: Accent color */
+  background-color: @blue;
+}
+
+#workspaces button:hover {
+  background-color: @surface1;
+  color: @text;
+}
+
+#clock {
+  background-color: @surface0;
+  color: @text;
+  padding: 0px 15px;
+  margin: 5px;
+  border-radius: 10px;
+}
+
+#tray {
+  background-color: @surface0;
+  margin: 5px;
+  padding: 0px 10px;
+  border-radius: 10px;
+}
+
+#tray>.passive {
+  -gtk-icon-effect: dim;
+}
+
+#tray>.needs-attention {
+  -gtk-icon-effect: highlight;
+  background-color: @red;
+}
