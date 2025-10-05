@@ -1,9 +1,13 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm hyprland hyprpolkitagent xdg-desktop-portal-hyprland qt5-wayland qt6-wayland
+    cmd: |
+      sudo pacman -S --noconfirm hyprland hyprpolkitagent xdg-desktop-portal \
+      xdg-desktop-portal-kde xdg-desktop-portal-hyprland qt5-wayland qt6-wayland
     depends:
       - /tools/jq
       - /lib/pipewire
+      - /lib/qt
+      - /lib/gtk
   links:
     hyprland.conf: ~/.config/hypr/hyprland.conf
     scripts/toggle-monitors.sh: ~/.config/hypr/scripts/toggle-monitors.sh

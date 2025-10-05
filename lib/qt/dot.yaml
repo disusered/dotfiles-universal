@@ -4,8 +4,8 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      yay -S --noconfirm qt6ct-kde
-      yay -S --noconfirm darkly-qt6-git
+      yay -S --noconfirm qt6ct-kde darkly-qt6-git
+      sudo pacman -S --noconfirm qt6-svg qt6-declarative qt5-quickcontrols2
       mkdir -p ~/.config/qt6ct/colors
       curl -sL https://raw.githubusercontent.com/catppuccin/qt5ct/main/themes/catppuccin-mocha-blue.conf -o ~/.config/qt6ct/colors/catppuccin-mocha-blue.conf
     depends:
