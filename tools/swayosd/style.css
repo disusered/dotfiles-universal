@@ -36,5 +36,6 @@ window#osd progressbar progress {
   min-height: inherit;
   border-radius: inherit;
   border: none;
+  /* TODO: Catppuccin accent color */
   background: #89b4fa;
 }

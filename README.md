@@ -213,3 +213,9 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [ ] Chrome (not Chromium)
 - [ ] Wezterm Replacement
   - [ ] Lazygit Neovim integration
+  - [ ] Claude Neovim integratioin
+- [ ] uwsm
+  - [ ] App Launcher
+  - [ ] SwayOSD <https://github.com/ErikReider/SwayOSD> LibInput backend
+  - [ ] Replace exec with systemd units
+  - [ ] 1password agent

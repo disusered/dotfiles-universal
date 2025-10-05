@@ -5,3 +5,4 @@ linux[whoami.distro^="Arch"]:
       - /lib/pipewire
   links:
     style.css: ~/.config/swayosd/style.css
+    sway.conf: ~/.config/hypr/conf.d/sway.conf
