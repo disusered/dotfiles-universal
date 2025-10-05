@@ -9,4 +9,4 @@ configuration {
     window-format: "{w} · {c} · {t}";
 }
 
-@theme "~/.local/share/rofi/themes/catppuccin-mocha.rasi"
+@theme "~/.dotfiles/tools/rofi/catppuccin-default"

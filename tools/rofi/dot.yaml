@@ -1,8 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: |
-      sudo pacman -S --noconfirm rofi
-      mkdir -p ~/.local/share/rofi/themes
-      curl -sL https://raw.githubusercontent.com/catppuccin/rofi/main/themes/catppuccin-mocha.rasi -o ~/.local/share/rofi/themes/catppuccin-mocha.rasi
+    cmd: sudo pacman -S --noconfirm rofi-wayland
   links:
     config.rasi: ~/.config/rofi/config.rasi
