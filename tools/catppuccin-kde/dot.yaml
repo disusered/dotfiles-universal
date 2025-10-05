@@ -7,4 +7,4 @@ linux[whoami.distro^="Arch"]:
         cd ~/.local/share/catppuccin-kde && ./install.sh
       fi
     depends:
-      - /tools/qt6ct
+      - /lib/qt
