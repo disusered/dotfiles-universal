@@ -1,0 +1,12 @@
+configuration {
+    modi: "drun,run,window";
+    show-icons: true;
+    icon-theme: "Papirus";
+    display-drun: "Apps";
+    display-run: "Run";
+    display-window: "Windows";
+    drun-display-format: "{name}";
+    window-format: "{w} · {c} · {t}";
+}
+
+@theme "~/.local/share/rofi/themes/catppuccin-mocha.rasi"

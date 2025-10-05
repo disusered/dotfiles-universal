@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm network-manager-applet
+    depends:
+      - /lib/networkmanager

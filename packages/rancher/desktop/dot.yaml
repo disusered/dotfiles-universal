@@ -10,3 +10,5 @@ linux[whoami.distro^="Arch"]:
     cmd: yay -S --noconfirm rancher-desktop
     depends:
       - /tools/yay
+  links:
+    rancher.zsh: ~/.config/zsh/0700_rancher.zsh

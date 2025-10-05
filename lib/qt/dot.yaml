@@ -1,0 +1,3 @@
+linux[whoami.distro^="Arch"]:
+  links:
+    qt.zsh: ~/.config/zsh/1000_qt.zsh

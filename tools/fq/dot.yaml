@@ -1,6 +1,6 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S fq
+    cmd: yay -S --noconfirm fq
     depends:
       - /tools/yay
 linux[whoami.distro^="Fedora"]:

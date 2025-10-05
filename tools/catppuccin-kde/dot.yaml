@@ -1,0 +1,10 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      sudo pacman -S --noconfirm plasma-workspace
+      if [ ! -d ~/.local/share/catppuccin-kde ]; then
+        git clone --depth=1 https://github.com/catppuccin/kde ~/.local/share/catppuccin-kde
+        cd ~/.local/share/catppuccin-kde && ./install.sh
+      fi
+    depends:
+      - /tools/qt6ct

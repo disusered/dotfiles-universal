@@ -1,0 +1,7 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm swayosd
+    depends:
+      - /lib/pipewire
+  links:
+    style.css: ~/.config/swayosd/style.css

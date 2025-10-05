@@ -20,7 +20,6 @@
 	editor = nvim
 	autocrlf = input
 	trustctime = false
-	sshCommand = ssh.exe
 	excludesfile = ~/.gitignore_global
 [pretty]
 	basic = %C(magenta bold)%h%C(reset) %C(auto)%d%C(reset) %s
