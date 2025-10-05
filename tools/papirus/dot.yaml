@@ -1,0 +1,8 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      sudo pacman -S --noconfirm papirus-icon-theme
+      yay -S --noconfirm papirus-folders-catppuccin-git
+      papirus-folders -C cat-mocha-blue --theme Papirus-Dark
+    depends:
+      - /tools/yay
