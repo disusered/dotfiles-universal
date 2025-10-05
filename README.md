@@ -187,35 +187,49 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [x] Kitty
     - [x] Pane management
     - [x] Theme
+    - [x] Links
 - [ ] Hyprland
-  - [ ] Login manager (SDDM)
+  - [x] Login manager (SDDM)
   - [ ] Must-have <https://wiki.hypr.land/Useful-Utilities/Must-have/>
-    - [ ] Notification daemon (mako)
-    - [ ] OSD (swayosd)
-    - [ ] Pipewire
-    - [ ] XDG Desktop Portal
+    - [x] Notification daemon (mako)
+    - [x] OSD (swayosd)
+    - [x] Pipewire
+    - [x] XDG Desktop Portal
     - [x] Authentication Agent (hyprpolkitagent, 1Password compatible)
-    - [ ] Qt Wayland Support
+    - [x] Qt Wayland Support
+      - [x] Theme
+      - [x] Icons
     - [x] Fonts
   - [ ] Utilities
-    - [ ] Clipboard manager (cliphist)
+    - [x] Clipboard manager (cliphist)
     - [ ] File manager (dolphin)
-    - [ ] Audio widget (investigate next iteration or if swayosd is enough)
+      - [x] Keybind
+      - [x] Terminal integration (links)
+      - [x] Theme
+      - [x] Icons
+      - [ ] Open terminal here
+      - [ ] Unzip
+    - [x] Audio widget
       - [x] Install
-      - [ ] Theme
-    - [ ] Network (iwd + nm-applet for WiFi)
+      - [x] Theme
+    - [x] Network (iwd + nm-applet for WiFi)
   - [ ] Monitor management
     - [ ] Profile: Single monitor (current)
     - [ ] Profile: Dual monitor (other location)
-  - [ ] Future: Evaluate walker (app launcher) + elephant + uwsm
-- [ ] Firefox
-  - [ ] Default browser
-- [ ] Chrome (not Chromium)
+- [x] Firefox
+  - [x] Default browser
+- [x] Chrome (not Chromium)
 - [ ] Wezterm Replacement
   - [ ] Lazygit Neovim integration
   - [ ] Claude Neovim integratioin
+- [ ] nwg-look save exported configs to Rotz
+- [ ] Lockscreen
+- [ ] Environment variables <https://wiki.hypr.land/Configuring/Environment-variables/>
+- [ ] /home/carlos/.config/qt6ct/qt6ct.conf
+- Authentication agent
 - [ ] uwsm
   - [ ] App Launcher
-  - [ ] SwayOSD <https://github.com/ErikReider/SwayOSD> LibInput backend
+    - [ ] SwayOSD <https://github.com/ErikReider/SwayOSD> LibInput backend
   - [ ] Replace exec with systemd units
   - [ ] 1password agent
+  - [ ] Bluetooth
