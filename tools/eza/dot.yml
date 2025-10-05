@@ -21,6 +21,5 @@ linux[whoami.distro^="Arch"]:
     cmd: yes | sudo pacman -S eza
     depends:
       - /tools/zsh
-      - /packages/homebrew
   links:
     eza.zsh: ~/.config/zsh/0050_eza.zsh

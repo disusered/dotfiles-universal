@@ -1,4 +1,4 @@
-linux:
+linux[whoami.distro^="Fedora"]:
   links:
     wezterm.zsh: ~/.config/zsh/0003_wezterm.zsh
 windows:

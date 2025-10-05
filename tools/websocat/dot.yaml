@@ -4,7 +4,10 @@ windows:
     # TODO: Install from Github
     # https://github.com/vi/websocat/releases/download/v4.0.0-alpha2/websocat.x86_64-pc-windows-gnu.exe
     # cmd: scoop install main/grpcurl
-linux|darwin:
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm websocat
+linux[whoami.distro^="Fedora"]|darwin:
   installs:
     cmd: brew install websocat
     depends:

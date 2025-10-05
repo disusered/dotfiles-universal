@@ -5,3 +5,4 @@ global:
     cmd: npm install -g mcp-chrome-bridge && mcp-chrome-bridge register
     depends:
       - /languages/node/latest
+      - /tools/chrome

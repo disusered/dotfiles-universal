@@ -4,7 +4,14 @@ windows:
     depends:
       - /languages/ruby/latest
       - /tools/msys2
-linux:
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm base-devel
+    depends:
+      - /languages/ruby/latest
+      - /tools/imagemagick
+      - /tools/postgresql
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: sudo dnf install ruby-devel -y
     depends:

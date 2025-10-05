@@ -1,5 +1,6 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm hyprland hyprpolkitagent xdg-desktop-portal-hyprland pipewire wireplumber qt5-wayland qt6-wayland
+    cmd: sudo pacman -S --noconfirm hyprland hyprpolkitagent xdg-desktop-portal-hyprland pipewire wireplumber qt5-wayland qt6-wayland jq
   links:
     hyprland.conf: ~/.config/hypr/hyprland.conf
+    scripts/toggle-monitors.sh: ~/.config/hypr/scripts/toggle-monitors.sh

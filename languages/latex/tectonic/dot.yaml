@@ -10,4 +10,4 @@ linux[whoami.distro^="Fedora"]:
       - /packages/homebrew
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S tectonic
+    cmd: sudo pacman -S --noconfirm tectonic

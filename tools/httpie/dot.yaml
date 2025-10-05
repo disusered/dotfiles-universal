@@ -1,4 +1,9 @@
-linux:
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm httpie
+    depends:
+      - /tools/jq
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install httpie
     depends:

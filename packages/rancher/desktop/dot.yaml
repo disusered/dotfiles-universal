@@ -7,8 +7,6 @@ windows:
       - /packages/rancher/compose
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S rancher-desktop-bin
+    cmd: yay -S --noconfirm rancher-desktop
     depends:
       - /tools/yay
-      - /packages/rancher/cli
-      - /packages/rancher/compose

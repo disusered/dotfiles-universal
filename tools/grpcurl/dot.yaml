@@ -3,7 +3,12 @@ windows:
     cmd: scoop install main/grpcurl
     depends:
       - /packages/scoop
-linux:
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
+    depends:
+      - /languages/go/latest
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install grpcurl
     depends:

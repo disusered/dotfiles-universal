@@ -183,14 +183,33 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 
 ## Arch
 
-- [ ] Terminal
-  - [ ] Kitty
+- [x] Terminal
+  - [x] Kitty
     - [x] Pane management
     - [x] Theme
-- [ ] Task launcher
+- [ ] Hyprland
+  - [ ] Login manager (SDDM)
+  - [ ] Must-have <https://wiki.hypr.land/Useful-Utilities/Must-have/>
+    - [ ] Notification daemon (mako)
+    - [ ] OSD (swayosd)
+    - [ ] Pipewire
+    - [ ] XDG Desktop Portal
+    - [x] Authentication Agent (hyprpolkitagent, 1Password compatible)
+    - [ ] Qt Wayland Support
+    - [x] Fonts
+  - [ ] Utilities
+    - [ ] Clipboard manager (cliphist)
+    - [ ] File manager (dolphin)
+    - [ ] Audio widget (investigate next iteration or if swayosd is enough)
+      - [x] Install
+      - [ ] Theme
+    - [ ] Network (iwd + nm-applet for WiFi)
+  - [ ] Monitor management
+    - [ ] Profile: Single monitor (current)
+    - [ ] Profile: Dual monitor (other location)
+  - [ ] Future: Evaluate walker (app launcher) + elephant + uwsm
 - [ ] Firefox
   - [ ] Default browser
 - [ ] Chrome (not Chromium)
 - [ ] Wezterm Replacement
   - [ ] Lazygit Neovim integration
-  - [ ] Claude Neovim integration

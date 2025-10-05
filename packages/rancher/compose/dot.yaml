@@ -3,8 +3,3 @@ windows:
     cmd: scoop install main/rancher-compose
     depends:
       - /packages/scoop
-linux[whoami.distro^="Arch"]:
-  installs:
-    cmd: yay -S rancher-compose-bin
-    depends:
-      - /tools/yay

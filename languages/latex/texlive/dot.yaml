@@ -5,4 +5,4 @@ linux[whoami.distro^="Fedora"]:
     cmd: sudo dnf install texlive-scheme-full -y
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S texlive-latexrecommended texlive-latexextra
+    cmd: sudo pacman -S --noconfirm texlive-latexrecommended texlive-latexextra

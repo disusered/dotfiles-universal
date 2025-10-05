@@ -3,7 +3,10 @@ windows:
     cmd: scoop install jq
     depends:
       - /packages/scoop
-linux:
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm jq
+linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install jq
     depends:

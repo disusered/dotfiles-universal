@@ -12,7 +12,9 @@ linux[whoami.distro^="Fedora"]:
     fzf.zsh: ~/.config/zsh/0130_fzf.zsh
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: git clone --depth=1 https://github.com/mattmc3/antidote.git ${ZDOTDIR:-~}/.antidote
+    cmd: |
+      if cd ~/.1password; then git pull; else git clone \
+      --depth 1 https://github.com/mattmc3/antidote.git ${ZDOTDIR:-~}/.antidote; fi
     depends:
       - /tools/zsh
   links:
