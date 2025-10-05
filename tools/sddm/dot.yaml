@@ -3,3 +3,10 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       sudo pacman -S --noconfirm sddm
       sudo systemctl enable sddm
+    depends:
+      - /lib/qt
+  links:
+    # FIXME: Sudo? Install script? Permissions?
+    # wayland.conf: /etc/sddm.conf.d/10-wayland.conf
+    # theme.conf: /etc/sddm.conf.d/15-theme.conf
+    # catppuccin-mocha-blue: /usr/share/sddm/themes/catppuccin-mocha-blue
