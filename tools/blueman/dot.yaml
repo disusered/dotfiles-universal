@@ -1,0 +1,8 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      sudo yay -S --noconfirm blueman
+      systemctl start bluetooth.service
+      systemctl enable bluetooth.service
+      systemctl start blueman-mechanism.service
+      systemctl enable blueman-mechanism.service
