@@ -8,3 +8,5 @@ linux[whoami.distro^="Arch"]:
         cd ~/.1password && yes | makepkg -si
     depends:
       - /lib/pipewire
+  links:
+    1password.conf: ~/.config/hypr/conf.d/1password.conf
