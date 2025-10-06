@@ -10,3 +10,4 @@ linux[whoami.distro^="Arch"]:
       - /lib/pipewire
   links:
     1password.conf: ~/.config/hypr/conf.d/1password.conf
+    1password.desktop: ~/.local/share/applications/1password-silent.desktop
