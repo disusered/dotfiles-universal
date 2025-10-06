@@ -3,3 +3,5 @@ linux[whoami.distro^="Arch"]:
     cmd: sudo pacman -S --noconfirm uwsm app2unit libnewt dbus-broker-units
   links:
     app2unit.zsh: ~/.config/zsh/1500_app2unit.zsh
+    opener.sh: ~/.local/bin/xdg-open
+    app2unit.conf: ~/config/environment.d/app2unit.conf
