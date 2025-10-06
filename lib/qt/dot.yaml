@@ -9,7 +9,6 @@ linux[whoami.distro^="Arch"]:
       mkdir -p ~/.config/qt6ct/colors
       curl -sL https://raw.githubusercontent.com/catppuccin/qt5ct/main/themes/catppuccin-mocha-blue.conf -o ~/.config/qt6ct/colors/catppuccin-mocha-blue.conf
     depends:
-      - /tools/hyprland
       - /tools/yay
   links:
     qt.zsh: ~/.config/zsh/1000_qt.zsh

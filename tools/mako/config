@@ -1,20 +1,8 @@
-[default]
-font=sans-serif 10
-layer=overlay
-max-visible=5
-default-timeout=5000
-
-# Catppuccin Mocha Colors
+border-radius=10px
 background-color=#1e1e2e
 text-color=#cdd6f4
 border-color=#89b4fa
-
-[urgency=low]
-border-color=#a6e3a1
-
-[urgency=normal]
-border-color=#89b4fa
+progress-color=over #313244
 
 [urgency=high]
-border-color=#f38ba8
-default-timeout=10000
+border-color=#fab387

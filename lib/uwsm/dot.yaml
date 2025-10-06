@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm uwsm app2unit libnewt dbus-broker-units
+  links:
+    app2unit.zsh: ~/.config/zsh/1500_app2unit.zsh

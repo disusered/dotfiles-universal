@@ -3,3 +3,5 @@ linux[whoami.distro^="Arch"]:
     cmd: sudo pacman -S --noconfirm dolphin
     depends:
       - /tools/qt6ct
+  links:
+    env: ~/.config/uwsm/env

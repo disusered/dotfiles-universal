@@ -228,6 +228,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [ ] /home/carlos/.config/qt6ct/qt6ct.conf
 - Authentication agent
 - [ ] uwsm
+  - [x] Auth agent (hyprpolkitagnet)
   - [ ] App Launcher
     - [ ] SwayOSD <https://github.com/ErikReider/SwayOSD> LibInput backend
   - [ ] Replace exec with systemd units
