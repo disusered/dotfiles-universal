@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S --noconfirm hyprshot
+  links:
+    hyprshot.conf: ~/.config/hypr/conf.d/hyprshot.conf
