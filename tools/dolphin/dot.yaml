@@ -1,7 +1,9 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm dolphin
+    cmd: yay -S --noconfirm dolphin archlinux-xdg-menu
     depends:
       - /tools/qt6ct
   links:
     env: ~/.config/uwsm/env
+    dolphin.conf: ~/.config/hypr/conf.d/dolphin.conf
+    kdeglobals: ~/.config/kdeglobals

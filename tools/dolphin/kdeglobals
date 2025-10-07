@@ -1,0 +1,8 @@
+[Icons]
+Theme=Papirus-Dark
+
+[KDE]
+widgetStyle=qt6ct-style
+
+[General]
+TerminalApplication=app2unit -- kitty

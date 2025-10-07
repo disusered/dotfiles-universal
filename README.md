@@ -207,8 +207,14 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
       - [x] Terminal integration (links)
       - [x] Theme
       - [x] Icons
-      - [ ] Open terminal here
+      - [x] Open terminal here
       - [ ] Unzip
+    - [ ] Screenshots
+      - [ ] Take screenshot
+      - [ ] Screenshot annotations
+    - [ ] Color picker
+    - [ ] Zoom
+    - [ ] Ruler
     - [x] Audio widget
       - [x] Install
       - [x] Theme
@@ -223,9 +229,9 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [ ] Lazygit Neovim integration
   - [ ] Claude Neovim integratioin
 - [ ] nwg-look save exported configs to Rotz
-- [ ] Lockscreen
 - [ ] Environment variables <https://wiki.hypr.land/Configuring/Environment-variables/>
 - [ ] /home/carlos/.config/qt6ct/qt6ct.conf
+- [x] Lockscreen
 - Authentication agent
 - [x] uwsm
   - [x] Auth agent (hyprpolkitagnet)
