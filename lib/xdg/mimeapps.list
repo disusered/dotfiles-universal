@@ -1,6 +1,6 @@
 [Added Associations]
-application/zip=unzip.desktop;
+text/plain=neovim.desktop;
 
 [Default Applications]
-application/zip=unzip.desktop;
 inode/directory=org.kde.dolphin.desktop
+text/plain=neovim.desktop;
