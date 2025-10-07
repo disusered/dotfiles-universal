@@ -10,4 +10,5 @@ linux[whoami.distro^="Arch"]:
       - /lib/qt
   links:
     hyprland.conf: ~/.config/hypr/hyprland.conf
+    env-hyperland: ~/.config/uwsm/env-hyperland
     scripts/toggle-monitors.sh: ~/.config/hypr/scripts/toggle-monitors.sh

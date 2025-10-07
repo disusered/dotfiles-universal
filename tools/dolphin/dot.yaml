@@ -4,6 +4,5 @@ linux[whoami.distro^="Arch"]:
     depends:
       - /tools/qt6ct
   links:
-    env: ~/.config/uwsm/env
     dolphin.conf: ~/.config/hypr/conf.d/dolphin.conf
     kdeglobals: ~/.config/kdeglobals
