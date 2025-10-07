@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  links:
+    config.jsonc: ~/.config/fastfetch/config.jsonc
+    cat.txt: ~/.config/fastfetch/cat.txt
+    archpuccinn.png: ~/.config/fastfetch/archpuccinn.png
