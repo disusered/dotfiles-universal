@@ -2,18 +2,26 @@ windows:
   installs:
     cmd: ridk install 3; ridk enable
     depends:
-      - /languages/ruby/latest
       - /tools/msys2
+      - /tools/mise
+      - /tools/imagemagick
+      - /tools/postgresql
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm base-devel
+    cmd: sudo pacman -S --noconfirm base-devel ruby-build
     depends:
-      - /languages/ruby/latest
+      - /lib/arch
+      - /tools/imagemagick
+      - /tools/postgresql
+      - /lib/poppler
+      - /lib/cairo
+      - /tools/mise
       - /tools/imagemagick
       - /tools/postgresql
 linux[whoami.distro^="Fedora"]:
   installs:
     cmd: sudo dnf install ruby-devel -y
     depends:
+      - /tools/mise
       - /tools/imagemagick
       - /tools/postgresql

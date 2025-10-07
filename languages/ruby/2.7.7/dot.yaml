@@ -1,0 +1,7 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      yay -S --noconfirm gcc12
+      CC=gcc-12 mise install ruby@2.7.7
+  depends:
+    - /tools/mise
