@@ -7,13 +7,18 @@
     "hyprland/workspaces"
   ],
   "modules-center": [
-    "clock"
+    "hyprland/window"
   ],
   "modules-right": [
-    "tray"
+    "tray",
+    "clock",
+    "custom/powermenu"
   ],
   "hyprland/workspaces": {
     "format": "{id}"
+  },
+  "hyprland/window": {
+    "format": "{}" // <--- these is the default value  
   },
   "clock": {
     "format": "{:%H:%M}",
@@ -36,5 +41,10 @@
   "tray": {
     "icon-size": 18,
     "spacing": 10
+  },
+  "custom/powermenu": {
+    "format": "⏻",
+    "tooltip": false,
+    "on-click": "app2unit -- rofi -show p -modi p:'~/.local/bin/rofi-power-menu --symbols-font \"JetBrains Mono Nerd Font\"' -font \"JetBrains Mono Nerd Font 16\" -theme-str 'window {width: 8em;} listview {lines: 6;}'"
   }
 }
