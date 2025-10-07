@@ -227,10 +227,13 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [ ] Environment variables <https://wiki.hypr.land/Configuring/Environment-variables/>
 - [ ] /home/carlos/.config/qt6ct/qt6ct.conf
 - Authentication agent
-- [ ] uwsm
+- [x] uwsm
   - [x] Auth agent (hyprpolkitagnet)
-  - [ ] App Launcher
-    - [ ] SwayOSD <https://github.com/ErikReider/SwayOSD> LibInput backend
-  - [ ] Replace exec with systemd units
-  - [ ] 1password agent
-  - [ ] Bluetooth
+  - [x] App Launcher
+    - [x] SwayOSD <https://github.com/ErikReider/SwayOSD> LibInput backend
+  - [x] Replace exec with systemd units
+  - [x] 1Password Agent
+  - [x] Bluetooth
+  - [x] Lock
+  - [ ] Logout
+  - [x] Power/Restart
