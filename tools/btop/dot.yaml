@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S --noconfirm btop
+  links:
+    catppuccin_mocha.theme: ~/.config/btop/themes/catppuccin_mocha.theme
