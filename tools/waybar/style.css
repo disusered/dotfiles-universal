@@ -55,6 +55,7 @@ window#waybar {
 #mpris,
 #pulseaudio,
 #privacy,
+#custom-weather,
 #custom-powermenu {
   background-color: @surface0;
   color: @text;

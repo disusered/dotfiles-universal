@@ -5,6 +5,7 @@
   "spacing": 4,
   "modules-left": [
     "clock",
+    "custom/weather",
     "hyprland/workspaces"
   ],
   "modules-center": [
@@ -106,5 +107,12 @@
     ],
     "ignore-monitor": true,
     "ignore": []
+  },
+  "custom/weather": {
+    "format": "{}°",
+    "tooltip": true,
+    "interval": 3600,
+    "exec": "wttrbar",
+    "return-type": "json"
   },
 }

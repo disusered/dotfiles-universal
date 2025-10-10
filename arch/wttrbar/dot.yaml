@@ -1,0 +1,7 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S --noconfirm wttrbar
+  depends:
+    - /languages/rust
+    - /tools/waybar
+    - /tools/yay
