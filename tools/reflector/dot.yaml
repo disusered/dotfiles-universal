@@ -3,3 +3,4 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       yay -S --noconfirm reflector
       systemctl enable --now reflector.service
+      sudo reflector --latest 20 --sort rate -l 20 --save /etc/pacman.d/mirrorlist
