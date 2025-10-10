@@ -1,5 +1,11 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S --noconfirm \
-      pipewire-audio pipewire-pulse gst-plugin-pipewire wireplumber \
-      pavucontrol pamixer playerctl
+    cmd: |
+      yay -S --noconfirm \
+        pipewire pipewire-audio gst-plugin-pipewire wireplumber \
+        pipewire-alsa pipewire-jack helvum playerctl pipewire-zeroconf \
+        pipewire-v4l2 pavucontrol
+    depends:
+      - /lib/avahi
+  links:
+    raop.conf: ~/.config/pipewire/pipewire.conf.d/50-raop.conf

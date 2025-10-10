@@ -1,0 +1,9 @@
+# TODO: Manual steps of modifying nsswitch.conf
+# TODO: hostname.local naming scheme
+# https://wiki.archlinux.org/title/Avahi
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      sudo pacman -S --noconfirm avahi nss-mdns
+      sudo systemctl disable --now systemd-resolved.service
+      sudo systemctl enable --now avahi-daemon.service
