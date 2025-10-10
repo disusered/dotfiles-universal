@@ -54,10 +54,16 @@ window#waybar {
 #clock,
 #mpris,
 #pulseaudio,
+#privacy,
 #custom-powermenu {
   background-color: @surface0;
   color: @text;
   padding: 0px 15px;
   margin: 5px;
   border-radius: 10px;
+}
+
+#privacy {
+  background-color: @red;
+  color: @surface0;
 }
