@@ -1,5 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo yay -S --noconfirm \
+    cmd: sudo pacman -S --noconfirm \
       pipewire-alsa pipewire-audio pipewire-pulse gst-plugin-pipewire \
-      wireplumber pavucontrol pamixer
+      wireplumber pavucontrol pamixer playerctl

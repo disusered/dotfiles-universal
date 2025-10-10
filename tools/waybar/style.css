@@ -66,3 +66,11 @@ window#waybar {
   margin: 5px;
   border-radius: 10px;
 }
+
+#mpris {
+  background-color: @surface0;
+  color: @text;
+  padding: 0px 15px;
+  margin: 5px;
+  border-radius: 10px;
+}
