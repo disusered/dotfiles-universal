@@ -1,5 +1,6 @@
 linux[whoami.distro^="Arch"]:
   installs:
+    # FIXME: This is non-interactive
     cmd: |
       sudo pacman -S --noconfirm plasma-workspace
       if [ ! -d ~/.local/share/catppuccin-kde ]; then

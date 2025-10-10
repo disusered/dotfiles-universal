@@ -2,6 +2,6 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       sudo pacman -S --noconfirm networkmanager
-      sudo systemctl enable NetworkManager
+      sudo systemctl enable --now NetworkManager
     depends:
       - /tools/iwd

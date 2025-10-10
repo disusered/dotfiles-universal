@@ -2,5 +2,4 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       yay -S --noconfirm reflector
-      systemctl start reflector.service
-      systemctl enable reflector.service
+      systemctl enable --now reflector.service

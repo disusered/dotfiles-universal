@@ -2,7 +2,7 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       sudo pacman -S --noconfirm sddm
-      sudo systemctl enable sddm
+      sudo systemctl enable --now sddm
     depends:
       - /lib/qt
   links:
