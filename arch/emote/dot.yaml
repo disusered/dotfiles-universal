@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S --noconfirm emote
+  links:
+    emote.conf: ~/.config/hypr/conf.d/emote.conf
