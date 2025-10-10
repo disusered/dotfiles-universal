@@ -49,7 +49,7 @@
   "custom/powermenu": {
     "format": "⏻",
     "tooltip": false,
-    "on-click": "app2unit -- rofi -show p -modi p:'~/.local/bin/rofi-power-menu --symbols-font \"JetBrains Mono Nerd Font\"' -font \"JetBrains Mono Nerd Font 16\" -theme-str 'window {width: 8em;} listview {lines: 6;}'"
+    "on-click": "app2unit -- wlogout"
   },
   "mpris": {
     "format": "{player_icon}  {dynamic}",
