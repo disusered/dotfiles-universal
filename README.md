@@ -202,26 +202,21 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [x] Fonts
   - [ ] Utilities
     - [x] Clipboard manager (cliphist)
-    - [ ] File manager (dolphin)
+    - [x] File manager (dolphin)
       - [x] Keybind
       - [x] Terminal integration (links)
       - [x] Theme
       - [x] Icons
       - [x] Open terminal here
-      - [ ] Unzip
+      - [x] Unzip
     - [ ] Screenshots
       - [ ] Take screenshot
       - [ ] Screenshot annotations
-    - [ ] Color picker
-    - [ ] Zoom
-    - [ ] Ruler
-    - [x] Audio widget
+    - [x] Color picker
       - [x] Install
       - [x] Theme
     - [x] Network (iwd + nm-applet for WiFi)
-  - [ ] Monitor management
-    - [ ] Profile: Single monitor (current)
-    - [ ] Profile: Dual monitor (other location)
+  - [x] Monitor management
 - [x] Firefox
   - [x] Default browser
 - [x] Chrome (not Chromium)
@@ -240,6 +235,13 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [x] Replace exec with systemd units
   - [x] 1Password Agent
   - [x] Bluetooth
-  - [x] Lock
   - [ ] Logout
-  - [x] Power/Restart
+    - [ ] wlogout
+    - [ ] Theme
+    - [ ] Physical key
+    - [x] Lock
+    - [x] Power/Restart
+  - [ ] GRUB
+    - [x] Windows
+    - [x] Linux
+    - [ ] Theme

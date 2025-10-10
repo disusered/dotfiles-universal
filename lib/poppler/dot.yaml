@@ -3,3 +3,6 @@ windows:
     cmd: scoop install poppler
     depends:
       - /packages/scoop
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm poppler

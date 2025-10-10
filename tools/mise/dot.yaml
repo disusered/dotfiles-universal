@@ -7,6 +7,7 @@ windows:
     depends:
       - /packages/scoop
       - /tools/pwsh
+      - /tools/zsh
   links:
     shims.ps1: ~/.config/powershell/profile.d/shims.ps1
 linux:

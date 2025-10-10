@@ -13,7 +13,7 @@ linux[whoami.distro^="Fedora"]:
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      if cd ~/.1password; then git pull; else git clone \
+      if cd ~/.antidote; then git pull; else git clone \
       --depth 1 https://github.com/mattmc3/antidote.git ${ZDOTDIR:-~}/.antidote; fi
     depends:
       - /tools/zsh

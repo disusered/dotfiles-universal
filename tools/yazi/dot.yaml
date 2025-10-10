@@ -6,7 +6,7 @@ windows:
       - /tools/ffmpeg
       - /tools/7zip
       - /tools/jq
-      - /tools/poppler
+      - /lib/poppler
       - /tools/fd
       - /tools/ripgrep
       - /tools/fzf

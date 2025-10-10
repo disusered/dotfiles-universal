@@ -1,6 +1,6 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S kitty
+    cmd: sudo pacman -S --noconfirm kitty ttf-jetbrains-mono-nerd
   links:
     kitty.conf: ~/.config/kitty/kitty.conf
     open-actions.conf: ~/.config/kitty/open-actions.conf
