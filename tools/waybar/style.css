@@ -35,14 +35,6 @@ window#waybar {
   color: @text;
 }
 
-#clock {
-  background-color: @surface0;
-  color: @text;
-  padding: 0px 15px;
-  margin: 5px;
-  border-radius: 10px;
-}
-
 #tray {
   background-color: @surface0;
   margin: 5px;
@@ -59,15 +51,10 @@ window#waybar {
   background-color: @red;
 }
 
+#clock,
+#mpris,
+#pulseaudio,
 #custom-powermenu {
-  background-color: @surface0;
-  color: @text;
-  padding: 0px 15px;
-  margin: 5px;
-  border-radius: 10px;
-}
-
-#mpris {
   background-color: @surface0;
   color: @text;
   padding: 0px 15px;
