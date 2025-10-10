@@ -1,0 +1,8 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm swappy
+    depends:
+      - /arch/hyprshot
+  links:
+    config: ~/.config/swappy/config
+    swappy.conf: ~/.config/hypr/conf.d/swappy.conf

@@ -209,9 +209,9 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
       - [x] Icons
       - [x] Open terminal here
       - [x] Unzip
-    - [ ] Screenshots
-      - [ ] Take screenshot <https://github.com/Gustash/Hyprshot>
-      - [ ] Screenshot annotations <https://github.com/jtheoof/swappy>
+    - [x] Screenshots
+      - [x] Take screenshot <https://github.com/Gustash/Hyprshot>
+      - [x] Screenshot annotations <https://github.com/jtheoof/swappy>
     - [x] Color picker
       - [x] Install
       - [x] Theme
@@ -235,18 +235,22 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [x] Replace exec with systemd units
   - [x] 1Password Agent
   - [x] Bluetooth
-  - [ ] Logout
+  - [x] Logout
     - [x] wlogout
     - [x] Theme
-    - [ ] Physical key
+    - [x] Physical key
     - [x] Lock
     - [x] Power/Restart
-  - [ ] GRUB
+  - [x] GRUB
     - [x] Windows
     - [x] Linux
-    - [ ] Theme
-  - [ ] Emoji: <https://github.com/tom-james-watson/Emote>
-  - [ ] Casting
-    - [ ] GNOME Network Displays
-    - [ ] wl-mirror?
+    - [x] Theme
+  - [x] Emoji: <https://github.com/tom-james-watson/Emote>
+  - [x] Casting
+    - [x] GNOME Network Displays <https://github.com/GNOME/gnome-network-displays?tab=readme-ov-file#testing>
   - [ ] Airplay
+    - [x] Pipewire
+    - [x] Avahi
+    - [x] RAOP Sink
+    - [x] Mixer/wpctl status
+    - [ ] Output
