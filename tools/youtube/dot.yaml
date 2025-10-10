@@ -1,0 +1,9 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S --noconfirm ytcast
+    depends:
+      - /tools/fzf
+      - /tools/jq
+      - /tools/curl
+  links:
+    ytsearch.sh: ~/.local/bin/ytsearch
