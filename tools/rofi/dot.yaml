@@ -3,5 +3,4 @@ linux[whoami.distro^="Arch"]:
     cmd: sudo pacman -S --noconfirm rofi-wayland
   links:
     config.rasi: ~/.config/rofi/config.rasi
-    powermenu.sh: ~/.local/bin/rofi-power-menu
     rofi.conf: ~/.config/hypr/conf.d/rofi.conf

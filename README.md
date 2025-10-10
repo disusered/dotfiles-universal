@@ -210,8 +210,8 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
       - [x] Open terminal here
       - [x] Unzip
     - [ ] Screenshots
-      - [ ] Take screenshot
-      - [ ] Screenshot annotations
+      - [ ] Take screenshot <https://github.com/Gustash/Hyprshot>
+      - [ ] Screenshot annotations <https://github.com/jtheoof/swappy>
     - [x] Color picker
       - [x] Install
       - [x] Theme
@@ -236,8 +236,8 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [x] 1Password Agent
   - [x] Bluetooth
   - [ ] Logout
-    - [ ] wlogout
-    - [ ] Theme
+    - [x] wlogout
+    - [x] Theme
     - [ ] Physical key
     - [x] Lock
     - [x] Power/Restart
@@ -245,3 +245,8 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [x] Windows
     - [x] Linux
     - [ ] Theme
+  - [ ] Emoji: <https://github.com/tom-james-watson/Emote>
+  - [ ] Casting
+    - [ ] GNOME Network Displays
+    - [ ] wl-mirror?
+  - [ ] Airplay

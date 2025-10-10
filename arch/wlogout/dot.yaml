@@ -1,0 +1,9 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      yay -S --noconfirm wlogout
+      sudo sed -i 's/#HandlePowerKey=poweroff/HandlePowerKey=ignore/' /etc/systemd/logind.conf
+  links:
+    wlogout.conf: ~/.config/hypr/conf.d/wlogout.conf
+    blue.css: ~/.config/wlogout/style.css
+    mocha/blue: ~/.config/wlogout/icons

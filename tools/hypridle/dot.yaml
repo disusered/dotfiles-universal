@@ -5,4 +5,3 @@ linux[whoami.distro^="Arch"]:
       systemctl --user enable --now hypridle.service
   links:
     hypridle.conf: ~/.config/hypr/hypridle.conf
-    hypridle.hyprland.conf: ~/.config/hypr/conf.d/hypridle.conf
