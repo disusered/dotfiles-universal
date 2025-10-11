@@ -359,7 +359,7 @@ return {
       { "<leader>aC", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
       { "<leader>am", "<cmd>ClaudeCodeSelectModel<cr>", desc = "Select Claude model" },
       {
-        "<leader>cb",
+        "<leader>as",
         function()
           local filename = vim.fn.expand("%:t")
           vim.cmd("ClaudeCodeAdd %")
@@ -368,7 +368,7 @@ return {
         desc = "Send buffer to Claude",
       },
       {
-        "<leader>cb",
+        "<leader>as",
         function()
           local filename = vim.fn.expand("%:t")
           vim.cmd("ClaudeCodeSend")
