@@ -7,3 +7,5 @@ linux[whoami.distro^="Arch"]:
     depends:
       - /lib/arch
       # - /tools/git
+  links:
+    yay.zsh: ~/.config/zsh/1400_yay.zsh
