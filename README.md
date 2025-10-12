@@ -220,13 +220,13 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
 - [x] Firefox
   - [x] Default browser
 - [x] Chrome (not Chromium)
-- [ ] Wezterm Replacement
-  - [ ] Lazygit Neovim integration
-  - [ ] Claude Neovim integratioin
+- [x] Wezterm Replacement
+  - [x] Lazygit Neovim integration
+  - [x] Claude Neovim integratioin
+- [x] Lockscreen
 - [ ] nwg-look save exported configs to Rotz
 - [ ] Environment variables <https://wiki.hypr.land/Configuring/Environment-variables/>
 - [ ] /home/carlos/.config/qt6ct/qt6ct.conf
-- [x] Lockscreen
 - Authentication agent
 - [x] uwsm
   - [x] Auth agent (hyprpolkitagnet)
