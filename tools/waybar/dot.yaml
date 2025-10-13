@@ -2,6 +2,7 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       sudo pacman -S --noconfirm waybar
+      sudo systemctl enable --now waybar.service
       mkdir -p ~/.config/waybar
       curl -sL https://raw.githubusercontent.com/catppuccin/waybar/main/themes/mocha.css -o ~/.config/waybar/mocha.css
     depends:
@@ -10,4 +11,3 @@ linux[whoami.distro^="Arch"]:
   links:
     config.jsonc: ~/.config/waybar/config.jsonc
     style.css: ~/.config/waybar/style.css
-    waybar.conf: ~/.config/hypr/conf.d/waybar.conf
