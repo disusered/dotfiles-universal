@@ -63,8 +63,8 @@
       "status-icons": {
         "paused": "⏸"
       },
-      "interval": 1
-      // "ignored-players": ["firefox"]
+      "interval": 15,
+      "dynamic-len": 60
     },
     "wireplumber": {
       "format": "{volume}% {icon}",
