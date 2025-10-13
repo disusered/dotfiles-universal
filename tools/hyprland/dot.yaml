@@ -10,7 +10,6 @@ linux[whoami.distro^="Arch"]:
       - /lib/pipewire
       - /lib/qt
   links:
-    fullscreen.sh: ~/.config/hypr/scripts/fullscreen-manager.sh
     hyprland.conf: ~/.config/hypr/hyprland.conf
     env-hyperland: ~/.config/uwsm/env-hyperland
     scripts/toggle-monitors.sh: ~/.config/hypr/scripts/toggle-monitors.sh
