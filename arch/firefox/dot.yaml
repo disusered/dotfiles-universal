@@ -1,5 +1,7 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: sudo pacman -S --noconfirm firefox
+    depends:
+      - /arch/speech
   links:
     firefox.conf: ~/.config/hypr/conf.d/firefox.conf
