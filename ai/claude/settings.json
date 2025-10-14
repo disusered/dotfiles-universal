@@ -39,10 +39,6 @@
           {
             "type": "command",
             "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -q '\\.py$'; then black \"$file_path\" && isort \"$file_path\"; fi"
-          },
-          {
-            "type": "command",
-            "command": "file_path=$(jq -r '.tool_input.file_path'); if echo \"$file_path\" | grep -q '\\.rb$'; then rubocop -a \"$file_path\" || true; fi"
           }
         ]
       }
