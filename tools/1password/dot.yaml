@@ -1,13 +1,11 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: |
-      curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
-        gpg --import && \
-        if cd ~/.1password; then git pull; else git clone \
-        --depth 1 https://aur.archlinux.org/1password.git ~/.1password; fi && \
-        cd ~/.1password && yes | makepkg -si
+    cmd: yay -S --noconfirm 1password
     depends:
       - /lib/pipewire
   links:
     1password.conf: ~/.config/hypr/conf.d/1password.conf
     1password.desktop: ~/.local/share/applications/1password-silent.desktop
+    agent.toml: ~/.config/1Password/ssh/agent.toml
+    config: ~/.ssh/config
+    1password.zsh: ~/.config/zsh/0017_1password.zsh

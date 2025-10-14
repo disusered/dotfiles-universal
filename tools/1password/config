@@ -1,0 +1,14 @@
+# vi: ft=sshconfig
+
+# --- 1Password Integration ---
+# Includes the file that maps real hostnames to specific keys.
+Include ~/.ssh/1Password/config
+
+# --- Work Integration ---
+Include ~/.ssh/CRI/config
+
+# --- Global Settings ---
+# Ensures all SSH connections use the 1Password agent and forward it.
+Host *
+  IdentityAgent ~/.1password/agent.sock
+  ForwardAgent yes
