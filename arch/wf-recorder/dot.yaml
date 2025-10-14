@@ -1,0 +1,13 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm wf-recorder
+    depends:
+      - /lib/slurp
+      - /lib/uwsm
+      - /tools/hyprland
+      - /tools/ffmpeg
+      - /tools/rofi
+      - /tools/jq
+  links:
+    wf-recorder.conf: ~/.config/hypr/conf.d/wf-recorder.conf
+    recorder.sh: ~/.config/hypr/scripts/recorder.sh

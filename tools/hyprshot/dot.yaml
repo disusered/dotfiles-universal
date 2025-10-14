@@ -1,5 +1,7 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: yay -S --noconfirm hyprshot
+    depends:
+      - /lib/slurp
   links:
     hyprshot.conf: ~/.config/hypr/conf.d/hyprshot.conf
