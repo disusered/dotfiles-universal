@@ -4,7 +4,10 @@ linux[whoami.distro^="Arch"]:
       yay -S --noconfirm \
         pipewire pipewire-audio gst-plugin-pipewire wireplumber \
         pipewire-alsa pipewire-jack helvum playerctl pipewire-zeroconf \
-        pipewire-v4l2 pavucontrol
+        pipewire-v4l2 pavucontrol pipewire-pulse
+      systemctl --user enable --now pipewire.service
+      systemctl --user enable --now pipewire-pulse.service
+      systemctl --user enable --now wireplumber
     depends:
       - /lib/avahi
   links:

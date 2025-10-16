@@ -1,0 +1,9 @@
+linux:
+  installs:
+    # TODO: Non-interactive installer
+    cmd: curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
+    depends:
+      - /tools/curl
+      - /lib/arch
+  links:
+    haskell.zsh: ~/.config/zsh/0500_haskell.zsh
