@@ -1,0 +1,12 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      sudo pacman -S --noconfirm qjackctl supercollider sc3-plugins tmux
+    depends:
+      - /tools/git
+      - /lib/pipewire
+      # TODO: Enable once installer is fixed
+      # - /languages/haskell
+  links:
+    tidal.lua: ~/.config/nvim/lua/plugins/tidal.lua
+    tidal.zsh: ~/.config/zsh/5000_tidal.zsh
