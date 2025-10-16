@@ -1,11 +1,11 @@
 return {
   "mrjones2014/smart-splits.nvim",
-  enabled = vim.env.TERM ~= "xterm-kitty",
-  config = function()
-    require("smart-splits").setup({
-      at_edge = "stop",
-    })
-  end,
+  lazy = false,
+  build = "./kitty/install-kittens.bash",
+  opts = {
+    at_edge = "stop",
+    multiplexer_integration = "kitty",
+  },
   keys = function()
     local smart_splits = require("smart-splits")
     return {
