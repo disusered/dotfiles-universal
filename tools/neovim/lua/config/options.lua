@@ -3,7 +3,7 @@
 -- Add any additional options here
 
 -- Set local leader to m
-vim.g.maplocalleader = "m"
+vim.g.maplocalleader = "\\"
 
 -- Change default conceal level to 0
 vim.opt.conceallevel = 0
@@ -109,3 +109,5 @@ vim.opt.secure = false
 -- https://www.lazyvim.org/extras/lang/ruby
 vim.g.lazyvim_ruby_lsp = "solargraph"
 vim.g.lazyvim_ruby_formatter = "rubocop"
+
+vim.g.tidal_target = "terminal"
