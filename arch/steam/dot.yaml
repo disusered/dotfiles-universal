@@ -2,9 +2,12 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       sudo locale-gen
-      sudo pacman -S --noconfirm ttf-liberation
+      sudo pacman -S --noconfirm ttf-liberation steam
     depends:
       - /arch/hyprland
       - /lib/networkmanager/
       - /lib/avahi/
       - /lib/pipewire/
+  links:
+    steam.conf: ~/.config/hypr/conf.d/steam.conf
+    steam_minimal.desktop: ~/.local/share/applications/steam_minimal.desktop
