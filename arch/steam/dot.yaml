@@ -1,8 +1,10 @@
+# Manual config: Add `gamemoderun %command%` to launch option of game
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       sudo locale-gen
-      sudo pacman -S --noconfirm ttf-liberation steam
+      sudo pacman -S --noconfirm ttf-liberation steam gamemode lib32-gamemode
+      sudo gpasswd -a $USER gamemode
     depends:
       - /arch/hyprland
       - /lib/networkmanager/
@@ -11,3 +13,4 @@ linux[whoami.distro^="Arch"]:
   links:
     steam.conf: ~/.config/hypr/conf.d/steam.conf
     steam_minimal.desktop: ~/.local/share/applications/steam_minimal.desktop
+    gamemode.ini: ~/.config/gamemode.ini
