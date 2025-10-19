@@ -7,3 +7,5 @@ linux[whoami.distro^="Arch"]:
       sudo pacman -S --noconfirm avahi nss-mdns
       sudo systemctl disable --now systemd-resolved.service
       sudo systemctl enable --now avahi-daemon.service
+    depends:
+      - /lib/networkmanager/

@@ -3,5 +3,6 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       sudo pacman -S --noconfirm networkmanager
       sudo systemctl enable --now NetworkManager
+      sudo systemctl enable --now systemd-networkd.service
     depends:
       - /tools/iwd
