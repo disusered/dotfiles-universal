@@ -1,6 +1,6 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S --noconfirm dolphin archlinux-xdg-menu ark
+    cmd: yay -S --noconfirm dolphin archlinux-xdg-menu ark unrar
     depends:
       - /lib/qt
   links:
