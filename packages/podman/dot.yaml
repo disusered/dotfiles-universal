@@ -1,0 +1,9 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      sudo pacman -S --noconfirm podman podman-compose netavark aardvark-dns
+      systemctl --user enable --now podman.socket
+  links:
+    registries.conf: ~/.config/containers/registries.conf
+    podman.zsh: ~/.config/zsh/0700_podman.zsh
+    docker.sh: ~/.local/bin/docker
