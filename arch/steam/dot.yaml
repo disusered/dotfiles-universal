@@ -3,7 +3,7 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       sudo locale-gen
-      sudo pacman -S --noconfirm ttf-liberation steam gamemode lib32-gamemode
+      sudo pacman -S --noconfirm ttf-liberation steam gamemode lib32-gamemode gamescope
       sudo gpasswd -a $USER gamemode
     depends:
       - /arch/hyprland
