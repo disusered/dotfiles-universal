@@ -26,7 +26,7 @@
 	extended = %C(magenta bold)%h%C(reset) %C(blue bold)%aN%C(reset) %C(auto)%d%C(reset) %s %C(8)(%cr)%C(reset)
 	reflog = %C(magenta bold)%h%C(reset)  %C(blue bold)%gd%C(reset) %gs %C(8)(%cr)%C(reset)
 [alias]
-        l = log --color --pretty=extended --graph --date=relative --branches 
+        l = log --color --pretty=extended --graph --date=relative
         la = log --color --pretty=extended --graph --date=relative --branches --tags --remotes
 	s = status --short --branch
 	b = branch

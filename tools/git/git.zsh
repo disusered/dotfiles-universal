@@ -24,28 +24,38 @@ alias gr='git r'
 alias gco='git co'
 
 # Git Log Interactive
-# https://gist.github/junegunn/f4fca918e937e6bf5bad
+# https://gist.github/junepunn/f4fca918e937e6bf5bad
 function gli() {
   local out shas sha q k
   while out=$(
       git l $@ |
       fzf --ansi --no-sort --reverse --multi --query="$q" \
-          --print-query --expect=ctrl-d,ctrl-c,ctrl-i,ctrl-r --toggle-sort=\`); do
+          --print-query --expect=ctrl-d,ctrl-c,ctrl-i,ctrl-r,ctrl-s,ctrl-p --toggle-sort=\`); do
     q=$(head -1 <<< "$out")
     k=$(head -2 <<< "$out" | tail -1)
-    shas=$(sed '1,2d;s/^[^a-z0-9]*//;/^$/d' <<< "$out" | awk '{print $1}')
+    shas=$(sed '1,2d;s/^[^a-z0-9]*//;/^$/d' <<< "$out" | awk '{print $1}' | tr '\n' ' ')
+    shas=${shas% }
     [ -z "$shas" ] && continue
     if [ "$k" = ctrl-d ]; then
-      # Git will now handle the pager correctly via delta's new config
       git show $shas
       break
+    elif [ "$k" = ctrl-s ]; then
+      echo -n "$shas" | pbcopy
+      notify-send "Git Log" "Copied to clipboard:\n$shas"
+    elif [ "$k" = ctrl-p ]; then
+      if git cherry-pick $shas; then
+        notify-send "Git Cherry-Pick" "Successfully picked:\n$shas"
+      else
+        notify-send -u critical "Git Cherry-Pick Failed" "Conflict detected. Please resolve."
+      fi
     elif [ "$k" = ctrl-i ]; then
       git rebase --interactive $shas
-    elif [ "$k" = ctrl-c ]; then
-      echo $shas | tr -d '\n' | pbcopy
       break
     elif [ "$k" = ctrl-r ]; then
       git reset --hard $shas
+      break
+    elif [ "$k" = ctrl-c ]; then
+      break
     else
       for sha in $shas; do
         git show $sha
