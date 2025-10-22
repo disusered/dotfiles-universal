@@ -4,5 +4,5 @@ linux[whoami.distro^="Arch"]:
   links:
     app2unit.zsh: ~/.config/zsh/1500_app2unit.zsh
     opener.sh: ~/.local/bin/xdg-open
-    app2unit.conf: ~/config/environment.d/app2unit.conf
+    app2unit.conf: ~/.config/environment.d/app2unit.conf
     env: ~/.config/uwsm/env
