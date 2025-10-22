@@ -2,7 +2,9 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       sudo pacman -S --noconfirm hyprland hyprpolkitagent xdg-desktop-portal \
-      xdg-desktop-portal-kde xdg-desktop-portal-hyprland qt5-wayland qt6-wayland && \
+      xdg-desktop-portal-kde xdg-desktop-portal-hyprland qt5-wayland \
+      qt6-wayland wayland wayland-protocols hyprutils hyprlang \
+      hyprwayland-scanner && \
       PATH="/usr/bin:$PATH" yay -S --noconfirm pyprland
       systemctl --user enable --now hyprpolkitagent.service
     depends:
@@ -12,5 +14,4 @@ linux[whoami.distro^="Arch"]:
   links:
     hyprland.conf: ~/.config/hypr/hyprland.conf
     env-hyperland: ~/.config/uwsm/env-hyperland
-    scripts/toggle-monitors.sh: ~/.config/hypr/scripts/toggle-monitors.sh
     pyprland.toml: ~/.config/hypr/pyprland.toml

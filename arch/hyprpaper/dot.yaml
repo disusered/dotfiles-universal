@@ -1,0 +1,11 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      sudo pacman -S --noconfirm \
+        ninja gcc libjpeg-turbo libwebp libjxl pango cairo \
+        pkgconf cmake libglvnd hyprpaper
+      systemctl --user enable --now hyprpaper.service
+    depends:
+      - /arch/hyprland
+  links:
+    hyprpaper.conf: ~/.config/hypr/hyprpaper.conf
