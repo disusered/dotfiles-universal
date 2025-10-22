@@ -43,10 +43,15 @@ function gli() {
       echo -n "$shas" | pbcopy
       notify-send "Git Log" "Copied to clipboard:\n$shas"
     elif [ "$k" = ctrl-p ]; then
-      if git cherry-pick $shas; then
-        notify-send "Git Cherry-Pick" "Successfully picked:\n$shas"
+      # Capture both standard output and error from the cherry-pick command
+      pick_output=$(git cherry-pick $shas 2>&1)
+      # Store the exit code immediately
+      local exit_code=$?
+
+      if [ $exit_code -eq 0 ]; then
+        notify-send "Git Cherry-Pick Success" "$pick_output"
       else
-        notify-send -u critical "Git Cherry-Pick Failed" "Conflict detected. Please resolve."
+        notify-send -u critical "Git Cherry-Pick Failed" "$pick_output"
       fi
     elif [ "$k" = ctrl-i ]; then
       git rebase --interactive $shas
