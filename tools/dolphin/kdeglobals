@@ -126,6 +126,7 @@ Theme=Papirus-Dark
 
 [KDE]
 LookAndFeelPackage=Catppuccin-Mocha-Blue
+ShowDeleteCommand=false
 widgetStyle=qt6ct-style
 
 [KFileDialog Settings]
@@ -146,6 +147,10 @@ Sort hidden files last=false
 Sort reversed=false
 Speedbar Width=154
 View Style=DetailTree
+
+[PreviewSettings]
+EnableRemoteFolderThumbnail=false
+MaximumRemoteSize=0
 
 [WM]
 activeBackground=30,30,46
