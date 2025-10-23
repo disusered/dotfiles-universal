@@ -93,7 +93,6 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [x] Explorer
   - [x] Neovim
 - [x] Starship show sudo status
-- [ ] Neovim wrap sidebar icon like screenshot
 - [ ] Neovim show selection stats (lines, words, characters) in statusline for Markdown
 - [x] WSL config <https://learn.microsoft.com/en-us/windows/wsl/wsl-config>
 - [x] Claude
@@ -224,9 +223,6 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
   - [x] Lazygit Neovim integration
   - [x] Claude Neovim integratioin
 - [x] Lockscreen
-- [ ] nwg-look save exported configs to Rotz
-- [ ] Environment variables <https://wiki.hypr.land/Configuring/Environment-variables/>
-- [ ] /home/carlos/.config/qt6ct/qt6ct.conf
 - Authentication agent
 - [x] uwsm
   - [x] Auth agent (hyprpolkitagnet)
@@ -254,3 +250,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [x] RAOP Sink
     - [x] Mixer/wpctl status
     - [ ] Output
+- [ ] Environment variables <https://wiki.hypr.land/Configuring/Environment-variables/>
+- [ ] /home/carlos/.config/qt6ct/qt6ct.conf
+- [ ] XDG/Dolphin associations issue
+- [ ] Sleep browser crash
