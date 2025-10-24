@@ -37,7 +37,7 @@ function gli() {
     shas=${shas% }
     [ -z "$shas" ] && continue
     if [ "$k" = ctrl-d ]; then
-      git show $shas
+      GIT_PAGER='delta --pager="less -RX -c -+F"' git show $shas
       break
     elif [ "$k" = ctrl-s ]; then
       echo -n "$shas" | pbcopy
@@ -63,7 +63,7 @@ function gli() {
       break
     else
       for sha in $shas; do
-        git show $sha
+        GIT_PAGER='delta --pager="less -RX -c -+F"' git show $sha
       done
     fi
   done
