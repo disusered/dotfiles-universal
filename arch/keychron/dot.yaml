@@ -1,0 +1,6 @@
+linux[whoami.distro^="Arch"]:
+  links:
+    # https://www.reddit.com/r/Keychron/comments/1nqpheb/comment/ngl9uvf/
+    # sudo chmod a+rw /dev/hidraw3
+    # sudo chmod 600 /dev/hidraw3
+    keychron.rules: /usr/lib/udev/rules.d/70-keychron.rules
