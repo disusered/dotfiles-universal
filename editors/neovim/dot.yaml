@@ -1,3 +1,8 @@
+linux:
+  links:
+    neovim.zsh: ~/.config/zsh/0020_neovim.zsh
+    init.lua: ~/.config/nvim/init.lua
+    config: ~/.config/nvim/lua/config
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: yes | sudo pacman -S neovim
@@ -25,14 +30,9 @@ linux[whoami.distro^="Arch"]:
       - /languages/node/latest
       - /languages/latex/tectonic
       - /tools/fonts
-      # TODO: Are the other latex stuff needed?
       - /tools/grpcurl
       - /tools/websocat
       - /tools/xmllint
-  links:
-    neovim.zsh: ~/.config/zsh/0020_neovim.zsh
-    init.lua: ~/.config/nvim/init.lua
-    lua: ~/.config/nvim/lua
 linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install neovim
@@ -61,12 +61,6 @@ linux[whoami.distro^="Fedora"]:
       - /languages/latex/tectonic
       - /languages/python/latest
       - /languages/node/latest
-      # TODO: Enable when platform-specific fonts are used for Wezterm
-      # - /tools/fonts
-  links:
-    neovim.zsh: ~/.config/zsh/0020_neovim.zsh
-    init.lua: ~/.config/nvim/init.lua
-    lua: ~/.config/nvim/lua
 windows:
   installs:
     cmd: scoop install neovim
