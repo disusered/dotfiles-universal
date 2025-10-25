@@ -1,0 +1,11 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      source ~/.local/share/virtualenvs/neovim/bin/activate
+      uv pip install jupyter_client cairosvg plotly kaleido pnglatex pyperclip nbformat
+      mkdir -p ~/.local/share/jupyter/runtime
+      chmod 700 ~/.local/share/jupyter/runtime
+    depends:
+      - /editor/neovim
+  links:
+    molten.lua: ~/.config/nvim/lua/plugins/molten.lua
