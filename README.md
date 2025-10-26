@@ -187,9 +187,9 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [x] Pane management
     - [x] Theme
     - [x] Links
-- [ ] Hyprland
+- [x] Hyprland
   - [x] Login manager (SDDM)
-  - [ ] Must-have <https://wiki.hypr.land/Useful-Utilities/Must-have/>
+  - [x] Must-have <https://wiki.hypr.land/Useful-Utilities/Must-have/>
     - [x] Notification daemon (mako)
     - [x] OSD (swayosd)
     - [x] Pipewire
@@ -199,7 +199,7 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
       - [x] Theme
       - [x] Icons
     - [x] Fonts
-  - [ ] Utilities
+  - [x] Utilities
     - [x] Clipboard manager (cliphist)
     - [x] File manager (dolphin)
       - [x] Keybind
@@ -250,7 +250,8 @@ Source: <https://github.com/pho3nixf1re/dotfiles/tree/main>
     - [x] RAOP Sink
     - [x] Mixer/wpctl status
     - [ ] Output
-- [ ] Environment variables <https://wiki.hypr.land/Configuring/Environment-variables/>
+- [x] Environment variables <https://wiki.hypr.land/Configuring/Environment-variables/>
 - [ ] /home/carlos/.config/qt6ct/qt6ct.conf
 - [ ] XDG/Dolphin associations issue
 - [ ] Sleep browser crash
+- [ ] <https://quarto.org/docs/tools/neovim.html>
