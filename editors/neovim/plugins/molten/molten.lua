@@ -3,22 +3,23 @@ return {
     "benlubas/molten-nvim",
     lazy = false,
     version = "^1.0.0",
-    dependencies = {
-      "3rd/image.nvim",
-      {
-        "quarto-dev/quarto-nvim",
-        dependencies = {
-          "jmbuhr/otter.nvim",
-          "nvim-treesitter/nvim-treesitter",
-        },
-      },
-    },
+    dependencies = { "3rd/image.nvim" },
     build = ":UpdateRemotePlugins",
     init = function()
       vim.g.molten_image_provider = "image.nvim"
       vim.g.molten_output_win_max_height = 20
     end,
     config = function()
+      -- Enable relative line numbers for Quarto files
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "quarto",
+        group = vim.api.nvim_create_augroup("UserQuartoSettings", { clear = true }),
+        callback = function()
+          vim.wo.relativenumber = true
+        end,
+        desc = "Enable relative line numbers for Quarto",
+      })
+
       -- Helper function: Initialize kernel with venv detection
       local function molten_init()
         local venv = os.getenv("VIRTUAL_ENV") or os.getenv("CONDA_PREFIX")
@@ -26,56 +27,16 @@ return {
           venv = string.match(venv, "/.+/(.+)")
           vim.cmd(("MoltenInit"):format(venv))
         else
-          vim.cmd("MoltenInit python3")
+          vim.cmd("MoltenInit")
         end
       end
 
-      -- Helper function: Evaluate current code block using treesitter
-      local function eval_code_block()
-        local ok, ts_utils = pcall(require, "nvim-treesitter.ts_utils")
-        if not ok then
-          vim.notify("Treesitter not available, falling back to line evaluation", vim.log.levels.WARN)
-          vim.cmd("MoltenEvaluateLine")
-          return
-        end
-
-        local node = ts_utils.get_node_at_cursor()
-        if not node then
-          vim.cmd("MoltenEvaluateLine")
-          return
-        end
-
-        -- Walk up the tree to find a fenced_code_block
-        while node do
-          local node_type = node:type()
-          if node_type == "fenced_code_block" or node_type == "code_block" then
-            local start_row, _, end_row, _ = node:range()
-            -- Convert from 0-indexed to 1-indexed and exclude fence markers
-            -- start_row is the ```{python} line (0-indexed)
-            -- end_row is exclusive, pointing just after the closing ```
-            local start_line = start_row + 2 -- Skip opening fence
-            local end_line = end_row - 1 -- Exclude closing fence
-
-            vim.fn.MoltenEvaluateRange(start_line, end_line)
-            return
-          end
-          node = node:parent()
-        end
-
-        -- Fallback to line if no code block found
-        vim.notify("No code block found, evaluating current line", vim.log.levels.INFO)
-        vim.cmd("MoltenEvaluateLine")
-      end
-
+      -- Helper functi
       -- Store functions globally for keymap access
       _G.molten_helpers = {
         init = molten_init,
-        eval_block = eval_code_block,
       }
     end,
-    -- TODO: https://github.com/quarto-dev/quarto-nvim
-    -- TODO: Review Treesitter/block command
-    -- TODO: Review keybinds
     keys = {
       -- Kernel Management
       {
@@ -84,11 +45,6 @@ return {
           _G.molten_helpers.init()
         end,
         desc = "Initialize kernel",
-      },
-      {
-        "<leader>jR",
-        ":MoltenRestart<CR>",
-        desc = "Restart kernel",
       },
       {
         "<leader>jI",
@@ -104,14 +60,6 @@ return {
         desc = "Evaluate with operator",
       },
       {
-        "<leader>jb",
-        function()
-          _G.molten_helpers.eval_block()
-        end,
-        mode = "n",
-        desc = "Evaluate code block",
-      },
-      {
         "<leader>jl",
         ":MoltenEvaluateLine<CR>",
         mode = "n",
@@ -124,7 +72,13 @@ return {
         desc = "Re-evaluate cell",
       },
       {
-        "<leader>jr",
+        "<leader>jR",
+        ":MoltenReevaluateAll<CR>",
+        mode = "n",
+        desc = "Re-evaluate all cells",
+      },
+      {
+        "<leader>je",
         ":<C-u>MoltenEvaluateVisual<CR>gv",
         mode = "v",
         desc = "Evaluate visual selection",

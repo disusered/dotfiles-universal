@@ -2,7 +2,7 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       source ~/.local/share/virtualenvs/neovim/bin/activate
-      uv pip install jupyter_client cairosvg plotly kaleido pnglatex pyperclip nbformat
+      uv pip install jupyter_client cairosvg plotly kaleido pnglatex pyperclip nbformat pillow requests websocket-client
       mkdir -p ~/.local/share/jupyter/runtime
       chmod 700 ~/.local/share/jupyter/runtime
     depends:
