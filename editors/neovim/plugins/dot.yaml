@@ -40,3 +40,4 @@ global:
     treesitter.lua: ~/.config/nvim/lua/plugins/treesitter.lua
     vimtex.lua: ~/.config/nvim/lua/plugins/vimtex.lua
     whichkey.lua: ~/.config/nvim/lua/plugins/whichkey.lua
+    venv-selector.lua: ~/.config/nvim/lua/plugins/venv-selector.lua
