@@ -352,7 +352,6 @@ return {
     },
 
     keys = {
-      { "<leader>a", nil, desc = "ai" },
       { "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
       { "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
       { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume Claude" },
@@ -386,6 +385,18 @@ return {
       -- Diff management
       { "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
       { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
+    },
+  },
+  {
+    "folke/which-key.nvim",
+    opts = {
+      spec = {
+        {
+          "<leader>a",
+          name = "+ai",
+          mode = "nv",
+        },
+      },
     },
   },
 }
