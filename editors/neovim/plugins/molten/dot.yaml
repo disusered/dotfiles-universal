@@ -7,9 +7,9 @@ linux[whoami.distro^="Arch"]:
       chmod 700 ~/.local/share/jupyter/runtime
     depends:
       - /editor/neovim
+      - /lib/wl-clipboard
   links:
     molten.lua: ~/.config/nvim/lua/plugins/molten.lua
-
 # Jupyter Kernel Registration Workflow:
 # 1. In your project: uv venv
 # 2. Add dependencies: uv add matplotlib jupyter ipykernel

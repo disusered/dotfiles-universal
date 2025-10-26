@@ -60,15 +60,6 @@ return {
     keys = {
       -- Quarto code execution via runner
       {
-        "<leader><enter>",
-        function()
-          require("quarto.runner").run_cell()
-        end,
-        mode = "n",
-        desc = "Run cell",
-        ft = "quarto",
-      },
-      {
         "<leader>jc",
         function()
           require("quarto.runner").run_cell()
@@ -89,7 +80,7 @@ return {
       {
         "<leader>ja",
         function()
-          require("quarto.runner").run_all()
+          require("quarto.runner").run_all(true)
         end,
         mode = "n",
         desc = "Run all cells",
