@@ -1,0 +1,7 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S --noconfirm quarto-cli-bin
+    depends:
+      - /editors/neovim/plugins/molten
+  links:
+    quarto.lua: ~/.config/nvim/lua/plugins/quarto.lua

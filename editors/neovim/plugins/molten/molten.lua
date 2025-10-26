@@ -20,14 +20,12 @@ return {
         desc = "Enable relative line numbers for Quarto",
       })
 
-      -- Helper function: Initialize kernel with venv detection
+      -- Helper function: Initialize kernel (shows picker)
       local function molten_init()
-        local venv = os.getenv("VIRTUAL_ENV") or os.getenv("CONDA_PREFIX")
-        if venv ~= nil then
-          venv = string.match(venv, "/.+/(.+)")
-          vim.cmd(("MoltenInit"):format(venv))
-        else
-          vim.cmd("MoltenInit")
+        vim.cmd("MoltenInit")
+        -- Auto-activate Quarto if in a quarto file
+        if vim.bo.filetype == "quarto" then
+          vim.cmd("QuartoActivate")
         end
       end
 

@@ -9,3 +9,11 @@ linux[whoami.distro^="Arch"]:
       - /editor/neovim
   links:
     molten.lua: ~/.config/nvim/lua/plugins/molten.lua
+
+# Jupyter Kernel Registration Workflow:
+# 1. In your project: uv venv
+# 2. Add dependencies: uv add matplotlib jupyter ipykernel
+# 3. Activate venv: source .venv/bin/activate
+# 4. Register kernel: python -m ipykernel install --user --name=<projectname>
+# 5. Launch nvim (with venv activated or use venv-selector plugin)
+# 6. Use <leader>ji to select the registered kernel from picker
