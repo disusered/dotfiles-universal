@@ -14,13 +14,18 @@ return {
           max_height_window_percentage = math.huge,
           max_width_window_percentage = math.huge,
           window_overlap_clear_enabled = true, -- toggles images when windows are overlapped
-          window_overlap_clear_ft_ignore = { "cmp_menu", "cmp_docs", "" },
+          window_overlap_clear_ft_ignore = { "cmp_menu", "cmp_docs", "snacks_notif" },
           integrations = {
             markdown = {
               enabled = true,
               download_remote_images = true,
               filetypes = { "markdown", "vimwiki", "quarto" }, -- markdown extensions (ie. quarto) can go here
-
+              clear_in_insert_mode = false,
+              only_render_image_at_cursor = true,
+              only_render_image_at_cursor_mode = "inline", -- "inline" or "popup"
+            },
+            html = {
+              enabled = true,
               clear_in_insert_mode = false,
               only_render_image_at_cursor = true,
               only_render_image_at_cursor_mode = "inline", -- "inline" or "popup"
@@ -28,10 +33,46 @@ return {
           },
         },
       },
+      {
+        "folke/snacks.nvim",
+        keys = {
+          -- Disable default snacks bind for icons
+          { "<leader>si", false },
+        },
+      },
+      {
+        "LazyVim/LazyVim",
+        keys = {
+          -- Update binding to non-clashing uppercase I
+          {
+            "<leader>sI",
+            function()
+              Snacks.picker.pick("icons")
+            end,
+            mode = "n",
+            desc = "Icons",
+          },
+          -- Add search for image
+          {
+            "<leader>si",
+            function()
+              Snacks.picker.files({
+                ft = { "jpg", "jpeg", "png", "webp" },
+                confirm = function(self, item, _)
+                  self:close()
+                  require("img-clip").paste_image({}, "./" .. item.file) -- ./ is necessary for img-clip to recognize it as path
+                end,
+              })
+            end,
+            -- TODO: Check if img-clip loaded
+            mode = "n",
+            desc = "Search images",
+          },
+        },
+      },
       { -- paste an image from the clipboard or drag-and-drop
         "HakonHarnes/img-clip.nvim",
         event = "VeryLazy",
-        ft = { "markdown", "quarto", "latex" },
         opts = {
           -- https://github.com/hakonharnes/img-clip.nvim?tab=readme-ov-file#setup
           {
@@ -228,6 +269,12 @@ return {
         desc = "Hide output",
         ft = "quarto",
       },
+      {
+        "<leader>jx",
+        ":MoltenImagePopup<CR>",
+        desc = "Open image",
+        ft = "quarto",
+      },
 
       -- Cell Management
       {
@@ -256,7 +303,6 @@ return {
             color = "orange",
           },
           mode = "nv",
-          ft = "quarto",
         },
       },
     },

@@ -51,8 +51,7 @@ return {
         codeRunner = {
           enabled = true,
           default_method = "molten", -- "molten", "slime", "iron" or <function>
-          ft_runners = {}, -- filetype to runner, ie. `{ python = "molten" }`.
-          -- Takes precedence over `default_method`
+          ft_runners = { python = "molten" }, -- filetype to runner, ie. `{ python = "molten" }`.
           never_run = { "yaml" }, -- filetypes which are never sent to a code runner
         },
       })
@@ -80,7 +79,7 @@ return {
       {
         "<leader>ja",
         function()
-          require("quarto.runner").run_all(true)
+          require("quarto.runner").run_all()
         end,
         mode = "n",
         desc = "Run all cells",
