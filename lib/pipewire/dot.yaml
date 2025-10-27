@@ -3,8 +3,9 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       yay -S --noconfirm \
         pipewire pipewire-audio gst-plugin-pipewire wireplumber \
-        pipewire-alsa pipewire-jack helvum playerctl pipewire-zeroconf \
-        pipewire-v4l2 pavucontrol pipewire-pulse lib32-pipewire
+        pipewire-alsa pipewire-jack playerctl pipewire-zeroconf \
+        pipewire-v4l2 pavucontrol pipewire-pulse lib32-pipewire \
+        helvum easyeffects
       systemctl --user enable --now pipewire.service
       systemctl --user enable --now pipewire-pulse.service
       systemctl --user enable --now wireplumber
@@ -12,3 +13,4 @@ linux[whoami.distro^="Arch"]:
       - /lib/avahi
   links:
     raop.conf: ~/.config/pipewire/pipewire.conf.d/50-raop.conf
+    presets: ~/.config/easyeffects/output/

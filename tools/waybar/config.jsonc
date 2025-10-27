@@ -83,7 +83,8 @@
       "format": "{volume}% {icon}",
       "format-muted": "",
       "on-click": "pavucontrol",
-      "on-click-right": "helvum",
+      "on-click-right": "easyeffects",
+      "on-click-middle": "helvum",
       "format-icons": [
         "",
         "",
