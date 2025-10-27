@@ -25,7 +25,15 @@
       "custom/powermenu"
     ],
     "hyprland/workspaces": {
-      "format": "{id}"
+      "format": "{icon}",
+      "format-icons": {
+        "7": "1",
+        "8": "2",
+        "9": "3",
+        "10": "4",
+        "11": "5",
+        "12": "6"
+      }
     },
     "hyprland/window": {
       "format": "{}",

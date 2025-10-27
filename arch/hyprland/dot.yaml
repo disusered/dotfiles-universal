@@ -4,7 +4,7 @@ linux[whoami.distro^="Arch"]:
       sudo pacman -S --noconfirm hyprland hyprpolkitagent xdg-desktop-portal \
       xdg-desktop-portal-kde xdg-desktop-portal-hyprland qt5-wayland \
       qt6-wayland wayland wayland-protocols hyprutils hyprlang \
-      hyprwayland-scanner && \
+      hyprwayland-scanner cpio && \
       PATH="/usr/bin:$PATH" yay -S --noconfirm pyprland
       systemctl --user enable --now hyprpolkitagent.service
     depends:
