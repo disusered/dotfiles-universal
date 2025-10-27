@@ -3,5 +3,6 @@ linux[whoami.distro^="Arch"]:
     cmd: yay -S --noconfirm hyprshot
     depends:
       - /lib/slurp
+      - /arch/hyprpicker
   links:
     hyprshot.conf: ~/.config/hypr/conf.d/hyprshot.conf
