@@ -1,7 +1,7 @@
 [
   {
     "output": [
-      "HDMI-A-1",
+      "HDMI-A-2",
       "DP-1",
       "DP-2"
     ],
@@ -28,7 +28,8 @@
       "format": "{id}"
     },
     "hyprland/window": {
-      "format": "{}" // <--- these is the default value  
+      "format": "{}",
+      "separate-outputs": true
     },
     "clock": {
       "format": "{:%H:%M}",
@@ -109,7 +110,7 @@
     }
   },
   {
-    "output": "HDMI-A-2",
+    "output": "HDMI-A-1",
     "layer": "top",
     "position": "top",
     "height": 25,
@@ -125,7 +126,8 @@
       "format": "{id}"
     },
     "hyprland/window": {
-      "format": "{}" // <--- these is the default value  
+      "format": "{}",
+      "separate-outputs": true
     },
     "clock": {
       "format": "{:%H:%M}",
