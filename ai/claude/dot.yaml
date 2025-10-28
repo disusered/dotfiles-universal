@@ -5,6 +5,8 @@ global:
       - /languages/node/latest
       - /ai/postgres-mcp
       - /ai/mcp-chrome
+  links:
+    agents: ~/.claude/agents/
 linux|darwin:
   links:
     settings.json: ~/.claude/settings.json
