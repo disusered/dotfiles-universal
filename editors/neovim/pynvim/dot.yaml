@@ -1,0 +1,26 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      # 1. Define paths
+      PROJECT_ROOT=~/.config/nvim
+      VENV_PATH=~/.local/share/virtualenvs/neovim
+
+      # 2. Create venv if it doesn't exist
+      if [[ ! -d $VENV_PATH ]]; then
+        mkdir -p ~/.local/share/virtualenvs
+        uv venv $VENV_PATH
+      fi
+
+      # 3. Tell uv which venv to use for installs
+      export VIRTUAL_ENV=$VENV_PATH
+
+      # 4. Go to the project directory
+      cd $PROJECT_ROOT
+
+      # 5. Install the dependencies
+      uv sync --active
+    depends:
+      - /languages/python/latest
+  links:
+    pyproject.toml: ~/.config/nvim/pyproject.toml
+    uv.lock: ~/.config/nvim/uv.lock

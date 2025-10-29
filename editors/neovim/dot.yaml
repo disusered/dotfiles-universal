@@ -8,19 +8,6 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       # Install Neovim
       sudo pacman -S --noconfirm neovim
-
-      # Create user-scoped venv
-      VENVS=~/.local/share/virtualenvs
-      if [[ ! -d $VENVS/neovim ]]; then
-        mkdir -p $VENVS
-        uv venv $VENVS/neovim
-      fi
-
-      # Activate venv
-      source $VENVS/neovim/bin/activate
-
-      # Install provider depedency in venv
-      uv pip install pynvim
     depends:
       - /lib/arch
       - /tools/ssh
@@ -48,6 +35,7 @@ linux[whoami.distro^="Arch"]:
       - /tools/grpcurl
       - /tools/websocat
       - /tools/xmllint
+      - /editors/neovim/pynvim
 linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install neovim
