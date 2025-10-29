@@ -175,11 +175,19 @@ return {
 
       -- Helper function: Initialize kernel (shows picker)
       local function molten_init()
-        vim.cmd("MoltenInit")
-        -- Auto-activate Quarto if in a quarto file
-        if vim.bo.filetype == "quarto" then
-          vim.cmd("QuartoActivate")
+        local venv = os.getenv("VIRTUAL_ENV") or os.getenv("CONDA_PREFIX")
+        if venv ~= nil then
+          vim.cmd("MoltenInit")
+        else
+          vim.notify("No virtualenv loaded", vim.log.levels.ERROR, { title = "Molten Init" })
         end
+
+        -- FIXME: Update with Quarto
+        -- vim.cmd("MoltenInit")
+        -- -- Auto-activate Quarto if in a quarto file
+        -- if vim.bo.filetype == "quarto" then
+        --   vim.cmd("QuartoActivate")
+        -- end
       end
 
       -- Helper functi

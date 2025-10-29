@@ -4,5 +4,15 @@ version = "0.1.0"
 description = "VirtualEnv for Neovim"
 requires-python = ">=3.11"
 dependencies = [
+    "cairosvg>=2.8.2",
+    "jupyter-client>=8.6.3",
+    "kaleido>=1.1.0",
+    "nbformat>=5.10.4",
+    "pillow>=12.0.0",
+    "plotly>=6.3.1",
+    "pnglatex>=1.1",
     "pynvim>=0.6.0",
+    "pyperclip>=1.11.0",
+    "requests>=2.32.5",
+    "websocket-client>=1.9.0",
 ]

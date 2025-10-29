@@ -1,8 +1,24 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      source ~/.local/share/virtualenvs/neovim/bin/activate
-      uv pip install jupyter_client cairosvg plotly kaleido pnglatex pyperclip nbformat pillow requests websocket-client
+      # 1. Define paths
+      PROJECT_ROOT=~/.config/nvim
+      VENV_PATH=~/.local/share/virtualenvs/neovim
+
+      # 2. Tell uv which venv to use
+      export VIRTUAL_ENV=$VENV_PATH
+
+      # 3. Go to the project directory
+      # This is so uv can find pyproject.toml and uv.lock
+      cd $PROJECT_ROOT
+
+      # 4. Add all packages to the project
+      # This updates pyproject.toml, uv.lock, AND
+      # installs them into the $VIRTUAL_ENV
+      uv add --active jupyter_client cairosvg plotly kaleido pnglatex pyperclip nbformat pillow requests websocket-client
+      uv sync --active
+
+      # 5. Create jupyter runtime dir
       mkdir -p ~/.local/share/jupyter/runtime
       chmod 700 ~/.local/share/jupyter/runtime
     depends:
@@ -12,7 +28,7 @@ linux[whoami.distro^="Arch"]:
     molten.lua: ~/.config/nvim/lua/plugins/molten.lua
 # Jupyter Kernel Registration Workflow:
 # 1. In your project: uv venv
-# 2. Add dependencies: uv add matplotlib jupyter ipykernel
+# 2. Add dependencies: uv add ipykernel
 # 3. Activate venv: source .venv/bin/activate
 # 4. Register kernel: python -m ipykernel install --user --name=<projectname>
 # 5. Launch nvim (with venv activated or use venv-selector plugin)
