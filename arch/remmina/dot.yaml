@@ -1,0 +1,10 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      sudo pacman -S --noconfirm remmina freerdp
+    depends:
+      - /arch/kwallet
+  links:
+    remmina.pref: ~/.config/remmina/remmina.pref
+    aws-ec2.remmina: ~/.local/share/remmina/aws-ec2.remmina
+    remmina.conf: ~/.config/hypr/conf.d/remmina.conf

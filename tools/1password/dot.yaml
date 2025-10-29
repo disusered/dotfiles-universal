@@ -3,6 +3,7 @@ linux[whoami.distro^="Arch"]:
     cmd: yay -S --noconfirm 1password
     depends:
       - /lib/pipewire
+      - /arch/kwallet
   links:
     1password.conf: ~/.config/hypr/conf.d/1password.conf
     1password.desktop: ~/.local/share/applications/1password-silent.desktop

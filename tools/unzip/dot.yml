@@ -8,4 +8,4 @@ linux[whoami.distro^="Fedora"]:
     cmd: command -v unzip &>/dev/null || sudo dnf install unzip -y
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S unzip
+    cmd: sudo pacman -S --noconfirm zip unzip
