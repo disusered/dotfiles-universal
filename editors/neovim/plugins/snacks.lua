@@ -27,7 +27,7 @@ return {
         tabline = false,
       },
       on_open = function()
-        vim.fn.system("kitten @ set-font-size +2")
+        vim.fn.system("kitten @ set-font-size +1")
       end,
       on_close = function()
         vim.fn.system("kitten @ set-font-size 0")
