@@ -178,16 +178,12 @@ return {
         local venv = os.getenv("VIRTUAL_ENV") or os.getenv("CONDA_PREFIX")
         if venv ~= nil then
           vim.cmd("MoltenInit")
+          vim.notify("Initializing Molten environment", vim.log.levels.INFO, { title = "Molten init" })
         else
-          vim.notify("No virtualenv loaded", vim.log.levels.ERROR, { title = "Molten Init" })
+          vim.notify("No virtualenv loaded, can't initialize Molten", vim.log.levels.ERROR, { title = "Molten init" })
         end
-
-        -- FIXME: Update with Quarto
-        -- vim.cmd("MoltenInit")
-        -- -- Auto-activate Quarto if in a quarto file
-        -- if vim.bo.filetype == "quarto" then
-        --   vim.cmd("QuartoActivate")
-        -- end
+        -- Return venv evaluation so callers can also use conditional logic
+        return venv
       end
 
       -- Helper functi
