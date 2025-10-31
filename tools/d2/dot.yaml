@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: go install oss.terrastruct.com/d2@latest
+    depends:
+      - /languages/go/latest

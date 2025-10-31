@@ -24,6 +24,8 @@ linux[whoami.distro^="Arch"]:
     depends:
       - /editor/neovim
       - /lib/wl-clipboard
+      - /tools/mermaid
+      - /tools/d2
   links:
     molten.lua: ~/.config/nvim/lua/plugins/molten.lua
 # Jupyter Kernel Registration Workflow:

@@ -156,6 +156,54 @@ return {
           },
         },
       },
+      {
+        "3rd/diagram.nvim",
+        dependencies = {
+          { "3rd/image.nvim" },
+        },
+        config = function()
+          -- Create custom integration for quarto that extends markdown
+          local markdown_integration = require("diagram.integrations.markdown")
+          local quarto_integration = vim.tbl_deep_extend("force", markdown_integration, {
+            name = "quarto",
+            filetypes = { "quarto" },
+          })
+
+          require("diagram").setup({
+            integrations = {
+              require("diagram.integrations.markdown"),
+              require("diagram.integrations.neorg"),
+              quarto_integration,
+            },
+            renderer_options = {
+              mermaid = {
+                theme = "default",
+              },
+              plantuml = {
+                charset = "utf-8",
+              },
+              d2 = {
+                theme_id = 1,
+              },
+              gnuplot = {
+                theme = "dark",
+                size = "800,600",
+              },
+            },
+          })
+        end,
+        keys = {
+          {
+            "K",
+            function()
+              require("diagram").show_diagram_hover()
+            end,
+            mode = "n",
+            ft = { "markdown", "quarto", "norg" },
+            desc = "Show diagram in new tab",
+          },
+        },
+      },
     },
     build = ":UpdateRemotePlugins",
     init = function()
