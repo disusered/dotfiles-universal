@@ -21,3 +21,19 @@ vim.keymap.del("t", "<C-_>")
 vim.keymap.del("n", "<leader>wd")
 vim.keymap.del("n", "<leader>-")
 vim.keymap.del("n", "<leader>|")
+
+-- disable zen mode toggle from snacks.nvim, use custom instead
+vim.keymap.del("n", "<leader>uz")
+
+-- Custom Snacks toggle for Zen Mode
+require("snacks").toggle
+  .new({
+    name = "Zen Mode",
+    get = function()
+      return require("no-neck-pain.state").enabled
+    end,
+    set = function()
+      vim.cmd("NoNeckPain")
+    end,
+  })
+  :map("<leader>uz")
