@@ -187,8 +187,11 @@ return {
               gitsigns.toggle_signs(false)
             end
 
-            zen_state.toggles.wrap = vim.opt.wrap:get()
+            zen_state.toggles.wrap = vim.opt.wrap
             vim.opt.wrap = true
+
+            zen_state.toggles.colorcolumn = vim.opt.colorcolumn
+            vim.opt.colorcolumn = 0
 
             -- Increase Kitty font size and line height
             vim.fn.system('kitten @ load-config --override modify_font="cell_height 120%"')
@@ -212,6 +215,7 @@ return {
             end
 
             vim.opt.wrap = zen_state.toggles.wrap
+            vim.opt.colorcolumn = zen_state.toggles.colorcolumn
 
             -- Reset Kitty font size and line height
             vim.fn.system('kitten @ load-config --override modify_font="cell_height 100%"')
