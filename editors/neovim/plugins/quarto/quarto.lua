@@ -129,15 +129,17 @@ return {
       },
     },
   },
+
   {
     "MeanderingProgrammer/render-markdown.nvim",
-    ft = "quarto", -- 1. Lazy-loads the plugin only when a quarto file is opened
     enabled = true,
-    config = function()
-      -- 2. When it loads, configure it to *only* attach to the "quarto" filetype
-      require("render-markdown").setup({
-        filetypes = { "quarto" },
-      })
-    end,
+    ft = { "quarto" },
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-mini/mini.icons" }, -- if you use standalone mini plugins
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {
+      file_types = { "quarto" },
+      preset = "lazy",
+    },
   },
 }
