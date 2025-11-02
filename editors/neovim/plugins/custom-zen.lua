@@ -191,7 +191,7 @@ return {
             vim.opt.wrap = true
 
             zen_state.toggles.colorcolumn = vim.opt.colorcolumn
-            vim.opt.colorcolumn = 0
+            vim.opt.colorcolumn = "0"
 
             -- Increase Kitty font size and line height
             vim.fn.system('kitten @ load-config --override modify_font="cell_height 120%"')

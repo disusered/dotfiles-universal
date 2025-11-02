@@ -109,6 +109,7 @@ return {
       },
     },
   },
+
   -- Open jupyter notebooks as plaintext (quarto)
   {
     "GCBallesteros/jupytext.nvim",
@@ -130,6 +131,7 @@ return {
     },
   },
 
+  -- "Prettier" rendering of Markdown
   {
     "MeanderingProgrammer/render-markdown.nvim",
     enabled = true,
@@ -139,7 +141,6 @@ return {
     ---@type render.md.UserConfig
     opts = {
       file_types = { "quarto" },
-      preset = "lazy",
     },
   },
 }

@@ -31,23 +31,19 @@ return {
       },
     },
   },
-
-  -- Diagram rendering in Neovim
   {
+    -- Diagram rendering in Neovim
     "3rd/diagram.nvim",
+    dependencies = { "3rd/image.nvim" },
     config = function()
-      -- Create custom integration for quarto that extends markdown
+      -- Extend markdown integration with Quarto filetype
       local markdown_integration = require("diagram.integrations.markdown")
-      local quarto_integration = vim.tbl_deep_extend("force", markdown_integration, {
-        name = "quarto",
-        filetypes = { "quarto" },
-      })
+      table.insert(markdown_integration.filetypes, "quarto")
 
       require("diagram").setup({
         integrations = {
-          require("diagram.integrations.markdown"),
+          markdown_integration,
           require("diagram.integrations.neorg"),
-          quarto_integration,
         },
         renderer_options = {
           mermaid = {
