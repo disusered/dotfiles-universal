@@ -29,6 +29,7 @@ return {
         end,
         mode = "n",
         desc = "Hush (Stop)",
+        ft = "javascript",
       },
       -- {
       --   "<c-h>",
@@ -47,6 +48,7 @@ return {
         end,
         mode = { "n", "v" },
         desc = "Update/Evaluate",
+        ft = "javascript",
       },
       {
         "<localleader>s",
@@ -55,6 +57,7 @@ return {
         end,
         mode = { "n", "v" },
         desc = "Send Line/Selection (Updates Buffer)",
+        ft = "javascript",
       },
       {
         "<localleader>ss",
@@ -63,6 +66,7 @@ return {
         end,
         mode = "n",
         desc = "Send Paragraph (Updates Buffer)",
+        ft = "javascript",
       },
 
       -- STRUDEL-SPECIFIC MANAGEMENT COMMANDS
@@ -72,6 +76,7 @@ return {
           require("strudel").launch()
         end,
         desc = "Launch Strudel",
+        ft = "javascript",
       },
       {
         "<leader>mq",
@@ -79,6 +84,7 @@ return {
           require("strudel").quit()
         end,
         desc = "Quit Strudel",
+        ft = "javascript",
       },
       {
         "<leader>mt",
@@ -86,6 +92,7 @@ return {
           require("strudel").toggle()
         end,
         desc = "Toggle Play/Stop",
+        ft = "javascript",
       },
       {
         "<leader>mb",
@@ -93,6 +100,7 @@ return {
           require("strudel").set_buffer()
         end,
         desc = "Set Buffer",
+        ft = "javascript",
       },
       {
         "<leader>mx",
@@ -100,6 +108,7 @@ return {
           require("strudel").execute()
         end,
         desc = "Execute (Set Buffer & Update)",
+        ft = "javascript",
       },
     },
   },
