@@ -140,7 +140,18 @@ return {
     ---@module 'render-markdown'
     ---@type render.md.UserConfig
     opts = {
+      -- Filetypes this plugin will run on.
       file_types = { "quarto" },
+
+      -- Pre configured settings that will attempt to mimic various target user experiences.
+      -- User provided settings will take precedence.
+      -- | obsidian | mimic Obsidian UI                                          |
+      -- | lazy     | will attempt to stay up to date with LazyVim configuration |
+      -- | none     | does nothing
+      preset = "lazy",
+
+      -- This enables hiding added text on the line the cursor is on.
+      anti_conceal = { enabled = false },
     },
   },
 }
