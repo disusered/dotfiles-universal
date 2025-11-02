@@ -19,31 +19,78 @@ return {
             markdown = {
               enabled = true,
               download_remote_images = true,
-              filetypes = { "markdown", "vimwiki", "quarto" }, -- markdown extensions (ie. quarto) can go here
+              filetypes = { "markdown", "vimwiki", "quarto" },
               clear_in_insert_mode = false,
-              only_render_image_at_cursor = true,
+              only_render_image_at_cursor = false,
               only_render_image_at_cursor_mode = "inline", -- "inline" or "popup"
             },
             html = {
               enabled = true,
+              download_remote_images = true,
+              filetypes = { "html", "xhtml", "htm", "markdown", "quarto" },
               clear_in_insert_mode = false,
-              only_render_image_at_cursor = true,
+              only_render_image_at_cursor = false,
               only_render_image_at_cursor_mode = "inline", -- "inline" or "popup"
             },
           },
         },
       },
       {
+        "3rd/diagram.nvim",
+        config = function()
+          -- Create custom integration for quarto that extends markdown
+          local markdown_integration = require("diagram.integrations.markdown")
+          local quarto_integration = vim.tbl_deep_extend("force", markdown_integration, {
+            name = "quarto",
+            filetypes = { "quarto" },
+          })
+
+          require("diagram").setup({
+            integrations = {
+              require("diagram.integrations.markdown"),
+              require("diagram.integrations.neorg"),
+              quarto_integration,
+            },
+            renderer_options = {
+              mermaid = {
+                theme = "default",
+              },
+              plantuml = {
+                charset = "utf-8",
+              },
+              d2 = {
+                theme_id = 1,
+              },
+              gnuplot = {
+                theme = "dark",
+                size = "800,600",
+              },
+            },
+          })
+        end,
+        keys = {
+          {
+            "K",
+            function()
+              require("diagram").show_diagram_hover()
+            end,
+            mode = "n",
+            ft = { "markdown", "quarto", "norg" },
+            desc = "Show diagram in new tab",
+          },
+        },
+      },
+      -- Disable default snacks bind for icons
+      {
         "folke/snacks.nvim",
         keys = {
-          -- Disable default snacks bind for icons
           { "<leader>si", false },
         },
       },
+      -- Update binding to non-clashing uppercase I
       {
         "LazyVim/LazyVim",
         keys = {
-          -- Update binding to non-clashing uppercase I
           {
             "<leader>sI",
             function()
@@ -153,54 +200,6 @@ return {
             mode = "n",
             desc = "Paste image",
             ft = "quarto",
-          },
-        },
-      },
-      {
-        "3rd/diagram.nvim",
-        dependencies = {
-          { "3rd/image.nvim" },
-        },
-        config = function()
-          -- Create custom integration for quarto that extends markdown
-          local markdown_integration = require("diagram.integrations.markdown")
-          local quarto_integration = vim.tbl_deep_extend("force", markdown_integration, {
-            name = "quarto",
-            filetypes = { "quarto" },
-          })
-
-          require("diagram").setup({
-            integrations = {
-              require("diagram.integrations.markdown"),
-              require("diagram.integrations.neorg"),
-              quarto_integration,
-            },
-            renderer_options = {
-              mermaid = {
-                theme = "default",
-              },
-              plantuml = {
-                charset = "utf-8",
-              },
-              d2 = {
-                theme_id = 1,
-              },
-              gnuplot = {
-                theme = "dark",
-                size = "800,600",
-              },
-            },
-          })
-        end,
-        keys = {
-          {
-            "K",
-            function()
-              require("diagram").show_diagram_hover()
-            end,
-            mode = "n",
-            ft = { "markdown", "quarto", "norg" },
-            desc = "Show diagram in new tab",
           },
         },
       },
