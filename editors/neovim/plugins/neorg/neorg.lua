@@ -1,6 +1,7 @@
 return {
   {
     "nvim-neorg/neorg",
+    dependencies = { "benlubas/neorg-interim-ls" },
     lazy = false,
     version = false,
     config = function()
@@ -16,10 +17,19 @@ return {
               default_workspace = "notes",
             },
           },
+          ["core.completion"] = {
+            config = {
+              engine = "nvim-cmp",
+              name = "neorg",
+            },
+          },
         },
       })
+
+      require("lspconfig").neorg.setup({})
     end,
     keys = {
+      -- Neorg command picker
       {
         "<leader>oo",
         function()
@@ -44,9 +54,22 @@ return {
         end,
         desc = "Neorg Commands",
       },
+      -- Show outline
+      {
+        "<leader>os",
+        ":Neorg toc right<CR>",
+        desc = "Table of contents",
+      },
+      -- Inject metadata
+      {
+        "<leader>oi",
+        ":Neorg inject-metadata<CR>",
+        desc = "Inject metadata",
+      },
     },
   },
 
+  -- Set icon and text for group
   {
     "folke/which-key.nvim",
     opts = {
@@ -59,6 +82,25 @@ return {
             color = "red",
           },
           mode = "nv",
+        },
+      },
+    },
+  },
+
+  -- Autocomplete using blink.compat
+  {
+    "saghen/blink.cmp",
+    opts = {
+      sources = {
+        -- enable new provider
+        default = { "neorg" },
+
+        providers = {
+          -- create provider
+          neorg = {
+            name = "neorg",
+            module = "blink.compat.source",
+          },
         },
       },
     },
