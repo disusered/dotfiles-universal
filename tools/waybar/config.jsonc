@@ -1,7 +1,7 @@
 [
   {
     "output": [
-      "HDMI-A-2",
+      "HDMI-A-1",
       "DP-1",
       "DP-2"
     ],
@@ -119,7 +119,7 @@
     }
   },
   {
-    "output": "HDMI-A-1",
+    "output": "HDMI-A-2",
     "layer": "top",
     "position": "top",
     "height": 25,
@@ -132,7 +132,15 @@
     ],
     "modules-right": [],
     "hyprland/workspaces": {
-      "format": "{id}"
+      "format": "{icon}",
+      "format-icons": {
+        "7": "1",
+        "8": "2",
+        "9": "3",
+        "10": "4",
+        "11": "5",
+        "12": "6"
+      }
     },
     "hyprland/window": {
       "format": "{}",
