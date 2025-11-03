@@ -5,10 +5,13 @@ return {
   },
   opts = function(_, opts)
     vim.list_extend(opts.ensure_installed, {
+      "c",
       "cpp",
       "cmake",
       "css",
       "graphql",
+      "query",
+      "lua",
       "latex",
       "make",
       "scss",
@@ -31,8 +34,11 @@ return {
       "markdown_inline",
       "typst",
       "powershell",
-      "norg",
+      -- TODO: Built automatically, current install was manually built in shell
+      -- "norg", -- Manually built, see build script at ~/.cache/nvim/tree-sitter-norg/build.sh
       "svelte",
+      "vim",
+      "vimdoc",
     })
   end,
 }
