@@ -10,10 +10,10 @@ swatch*
 .neoconf.json
 pr
 .aider*
-!confs/aider/.aider.conf.yml
 opencode.jsonc
 .claude/
 CLAUDE.md
+!ai/claude/CLAUDE.md
 .mcp.json
 .serena
 .beads
