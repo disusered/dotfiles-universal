@@ -25,8 +25,6 @@ return {
           },
         },
       })
-
-      require("lspconfig").neorg.setup({})
     end,
     keys = {
       -- Neorg command picker
