@@ -7,12 +7,29 @@ return {
     config = function()
       require("neorg").setup({
         load = {
-          ["core.defaults"] = {},
-          ["core.concealer"] = {},
+          ["core.defaults"] = {}, -- Loads default behavior
+          ["core.concealer"] = {
+            config = {
+              icons = {
+                todo = {
+                  uncertain = {
+                    icon = "",
+                  },
+                  cancelled = {
+                    icon = "",
+                  },
+                  recurring = {
+                    icon = "󰔟",
+                  },
+                },
+              },
+            },
+          },
           ["core.dirman"] = {
             config = {
               workspaces = {
                 notes = "~/Documents/notes",
+                fastai = "~/Documents/fastai",
               },
               default_workspace = "notes",
             },
