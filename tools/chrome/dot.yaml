@@ -3,3 +3,5 @@ linux[whoami.distro^="Arch"]:
     cmd: yay -S --noconfirm google-chrome
     depends:
       - /tools/yay
+  links:
+    chrome.desktop: ~/.local/share/applications/chrome-dev.desktop
