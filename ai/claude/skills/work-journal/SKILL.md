@@ -116,10 +116,11 @@ This skill activates automatically when you detect that the user's request match
    ```
 
 5. **Log continuously**
-   - After EVERY command: append to page
-   - After EVERY finding: append to page
-   - After EVERY error: append to page
+   - After EVERY command: append to page with timestamp
+   - After EVERY finding: append to page with timestamp
+   - After EVERY error: append to page with timestamp
    - Format per `templates/work-log.md`
+   - **CRITICAL:** Every append MUST include timestamp in format: `### YYYY-MM-DD HH:MM - [Action Type]`
 
 6. **Complete work**
    - Append final summary to page content
@@ -134,7 +135,9 @@ This skill activates automatically when you detect that the user's request match
 
 **Template:** `templates/pr-description.md`
 
-**Language:** Spanish (all output)
+**Language:**
+- Input: English (reads English work log from Notion)
+- Output: Spanish (generates Spanish PR description)
 
 ### Process:
 
@@ -198,7 +201,9 @@ This skill activates automatically when you detect that the user's request match
 
 **Template:** `templates/manager-summary.md`
 
-**Language:** Spanish (formal business)
+**Language:**
+- Input: English (reads English work log from Notion)
+- Output: Spanish (generates Spanish summary, appends to page)
 
 ### Process:
 
@@ -272,7 +277,9 @@ This skill activates automatically when you detect that the user's request match
 
 **Template:** `templates/stakeholder-update.md`
 
-**Language:** Spanish
+**Language:**
+- Input: English (reads English work log from Notion)
+- Output: Spanish (generates Spanish GitHub comment)
 
 ### Process:
 

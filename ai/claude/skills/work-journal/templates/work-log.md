@@ -80,8 +80,10 @@ Use `mcp__notion__append_to_page_content` with `command: "insert_content_after"`
 
 **Log format:**
 
+**CRITICAL:** Every entry MUST start with a timestamp in format `### YYYY-MM-DD HH:MM - [Action Type]`
+
 ```markdown
-### [Timestamp] - [Action Type]
+### YYYY-MM-DD HH:MM - [Action Type]
 
 **Command/Action:**
 ```
