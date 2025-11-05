@@ -71,30 +71,59 @@ Work tracking is not a summary activity—it's a continuous documentation proces
 
 Use `mcp__notion__append_to_page_content` with `command: "insert_content_after"`.
 
-**What counts as "significant action"?**
-- Running a command (grep, git, test, build)
-- Encountering an error
-- Discovering a finding (root cause, pattern, related issue)
-- Making a decision (approach chosen, option rejected)
-- Gathering context (reading code, checking docs, reviewing history)
+**CRITICAL RULES:**
+
+1. **Journal Structure**
+   - Chronological log ONLY
+   - NEVER restructure or reorganize sections
+   - NEVER read entire file before appending
+   - ALWAYS append to end
+   - Trust the Notion MCP append API
+
+2. **What to Log (THINKING, not DOING)**
+
+   **DO LOG:**
+   - Approaches attempted and WHY chosen
+   - Failures and root cause analysis
+   - Decisions made and reasoning
+   - Technical insights/discoveries
+   - Alternative approaches considered and WHY rejected
+   - Code snippets ONLY IF explanatory (showing bug logic, design pattern)
+
+   **DO NOT LOG:**
+   - Commit message writing/editing
+   - PR text revisions
+   - Git operations (push, pull, checkout, branch, merge, rebase, etc.)
+   - File saves, basic file edits
+   - Any information available in Git/GitHub/Jira logs
+
+   **Philosophy:** If it's in Git history, DON'T duplicate it. Log your THINKING, not your DOING.
+
+3. **Timestamps**
+   - Get real system time using: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
+   - NEVER hallucinate or offset timestamps
+   - Use this command before EACH append
+
+4. **Entry Names**
+   - Descriptive only (e.g., "Identified root cause in token validation logic")
+   - NO metadata that's already in table columns (dates, types, issue #s, priorities)
+   - KISS principle
 
 **Log format:**
 
-**CRITICAL:** Every entry MUST start with a timestamp in format `### YYYY-MM-DD HH:MM - [Action Type]`
-
 ```markdown
-### YYYY-MM-DD HH:MM - [Action Type]
+### [Descriptive entry name]
 
-**Command/Action:**
-```
-[exact command or action taken]
-```
+**Timestamp:** [output from TZ='America/Tijuana' date '+%Y-%m-%d %H:%M']
 
-**Output/Result:**
-[relevant output, error message, or finding]
+**Context:**
+[What you were investigating or attempting]
+
+**Finding/Decision:**
+[What you discovered or decided, and WHY]
 
 **Notes:**
-[interpretation, decisions, next steps]
+[Interpretation, implications, next steps]
 
 [Links to related items using references/link-formats.md patterns]
 ```
@@ -102,77 +131,70 @@ Use `mcp__notion__append_to_page_content` with `command: "insert_content_after"`
 **Example append operations:**
 
 ```markdown
-### 2025-01-04 10:23 - Investigation
+### Identified token refresh files
 
-**Command:**
-```
-grep -r "refresh_token" src/auth/
-```
+**Timestamp:** 2025-01-04 10:23
 
-**Output:**
-Found 3 files using refresh_token:
+**Context:**
+Searching codebase for refresh_token usage to understand the OAuth flow.
+
+**Finding/Decision:**
+Found 3 key files:
 - src/auth/oauth.js (main implementation)
 - src/auth/token-store.js (storage)
 - tests/auth/oauth.test.js (tests)
 
-**Notes:**
-Primary logic appears to be in oauth.js. Need to check token expiration handling.
+Primary logic is in oauth.js, will review token expiration handling there next.
 
 ---
 
-### 2025-01-04 10:31 - Root Cause Found
+### Root cause in token expiration check
 
-**Action:**
-Reviewed [src/auth/oauth.js#L156-L178](https://github.com/odasoftmx/app/blob/a1b2c3d4e5f67890abcdef1234567890abcdef12/src/auth/oauth.js#L156-L178)
+**Timestamp:** 2025-01-04 10:31
 
-**Finding:**
-Bug in line 167: using assignment operator `=` instead of comparison `==` in token expiration check:
+**Context:**
+Reviewing [src/auth/oauth.js#L156-L178](https://github.com/odasoftmx/app/blob/a1b2c3d4e5f67890abcdef1234567890abcdef12/src/auth/oauth.js#L156-L178) for expiration logic.
+
+**Finding/Decision:**
+Bug in line 167: using assignment operator `=` instead of comparison `==`:
 ```javascript
 if (token.expires_at = Date.now()) {  // BUG: assignment not comparison
 ```
 
-This always evaluates to true, causing premature token refresh attempts.
+This always evaluates to true, causing premature refresh attempts. Explains the "invalid_grant" errors.
 
 **Notes:**
-This explains the "invalid_grant" errors users are seeing. Token is being marked as expired immediately after creation.
-
-Related to [SYS-1850](https://odasoftmx.atlassian.net/browse/SYS-1850) where similar assignment bug was found.
+Similar pattern as [SYS-1850](https://odasoftmx.atlassian.net/browse/SYS-1850). Will use `<=` instead of `==` for edge case safety.
 
 ---
 
-### 2025-01-04 10:45 - Fix Applied
+### Decided on defensive comparison approach
 
-**Command:**
-```
-# Edit src/auth/oauth.js line 167
-# Changed: if (token.expires_at = Date.now())
-# To: if (token.expires_at <= Date.now())
-```
+**Timestamp:** 2025-01-04 10:45
 
-**Result:**
-Fix applied and file saved.
+**Context:**
+Fixing the assignment bug in token expiration check.
+
+**Finding/Decision:**
+Using `<=` instead of `==` to handle exact timestamp edge case more defensively. This prevents potential race conditions where token expires at the exact moment of the check.
 
 **Notes:**
-Using `<=` instead of `==` to handle exact timestamp edge case. This is more defensive.
-
-Commit: [3f4e5d6](https://github.com/odasoftmx/app/commit/3f4e5d6789abcdef0123456789abcdef01234567)
+Alternative considered: strict equality `==`. Rejected because it's less defensive against edge cases.
 
 ---
 
-### 2025-01-04 11:02 - Testing
+### Test results confirm fix
 
-**Command:**
-```
-npm test -- src/auth/oauth.test.js
-```
+**Timestamp:** 2025-01-04 11:02
 
-**Output:**
-All 15 tests passing ✓
+**Context:**
+Running existing OAuth test suite to verify fix doesn't break anything.
+
+**Finding/Decision:**
+All 15 tests passing. Fix resolves the issue without breaking existing functionality.
 
 **Notes:**
-Existing tests now pass. Should add specific test for assignment operator bug to prevent regression.
-
-Created follow-up task: [#456](https://github.com/odasoftmx/app/issues/456) to add regression test.
+Created follow-up task [#456](https://github.com/odasoftmx/app/issues/456) to add regression test specifically for this assignment operator bug.
 ```
 
 ### Phase 3: Work Completion
@@ -300,9 +322,9 @@ Before considering work "logged":
 When using this template, replace:
 
 - `{page-id}` - The Notion page ID after creation
-- `{timestamp}` - Current date/time in format YYYY-MM-DD HH:MM
-- `{action-type}` - Category: Investigation, Root Cause Found, Fix Applied, Testing, etc.
-- `{command}` - Exact command executed
-- `{output}` - Relevant command output or result
-- `{notes}` - Your interpretation and decisions
+- `{timestamp}` - Get via `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'` before each append
+- `{entry-name}` - Descriptive only, no metadata (e.g., "Root cause in token expiration check")
+- `{context}` - What you were investigating or attempting
+- `{finding}` - What you discovered or decided, and WHY
+- `{notes}` - Your interpretation, implications, next steps
 - `{links}` - Formatted links per references/link-formats.md

@@ -1,79 +1,85 @@
-# Plantilla: Descripción de Pull Request (PR)
+# Template: Pull Request (PR) Description
 
-## Propósito
+## Purpose
 
-Esta plantilla guía la generación de descripciones técnicas para Pull Requests de GitHub, combinando el contexto del "por qué" (del log de Notion) con el "qué" (de los cambios en git).
+This template guides the generation of technical PR descriptions for GitHub, combining the "why" context (from Notion log) with the "what" (from git changes).
 
-## Audiencia
+## Audience
 
-**Desarrolladores que revisarán el código.**
+**Developers who will review the code.**
 
-La descripción del PR debe proporcionar a los revisores todo el contexto que necesitan para entender:
-- Por qué se hizo este cambio
-- Qué se cambió técnicamente
-- Cómo verificar que funciona
-- Qué aspectos específicos revisar
+The PR description should provide reviewers with all the context they need to understand:
+- Why this change was made
+- What was changed technically
+- How to verify it works
+- What specific aspects to review
 
-## Idioma
+## Language
 
-**Español** - Toda la salida debe estar en español.
+**ALL agent ↔ user communication: ENGLISH**
 
-## Flujo de Trabajo
+**Final artifact output: SPANISH**
 
-### Paso 1: Recopilar Entradas
+The PR description itself must be in Spanish, but all questions, confirmations, and communication with the user are in English.
 
-**Pedir al usuario:**
-1. **ID(s) de Página de Notion** - Todos los elementos de trabajo incluidos en este PR
-2. **Rama de Origen** - Tu rama (ej. `feature/oauth-fix`)
-3. **Rama de Destino** - Rama base (ej. `main` o `develop`)
+## Workflow
 
-**Si falta información:**
-- DETENTE y pregunta por las entradas faltantes
-- No procedas hasta tener al menos un ID de página de Notion y las ramas
+### Step 1: Gather Inputs (English)
 
-### Paso 2: Analizar Contexto (El "Por Qué")
+**Ask the user:**
+1. **Notion Page ID(s)** - All work items included in this PR
+2. **Source Branch** - Your branch (e.g., `feature/oauth-fix`)
+3. **Target Branch** - Base branch (e.g., `main` or `develop`)
 
-1. **Obtener la(s) página(s) de Notion**
-   - Usa `mcp__notion__notion-fetch` con cada ID de página
-   - Extrae del contenido de la página:
-     - Resumen Técnico
-     - Objetivo/Meta
-     - Causa Raíz (para bugs)
-     - Contexto relevante del negocio o técnico
+**If information is missing:**
+- STOP and ASK for missing inputs (in English)
+- Do not proceed until you have at least one Notion page ID and the branches
 
-2. **Identificar la justificación**
-   - Por qué era necesario este trabajo
-   - Qué problema resuelve
-   - Qué mejora aporta
+### Step 2: Analyze Context (The "Why")
 
-### Paso 3: Analizar Cambios (El "Qué")
+1. **Fetch Notion page(s)**
+   - Use `mcp__notion__notion-fetch` with each page ID
+   - Extract from page content:
+     - Technical Summary
+     - Goal/Objective
+     - Root Cause (for bugs)
+     - Relevant business or technical context
 
-1. **Inspeccionar cambios de git**
+2. **Identify justification**
+   - Why this work was necessary
+   - What problem it solves
+   - What improvement it brings
+
+### Step 3: Analyze Changes (The "What")
+
+1. **Inspect git changes**
    ```bash
-   # Ver el diff entre rama destino y rama origen
-   git diff origin/{rama-destino}...{rama-origen}
+   # View diff between target and source branches
+   git diff origin/{target-branch}...{source-branch}
 
-   # Ver los commits en la rama
-   git log origin/{rama-destino}..{rama-origen} --oneline
+   # View commits in the branch
+   git log origin/{target-branch}..{source-branch} --oneline
    ```
 
-2. **Crear resumen de alto nivel**
-   - ¿Qué archivos se modificaron?
-   - ¿Qué componentes/servicios se afectaron?
-   - ¿Qué patrones o enfoques se usaron?
+2. **Create high-level summary**
+   - What files were modified?
+   - What components/services were affected?
+   - What patterns or approaches were used?
 
-3. **Categorizar cambios**
-   - Nuevas funcionalidades añadidas
-   - Bugs corregidos
-   - Refactorizaciones realizadas
-   - Tests agregados/modificados
-   - Documentación actualizada
+3. **Categorize changes**
+   - New functionality added
+   - Bugs fixed
+   - Refactoring performed
+   - Tests added/modified
+   - Documentation updated
 
-**Nota:** No copies el diff completo. Sintetiza los cambios clave.
+**Note:** Don't copy the full diff. Synthesize the key changes.
 
-### Paso 4: Generar Borrador de Descripción del PR
+### Step 4: Draft PR Description in Spanish
 
-**Combina el "por qué" y el "qué" en una descripción estructurada.**
+**CRITICAL: The PR description output must be in Spanish.**
+
+**Combine the "why" and "what" into a structured description.**
 
 **Formato requerido:**
 
@@ -136,85 +142,85 @@ La descripción del PR debe proporcionar a los revisores todo el contexto que ne
 🤖 Generado con [Claude Code](https://claude.com/claude-code)
 ```
 
-### Paso 5: Iterar con el Usuario
+### Step 5: Iterate with User (English)
 
-**CRÍTICO: No procedas sin aprobación explícita.**
+**CRITICAL: Do not proceed without explicit approval.**
 
-1. Presenta el borrador al usuario
-2. Pregunta: "¿Esta descripción del PR captura correctamente los cambios? ¿Alguna modificación necesaria?"
-3. Realiza ajustes según retroalimentación
-4. Repite hasta que el usuario apruebe
+1. Present the draft to the user (PR description in Spanish)
+2. Ask (in English): "Does this PR description capture the changes correctly? Any modifications needed?"
+3. Make adjustments based on feedback
+4. Repeat until user approves
 
-### Paso 6: Crear el PR en GitHub
+**VERIFY:** Before proceeding, double-check that the PR description is in Spanish.
 
-**Solo después de la aprobación del usuario:**
+### Step 6: Create Child Page with PR Text
 
-1. **Verificar estado de git**
+**Only after user approval:**
+
+1. **Get timestamp**
    ```bash
-   # ¿La rama actual rastrea una rama remota?
-   git rev-parse --abbrev-ref --symbolic-full-name @{u}
-
-   # ¿Está actualizada con el remoto?
-   git status
+   TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'
    ```
 
-2. **Push si es necesario**
-   ```bash
-   # Si la rama no existe en el remoto o no está actualizada
-   git push -u origin {rama-origen}
-   ```
+2. **Create child page**
+   - Parent: The Notion work log page
+   - Title: `PR Description - {timestamp}`
+   - Content: The approved Spanish PR description
+   - Use Notion's child page syntax: `<page>PR Description - {timestamp}</page>`
 
-3. **Crear PR usando GitHub CLI**
-   ```bash
-   gh pr create --base {rama-destino} --head {rama-origen} --title "{título}" --body "$(cat <<'EOF'
-   [Descripción completa aprobada del PR aquí]
-   EOF
-   )"
-   ```
-
-**Importante:** Usa un HEREDOC para el body del PR para garantizar formato correcto.
-
-### Paso 7: Confirmar
-
-**Notificar al usuario:**
-```
-✅ PR creado exitosamente: [URL del PR]
+**Example:**
+```markdown
+<page>PR Description - 2025-01-04 14:30</page>
+[Full approved PR description in Spanish goes here]
+</page>
 ```
 
-**Proporciona el URL del PR para que el usuario pueda verlo.**
+### Step 7: Confirm (English)
 
-## Directrices de Tono
+**Notify the user:**
+```
+✅ PR description created: [child page URL]
+```
 
-- **Técnico:** Asume que los revisores son desarrolladores con contexto del proyecto
-- **Detallado:** Incluye suficiente contexto técnico para entender el "por qué"
-- **Enfocado en código:** Menciona archivos específicos, componentes, patrones
-- **Directo:** Ve al grano, pero no omitas contexto importante
-- **Idioma:** Todo en español
-- **Profesional:** Mantén tono formal de documentación técnica
+**User can then copy the text from the child page to GitHub when creating the PR.**
 
-## Prioridades de Contenido
+## Tone Guidelines
 
-### Incluir (Primario):
-- Razón del cambio (por qué era necesario)
-- Resumen de cambios clave (qué archivos/componentes)
-- Causa raíz (para bugs)
-- Enfoque de solución
-- Plan de pruebas
-- Enlaces a trabajo relacionado (Notion, Jira, GitHub)
+**For agent ↔ user communication (English):**
+- Clear, direct questions
+- Professional but conversational
+- Seek clarification when needed
 
-### Incluir (Secundario):
-- Notas específicas para revisores
-- Consideraciones de seguridad/rendimiento
-- Cambios que rompen compatibilidad
-- Deuda técnica introducida/resuelta
+**For PR description artifact (Spanish):**
+- **Technical:** Assume reviewers are developers with project context
+- **Detailed:** Include enough technical context to understand the "why"
+- **Code-focused:** Mention specific files, components, patterns
+- **Direct:** Get to the point, but don't omit important context
+- **Professional:** Maintain formal technical documentation tone
 
-### Excluir:
-- Diff completo de código (GitHub lo muestra)
-- Lista de cada archivo modificado (GitHub lo muestra)
-- Historial detallado de commits (debe ser parte del log de git)
-- Contexto obvio que todos los desarrolladores conocen
+## Content Priorities
 
-## Ejemplo de Salida
+### Include (Primary):
+- Reason for the change (why it was necessary)
+- Summary of key changes (which files/components)
+- Root cause (for bugs)
+- Solution approach
+- Test plan
+- Links to related work (Notion, Jira, GitHub)
+
+### Include (Secondary):
+- Specific notes for reviewers
+- Security/performance considerations
+- Breaking changes
+- Technical debt introduced/resolved
+
+### Exclude:
+- Full code diff (GitHub shows this)
+- List of every modified file (GitHub shows this)
+- Detailed commit history (should be part of git log)
+- Obvious context that all developers know
+
+## Example Output
 
 ```markdown
 ## Resumen
@@ -267,35 +273,38 @@ Se eligió `<=` sobre `==` porque proporciona comportamiento más robusto cuando
 🤖 Generado con [Claude Code](https://claude.com/claude-code)
 ```
 
-## Errores Comunes a Evitar
+## Common Errors to Avoid
 
-❌ **Copiar el diff completo de git**
-- Sintetiza los cambios clave, no pegues el diff
+❌ **Copying the full git diff**
+- Synthesize key changes, don't paste the diff
 
-❌ **Omitir el "por qué"**
-- Los revisores necesitan contexto, no solo una lista de cambios
+❌ **Omitting the "why"**
+- Reviewers need context, not just a list of changes
 
-❌ **Crear PR sin aprobación del usuario**
-- Siempre itera en el borrador primero
+❌ **Creating child page without user approval**
+- Always iterate on the draft first
 
-❌ **Olvidar push de la rama**
-- Verifica que la rama esté en el remoto antes de crear el PR
+❌ **Using English for the PR description**
+- The artifact output must be in Spanish
 
-❌ **Usar inglés**
-- Toda la salida debe estar en español
+❌ **Communicating with user in Spanish**
+- ALL agent ↔ user communication must be in English
 
-❌ **Descripción vaga o genérica**
-- Sé específico sobre archivos, componentes, y razones
+❌ **Vague or generic description**
+- Be specific about files, components, and reasons
 
-❌ **Omitir enlaces a trabajo relacionado**
-- Siempre enlaza a la página de Notion, y Jira/GitHub si aplica
+❌ **Omitting links to related work**
+- Always link to Notion page, and Jira/GitHub if applicable
 
-## Variables de Plantilla
+❌ **Forgetting to verify Spanish output**
+- Double-check the PR description is in Spanish before proceeding
 
-Al usar esta plantilla, reemplaza:
+## Template Variables
 
-- `{rama-origen}` - Rama con los cambios (ej. `feature/oauth-fix`)
-- `{rama-destino}` - Rama base para merge (ej. `main`)
-- `{página-notion-id}` - ID de la página de Notion con el log de trabajo
-- `{título}` - Título breve del PR (ej. "Corregir bug de renovación de token OAuth")
-- `{descripción}` - La descripción completa y aprobada del PR
+When using this template, replace:
+
+- `{source-branch}` - Branch with changes (e.g., `feature/oauth-fix`)
+- `{target-branch}` - Base branch for merge (e.g., `main`)
+- `{notion-page-id}` - ID of the Notion page with work log
+- `{timestamp}` - Get via `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
+- `{pr-description}` - The full approved PR description in Spanish

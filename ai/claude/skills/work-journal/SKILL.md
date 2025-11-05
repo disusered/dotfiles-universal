@@ -13,9 +13,21 @@ This skill manages work tracking in Notion and generates audience-appropriate co
 
 **Core Philosophy:** Log as you go, not at the end. Work tracking is continuous documentation.
 
+## Language Rule
+
+**ALL agent ↔ user communication: ENGLISH**
+**ONLY final artifact outputs: SPANISH**
+
+| Workflow | You ask questions | You confirm | Artifact output |
+|----------|------------------|-------------|-----------------|
+| Work Log | English | English | English (journal) |
+| PR | English | English | **Spanish** (PR text) |
+| Manager | English | English | **Spanish** (summary) |
+| Stakeholder | English | English | **Spanish** (update) |
+
 ## Supported Workflows
 
-1. **Work Logging** - Log development work to Notion as it happens
+1. **Work Logging** - Log development work to Notion as it happens (English)
 2. **PR Descriptions** - Generate technical PR descriptions in Spanish for code review
 3. **Manager Summaries** - Generate strategic summaries in Spanish for managers
 4. **Stakeholder Updates** - Generate non-technical updates in Spanish for stakeholders
@@ -115,12 +127,40 @@ This skill activates automatically when you detect that the user's request match
    }
    ```
 
-5. **Log continuously**
-   - After EVERY command: append to page with timestamp
-   - After EVERY finding: append to page with timestamp
-   - After EVERY error: append to page with timestamp
-   - Format per `templates/work-log.md`
-   - **CRITICAL:** Every append MUST include timestamp in format: `### YYYY-MM-DD HH:MM - [Action Type]`
+5. **Log continuously - FILTER BUSYWORK**
+
+   **CRITICAL:** Journal = THINKING, not DOING. If it's in Git history, DON'T duplicate.
+
+   **DO NOT LOG:**
+   - Commit message writing/editing
+   - PR text revisions
+   - Git operations (push, pull, checkout, branch, merge, rebase, etc.)
+   - File saves, basic file edits
+   - Any information available in Git/GitHub/Jira logs
+
+   **DO LOG:**
+   - Approaches attempted and WHY chosen
+   - Failures and root cause analysis
+   - Decisions made and reasoning
+   - Technical insights/discoveries
+   - Alternative approaches considered and WHY rejected
+   - Code snippets ONLY IF explanatory (showing bug logic, design pattern, NOT just "what I changed")
+
+   **Timestamp:**
+   - Get real system time: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
+   - NEVER hallucinate or offset timestamps
+
+   **Entry Names:**
+   - Descriptive only (e.g., "Identified root cause in token validation logic")
+   - NO metadata that's in table columns (dates, types, issue #s, priorities)
+   - KISS principle
+
+   **Journal Structure:**
+   - Chronological log ONLY
+   - NEVER restructure or reorganize sections
+   - NEVER read entire file before appending
+   - ALWAYS append to end using `mcp__notion__append_to_page_content`
+   - Trust Notion MCP append API
 
 6. **Complete work**
    - Append final summary to page content
@@ -135,14 +175,14 @@ This skill activates automatically when you detect that the user's request match
 
 **Template:** `templates/pr-description.md`
 
-**Language:**
-- Input: English (reads English work log from Notion)
-- Output: Spanish (generates Spanish PR description)
+**Language:** All communication in English, artifact output in Spanish
+
+**CRITICAL:** ALL PR description text MUST be in Mexican Spanish.
 
 ### Process:
 
-1. **Gather inputs**
-   - Ask for: Notion Page ID(s), Source Branch, Target Branch
+1. **Gather inputs (English)**
+   - Ask: "What's the Notion page ID, source branch, and target branch?"
    - If missing: STOP and ASK
 
 2. **Analyze context (the "why")**
@@ -157,8 +197,9 @@ This skill activates automatically when you detect that the user's request match
      ```
    - Summarize: files changed, components affected, patterns used
 
-4. **Draft PR description**
+4. **Draft PR description in Spanish**
    - Use format from `templates/pr-description.md`
+   - **VERIFY output language is Spanish before proceeding**
    - Structure:
      - Resumen (why + what)
      - Trabajo Relacionado (links)
@@ -166,32 +207,23 @@ This skill activates automatically when you detect that the user's request match
      - Contexto Técnico (from Notion)
      - Plan de Pruebas
      - Notas para Revisores
-   - Language: Spanish
    - Tone: Technical, detailed, code-focused
 
-5. **Iterate with user**
-   - Present draft
-   - Ask: "¿Esta descripción del PR captura correctamente los cambios?"
+5. **Iterate with user (English)**
+   - Present draft (in Spanish)
+   - Ask (in English): "Does this PR description capture the changes correctly?"
    - Adjust based on feedback
    - Repeat until approved
 
-6. **Create PR**
-   ```bash
-   # Check git status
-   git status
+6. **Create child page with PR text**
+   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
+   - Create child page of journal with title: `PR Description - {timestamp}`
+   - Page content: Approved Spanish PR text
+   - Use Notion's `<page>PR Description - {timestamp}</page>` syntax in append
 
-   # Push if needed
-   git push -u origin {source-branch}
-
-   # Create PR using heredoc for body
-   gh pr create --base {target} --head {source} --title "{title}" --body "$(cat <<'EOF'
-   [approved PR description here]
-   EOF
-   )"
-   ```
-
-7. **Confirm**
-   - Respond: `✅ PR creado exitosamente: [URL]`
+7. **Confirm (English)**
+   - `✅ PR description created: [child page URL]`
+   - User can copy text from child page to GitHub PR
 
 ---
 
@@ -201,90 +233,61 @@ This skill activates automatically when you detect that the user's request match
 
 **Template:** `templates/manager-summary.md`
 
-**Language:**
-- Input: English (reads English work log from Notion)
-- Output: Spanish (generates Spanish summary, appends to page)
+**Language:** All communication in English, artifact output in Spanish
 
 ### Process:
 
-1. **PRIMARY DIRECTIVE: Find Notion Page ID**
-   - Look in user's most recent message
-   - If NOT clearly provided: **STOP and ASK** (in Spanish)
-   - Example: "¡Claro! ¿Me pasas el ID de la página de Notion que quieres que reporte?"
+1. **Gather inputs (English)**
+   - Ask: "What's the Notion page ID for the work log?"
+   - If missing: STOP and ASK
+   - If Jira issue # property is empty: STOP and ASK
 
-2. **Fetch page data**
-   - Use `mcp__notion__notion-fetch` with page ID
-   - Extract properties:
-     - **Jira issue #**: If empty, STOP and ASK (in Spanish)
-     - **Github issue #**: If available, fetch for context
-
-3. **Fetch GitHub context (if available)**
-   - Use `mcp__github__issue_read` for original problem definition
-   - Extract: bug description, expected behavior, user impact
-
-4. **Analyze Notion log**
-   - Read full page content
+2. **Analyze context**
+   - Use `mcp__notion__notion-fetch` to read page
+   - If GitHub issue # available, use `mcp__github__issue_read` for context
    - Extract:
      - Context (what system/component)
      - Technical root cause (conceptual, not line-by-line)
      - Solution applied (logical changes)
      - Metrics/data
-     - Next steps
+     - Next steps/blockers
 
-5. **Synthesize and log to Notion**
-   - Generate summary in Spanish using format from `templates/manager-summary.md`:
-     ```markdown
-     ---
-
-     ## Resumen de Jira (para {JIRA-ID})
-
-     **Resumen Ejecutivo**
-     [1-2 sentences on progress]
-
-     **Logros Clave**
-     - [Achievement 1 with metric]
-     - [Achievement 2 with metric]
-
-     **Contexto Técnico**
-     [Conceptual explanation - NO code, NO line numbers]
-
-     **Siguiente Pasos**
-     - [Next work]
-
-     **Bloqueadores**
-     - [Blockers with impact]
-     ```
-
+3. **Draft manager summary in Spanish**
+   - Use format from `templates/manager-summary.md`
+   - **VERIFY output language is Spanish before proceeding**
    - **CRITICAL RULES:**
-     - RULE 1: DO NOT FABRICATE - Only summarize from sources
-     - RULE 2: CONCEPTUAL SUMMARY, NOT DIFF - Explain logic, not line changes
-     - RULE 3: NO GITHUB DUPLICATION - No code snippets, line numbers, SHAs
-     - RULE 4: PROFESSIONAL FORMATTING - No decorative emojis in headings
-     - RULE 5: NO INVENTED DATES
+     - DO NOT FABRICATE - Only summarize from sources
+     - CONCEPTUAL SUMMARY, NOT DIFF - Explain logic, not line changes
+     - NO GITHUB DUPLICATION - No code snippets, line numbers, SHAs
+     - PROFESSIONAL FORMATTING - No decorative emojis in headings
+     - NO INVENTED DATES
+   - Tone: Strategic, high-level, business-impact focused
 
-   - Immediately append to original Notion page
+4. **Create child page with summary**
+   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
+   - Create child page of journal with title: `Manager Summary - {timestamp}`
+   - Page content: Spanish manager summary
+   - Use Notion's `<page>Manager Summary - {timestamp}</page>` syntax in append
    - DO NOT ask for approval (one-shot action)
 
-6. **Confirm (in Spanish)**
-   - `¡Listo! Ya generé el resumen y lo guardé en la página de Notion: [URL]`
+5. **Confirm (English)**
+   - `✅ Manager summary created: [child page URL]`
    - DO NOT reprint the summary text
 
 ---
 
 ## Workflow 4: Stakeholder Update Generation
 
-**When to use:** User wants to post a non-technical update to GitHub issue
+**When to use:** User wants to create a non-technical update for stakeholders
 
 **Template:** `templates/stakeholder-update.md`
 
-**Language:**
-- Input: English (reads English work log from Notion)
-- Output: Spanish (generates Spanish GitHub comment)
+**Language:** All communication in English, artifact output in Spanish
 
 ### Process:
 
-1. **Gather inputs**
-   - Ask for: Notion Page ID, GitHub Issue Number
+1. **Gather inputs (English)**
+   - Ask: "What's the Notion page ID for the work log?"
    - If missing: STOP and ASK
 
 2. **Analyze work log**
@@ -297,49 +300,28 @@ This skill activates automatically when you detect that the user's request match
      - Code specifics
      - Architecture
 
-3. **Draft response**
-   - Use format from `templates/stakeholder-update.md`:
-     ```markdown
-     Hola [Stakeholder],
-
-     Este issue ya está resuelto. [Simple explanation from user perspective].
-
-     [What changed for the user].
-
-     **Para probar:**
-     - [Specific step 1]
-     - [Specific step 2]
-     - [Expected result]
-
-     Por favor háznoslo saber si está funcionando como esperas.
-
-     ¡Gracias!
-     ```
-
-   - **Tone:** Friendly, non-technical, business value focused
-   - **Language:** Spanish
+3. **Draft stakeholder update in Spanish**
+   - Use format from `templates/stakeholder-update.md`
+   - **VERIFY output language is Spanish before proceeding**
+   - **Tone:** Professional, non-technical, business value focused
    - **Avoid:** Technical jargon (OAuth, API, token, endpoint, etc.)
+   - **DO NOT FABRICATE:** Only summarize what's in the work log
 
-4. **Iterate with user**
-   - Present draft
-   - Ask: "¿Este mensaje comunica claramente el cambio al stakeholder?"
+4. **Iterate with user (English)**
+   - Present draft (in Spanish)
+   - Ask (in English): "Does this stakeholder update communicate the changes clearly?"
    - Adjust based on feedback
    - Repeat until approved
 
-5. **Post to GitHub**
-   - Use `mcp__github__issue_comment` to post approved text
-   - Parameters:
-     ```json
-     {
-       "owner": "...",
-       "repo": "...",
-       "issue_number": 123,
-       "body": "[approved message]"
-     }
-     ```
+5. **Create child page with update**
+   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
+   - Create child page of journal with title: `Stakeholder Update - {timestamp}`
+   - Page content: Approved Spanish stakeholder update
+   - Use Notion's `<page>Stakeholder Update - {timestamp}</page>` syntax in append
 
-6. **Confirm**
-   - `✅ El comentario se ha publicado en el issue de GitHub: [URL]`
+6. **Confirm (English)**
+   - `✅ Stakeholder update created: [child page URL]`
+   - User can copy text from child page to GitHub or other communication channels
 
 ---
 

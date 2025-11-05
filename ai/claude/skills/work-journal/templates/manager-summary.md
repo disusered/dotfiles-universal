@@ -1,150 +1,156 @@
-# Plantilla: Resumen para Manager
+# Template: Manager Summary
 
-## Propósito
+## Purpose
 
-Esta plantilla guía la generación de resúmenes técnicos conceptuales en español para managers técnicos, leyendo un log de trabajo en inglés de Notion y su issue vinculado de GitHub.
+This template guides the generation of conceptual technical summaries in Spanish for technical managers, reading an English work log from Notion and its linked GitHub issue.
 
-## Audiencia
+## Audience
 
-**Manager técnico que entiende conceptos de ingeniería.**
+**Technical manager who understands engineering concepts.**
 
-El resumen debe:
-- Explicar la **lógica** del fix, no pegar el diff
-- Enfocarse en progreso, métricas, e impacto al negocio
-- Usar conceptos técnicos de alto nivel (sin detalles de implementación)
-- Ser accionable (próximos pasos, bloqueadores)
+The summary should:
+- Explain the **logic** of the fix, not paste the diff
+- Focus on progress, metrics, and business impact
+- Use high-level technical concepts (no implementation details)
+- Be actionable (next steps, blockers)
 
-## Idioma
+## Language
 
-**Español (formal de negocios)** - Toda la salida debe estar en español mexicano formal.
+**ALL agent ↔ user communication: ENGLISH**
 
-## Reglas Críticas
+**Final artifact output: SPANISH (formal business Spanish)**
 
-### REGLA 1: NO FABRICAR
+The manager summary itself must be in Spanish, but all questions, confirmations, and communication with the user are in English.
 
-Tu **única** tarea es sintetizar información de tus fuentes (log de Notion, issue de GitHub).
+## Critical Rules
 
-❌ **NO** inventes:
-- Métricas que no están en las fuentes
-- Detalles técnicos no mencionados
-- Fechas o timelines no especificadas
-- Próximos pasos no documentados
+### RULE 1: DO NOT FABRICATE
 
-✅ **SÍ** resume:
-- Información explícita en el log de Notion
-- Datos del issue de GitHub
-- Progreso visible en los commits/cambios
+Your **only** task is to synthesize information from your sources (Notion log, GitHub issue).
 
-### REGLA 2: RESUMEN CONCEPTUAL, NO DIFF
+❌ **DO NOT** invent:
+- Metrics not in the sources
+- Technical details not mentioned
+- Dates or timelines not specified
+- Next steps not documented
 
-Explica la **lógica** del fix, no regurgites los cambios línea por línea.
+✅ **DO** summarize:
+- Explicit information in the Notion log
+- Data from the GitHub issue
+- Progress visible in commits/changes
 
-✅ **BUENO (Conceptual Técnico):**
+### RULE 2: CONCEPTUAL SUMMARY, NOT DIFF
+
+Explain the **logic** of the fix, don't regurgitate line-by-line changes.
+
+✅ **GOOD (Conceptual Technical):**
 "Se corrigió un condicional que usaba asignación (`=`) en lugar de comparación (`==`), causando que los tokens se marcaran como expirados inmediatamente."
 
-❌ **MALO (Diff Regurgitado):**
+❌ **BAD (Regurgitated Diff):**
 "Se cambió la línea 167 de `if (token.expires_at = Date.now())` a `if (token.expires_at == Date.now())`."
 
-### REGLA 3: NO DUPLICAR GITHUB
+### RULE 3: NO GITHUB DUPLICATION
 
-NO incluyas:
-- ❌ Snippets de código
-- ❌ Números de línea
-- ❌ SHAs de commits
-- ❌ Links a archivos de git
+DO NOT include:
+- ❌ Code snippets
+- ❌ Line numbers
+- ❌ Commit SHAs
+- ❌ Links to git files
 
-Las propiedades de Notion y el UI de GitHub ya muestran esto. Tu trabajo es sintetizar, no copiar.
+Notion properties and GitHub UI already show this. Your job is to synthesize, not copy.
 
-### REGLA 4: FORMATO PROFESIONAL
+### RULE 4: PROFESSIONAL FORMATTING
 
-- ❌ NO uses emojis decorativos en encabezados
-- ❌ NO uses encabezados casuales (ej. "Listo", "¡Todo bien!")
-- ✅ SÍ usa emojis en listas de bullets para claridad (opcional)
-- ✅ SÍ mantén tono profesional de reporte
+- ❌ DO NOT use decorative emojis in headings
+- ❌ DO NOT use casual headings (e.g., "Done", "All good!")
+- ✅ DO use emojis in bullet lists for clarity (optional)
+- ✅ DO maintain professional report tone
 
-### REGLA 5: NO INVENTES FECHAS
+### RULE 5: NO INVENTED DATES
 
-NO incluyas fechas de completado (ej. "Completado el 4 de enero").
+DO NOT include completion dates (e.g., "Completed on January 4").
 
-Las fechas ya están en las propiedades de Notion y GitHub. No inventes o asumas fechas no documentadas.
+Dates are already in Notion properties and GitHub. Don't invent or assume undocumented dates.
 
-## Flujo de Trabajo
+## Workflow
 
-### Paso 1: DIRECTIVA PRINCIPAL - Encontrar el ID de Página de Notion
+### Step 1: PRIMARY DIRECTIVE - Find Notion Page ID (English)
 
-**Tu primer y único trabajo es encontrar el ID de Página de Notion.**
+**Your first and only job is to find the Notion Page ID.**
 
-1. Busca en el mensaje más reciente del usuario
-2. Busca un ID de Página de Notion (UUID) o URL
+1. Look in the user's most recent message
+2. Look for a Notion Page ID (UUID) or URL
 
-**Si NO está claramente proporcionado:**
-- **DETENTE** inmediatamente
-- **PREGUNTA** (en español) solo por el ID de Página de Notion
-- Ejemplo: "¡Claro! ¿Me pasas el ID de la página de Notion que quieres que reporte?"
+**If NOT clearly provided:**
+- **STOP** immediately
+- **ASK** (in English) for the Notion Page ID only
+- Example: "What's the Notion page ID for the work log?"
 
-**No procedas a ningún otro paso hasta tener este ID.**
+**Do not proceed to any other step until you have this ID.**
 
-### Paso 2: Obtener Datos de la Página (CRÍTICO)
+### Step 2: Get Page Data (CRITICAL)
 
-**Una vez que tengas el Page ID:**
+**Once you have the Page ID:**
 
-1. **Obtener el objeto de página** para leer sus **propiedades**
-   - Usa `mcp__notion__notion-fetch` con el page ID
+1. **Get the page object** to read its **properties**
+   - Use `mcp__notion__notion-fetch` with the page ID
 
-2. **Extraer propiedades requeridas:**
-   - **Jira ID:** Extrae la URL `Jira issue #`
-     - Si está **vacío**, **DETENTE** y pregunta al usuario (en español) por el Jira ID
-     - Ejemplo: "Necesito el ID de Jira para este trabajo (ej. PROJ-123). ¿Me lo puedes proporcionar?"
-   - **GitHub ID:** Extrae la URL `Github issue #` (si está disponible)
+2. **Extract required properties:**
+   - **Jira ID:** Extract the `Jira issue #` URL
+     - If **empty**, **STOP** and ask the user (in English) for the Jira ID
+     - Example: "I need the Jira ID for this work (e.g., PROJ-123). Can you provide it?"
+   - **GitHub ID:** Extract the `Github issue #` URL (if available)
 
-### Paso 3: Obtener Contexto de GitHub (si está disponible)
+### Step 3: Get GitHub Context (if available)
 
-**Si se encontró una URL de `Github issue #`:**
+**If a `Github issue #` URL was found:**
 
-1. Usa `mcp__github__issue_read` para leer el issue de GitHub
-2. Extrae la **definición del problema original**:
-   - Descripción del bug reportado
-   - Comportamiento esperado vs actual
-   - Impacto al usuario
-   - Contexto del negocio
+1. Use `mcp__github__issue_read` to read the GitHub issue
+2. Extract the **original problem definition**:
+   - Reported bug description
+   - Expected vs actual behavior
+   - User impact
+   - Business context
 
-**Si NO hay GitHub issue:** Procede solo con el log de Notion.
+**If NO GitHub issue:** Proceed with Notion log only.
 
-### Paso 4: Analizar Log de Notion (Interno)
+### Step 4: Analyze Notion Log (Internal)
 
-**Lee el contenido completo de la página (bloques).**
+**Read the full page content (blocks).**
 
-Esta es tu fuente principal para la **resolución**.
+This is your primary source for the **resolution**.
 
-**Extrae:**
+**Extract:**
 
-1. **Contexto:**
-   - ¿Qué sistema/componente?
-   - ¿Qué flujo de usuario?
-   - ¿Qué tipo de problema? (bug, feature, mejora)
+1. **Context:**
+   - What system/component?
+   - What user flow?
+   - What type of problem? (bug, feature, improvement)
 
-2. **Causa raíz técnica:**
-   - ¿Qué causó el problema? (bug lógico, condición de carrera, variable indefinida, código muerto)
-   - Explicación conceptual (sin mencionar líneas específicas)
+2. **Technical root cause:**
+   - What caused the problem? (logic bug, race condition, undefined variable, dead code)
+   - Conceptual explanation (without mentioning specific lines)
 
-3. **Solución aplicada:**
-   - ¿Qué se cambió lógicamente?
-   - ¿Por qué este enfoque?
-   - ¿Qué mejora/arregla?
+3. **Solution applied:**
+   - What was changed logically?
+   - Why this approach?
+   - What does it improve/fix?
 
-4. **Métricas/Datos:**
-   - Tests pasando (cuántos)
-   - Mejoras de rendimiento (si se mencionan)
-   - Usuarios impactados (si se mencionan)
+4. **Metrics/Data:**
+   - Tests passing (how many)
+   - Performance improvements (if mentioned)
+   - Users impacted (if mentioned)
 
-5. **Próximos pasos:**
-   - Trabajo pendiente mencionado
-   - Follow-up tasks creados
-   - Bloqueadores identificados
+5. **Next steps:**
+   - Pending work mentioned
+   - Follow-up tasks created
+   - Blockers identified
 
-### Paso 5: Sintetizar y Registrar en Notion (CRÍTICO)
+### Step 5: Synthesize and Create Child Page (CRITICAL)
 
-**Sintetiza tus hallazgos en un resumen técnico conceptual en español mexicano formal.**
+**CRITICAL: The manager summary output must be in Spanish.**
+
+**Synthesize your findings into a conceptual technical summary in formal Mexican Spanish.**
 
 **Formato requerido:**
 
@@ -173,69 +179,84 @@ Esta es tu fuente principal para la **resolución**.
 - [Bloqueador con impacto + acción necesaria]
 ```
 
-**Inmediatamente append este texto en español** a la Página de Notion original.
+**Create a child page with this Spanish summary text.**
 
-- Usa `mcp__notion__append_to_page_content`
-- **NO pidas aprobación.** Tu trabajo es generar y registrar una sola vez.
-- Esta es tu **ÚNICA** acción de escritura.
-- Usa el Jira ID que encontraste en el Paso 2 para el título.
+1. **Get timestamp**
+   ```bash
+   TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'
+   ```
 
-### Paso 6: Paso Final (en español)
+2. **Create child page**
+   - Parent: The Notion work log page
+   - Title: `Manager Summary - {timestamp}`
+   - Content: The Spanish manager summary
+   - Use Notion's child page syntax: `<page>Manager Summary - {timestamp}</page>`
 
-**Confirma al usuario (en español) que el reporte se ha generado y registrado en Notion.**
+- **DO NOT ask for approval.** This is a one-shot action: generate and create immediately.
+- Use the Jira ID you found in Step 2 for the summary heading.
 
-**Proporciona SOLO el URL a la página de Notion.**
+### Step 6: Final Step (English)
 
-**NO reimprimas el texto final.**
+**Confirm to the user (in English) that the summary has been generated and saved to Notion.**
 
-**Ejemplo:**
+**Provide ONLY the URL to the child page.**
+
+**DO NOT reprint the summary text.**
+
+**Example:**
 ```
-¡Listo! Ya generé el resumen y lo guardé en la página de Notion: https://www.notion.so/...
+✅ Manager summary created: https://www.notion.so/...
 ```
 
-## Directrices de Tono
+## Tone Guidelines
 
-- **Audiencia:** Manager técnico (habla español)
-- **Idioma:** Español (formal de negocios, mexicano)
-- **Nivel técnico:** Medio (entiende conceptos, quiere resultados)
-- **Longitud:** 2-3 frases por sección máximo
-- **Estilo:** Orientado a datos, enfoque estratégico, accionable
+**For agent ↔ user communication (English):**
+- Clear, direct questions
+- Professional but conversational
+- Seek clarification when needed
 
-## Prioridades de Contenido
+**For manager summary artifact (Spanish):**
+- **Audience:** Technical manager (Spanish speaker)
+- **Language:** Spanish (formal business, Mexican)
+- **Technical level:** Medium (understands concepts, wants results)
+- **Length:** 2-3 sentences per section maximum
+- **Style:** Data-driven, strategic focus, actionable
 
-### Incluir (Primario):
-- Impacto al negocio
-- Métricas y datos
-- Progreso y timeline (solo si está documentado)
-- Próximos pasos concretos
-- Bloqueadores con acciones requeridas
+## Content Priorities
 
-### Incluir (Secundario):
-- Enfoque técnico (solo alto nivel)
-- Causa raíz (conceptual, sin código)
-- Decisiones técnicas importantes
+### Include (Primary):
+- Business impact
+- Metrics and data
+- Progress and timeline (only if documented)
+- Concrete next steps
+- Blockers with required actions
 
-### Excluir:
-- Detalles de implementación
-- Especificaciones de código
-- Números de línea, SHAs de commits
-- Tareas granulares (excepto si son bloqueadores)
-- Información duplicada de GitHub/Jira
+### Include (Secondary):
+- Technical approach (high level only)
+- Root cause (conceptual, no code)
+- Important technical decisions
 
-## Fuentes de Información
+### Exclude:
+- Implementation details
+- Code specifications
+- Line numbers, commit SHAs
+- Granular tasks (unless they are blockers)
+- Duplicate information from GitHub/Jira
 
-Del log de trabajo de Notion, extrae:
-- **Tareas completadas** → Logros Clave
-- **Trabajo planeado** → Siguiente Pasos
-- **Problemas/Bloqueadores** → Bloqueadores
-- **Métricas/datos** → Incluir en todas las secciones
+## Information Sources
 
-Del issue de GitHub (si está disponible):
-- **Descripción del problema** → Contexto
-- **Impacto al usuario** → Resumen Ejecutivo
-- **Comportamiento esperado** → Para contrastar con solución
+From Notion work log, extract:
+- **Completed tasks** → Key Achievements
+- **Planned work** → Next Steps
+- **Problems/Blockers** → Blockers
+- **Metrics/data** → Include in all sections
 
-## Ejemplo de Salida
+From GitHub issue (if available):
+- **Problem description** → Context
+- **User impact** → Executive Summary
+- **Expected behavior** → To contrast with solution
+
+## Example Output
 
 ```markdown
 ---
@@ -264,47 +285,54 @@ La solución corrigió la lógica de comparación para evaluar correctamente la 
 Ninguno. El trabajo está completo y listo para merge.
 ```
 
-## Errores Comunes a Evitar
+## Common Errors to Avoid
 
-❌ **Fabricar información**
-- Solo reporta lo que está en las fuentes
+❌ **Fabricating information**
+- Only report what's in the sources
 
-❌ **Copiar el diff o mencionar líneas específicas**
-- Explica la lógica conceptualmente
+❌ **Copying the diff or mentioning specific lines**
+- Explain the logic conceptually
 
-❌ **Incluir snippets de código**
-- GitHub ya muestra el código, tú sintetizas el "qué" y "por qué"
+❌ **Including code snippets**
+- GitHub already shows the code, you synthesize the "what" and "why"
 
-❌ **Usar encabezados casuales o emojis decorativos**
-- Mantén tono profesional de reporte
+❌ **Using casual headings or decorative emojis**
+- Maintain professional report tone
 
-❌ **Inventar fechas**
-- No digas "Completado el..." sin fecha documentada
+❌ **Inventing dates**
+- Don't say "Completed on..." without documented date
 
-❌ **Crear sección "Related Tickets"**
-- Los tickets principales ya están en propiedades de Notion
+❌ **Creating "Related Tickets" section**
+- Main tickets are already in Notion properties
 
-❌ **Pedir aprobación del usuario**
-- Este es un proceso de un solo disparo, genera y registra inmediatamente
+❌ **Asking for user approval**
+- This is a one-shot process, generate and create immediately
 
-❌ **Reimprimir el resumen al usuario**
-- Solo proporciona el URL de Notion
+❌ **Reprinting the summary to the user**
+- Only provide the Notion child page URL
 
-❌ **Proceder sin Jira ID**
-- Detente y pregunta si falta
+❌ **Proceeding without Jira ID**
+- Stop and ask if missing
 
-❌ **Usar inglés**
-- Todo debe estar en español
+❌ **Using English for the manager summary**
+- The artifact output must be in Spanish
 
-## Variables de Plantilla
+❌ **Communicating with user in Spanish**
+- ALL agent ↔ user communication must be in English
 
-Al usar esta plantilla, reemplaza:
+❌ **Forgetting to verify Spanish output**
+- Double-check the manager summary is in Spanish before proceeding
 
-- `{JIRA-ID}` - El Jira issue ID extraído de las propiedades (ej. SYS-2110)
-- `{página-notion-id}` - El UUID de la página de Notion
-- `{github-issue}` - El issue de GitHub (si está disponible)
-- `{resumen-ejecutivo}` - Sintetizado del log de Notion + GitHub issue
-- `{logros}` - Extraídos del contenido de la página de Notion
-- `{contexto}` - Causa raíz y solución, conceptual
-- `{siguientes-pasos}` - Trabajo futuro documentado en el log
-- `{bloqueadores}` - Problemas activos documentados (puede estar vacío)
+## Template Variables
+
+When using this template, replace:
+
+- `{JIRA-ID}` - The Jira issue ID extracted from properties (e.g., SYS-2110)
+- `{notion-page-id}` - The UUID of the Notion page
+- `{github-issue}` - The GitHub issue (if available)
+- `{timestamp}` - Get via `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
+- `{executive-summary}` - Synthesized from Notion log + GitHub issue
+- `{achievements}` - Extracted from Notion page content
+- `{context}` - Root cause and solution, conceptual
+- `{next-steps}` - Future work documented in the log
+- `{blockers}` - Active documented problems (can be empty)

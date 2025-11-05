@@ -1,173 +1,184 @@
-# Plantilla: Actualización para Stakeholder
+# Template: Stakeholder Update
 
-## Propósito
+## Purpose
 
-Esta plantilla guía la generación de actualizaciones no técnicas para issues de GitHub, informando a expertos del dominio (no desarrolladores) sobre una resolución para que puedan realizar Quality Assurance (QA).
+This template guides the generation of non-technical updates for stakeholders (domain experts, product managers, QA specialists), informing them about completed work from a user perspective.
 
-## Audiencia
+## Audience
 
-**Stakeholders no técnicos:** Product managers, domain experts, QA specialists que no son desarrolladores.
+**Non-technical stakeholders:** Product managers, domain experts, QA specialists who are not developers.
 
-La actualización debe:
-- Traducir logs técnicos complejos a lenguaje simple y claro
-- Enfocarse en **qué** se hizo desde la perspectiva del usuario
-- Explicar **qué** necesitan probar
-- **Evitar toda jerga técnica**
+The update should:
+- Translate complex technical logs into simple, clear language
+- Focus on **what** was done from the user's perspective
+- Explain **what** they need to test
+- **Avoid all technical jargon**
 
-## Idioma
+## Language
 
-**Español** - Toda la salida debe estar en español.
+**ALL agent ↔ user communication: ENGLISH**
 
-## Flujo de Trabajo
+**Final artifact output: SPANISH**
 
-### Paso 1: Identificar Entradas
+The stakeholder update itself must be in Spanish, but all questions, confirmations, and communication with the user are in English.
 
-**Pedir al usuario:**
-1. **ID de Página de Notion** del elemento de trabajo completado
-2. **Número de Issue de GitHub** (ej. "#42")
+## Workflow
 
-**Si falta información:**
-- DETENTE y pregunta por las entradas faltantes
-- No procedas sin ambas entradas
+### Step 1: Gather Inputs (English)
 
-### Paso 2: Analizar Log de Trabajo
+**Ask the user:**
+1. **Notion Page ID** of the completed work item
 
-1. **Obtener la página de Notion**
-   - Usa `mcp__notion__notion-fetch` con el ID de página
+**If information is missing:**
+- STOP and ASK for missing inputs (in English)
+- Do not proceed without the Notion page ID
 
-2. **Buscar secciones relevantes:**
-   - "Impacto al Negocio" o "Business Impact"
-   - "Objetivo" o "Goal"
-   - "Resumen" o "Summary"
+### Step 2: Analyze Work Log
 
-3. **Ignorar detalles de bajo nivel:**
-   - Implementación técnica
-   - Cambios de código específicos
-   - Detalles de arquitectura
-   - Nombres de archivos o funciones
+1. **Fetch the Notion page**
+   - Use `mcp__notion__notion-fetch` with the page ID
 
-4. **Enfocarse en perspectiva del usuario:**
-   - ¿Qué puede hacer ahora el usuario?
-   - ¿Qué bug ya no verá el usuario?
-   - ¿Qué funcionalidad nueva está disponible?
-   - ¿Qué flujo mejoró?
+2. **Look for relevant sections:**
+   - "Business Impact" or "Impacto al Negocio"
+   - "Goal" or "Objetivo"
+   - "Summary" or "Resumen"
 
-### Paso 3: Generar Borrador de Respuesta
+3. **Ignore low-level details:**
+   - Technical implementation
+   - Specific code changes
+   - Architecture details
+   - File or function names
 
-**Crea una respuesta simple y amigable.**
+4. **Focus on user perspective:**
+   - What can the user do now?
+   - What bug will the user no longer see?
+   - What new functionality is available?
+   - What flow improved?
 
-**Formato requerido:**
+### Step 3: Draft Stakeholder Update in Spanish
+
+**CRITICAL: The stakeholder update output must be in Spanish.**
+
+**Create a simple, professional message.**
+
+**Required format:**
 
 ```markdown
-Hola [Nombre del Stakeholder],
+Este issue ya está resuelto. [Simple explanation from user perspective in 1-2 sentences].
 
-Este issue ya está resuelto. [Explicación simple de lo que se arregló desde la perspectiva del usuario, en 1-2 frases].
-
-[Descripción de lo que cambió para el usuario en 1-2 frases].
+[What changed for the user in 1-2 sentences].
 
 **Para probar:**
-- [Paso específico 1 que el usuario puede hacer]
-- [Paso específico 2 que el usuario puede hacer]
-- [Resultado esperado que debería ver]
+- [Specific step 1 user can do]
+- [Specific step 2 user can do]
+- [Expected result they should see]
 
-Por favor háznoslo saber si está funcionando como esperas o si encuentras algún problema.
-
-¡Gracias!
+Por favor háznoslo saber si está funcionando como esperas.
 ```
 
-**Directrices de contenido:**
+**Content guidelines:**
 
-- **Lenguaje simple:** No uses términos como "OAuth", "token", "API", "validación", "condicional", etc.
-- **Perspectiva del usuario:** Describe en términos de lo que el usuario experimenta
-- **Pasos de prueba concretos:** Da acciones específicas que pueden realizar
-- **Resultado esperado claro:** Di qué deberían ver si funciona correctamente
+- **Simple language:** Don't use terms like "OAuth", "token", "API", "validation", "conditional", etc.
+- **User perspective:** Describe in terms of what the user experiences
+- **Concrete test steps:** Give specific actions they can perform
+- **Clear expected result:** Say what they should see if it works correctly
+- **Professional tone:** No "Gracias por reportar!" (not client-like)
+- **NO metadata sections:** No "Para:", "Estado:", "When released:", "Test coverage:", or ETAs
 
-**Ejemplo de traducción técnico → no técnico:**
+**Translation examples (technical → non-technical):**
 
-| ❌ Técnico | ✅ No técnico |
-|-----------|--------------|
+| ❌ Technical | ✅ Non-technical |
+|--------------|------------------|
 | "Corregimos un bug en la lógica de renovación de tokens OAuth" | "Arreglamos un problema que causaba errores de sesión" |
 | "La validación de expiración usaba operador incorrecto" | "El sistema ahora mantiene tu sesión activa correctamente" |
 | "Implementamos nuevo endpoint para exportación de datos" | "Ahora puedes descargar tus datos en formato Excel" |
 | "Refactorizamos el componente de autenticación" | "Mejoramos la confiabilidad del inicio de sesión" |
 
-### Paso 4: Iterar con el Usuario
+### Step 4: Iterate with User (English)
 
-**CRÍTICO: No procedas sin aprobación explícita.**
+**CRITICAL: Do not proceed without explicit approval.**
 
-1. Presenta el borrador al usuario
-2. Pregunta: "¿Este mensaje comunica claramente el cambio al stakeholder? ¿Alguna modificación necesaria?"
-3. Realiza ajustes según retroalimentación
-4. Repite hasta que el usuario apruebe
+1. Present the draft to the user (stakeholder update in Spanish)
+2. Ask (in English): "Does this stakeholder update communicate the changes clearly?"
+3. Make adjustments based on feedback
+4. Repeat until user approves
 
-### Paso 5: Publicar en GitHub
+**VERIFY:** Before proceeding, double-check that the stakeholder update is in Spanish.
 
-**Solo después de la aprobación del usuario:**
+### Step 5: Create Child Page with Update
 
-1. Usa `mcp__github__issue_comment` para publicar el borrador como comentario en el Issue de GitHub especificado
+**Only after user approval:**
 
-2. Parámetros:
-   - `owner`: El usuario/organización de GitHub
-   - `repo`: El nombre del repositorio
-   - `issue_number`: El número del issue (sin el `#`)
-   - `body`: El mensaje aprobado
+1. **Get timestamp**
+   ```bash
+   TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'
+   ```
 
-**Ejemplo:**
-```json
-{
-  "owner": "odasoftmx",
-  "repo": "app",
-  "issue_number": 123,
-  "body": "[mensaje aprobado aquí]"
-}
+2. **Create child page**
+   - Parent: The Notion work log page
+   - Title: `Stakeholder Update - {timestamp}`
+   - Content: The approved Spanish stakeholder update
+   - Use Notion's child page syntax: `<page>Stakeholder Update - {timestamp}</page>`
+
+**Example:**
+```markdown
+<page>Stakeholder Update - 2025-01-04 15:45</page>
+[Full approved stakeholder update in Spanish goes here]
+</page>
 ```
 
-### Paso 6: Confirmar
+### Step 6: Confirm (English)
 
-**Notificar al usuario:**
+**Notify the user:**
 ```
-✅ El comentario se ha publicado en el issue de GitHub: [URL del comentario]
+✅ Stakeholder update created: [child page URL]
 ```
 
-## Directrices de Tono
+**User can then copy the text from the child page to GitHub or other communication channels.**
 
-- **Amigable:** Usa saludos y cierre cordial
-- **Simple:** Vocabulario no técnico
-- **Claro:** Oraciones cortas y directas
-- **Útil:** Proporciona pasos concretos de prueba
-- **Profesional:** Mantén cortesía y respeto
-- **Idioma:** Todo en español
-- **Orientado a valor:** Enfatiza el beneficio para el usuario
+## Tone Guidelines
 
-## Prioridades de Contenido
+**For agent ↔ user communication (English):**
+- Clear, direct questions
+- Professional but conversational
+- Seek clarification when needed
 
-### Incluir (Primario):
-- Qué se arregló/agregó desde perspectiva del usuario
-- Qué puede hacer ahora el usuario (o qué problema ya no verá)
-- Pasos específicos para probar el cambio
-- Resultado esperado de las pruebas
-- Solicitud de feedback
+**For stakeholder update artifact (Spanish):**
+- **Friendly:** Use professional but warm tone
+- **Simple:** Non-technical vocabulary
+- **Clear:** Short, direct sentences
+- **Helpful:** Provide concrete test steps
+- **Professional:** Maintain courtesy and respect (no client-like "Gracias por reportar!")
+- **Value-oriented:** Emphasize benefit for the user
 
-### Incluir (Secundario):
-- Contexto del negocio (si ayuda al entendimiento)
-- Beneficio o impacto al flujo del usuario
-- Agradecimiento por reportar el issue (si es bug report)
+## Content Priorities
 
-### Excluir:
-- Detalles técnicos de implementación
-- Nombres de archivos o componentes
-- Jerga de desarrollo (API, endpoint, token, etc.)
-- Cambios de código
-- Información de arquitectura
-- Métricas técnicas (tests, rendimiento)
+### Include (Primary):
+- What was fixed/added from user perspective
+- What the user can do now (or what problem they won't see)
+- Specific steps to test the change
+- Expected result from tests
+- Request for feedback
 
-## Ejemplos de Salida
+### Include (Secondary):
+- Business context (if it helps understanding)
+- Benefit or impact to user flow
 
-### Ejemplo 1: Bug Fix
+### Exclude:
+- Technical implementation details
+- File or component names
+- Development jargon (API, endpoint, token, etc.)
+- Code changes
+- Architecture information
+- Technical metrics (tests, performance)
+- Metadata sections (Para:, Estado:, When released:, Test coverage:, ETAs)
+- Fabricated information not in work log
+
+## Example Output
+
+### Example 1: Bug Fix
 
 ```markdown
-Hola María,
-
 Este issue ya está resuelto. Arreglamos el problema que causaba que tu sesión se cerrara inesperadamente cuando intentabas renovar tu acceso.
 
 Ahora cuando tu sesión esté por expirar, el sistema la renovará automáticamente sin errores ni interrupciones.
@@ -178,16 +189,12 @@ Ahora cuando tu sesión esté por expirar, el sistema la renovará automáticame
 - Intenta realizar alguna acción (ej. ver un reporte)
 - Deberías poder continuar trabajando sin necesidad de volver a iniciar sesión
 
-Por favor háznoslo saber si está funcionando como esperas o si encuentras algún problema.
-
-¡Gracias!
+Por favor háznoslo saber si está funcionando como esperas.
 ```
 
-### Ejemplo 2: Nueva Funcionalidad
+### Example 2: New Feature
 
 ```markdown
-Hola Carlos,
-
 Este issue ya está resuelto. Agregamos la funcionalidad que solicitaste para exportar datos de estudiantes a Excel.
 
 Ahora puedes descargar la lista completa de estudiantes con toda su información en un archivo Excel que puedes abrir y editar en tu computadora.
@@ -199,16 +206,12 @@ Ahora puedes descargar la lista completa de estudiantes con toda su información
 - Descarga el archivo y ábrelo en Excel
 - Deberías ver todas las columnas de información de los estudiantes correctamente organizadas
 
-Por favor háznoslo saber si está funcionando como esperas o si encuentras algún problema.
-
-¡Gracias!
+Por favor háznoslo saber si está funcionando como esperas.
 ```
 
-### Ejemplo 3: Mejora de UX
+### Example 3: UX Improvement
 
 ```markdown
-Hola Ana,
-
 Este issue ya está resuelto. Mejoramos el proceso de carga de documentos para que sea más rápido y confiable.
 
 Ahora cuando subas un documento, verás una barra de progreso clara y el documento se guardará correctamente sin necesidad de reintentar.
@@ -220,72 +223,54 @@ Ahora cuando subas un documento, verás una barra de progreso clara y el documen
 - Confirma que aparece el mensaje de éxito cuando termina
 - Verifica que el documento aparece en tu lista de documentos subidos
 
-Por favor háznoslo saber si está funcionando como esperas o si encuentras algún problema.
-
-¡Gracias!
+Por favor háznoslo saber si está funcionando como esperas.
 ```
 
-## Errores Comunes a Evitar
+## Common Errors to Avoid
 
-❌ **Usar jerga técnica**
-- "OAuth token", "API endpoint", "validación de schema", etc.
+❌ **Using technical jargon**
+- "OAuth token", "API endpoint", "schema validation", etc.
 
-❌ **Explicar cómo se implementó**
-- "Cambiamos el operador en línea 167"
+❌ **Explaining how it was implemented**
+- "We changed the operator on line 167"
 
-❌ **Ser vago sobre las pruebas**
-- "Prueba que funciona" → Dar pasos específicos
+❌ **Being vague about tests**
+- "Test that it works" → Give specific steps
 
-❌ **Olvidar mencionar el resultado esperado**
-- Usuario no sabrá si la prueba fue exitosa
+❌ **Forgetting to mention expected result**
+- User won't know if the test was successful
 
-❌ **Usar inglés**
-- Toda la salida debe estar en español
+❌ **Using English for the stakeholder update**
+- The artifact output must be in Spanish
 
-❌ **Tono demasiado formal o técnico**
-- Debe ser amigable y accesible
+❌ **Communicating with user in Spanish**
+- ALL agent ↔ user communication must be in English
 
-❌ **Publicar sin aprobación del usuario**
-- Siempre itera en el borrador primero
+❌ **Too formal or technical tone**
+- Should be friendly and accessible (but professional, not client-like)
 
-❌ **Asumir contexto técnico**
-- Explica en términos de experiencia del usuario
+❌ **Publishing without user approval**
+- Always iterate on the draft first
 
-## Adaptaciones Opcionales
+❌ **Assuming technical context**
+- Explain in terms of user experience
 
-### Si el stakeholder habla español e inglés:
-Mantén español por defecto, pero puedes preguntar al usuario si prefieren el mensaje en inglés.
+❌ **Adding metadata sections**
+- No "Para:", "Estado:", "When released:", "Test coverage:", or ETAs
 
-### Si el issue es complejo:
-Divide en secciones:
-```markdown
-**Lo que arreglamos:**
-[Explicación simple]
+❌ **Fabricating information**
+- Only include what's documented in the work log
 
-**Lo que esto significa para ti:**
-[Impacto directo al usuario]
+❌ **Client-like tone**
+- No "Gracias por reportar!" - maintain professional colleague tone
 
-**Cómo probarlo:**
-[Pasos específicos]
-```
+## Template Variables
 
-### Si hay múltiples stakeholders mencionados:
-Usa saludo general:
-```markdown
-Hola equipo,
+When using this template, replace:
 
-Este issue ya está resuelto. [...]
-```
-
-## Variables de Plantilla
-
-Al usar esta plantilla, reemplaza:
-
-- `[Nombre del Stakeholder]` - Nombre del stakeholder o "equipo" si son varios
-- `[explicación simple]` - Qué se arregló/agregó en lenguaje no técnico
-- `[perspectiva del usuario]` - Qué cambió para el usuario
-- `[pasos de prueba]` - Acciones específicas y concretas
-- `[resultado esperado]` - Qué deberían ver si funciona
-- `{issue-number}` - Número del issue de GitHub (sin `#`)
-- `{owner}` - Usuario u organización de GitHub
-- `{repo}` - Nombre del repositorio
+- `{notion-page-id}` - The UUID of the Notion page
+- `{timestamp}` - Get via `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
+- `{simple-explanation}` - What was fixed/added in non-technical language
+- `{user-perspective}` - What changed for the user
+- `{test-steps}` - Specific, concrete actions
+- `{expected-result}` - What they should see if it works
