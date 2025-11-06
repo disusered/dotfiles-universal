@@ -9,6 +9,7 @@ This template guides the generation of conceptual technical summaries in Spanish
 **Technical manager who understands engineering concepts.**
 
 The summary should:
+
 - Explain the **logic** of the fix, not paste the diff
 - Focus on progress, metrics, and business impact
 - Use high-level technical concepts (no implementation details)
@@ -29,12 +30,14 @@ The manager summary itself must be in Spanish, but all questions, confirmations,
 Your **only** task is to synthesize information from your sources (Notion log, GitHub issue).
 
 ❌ **DO NOT** invent:
+
 - Metrics not in the sources
 - Technical details not mentioned
 - Dates or timelines not specified
 - Next steps not documented
 
 ✅ **DO** summarize:
+
 - Explicit information in the Notion log
 - Data from the GitHub issue
 - Progress visible in commits/changes
@@ -49,22 +52,32 @@ Explain the **logic** of the fix, don't regurgitate line-by-line changes.
 ❌ **BAD (Regurgitated Diff):**
 "Se cambió la línea 167 de `if (token.expires_at = Date.now())` a `if (token.expires_at == Date.now())`."
 
-### RULE 3: NO GITHUB DUPLICATION
+### RULE 3: NO DUPLICATION OF SYSTEM DATA
+
+**CRITICAL: Do not duplicate information available in other systems.**
 
 DO NOT include:
-- ❌ Code snippets
-- ❌ Line numbers
-- ❌ Commit SHAs
-- ❌ Links to git files
 
-Notion properties and GitHub UI already show this. Your job is to synthesize, not copy.
+- ❌ Code snippets (visible in GitHub)
+- ❌ Line numbers (visible in GitHub)
+- ❌ Commit SHAs (visible in git log)
+- ❌ Links to git files (visible in GitHub)
+- ❌ GitHub issue numbers (already in Notion properties)
+- ❌ Jira issue numbers (already in Notion properties)
+- ❌ Commit messages (visible in git log)
+- ❌ PR descriptions (visible in GitHub)
+- ❌ File change lists (visible in git diff)
+
+**Your job is to SYNTHESIZE the "why" and "impact", not COPY the "what" from other tools.**
+
+Notion properties, GitHub UI, Jira, and git logs already contain this data. Don't repeat it.
 
 ### RULE 4: PROFESSIONAL FORMATTING
 
-- ❌ DO NOT use decorative emojis in headings
+- ❌ DO NOT use decorative emojis in headings or anywhere
 - ❌ DO NOT use casual headings (e.g., "Done", "All good!")
-- ✅ DO use emojis in bullet lists for clarity (optional)
 - ✅ DO maintain professional report tone
+- ✅ DO use plain text throughout
 
 ### RULE 5: NO INVENTED DATES
 
@@ -82,6 +95,7 @@ Dates are already in Notion properties and GitHub. Don't invent or assume undocu
 2. Look for a Notion Page ID (UUID) or URL
 
 **If NOT clearly provided:**
+
 - **STOP** immediately
 - **ASK** (in English) for the Notion Page ID only
 - Example: "What's the Notion page ID for the work log?"
@@ -163,6 +177,7 @@ This is your primary source for the **resolution**.
 [1-2 frases sobre el progreso general. Enfocarse en qué se logró y el impacto.]
 
 **Logros Clave**
+
 - [Logro 1 con métrica, si está disponible]
 - [Logro 2 con métrica, si está disponible]
 - [Logro 3 con impacto al negocio o técnico]
@@ -171,17 +186,20 @@ This is your primary source for the **resolution**.
 [Explicación conceptual de la causa raíz y la solución. Sin código, sin líneas, solo lógica.]
 
 **Siguiente Pasos**
+
 - [Próximo trabajo de prioridad alta, si está documentado]
 - [Próximo trabajo de prioridad media, si está documentado]
 
 **Bloqueadores**
 [Solo si hay bloqueadores documentados. Incluir impacto y acción requerida.]
+
 - [Bloqueador con impacto + acción necesaria]
 ```
 
 **Create a child page with this Spanish summary text.**
 
 1. **Get timestamp**
+
    ```bash
    TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'
    ```
@@ -204,6 +222,7 @@ This is your primary source for the **resolution**.
 **DO NOT reprint the summary text.**
 
 **Example:**
+
 ```
 ✅ Manager summary created: https://www.notion.so/...
 ```
@@ -211,11 +230,13 @@ This is your primary source for the **resolution**.
 ## Tone Guidelines
 
 **For agent ↔ user communication (English):**
+
 - Clear, direct questions
 - Professional but conversational
 - Seek clarification when needed
 
 **For manager summary artifact (Spanish):**
+
 - **Audience:** Technical manager (Spanish speaker)
 - **Language:** Spanish (formal business, Mexican)
 - **Technical level:** Medium (understands concepts, wants results)
@@ -224,19 +245,22 @@ This is your primary source for the **resolution**.
 
 ## Content Priorities
 
-### Include (Primary):
+### Include (Primary)
+
 - Business impact
 - Metrics and data
 - Progress and timeline (only if documented)
 - Concrete next steps
 - Blockers with required actions
 
-### Include (Secondary):
+### Include (Secondary)
+
 - Technical approach (high level only)
 - Root cause (conceptual, no code)
 - Important technical decisions
 
-### Exclude:
+### Exclude
+
 - Implementation details
 - Code specifications
 - Line numbers, commit SHAs
@@ -246,12 +270,14 @@ This is your primary source for the **resolution**.
 ## Information Sources
 
 From Notion work log, extract:
+
 - **Completed tasks** → Key Achievements
 - **Planned work** → Next Steps
 - **Problems/Blockers** → Blockers
 - **Metrics/data** → Include in all sections
 
 From GitHub issue (if available):
+
 - **Problem description** → Context
 - **User impact** → Executive Summary
 - **Expected behavior** → To contrast with solution
@@ -267,6 +293,7 @@ From GitHub issue (if available):
 Se corrigió un bug crítico en el sistema de autenticación OAuth que causaba errores `invalid_grant` para usuarios al intentar renovar tokens de acceso. El problema afectaba aproximadamente 15% de las sesiones de usuario diariamente.
 
 **Logros Clave**
+
 - Identificación y corrección de bug lógico en verificación de expiración de tokens (operador incorrecto causaba evaluación prematura)
 - Validación completa con 15 tests unitarios pasando exitosamente
 - Eliminación de reintentos innecesarios de renovación, reduciendo llamadas a API de OAuth en ~40%
@@ -277,6 +304,7 @@ El sistema de autenticación usaba un operador de asignación en lugar de compar
 La solución corrigió la lógica de comparación para evaluar correctamente la expiración del token, usando un operador de comparación defensivo que maneja casos límite de timestamp. Este cambio es backward-compatible y no requiere migraciones.
 
 **Siguiente Pasos**
+
 - Rollout de fix a producción esta semana (esperando aprobación de QA)
 - Agregar test de regresión específico para prevenir bug similar en futuro (issue #456 creado)
 - Incluir archivo en configuración de ESLint para detección automática de este tipo de errores
@@ -288,39 +316,51 @@ Ninguno. El trabajo está completo y listo para merge.
 ## Common Errors to Avoid
 
 ❌ **Fabricating information**
+
 - Only report what's in the sources
 
 ❌ **Copying the diff or mentioning specific lines**
+
 - Explain the logic conceptually
 
 ❌ **Including code snippets**
+
 - GitHub already shows the code, you synthesize the "what" and "why"
 
 ❌ **Using casual headings or decorative emojis**
+
 - Maintain professional report tone
 
 ❌ **Inventing dates**
+
 - Don't say "Completed on..." without documented date
 
 ❌ **Creating "Related Tickets" section**
+
 - Main tickets are already in Notion properties
 
 ❌ **Asking for user approval**
+
 - This is a one-shot process, generate and create immediately
 
 ❌ **Reprinting the summary to the user**
+
 - Only provide the Notion child page URL
 
 ❌ **Proceeding without Jira ID**
+
 - Stop and ask if missing
 
 ❌ **Using English for the manager summary**
+
 - The artifact output must be in Spanish
 
 ❌ **Communicating with user in Spanish**
+
 - ALL agent ↔ user communication must be in English
 
 ❌ **Forgetting to verify Spanish output**
+
 - Double-check the manager summary is in Spanish before proceeding
 
 ## Template Variables

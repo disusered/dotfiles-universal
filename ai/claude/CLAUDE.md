@@ -11,7 +11,7 @@
 
 ### Core Policy
 
-- ✅ **ALWAYS** create a Notion page **before** starting any multi-step task
+- ✅ **ALWAYS** invoke the `work-journal` skill **before** starting any multi-step task
 - ✅ **ALWAYS** log work as it happens (append to the page), not at the end
 - ❌ **DO NOT** use markdown TODOs, local files, or other tracking methods
 - ❌ **DO NOT** guess required properties - if missing, **STOP and ASK the user**
@@ -19,14 +19,25 @@
   - **Correct:** "✅ Task complete. The work has been logged to Notion: [URL]"
   - **Incorrect:** "Perfect! I've logged... Summary: ..."
 
-### When to Track Work
+### When to Track Work (PROACTIVE)
 
-Proactively create Notion pages when starting ANY multi-step task:
-- Investigation/debugging
+**AUTOMATICALLY invoke the `work-journal` skill** when starting ANY of these tasks:
+- Investigation/debugging (multi-step)
 - Feature development
 - Bug fixes
 - Code refactoring
 - Any work requiring multiple commands/steps
+
+**You MUST invoke the skill BEFORE executing commands, not after.**
+
+### Logging Behavior (CONTINUOUS)
+
+Once a Notion page is created for work:
+- **Log THINKING, not DOING** - focus on decisions, discoveries, and reasoning
+- **Append after EVERY significant action** - don't batch at the end
+- **Use real timestamps** from `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
+- **Filter busywork** - don't log git operations, commit messages, file saves (see skill for full list)
+- **Chronological only** - ALWAYS append to end, NEVER restructure or read entire page
 
 ### Required Properties
 
