@@ -7,6 +7,7 @@ global:
       - /ai/mcp-chrome
   links:
     agents: ~/.claude/agents/
+    skills: ~/.claude/skills/
     CLAUDE.md: ~/.claude/CLAUDE.md
 linux|darwin:
   links:
