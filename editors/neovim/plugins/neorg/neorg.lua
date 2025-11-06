@@ -60,10 +60,12 @@ return {
           local dirman = neorg.modules.get_module("core.dirman")
           local workspaces = dirman.get_workspaces()
 
-          -- Build items list for picker
+          -- Build items list for picker (exclude 'default' workspace)
           local items = {}
           for name, _ in pairs(workspaces) do
-            table.insert(items, { text = name, name = name })
+            if name ~= "default" then
+              table.insert(items, { text = name, name = name })
+            end
           end
 
           -- Sort alphabetically
@@ -81,9 +83,9 @@ return {
             confirm = function(picker, item)
               picker:close()
 
-              -- Get the target workspace path
-              local target_workspace = workspaces[item.name]
-              local expanded_target = vim.fn.expand(target_workspace)
+              -- Get the target workspace path (returns a PathlibPath object)
+              local workspace_path = tostring(dirman.get_workspace(item.name))
+              local expanded_target = vim.fn.expand(workspace_path)
 
               -- Close buffers from other workspaces
               for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -164,19 +166,22 @@ return {
       {
         "<leader>os",
         function()
-          -- Check if TOC window is open by looking for a buffer with filetype "norg-toc"
+          -- Check if TOC buffer exists (buffer name pattern: "neorg://toc-<tabpage>")
           local toc_open = false
+          local toc_win = nil
+
           for _, win in ipairs(vim.api.nvim_list_wins()) do
             local buf = vim.api.nvim_win_get_buf(win)
-            local ft = vim.api.nvim_buf_get_option(buf, "filetype")
-            if ft == "norg-toc" then
+            local buf_name = vim.api.nvim_buf_get_name(buf)
+            if buf_name:match("^neorg://toc%-") then
               toc_open = true
+              toc_win = win
               break
             end
           end
 
-          if toc_open then
-            vim.cmd("Neorg toc close")
+          if toc_open and toc_win then
+            vim.api.nvim_win_close(toc_win, false)
           else
             vim.cmd("Neorg toc right")
           end
