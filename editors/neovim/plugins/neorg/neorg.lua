@@ -166,19 +166,22 @@ return {
       {
         "<leader>os",
         function()
-          -- Check if TOC window is open by looking for a buffer with filetype "norg-toc"
+          -- Check if TOC buffer exists (buffer name pattern: "neorg://toc-<tabpage>")
           local toc_open = false
+          local toc_win = nil
+
           for _, win in ipairs(vim.api.nvim_list_wins()) do
             local buf = vim.api.nvim_win_get_buf(win)
-            local ft = vim.api.nvim_buf_get_option(buf, "filetype")
-            if ft == "norg-toc" then
+            local buf_name = vim.api.nvim_buf_get_name(buf)
+            if buf_name:match("^neorg://toc%-") then
               toc_open = true
+              toc_win = win
               break
             end
           end
 
-          if toc_open then
-            vim.cmd("Neorg toc close")
+          if toc_open and toc_win then
+            vim.api.nvim_win_close(toc_win, false)
           else
             vim.cmd("Neorg toc right")
           end
