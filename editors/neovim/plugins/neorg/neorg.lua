@@ -60,10 +60,12 @@ return {
           local dirman = neorg.modules.get_module("core.dirman")
           local workspaces = dirman.get_workspaces()
 
-          -- Build items list for picker
+          -- Build items list for picker (exclude 'default' workspace)
           local items = {}
           for name, _ in pairs(workspaces) do
-            table.insert(items, { text = name, name = name })
+            if name ~= "default" then
+              table.insert(items, { text = name, name = name })
+            end
           end
 
           -- Sort alphabetically
@@ -81,9 +83,9 @@ return {
             confirm = function(picker, item)
               picker:close()
 
-              -- Get the target workspace path
-              local target_workspace = workspaces[item.name]
-              local expanded_target = vim.fn.expand(target_workspace)
+              -- Get the target workspace path (returns a PathlibPath object)
+              local workspace_path = tostring(dirman.get_workspace(item.name))
+              local expanded_target = vim.fn.expand(workspace_path)
 
               -- Close buffers from other workspaces
               for _, buf in ipairs(vim.api.nvim_list_bufs()) do
