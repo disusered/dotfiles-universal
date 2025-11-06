@@ -49,22 +49,32 @@ Explain the **logic** of the fix, don't regurgitate line-by-line changes.
 ❌ **BAD (Regurgitated Diff):**
 "Se cambió la línea 167 de `if (token.expires_at = Date.now())` a `if (token.expires_at == Date.now())`."
 
-### RULE 3: NO GITHUB DUPLICATION
+### RULE 3: NO DUPLICATION OF SYSTEM DATA
+
+**CRITICAL: Do not duplicate information available in other systems.**
 
 DO NOT include:
-- ❌ Code snippets
-- ❌ Line numbers
-- ❌ Commit SHAs
-- ❌ Links to git files
+- ❌ Code snippets (visible in GitHub)
+- ❌ Line numbers (visible in GitHub)
+- ❌ Commit SHAs (visible in git log)
+- ❌ Links to git files (visible in GitHub)
+- ❌ GitHub issue numbers (already in Notion properties)
+- ❌ Jira issue numbers (already in Notion properties)
+- ❌ Commit messages (visible in git log)
+- ❌ PR descriptions (visible in GitHub)
+- ❌ File change lists (visible in git diff)
 
-Notion properties and GitHub UI already show this. Your job is to synthesize, not copy.
+**Your job is to SYNTHESIZE the "why" and "impact", not COPY the "what" from other tools.**
+
+Notion properties, GitHub UI, Jira, and git logs already contain this data. Don't repeat it.
 
 ### RULE 4: PROFESSIONAL FORMATTING
 
-- ❌ DO NOT use decorative emojis in headings
+- ❌ DO NOT use decorative emojis in headings or anywhere
 - ❌ DO NOT use casual headings (e.g., "Done", "All good!")
-- ✅ DO use emojis in bullet lists for clarity (optional)
+- ❌ DO NOT use emojis in bullet lists (even functional ones like ✅, ❌)
 - ✅ DO maintain professional report tone
+- ✅ DO use plain text throughout
 
 ### RULE 5: NO INVENTED DATES
 

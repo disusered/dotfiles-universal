@@ -84,6 +84,7 @@ Por favor háznoslo saber si está funcionando como esperas.
 - **Clear expected result:** Say what they should see if it works correctly
 - **Professional tone:** No "Gracias por reportar!" (not client-like)
 - **NO metadata sections:** No "Para:", "Estado:", "When released:", "Test coverage:", or ETAs
+- **NO emojis:** Don't use emojis in stakeholder updates (no ✅, 🎉, 🔥, etc.)
 
 **Translation examples (technical → non-technical):**
 
@@ -164,7 +165,7 @@ Por favor háznoslo saber si está funcionando como esperas.
 - Business context (if it helps understanding)
 - Benefit or impact to user flow
 
-### Exclude:
+### Exclude (CRITICAL - Do NOT Duplicate System Data):
 - Technical implementation details
 - File or component names
 - Development jargon (API, endpoint, token, etc.)
@@ -173,6 +174,12 @@ Por favor háznoslo saber si está funcionando como esperas.
 - Technical metrics (tests, performance)
 - Metadata sections (Para:, Estado:, When released:, Test coverage:, ETAs)
 - Fabricated information not in work log
+- **GitHub issue numbers** (already visible in GitHub and Notion properties)
+- **Jira issue numbers** (already visible in Jira and Notion properties)
+- **Commit information** (visible in git log)
+- **PR details** (visible in GitHub)
+
+**Remember: Don't repeat data that stakeholders can see in their tools. Focus on USER IMPACT.**
 
 ## Example Output
 

@@ -49,6 +49,21 @@ This skill activates automatically when you detect that the user's request match
 
 ## Critical Rules (Apply to ALL Workflows)
 
+### Emoji Usage Policy
+
+**CRITICAL: Minimize emoji usage across all outputs.**
+
+- ❌ **NEVER** use emojis in headings or section titles
+- ❌ **NEVER** use decorative emojis (✨, 🎉, 🔥, etc.)
+- ✅ **ONLY** use functional emojis in bullet lists (✅, ❌, ⚠️) and **sparingly**
+- ✅ If in doubt, don't use emojis
+
+**Example:**
+
+❌ BAD: `## 🎯 Logros Clave` → Use: `## Logros Clave`
+❌ BAD: `- ✅ Feature completada exitosamente 🎉` → Use: `- Feature completada exitosamente`
+✅ ACCEPTABLE (sparingly): `- ✅ Tests passing` or `- ❌ Build failed`
+
 ### Notion Integration Rules
 
 1. **Data Source URL**

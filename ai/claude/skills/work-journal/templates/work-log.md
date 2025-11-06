@@ -88,16 +88,21 @@ Use `mcp__notion__append_to_page_content` with `command: "insert_content_after"`
    - Decisions made and reasoning
    - Technical insights/discoveries
    - Alternative approaches considered and WHY rejected
-   - Code snippets ONLY IF explanatory (showing bug logic, design pattern)
+   - Code snippets ONLY IF explanatory (showing bug logic, design pattern, NOT just "what I changed")
+   - Links to commits/files ONLY IF explanatory (showing context, NOT just listing changes)
 
-   **DO NOT LOG:**
-   - Commit message writing/editing
-   - PR text revisions
-   - Git operations (push, pull, checkout, branch, merge, rebase, etc.)
-   - File saves, basic file edits
+   **DO NOT LOG (Busywork that adds no value):**
+   - Commit message writing/editing/rewriting
+   - PR text revisions or rewrites
+   - Git operations (push, pull, checkout, branch, merge, rebase, add, etc.)
+   - File saves, basic file edits, file creation
+   - Running tests (just log the RESULT if significant)
+   - Installing dependencies
+   - Formatting code
    - Any information available in Git/GitHub/Jira logs
+   - Any grunt work visible in system logs
 
-   **Philosophy:** If it's in Git history, DON'T duplicate it. Log your THINKING, not your DOING.
+   **Philosophy:** If it's in Git history, DON'T duplicate it. Log your THINKING, not your DOING. Document DECISIONS and DISCOVERIES, not ACTIONS.
 
 3. **Timestamps**
    - Get real system time using: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
