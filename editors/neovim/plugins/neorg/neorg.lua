@@ -29,7 +29,9 @@ return {
             config = {
               workspaces = {
                 notes = "~/Documents/notes",
-                fastai = "~/Documents/fastai",
+                study = "~/Documents/study",
+                projects = "~/Documents/projects",
+                blog = "~/Documents/blog",
               },
               default_workspace = "notes",
             },
