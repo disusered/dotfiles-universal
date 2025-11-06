@@ -4,6 +4,39 @@ return {
     dependencies = { "benlubas/neorg-interim-ls" },
     lazy = false,
     version = false,
+    init = function()
+      local Snacks = require("snacks")
+
+      -- Helper function to check if ToC is open and get the window
+      local function get_toc_state()
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+          local buf = vim.api.nvim_win_get_buf(win)
+          local buf_name = vim.api.nvim_buf_get_name(buf)
+          if buf_name:match("^neorg://toc%-") then
+            return true, win
+          end
+        end
+        return false, nil
+      end
+
+      Snacks.toggle
+        .new({
+          name = "Table of Contents",
+          get = function()
+            local is_open, _ = get_toc_state()
+            return is_open
+          end,
+          set = function(enabled)
+            local is_open, toc_win = get_toc_state()
+            if enabled and not is_open then
+              vim.cmd("Neorg toc right")
+            elseif not enabled and is_open then
+              vim.api.nvim_win_close(toc_win, false)
+            end
+          end,
+        })
+        :map("<leader>os")
+    end,
     config = function()
       require("neorg").setup({
         load = {
@@ -162,32 +195,8 @@ return {
         end,
         desc = "Export to markdown",
       },
-      -- Toggle table of contents
-      {
-        "<leader>os",
-        function()
-          -- Check if TOC buffer exists (buffer name pattern: "neorg://toc-<tabpage>")
-          local toc_open = false
-          local toc_win = nil
-
-          for _, win in ipairs(vim.api.nvim_list_wins()) do
-            local buf = vim.api.nvim_win_get_buf(win)
-            local buf_name = vim.api.nvim_buf_get_name(buf)
-            if buf_name:match("^neorg://toc%-") then
-              toc_open = true
-              toc_win = win
-              break
-            end
-          end
-
-          if toc_open and toc_win then
-            vim.api.nvim_win_close(toc_win, false)
-          else
-            vim.cmd("Neorg toc right")
-          end
-        end,
-        desc = "Toggle table of contents",
-      },
+      -- Toggle table of contents (handled via init function below)
+      -- This placeholder ensures Which Key registers the keybinding
       -- Inject metadata
       {
         "<leader>oi",
