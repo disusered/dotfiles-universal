@@ -136,6 +136,9 @@ This skill activates when you detect that the user's request matches one of the 
 7. **YOU DO NOT UPDATE STATUS - work stays "In Progress" until merged**
 
 **YOU DO NOT:**
+- **Create a new work log page** (one already exists - FIND it, don't create it)
+- **Ask for Priority, Project, or Type** (you're not creating a page)
+- **Use `mcp__notion__create_page` for the work log** (only for the child PR description page)
 - Modify or translate the work log (it's read-only input)
 - Append to the work log (create child page instead)
 - Regenerate content after user approves
@@ -146,6 +149,8 @@ This skill activates when you detect that the user's request matches one of the 
 1. **Gather inputs (English)**
    - Ask: "What's the Notion page ID, source branch, and target branch?"
    - If missing: STOP and ASK
+   - **CRITICAL: You are NOT creating a new work log - you are using an existing one**
+   - **DO NOT ask for Priority, Project, Type - you are NOT creating a page**
 
 2. **Analyze context (READ-ONLY)**
    - Use `mcp__notion__notion-fetch` to read Notion page(s)
@@ -311,6 +316,9 @@ This skill activates when you detect that the user's request matches one of the 
 6. **YOU DO NOT UPDATE STATUS - stakeholder updates don't complete work**
 
 **YOU DO NOT:**
+- **Create a new work log page** (one already exists - FIND it, don't create it)
+- **Ask for Priority, Project, or Type** (you're not creating a page)
+- **Use `mcp__notion__create_page` for the work log** (only for the child stakeholder update page)
 - Modify or translate the work log (it's read-only input)
 - Append to the work log (create child page instead)
 - Regenerate content after user approves
@@ -321,6 +329,8 @@ This skill activates when you detect that the user's request matches one of the 
 1. **Gather inputs (English)**
    - Ask: "What's the Notion page ID for the work log?"
    - If missing: STOP and ASK
+   - **CRITICAL: You are NOT creating a new work log - you are using an existing one**
+   - **DO NOT ask for Priority, Project, Type - you are NOT creating a page**
 
 2. **Analyze work log (READ-ONLY)**
    - Use `mcp__notion__notion-fetch` to read page
