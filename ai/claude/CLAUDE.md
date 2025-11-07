@@ -66,3 +66,26 @@ CLI for Jira issues and comments.
 - `jiratui issues` - List/query issues
 - `jiratui comments <issue-key>` - View/add comments
 - Use `--help` on any command for options
+
+### gh
+
+GitHub CLI for issues and pull requests.
+
+**Issues:**
+- `gh issue list` - List issues
+- `gh issue view <number>` - View issue details
+- `gh issue comment <number>` - Add comment to issue
+- `gh issue edit <number> --add-label <label>` - Add labels
+- `gh issue edit <number> --remove-label <label>` - Remove labels
+
+**Pull Requests:**
+- `gh pr list` - List PRs
+- `gh pr view <number>` - View PR details
+- `gh pr create` - Create new PR
+- `gh pr comment <number>` - Add comment to PR
+- `gh pr review <number>` - Start a review
+- `gh pr review <number> --approve` - Approve PR
+- `gh pr review <number> --request-changes` - Request changes
+- `gh pr review <number> --comment` - Comment-only review
+
+**Use `--help` on any command for full options**
