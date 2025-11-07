@@ -1,17 +1,17 @@
 ---
 name: work-journal
-description: Track technical work in Notion and generate audience-specific summaries. Use when logging work, creating PR descriptions, or generating status updates for managers and stakeholders.
-allowed-tools: mcp__notion__query_database, mcp__notion__create_page, mcp__notion__update_page_properties, mcp__notion__append_to_page_content, mcp__notion__notion-create-pages, mcp__notion__notion-update-page, mcp__notion__notion-fetch, mcp__github__issue_read, mcp__github__issue_comment, mcp__github__pull_request_create, Read, Grep, Bash, mcp__git__git_status, mcp__git__git_diff, mcp__git__git_log, mcp__git__git_show
+description: Generate audience-specific communications from Notion work logs. Use when creating PR descriptions, or generating status updates for managers and stakeholders. (Note: Basic work logging is handled by CLAUDE.md directives, not this skill.)
+allowed-tools: mcp__notion__query_database, mcp__notion__update_page_properties, mcp__notion__append_to_page_content, mcp__notion__notion-update-page, mcp__notion__notion-fetch, mcp__github__issue_read, mcp__github__issue_comment, mcp__github__pull_request_create, Read, Grep, Bash, mcp__git__git_status, mcp__git__git_diff, mcp__git__git_log, mcp__git__git_show
 model: Sonnet
 ---
 
-# Work Journaling & Communication Generation
+# Work Journal Communication Generation
 
 ## Purpose
 
-This skill manages work tracking in Notion and generates audience-appropriate communications from logged work.
+This skill generates audience-appropriate communications from Notion work logs that were created using CLAUDE.md directives.
 
-**Core Philosophy:** Log as you go, not at the end. Work tracking is continuous documentation.
+**IMPORTANT:** This skill does NOT handle basic work logging. That's handled automatically by CLAUDE.md directives.
 
 ## Language Rule
 
@@ -20,30 +20,29 @@ This skill manages work tracking in Notion and generates audience-appropriate co
 
 | Workflow | You ask questions | You confirm | Artifact output |
 |----------|------------------|-------------|-----------------|
-| Work Log | English | English | English (journal) |
 | PR | English | English | **Spanish** (PR text) |
 | Manager | English | English | **Spanish** (summary) |
 | Stakeholder | English | English | **Spanish** (update) |
 
 ## Supported Workflows
 
-1. **Work Logging** - Log development work to Notion as it happens (English)
-2. **PR Descriptions** - Generate technical PR descriptions in Spanish for code review
-3. **Manager Summaries** - Generate strategic summaries in Spanish for managers
-4. **Stakeholder Updates** - Generate non-technical updates in Spanish for stakeholders
+1. **PR Descriptions** - Generate technical PR descriptions in Spanish for code review
+2. **Manager Summaries** - Generate strategic summaries in Spanish for managers
+3. **Stakeholder Updates** - Generate non-technical updates in Spanish for stakeholders
 
 ## How This Skill Works
 
 **Model-Invoked Activation:**
-This skill activates automatically when you detect that the user's request matches one of the supported workflows above.
+This skill activates when you detect that the user's request matches one of the supported workflows above.
 
 **Identify the workflow by keywords:**
-- "log this work", "track work", "create notion page" → Work Logging
 - "PR description", "pull request", "create PR" → PR Description
 - "manager summary", "resumen para manager", "jefe" → Manager Summary
 - "stakeholder update", "post to github", "actualización" → Stakeholder Update
 
 **Then dispatch to the appropriate template.**
+
+**Note:** If user mentions "log work" or "track work", that's handled by CLAUDE.md, not this skill.
 
 ---
 
@@ -66,125 +65,33 @@ This skill activates automatically when you detect that the user's request match
 
 ### Notion Integration Rules
 
-1. **Data Source URL**
-   - ALL page creation MUST use: `{"data_source_id": "2a0d1aba-3b72-8031-aedc-000b7ba2c45f"}`
-   - See `references/notion-schema.md` for complete schema
+1. **Fetch Work Logs**
+   - Use `mcp__notion__notion-fetch` to read existing work log pages
+   - Extract page properties (Jira, GitHub, Project, etc.)
+   - Read page content (work log entries)
 
-2. **Property Validation**
-   - Required properties: Priority, Project, Type
-   - If ANY are missing from user request: **STOP and ASK**
-   - Use `scripts/validate_properties.py` to verify before creation
-   - For Jira/GitHub URLs, construct full URLs per `references/link-formats.md`
+2. **Create Child Pages**
+   - All artifacts (PR descriptions, summaries, updates) go in child pages
+   - Use Notion's `<page>Title</page>` syntax when appending
+   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
 
-3. **Create BEFORE Execute**
-   - For work logging: Create Notion page BEFORE running any commands
-   - Never execute commands, then try to log them retroactively
+3. **Update Properties**
+   - Use `mcp__notion__update_page_properties` to update Status, etc.
+   - Don't recreate pages that already exist
 
-4. **Log As You Go**
-   - Use `mcp__notion__append_to_page_content` after EVERY significant action
-   - Don't batch logs at the end
-   - Append immediately after: commands, errors, findings, decisions
-
-5. **URL-Only Response**
-   - Final response: `✅ Task complete. The work has been logged to Notion: [URL]`
-   - DO NOT print summary of logged work (it's redundant, already in Notion)
+4. **URL-Only Confirmations**
+   - Final response: `✅ [Artifact type] created: [child page URL]`
+   - DO NOT reprint the artifact content (it's in Notion)
 
 ### Link Formatting Rules
 
-- **Main tickets** (primary Jira/GitHub) → Page PROPERTIES
-- **Discovered items** (related tickets, commits, code) → Page BODY
 - Use exact formats from `references/link-formats.md`
-- Never create "Related Tickets" section (main tickets in properties)
+- Jira: `https://odasoftmx.atlassian.net/browse/{ID}`
+- GitHub: `https://github.com/{user}/{repo}/issues/{NUM}`
 
 ---
 
-## Workflow 1: Work Logging
-
-**When to use:** User wants to track/log work to Notion
-
-**Template:** `templates/work-log.md`
-
-### Process:
-
-1. **Pre-Work Validation**
-   ```bash
-   # Always run validation first (with --help to see usage)
-   python scripts/validate_properties.py --help
-   python scripts/validate_properties.py --priority X --project "Y" --type Z
-   ```
-
-2. **Check for missing properties**
-   - If Priority, Project, or Type not provided: **STOP and ASK**
-   - If Jira mentioned but unclear: **STOP and ASK**
-   - If GitHub mentioned but repo unknown: **STOP and ASK for full repo name**
-
-3. **Construct URLs for properties**
-   - Jira: `https://odasoftmx.atlassian.net/browse/{issue-id}`
-   - GitHub: `https://github.com/{user}/{repo}/issues/{number}`
-   - See `references/link-formats.md` for details
-
-4. **Create Notion page**
-   ```json
-   {
-     "parent": {"data_source_id": "2a0d1aba-3b72-8031-aedc-000b7ba2c45f"},
-     "pages": [{
-       "properties": {
-         "Name": "...",
-         "Priority": 0-4,
-         "Project": "...",
-         "Type": "bug|feature|task|epic|chore",
-         "Jira issue #": "https://...",
-         "Github issue #": "https://...",
-         "Status": "In Progress"
-       },
-       "content": "## Work Log\n\nStarting work...\n"
-     }]
-   }
-   ```
-
-5. **Log continuously - FILTER BUSYWORK**
-
-   **CRITICAL:** Journal = THINKING, not DOING. If it's in Git history, DON'T duplicate.
-
-   **DO NOT LOG:**
-   - Commit message writing/editing
-   - PR text revisions
-   - Git operations (push, pull, checkout, branch, merge, rebase, etc.)
-   - File saves, basic file edits
-   - Any information available in Git/GitHub/Jira logs
-
-   **DO LOG:**
-   - Approaches attempted and WHY chosen
-   - Failures and root cause analysis
-   - Decisions made and reasoning
-   - Technical insights/discoveries
-   - Alternative approaches considered and WHY rejected
-   - Code snippets ONLY IF explanatory (showing bug logic, design pattern, NOT just "what I changed")
-
-   **Timestamp:**
-   - Get real system time: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
-   - NEVER hallucinate or offset timestamps
-
-   **Entry Names:**
-   - Descriptive only (e.g., "Identified root cause in token validation logic")
-   - NO metadata that's in table columns (dates, types, issue #s, priorities)
-   - KISS principle
-
-   **Journal Structure:**
-   - Chronological log ONLY
-   - NEVER restructure or reorganize sections
-   - NEVER read entire file before appending
-   - ALWAYS append to end using `mcp__notion__append_to_page_content`
-   - Trust Notion MCP append API
-
-6. **Complete work**
-   - Append final summary to page content
-   - Update Status to "Done"
-   - Respond with URL ONLY
-
----
-
-## Workflow 2: PR Description Generation
+## Workflow 1: PR Description Generation
 
 **When to use:** User wants to create a GitHub Pull Request description
 
@@ -242,7 +149,7 @@ This skill activates automatically when you detect that the user's request match
 
 ---
 
-## Workflow 3: Manager Summary Generation
+## Workflow 2: Manager Summary Generation
 
 **When to use:** User wants to generate a Spanish summary for a technical manager
 
@@ -291,7 +198,7 @@ This skill activates automatically when you detect that the user's request match
 
 ---
 
-## Workflow 4: Stakeholder Update Generation
+## Workflow 3: Stakeholder Update Generation
 
 **When to use:** User wants to create a non-technical update for stakeholders
 
@@ -344,34 +251,12 @@ This skill activates automatically when you detect that the user's request match
 
 When you need detailed information:
 
-- **Notion schema:** Read `references/notion-schema.md` for property definitions, SQLite schema, and data source URL
 - **Link formats:** Read `references/link-formats.md` for Jira/GitHub/code/commit URL construction patterns
-- **Work logging:** Read `templates/work-log.md` for canonical logging workflow
 - **PR description:** Read `templates/pr-description.md` for PR format and tone guidelines
 - **Manager summary:** Read `templates/manager-summary.md` for Spanish manager format and critical rules
 - **Stakeholder update:** Read `templates/stakeholder-update.md` for non-technical Spanish format
 
-## Validation Script Usage
-
-Before creating Notion pages, use the validation script:
-
-```bash
-# First, check help
-python scripts/validate_properties.py --help
-
-# Then validate
-python scripts/validate_properties.py --priority 1 --project "Auth" --type bug --jira 2110 --github 123 --repo "odasoftmx/app"
-```
-
-The script returns JSON with:
-- `valid`: boolean
-- `errors`: array of validation errors with agent-centric suggestions
-- `urls`: constructed Jira and GitHub URLs
-
-**If validation fails:**
-- Read the `suggestion` field for each error
-- Address the issue (usually: ask user for missing info)
-- Re-run validation
+**Note:** For basic work logging instructions, see CLAUDE.md (not this skill).
 
 ---
 
@@ -393,43 +278,19 @@ The script returns JSON with:
 9. Append to Notion immediately (no approval needed for this)
 10. Confirm both completed
 
-### Discovered Related Work
-
-**While logging work, you discover a related issue:**
-
-1. Continue logging current work
-2. In the log, mention the discovery:
-   ```markdown
-   ### Discovery
-
-   Found related issue: [SYS-1850](https://odasoftmx.atlassian.net/browse/SYS-1850)
-   which had similar assignment operator bug.
-   ```
-3. If the discovered issue needs work:
-   - Create NEW Notion page for it
-   - Link via relation property
-   - Log the link in current page body
-
 ---
 
 ## Error Handling
 
-### Validation Fails
-- Read error suggestions from `validate_properties.py` output
-- Ask user for missing/incorrect information
-- Re-validate before proceeding
-
-### Page Creation Fails
-- Check validation output
-- Verify data source ID is correct
-- Ensure properties match schema
-- Retry after fixing
-
-### Append Fails
+### Page Fetch Fails
 - Verify page ID is correct
+- Ask user for the correct Notion page URL/ID
+- Ensure page exists
+
+### Child Page Creation Fails
+- Verify parent page ID is correct
 - Check markdown is valid Notion-flavored markdown
-- Ensure page was created before trying to append
-- Retry the append operation
+- Retry the operation
 
 ### User Blocks During Iteration
 - If user rejects draft, ask what to change
@@ -443,18 +304,16 @@ The script returns JSON with:
 
 You've completed your job when:
 
-- ✅ For work logging: Notion page created, work logged continuously, status updated to Done, URL provided
-- ✅ For PR: Draft approved by user, PR created in GitHub, URL provided
-- ✅ For manager summary: Summary generated and appended to Notion, URL provided (in Spanish)
-- ✅ For stakeholder update: Draft approved by user, comment posted to GitHub, URL provided
+- ✅ For PR: Draft approved by user, child page created in Notion, URL provided
+- ✅ For manager summary: Summary generated, child page created in Notion, URL provided (in Spanish)
+- ✅ For stakeholder update: Draft approved by user, child page created in Notion, URL provided
 
 ---
 
 ## Important Notes
 
-- **Language Awareness:** Work logging uses English (technical logs). All audience outputs (PR, manager, stakeholder) use Spanish.
+- **Language Awareness:** All artifacts (PR, manager, stakeholder) use Spanish. Agent ↔ user communication uses English.
 - **Approval Gates:** PR and stakeholder updates require user approval. Manager summaries are one-shot (no approval).
-- **Notion First:** Always create Notion page before running commands (for work logging).
+- **Work Logging:** Basic work logging is NOT handled by this skill - see CLAUDE.md for those directives.
 - **URL Construction:** Always use full, absolute URLs per `references/link-formats.md`.
-- **No Redundant Summaries:** Never print logged work back to user; just provide URL.
-- **Property Validation:** Always validate before page creation to prevent errors.
+- **No Redundant Content:** Never reprint artifact content; just provide child page URL.
