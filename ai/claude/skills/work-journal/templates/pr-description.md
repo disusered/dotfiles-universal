@@ -87,8 +87,6 @@ The PR description itself must be in Spanish, but all questions, confirmations, 
 
 ## Trabajo Relacionado
 
-- Notion: [Título de la página](https://notion.so/...)
-- Jira: [ISSUE-123](https://odasoftmx.atlassian.net/browse/ISSUE-123) _(si aplica)_
 - GitHub Issue: [#456](https://github.com/user/repo/issues/456) _(si aplica)_
 
 ## Contexto Técnico
@@ -223,8 +221,6 @@ Este PR corrige un bug crítico en el flujo de renovación de tokens OAuth que c
 
 ## Trabajo Relacionado
 
-- Notion: [Fix OAuth Token Refresh Bug](https://www.notion.so/Fix-OAuth-Token-Refresh-Bug-abc123...)
-- Jira: [SYS-2110](https://odasoftmx.atlassian.net/browse/SYS-2110)
 - GitHub Issue: [#123](https://github.com/odasoftmx/app/issues/123)
 
 ## Contexto Técnico
@@ -253,6 +249,11 @@ Se eligió `<=` sobre `==` porque proporciona comportamiento más robusto cuando
 ```
 
 ## Common Errors to Avoid
+
+❌ **CRITICAL: Including Jira or Notion links in PR**
+- GitHub PRs are public/external - NEVER expose internal Jira or Notion links
+- Only include public GitHub issue references
+- Information flow: Jira (internal) → GitHub (public) is OK, but GitHub → Jira is FORBIDDEN
 
 ❌ **Including line numbers**
 - Line numbers are meaningless without commit context. NEVER include them.

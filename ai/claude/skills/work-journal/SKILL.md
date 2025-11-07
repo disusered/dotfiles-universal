@@ -102,6 +102,30 @@ Invoke the `gh` skill when you need to:
 
 **If you see yourself about to call `mcp__notion__update_page_properties` to update Status: STOP. Don't do it.**
 
+### Information Flow Security (CRITICAL)
+
+**CRITICAL: Internal tracking info MUST NOT leak to external channels.**
+
+**Information flow rules:**
+- ✅ **Jira (internal) → can reference GitHub** (e.g., Jira comment can link to GitHub issue)
+- ❌ **GitHub (public) → MUST NOT reference Jira** (e.g., PR descriptions NEVER include Jira links)
+- ❌ **Stakeholder updates (external) → MUST NOT reference Jira or Notion** (only user-facing info)
+- ✅ **Manager summaries (internal, posted to Jira) → can reference anything**
+
+**What to EXCLUDE from public artifacts (PRs, stakeholder updates):**
+- ❌ Jira issue numbers or URLs
+- ❌ Notion page links
+- ❌ Internal tracking IDs
+- ❌ Commit SHAs (in PR descriptions)
+- ❌ Any reference to internal tools
+
+**What CAN be included in public artifacts:**
+- ✅ GitHub issue numbers (in PR descriptions only)
+- ✅ User-facing impact descriptions
+- ✅ Technical context (for PRs)
+
+**If you find yourself about to include a Jira or Notion link in a PR or stakeholder update: STOP. Don't do it.**
+
 ### Emoji Usage Policy
 
 **CRITICAL: Minimize emoji usage across all outputs.**
