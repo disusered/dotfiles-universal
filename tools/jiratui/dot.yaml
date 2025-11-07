@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: uv tool install jiratui
+    depends:
+      - /languages/python/latest
