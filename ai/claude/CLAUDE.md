@@ -60,11 +60,9 @@ Once a Notion page is created for work:
 
 ### jiratui
 
-Terminal UI for Jira. Use for viewing/managing issues and comments.
+CLI for Jira issues and comments.
 
-**Launch:** `jiratui`
-
-**Key operations:**
-- View issues, browse tickets, read/add comments
-- Navigate with vim-style keybindings
-- Run `jiratui --help` for full CLI options
+**Commands:**
+- `jiratui issues` - List/query issues
+- `jiratui comments <issue-key>` - View/add comments
+- Use `--help` on any command for options
