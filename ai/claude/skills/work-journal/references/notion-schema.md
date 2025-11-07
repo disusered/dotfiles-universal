@@ -55,7 +55,7 @@ Every work page MUST have these properties set before creation:
 
 **Validation:** Must be one of the above values
 
-### Property: Jira issue #
+### Property: Jira
 
 **Type:** URL
 **Required:** No (but ask if not provided)
@@ -70,7 +70,7 @@ https://odasoftmx.atlassian.net/browse/{issue-number}
 
 **Critical:** This is a URL property, NOT text. You must provide the full constructed URL.
 
-### Property: Github issue #
+### Property: Github
 
 **Type:** URL
 **Required:** No (but ask if not provided)
@@ -146,8 +146,8 @@ When setting properties via MCP, use this format:
     "Priority": 2,
     "Project": "Project Name",
     "Type": "feature",
-    "Jira issue #": "https://odasoftmx.atlassian.net/browse/2110",
-    "Github issue #": "https://github.com/odasoftmx/app/issues/123",
+    "Jira": "https://odasoftmx.atlassian.net/browse/2110",
+    "Github": "https://github.com/odasoftmx/app/issues/123",
     "Status": "In Progress"
   }
 }
@@ -182,23 +182,6 @@ Before creating a page:
 6. If MCP errors occur, handle gracefully (see Troubleshooting below)
 
 ## Troubleshooting
-
-### Property Name Errors
-
-If you get an error like: `Property "Github issue #" not found`
-
-**This means the property name in the user's database is different.**
-
-**How to handle:**
-1. Ask the user: "What's the exact name of the GitHub/Jira property in your Notion database?"
-2. Update your call with the correct property name
-3. Document the correct names for future reference
-
-**Common variations:**
-- "Github issue #" vs "GitHub issue #" vs "GitHub Issue"
-- "Jira issue #" vs "Jira Issue #" vs "Jira"
-
-**Note:** Property names are case-sensitive and must match exactly.
 
 ### Collection Fetch Errors
 

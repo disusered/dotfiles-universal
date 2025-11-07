@@ -32,8 +32,8 @@
    - **Priority** (0-4): Ask user if not clear from context
    - **Project**: Ask user which team/project this belongs to
    - **Type**: Infer from context or ask (bug/feature/task/epic/chore)
-   - **Jira issue #** (optional): Ask "Is there a Jira issue for this?" (blank is OK)
-   - **Github issue #** (optional): Check if mentioned, ask for repo if needed
+   - **Jira** (optional): Ask "Is there a Jira issue for this?" if not mentioned (blank is OK)
+   - **Github** (optional): Ask if not mentioned, ask for repo if needed
 
 3. **Generate clean Name (avoid redundancy):**
    - Extract issue number from GitHub/Jira if present
@@ -53,8 +53,8 @@
          "Priority": 0-4,
          "Project": "Team/Project name",
          "Type": "bug|feature|task|epic|chore",
-         "Jira issue #": "https://odasoftmx.atlassian.net/browse/ID" (optional),
-         "Github issue #": "https://github.com/user/repo/issues/NUM" (optional),
+         "Jira": "https://odasoftmx.atlassian.net/browse/ID" (optional),
+         "Github": "https://github.com/user/repo/issues/NUM" (optional),
          "Status": "In Progress"
        },
        "content": "## Work Log\n\nStarting work...\n"
@@ -124,8 +124,8 @@
 - **Type** (enum): `bug`, `feature`, `task`, `epic`, or `chore`
 
 **GitHub and Jira prompts:**
-- **ALWAYS ask** for Jira issue # ("Is there a Jira issue for this?")
-- **ALWAYS ask** for GitHub issue # if not already mentioned
+- **Ask if not known/mentioned**: "Is there a Jira/GitHub issue for this?"
+- If user already mentioned issue number in context, don't re-ask
 - Blank/empty answers are acceptable - just omit from properties
 - If GitHub issue provided, MUST ask for repo (user/repo format)
 
@@ -133,19 +133,6 @@
 
 - **Data Source:** `collection://2a0d1aba-3b72-8031-aedc-000b7ba2c45f`
 - All work pages **MUST** use this as parent
-
-### Error Handling
-
-**If property name errors occur:**
-- MCP will error with: `Property "X" not found`
-- ASK user for exact property name in their database
-- Common variations: "Github issue #" vs "GitHub issue #"
-- Property names are case-sensitive
-
-**If you get property errors, DO NOT:**
-- Keep retrying with the same property name
-- Try to "guess" the right property name
-- Give up - just ask the user
 
 ---
 
