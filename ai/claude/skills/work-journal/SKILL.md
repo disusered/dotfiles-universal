@@ -172,27 +172,43 @@ This skill activates when you detect that the user's request matches one of the 
 
 **Language:** All communication in English, artifact output in Spanish
 
+**CRITICAL WORKFLOW OVERVIEW:**
+1. User gives you a Jira URL (e.g., https://odasoftmx.atlassian.net/browse/CM-2765)
+2. You FIND the existing Notion work log by querying for that Jira URL
+3. You READ the work log (it's in English, don't touch it)
+4. You generate a Spanish manager summary (once, concisely)
+5. You CREATE A NESTED CHILD PAGE under the work log with the summary
+6. You post the summary to Jira as a comment
+
+**YOU DO NOT:**
+- Create a new work log page (one already exists)
+- Modify or translate the work log (it's read-only input)
+- Append to the work log (create child page instead)
+- Regenerate content after showing the user
+
 ### Process:
 
-1. **Find the work log page (English)**
-   - If user provides Jira URL: Extract issue key and query database by Jira property
+1. **Find the existing work log page (English)**
+   - If user provides Jira URL: Extract issue key (e.g., CM-2765) and query database
+   - Use `mcp__notion__query_database` to search where Jira property = that URL
    - If user provides Notion page URL/ID: Use that directly
-   - Use `mcp__notion__query_database` to search by Jira property if given Jira URL
-   - If page not found or Jira property is empty: STOP and ASK
-   - **DO NOT create new pages - only work with existing work logs**
+   - If page not found: STOP and tell user no work log exists for that Jira issue
+   - **DO NOT ask to create new page - work log should already exist**
 
-2. **Analyze context**
-   - Use `mcp__notion__notion-fetch` to read page
+2. **Analyze context (READ-ONLY)**
+   - Use `mcp__notion__notion-fetch` to read page content
+   - **CRITICAL: The work log page is READ-ONLY - you will NOT modify it**
    - If GitHub issue # available, use `gh issue view {number}` for context
-   - Extract:
+   - Extract from the ENGLISH work log:
      - Context (what system/component)
      - Technical root cause (conceptual, not line-by-line)
      - Solution applied (logical changes)
      - Metrics/data
      - Next steps/blockers
 
-3. **Draft manager summary in Spanish**
+3. **Draft manager summary in Spanish (generate ONCE)**
    - Use format from `templates/manager-summary.md`
+   - **GENERATE THE SUMMARY ONCE - don't regenerate after showing user**
    - **VERIFY output language is Spanish before proceeding**
    - **CRITICAL RULES:**
      - BE CONCISE - 2-3 paragraphs max, clear and direct
@@ -204,16 +220,20 @@ This skill activates when you detect that the user's request matches one of the 
      - WRITE LIKE A HUMAN - Clear, direct, professional
    - Tone: Strategic, high-level, business-impact focused, CONCISE
 
-4. **Create CHILD PAGE (not append!) AND post to Jira**
+4. **Create NESTED CHILD PAGE (DO NOT TOUCH WORK LOG) AND post to Jira**
    - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
-   - **CRITICAL:** Use `mcp__notion__create_page` to create a NEW CHILD PAGE
-   - Parent: The work log page ID you found in step 1
-   - Child page title: `Manager Summary - {timestamp}`
-   - Child page content: Spanish manager summary
-   - **DO NOT use append_to_page_content on the work log - CREATE CHILD PAGE**
+   - **CRITICAL: DO NOT MODIFY THE WORK LOG PAGE IN ANY WAY**
+   - **CRITICAL: Use `mcp__notion__create_page` to create a NESTED CHILD PAGE:**
+     - Parent: `{ page_id: "{work log page ID from step 1}" }`
+     - Title: `Manager Summary - {timestamp}`
+     - Content: The EXACT Spanish summary you generated in step 3
+   - This creates a SEPARATE page nested under the work log
+   - **DO NOT use `append_to_page_content` - that would modify the work log**
+   - **DO NOT translate the work log - it stays in English**
+   - **Upload the EXACT content from step 3 - don't regenerate or change it**
    - **Post comment to Jira using jiratui:**
      ```bash
-     echo "{Spanish manager summary}" | jiratui comments {jira-issue-key} --add
+     echo "{EXACT Spanish manager summary from step 3}" | jiratui comments {jira-issue-key} --add
      ```
    - Extract Jira issue key from page properties (from URL like `CM-2765`)
    - DO NOT ask for approval (one-shot action)

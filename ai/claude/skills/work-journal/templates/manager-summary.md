@@ -218,22 +218,35 @@ This is your primary source for the **resolution**.
 - [Bloqueador con impacto + acción necesaria]
 ```
 
-**Create a child page with this Spanish summary text.**
+**CRITICAL INSTRUCTIONS FOR CREATING CHILD PAGE:**
 
-1. **Get timestamp**
+1. **THE WORK LOG PAGE IS READ-ONLY**
+   - You MUST NOT modify the work log page content
+   - You MUST NOT append to the work log page
+   - You MUST NOT translate the work log page
+   - The work log page is your INPUT - you only READ from it
 
+2. **Get timestamp**
    ```bash
    TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'
    ```
 
-2. **Create child page**
-   - Parent: The Notion work log page
-   - Title: `Manager Summary - {timestamp}`
-   - Content: The Spanish manager summary
-   - Use Notion's child page syntax: `<page>Manager Summary - {timestamp}</page>`
+3. **Create a NEW CHILD PAGE nested under the work log**
+   - Use `mcp__notion__create_page` with:
+     - `parent: { page_id: "{the work log page ID from step 1}" }`
+     - `title: "Manager Summary - {timestamp}"`
+     - `content: "{the EXACT Spanish summary you generated and showed to user}"`
+   - This creates a SEPARATE page nested under the work log
+   - DO NOT use `append_to_page_content` - that would modify the work log
 
-- **DO NOT ask for approval.** This is a one-shot action: generate and create immediately.
-- Use the Jira ID you found in Step 2 for the summary heading.
+4. **Upload the EXACT content you showed the user**
+   - Generate the summary ONCE
+   - Show it to the user (they'll see it in output)
+   - Upload that EXACT text to the child page
+   - DO NOT regenerate, rewrite, or "improve" it
+
+5. **DO NOT ask for approval** - This is a one-shot action: generate and create immediately
+6. **Use the Jira ID** you found in Step 2 for the summary heading
 
 ### Step 6: Final Step (English)
 
@@ -340,9 +353,17 @@ Ninguno.
 - Work logs stay in ENGLISH
 - Only the manager summary artifact is in Spanish
 
+❌ **CRITICAL: Modifying the work log page in ANY way**
+- The work log is READ-ONLY input
+- DO NOT append to it
+- DO NOT translate it
+- DO NOT modify it
+- Only READ from it
+
 ❌ **Appending summary to work log instead of creating child page**
-- Use `mcp__notion__create_page` to create CHILD PAGE
-- DO NOT use `append_to_page_content` on the work log
+- Use `mcp__notion__create_page` with `parent: { page_id: "work-log-id" }`
+- This creates a NESTED page under the work log
+- DO NOT use `append_to_page_content` - that modifies the work log
 
 ❌ **Communicating with user in Spanish**
 - ALL agent ↔ user communication must be in English
