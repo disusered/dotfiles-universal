@@ -107,7 +107,18 @@ This skill activates when you detect that the user's request matches one of the 
 
 **Language:** All communication in English, artifact output in Spanish
 
-**CRITICAL:** ALL PR description text MUST be in Mexican Spanish.
+**CRITICAL WORKFLOW OVERVIEW:**
+1. User provides Notion page ID, source branch, target branch
+2. You READ the work log (English, read-only)
+3. You analyze git changes
+4. You generate a Spanish PR description (once, get user approval)
+5. You CREATE A NESTED CHILD PAGE under the work log with the PR text
+6. You create the PR in GitHub with that exact text
+
+**YOU DO NOT:**
+- Modify or translate the work log (it's read-only input)
+- Append to the work log (create child page instead)
+- Regenerate content after user approves
 
 ### Process:
 
@@ -115,8 +126,9 @@ This skill activates when you detect that the user's request matches one of the 
    - Ask: "What's the Notion page ID, source branch, and target branch?"
    - If missing: STOP and ASK
 
-2. **Analyze context (the "why")**
+2. **Analyze context (READ-ONLY)**
    - Use `mcp__notion__notion-fetch` to read Notion page(s)
+   - **CRITICAL: The work log page is READ-ONLY - you will NOT modify it**
    - Extract: Technical Summary, Goal, Root Cause
 
 3. **Analyze changes (the "what")**
@@ -125,19 +137,15 @@ This skill activates when you detect that the user's request matches one of the 
      git diff origin/{target}...{source}
      git log origin/{target}..{source} --oneline
      ```
-   - Summarize: files changed, components affected, patterns used
+   - Understand conceptually: goal, approach, reasoning
 
-4. **Draft PR description in Spanish**
+4. **Draft PR description in Spanish (generate ONCE)**
    - Use format from `templates/pr-description.md`
+   - **GENERATE THE DESCRIPTION ONCE - don't regenerate after user approves**
    - **VERIFY output language is Spanish before proceeding**
-   - Structure:
-     - Resumen (why + what)
-     - Trabajo Relacionado (links)
-     - Cambios Realizados (categorized changes)
-     - Contexto Técnico (from Notion)
-     - Plan de Pruebas
-     - Notas para Revisores
-   - Tone: Technical, detailed, code-focused
+   - Structure: Resumen, Trabajo Relacionado, Contexto Técnico, Notas para Revisores
+   - Tone: Technical, concise, focused on WHY not WHAT
+   - **CRITICAL: No line numbers, no file lists, no "Cambios Realizados" section**
 
 5. **Iterate with user (English)**
    - Present draft (in Spanish)
@@ -145,14 +153,19 @@ This skill activates when you detect that the user's request matches one of the 
    - Adjust based on feedback
    - Repeat until approved
 
-6. **Create child page with PR text AND create PR in GitHub**
+6. **Create NESTED CHILD PAGE AND create PR in GitHub**
    - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
-   - Create child page of journal with title: `PR Description - {timestamp}`
-   - Page content: Approved Spanish PR text
-   - Use Notion's `<page>PR Description - {timestamp}</page>` syntax in append
+   - **CRITICAL: DO NOT MODIFY THE WORK LOG PAGE IN ANY WAY**
+   - **CRITICAL: Use `mcp__notion__create_page` to create a NESTED CHILD PAGE:**
+     - Parent: `{ page_id: "{work log page ID from step 1}" }`
+     - Title: `PR Description - {timestamp}`
+     - Content: The EXACT Spanish PR text approved by user in step 5
+   - This creates a SEPARATE page nested under the work log
+   - **DO NOT use `append_to_page_content` - that would modify the work log**
+   - **Upload the EXACT content from step 5 - don't regenerate or change it**
    - **Create PR using gh CLI:**
      ```bash
-     gh pr create --base {target} --head {source} --title "{title}" --body "{approved PR text in Spanish}"
+     gh pr create --base {target} --head {source} --title "{title}" --body "{EXACT approved PR text in Spanish from step 5}"
      ```
    - **CRITICAL: DO NOT update Status to "Done"** - Work is not complete until PR is merged
    - Leave Status as "In Progress" after PR creation
@@ -253,14 +266,27 @@ This skill activates when you detect that the user's request matches one of the 
 
 **Language:** All communication in English, artifact output in Spanish
 
+**CRITICAL WORKFLOW OVERVIEW:**
+1. User provides Notion page ID for work log
+2. You READ the work log (English, read-only)
+3. You generate a Spanish stakeholder update (once, get user approval)
+4. You CREATE A NESTED CHILD PAGE under the work log with the update
+5. You post the update to GitHub issue as a comment
+
+**YOU DO NOT:**
+- Modify or translate the work log (it's read-only input)
+- Append to the work log (create child page instead)
+- Regenerate content after user approves
+
 ### Process:
 
 1. **Gather inputs (English)**
    - Ask: "What's the Notion page ID for the work log?"
    - If missing: STOP and ASK
 
-2. **Analyze work log**
+2. **Analyze work log (READ-ONLY)**
    - Use `mcp__notion__notion-fetch` to read page
+   - **CRITICAL: The work log page is READ-ONLY - you will NOT modify it**
    - Focus on:
      - Business Impact / Goal sections
      - User-facing changes
@@ -269,10 +295,11 @@ This skill activates when you detect that the user's request matches one of the 
      - Code specifics
      - Architecture
 
-3. **Draft stakeholder update in Spanish**
+3. **Draft stakeholder update in Spanish (generate ONCE)**
    - Use format from `templates/stakeholder-update.md`
+   - **GENERATE THE UPDATE ONCE - don't regenerate after user approves**
    - **VERIFY output language is Spanish before proceeding**
-   - **Tone:** Professional, non-technical, business value focused
+   - **Tone:** Professional, non-technical, business value focused, CONCISE
    - **Avoid:** Technical jargon (OAuth, API, token, endpoint, etc.)
    - **DO NOT FABRICATE:** Only summarize what's in the work log
 
@@ -282,14 +309,19 @@ This skill activates when you detect that the user's request matches one of the 
    - Adjust based on feedback
    - Repeat until approved
 
-5. **Create child page with update AND post to GitHub**
+5. **Create NESTED CHILD PAGE AND post to GitHub**
    - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
-   - Create child page of journal with title: `Stakeholder Update - {timestamp}`
-   - Page content: Approved Spanish stakeholder update
-   - Use Notion's `<page>Stakeholder Update - {timestamp}</page>` syntax in append
+   - **CRITICAL: DO NOT MODIFY THE WORK LOG PAGE IN ANY WAY**
+   - **CRITICAL: Use `mcp__notion__create_page` to create a NESTED CHILD PAGE:**
+     - Parent: `{ page_id: "{work log page ID from step 1}" }`
+     - Title: `Stakeholder Update - {timestamp}`
+     - Content: The EXACT Spanish update approved by user in step 4
+   - This creates a SEPARATE page nested under the work log
+   - **DO NOT use `append_to_page_content` - that would modify the work log**
+   - **Upload the EXACT content from step 4 - don't regenerate or change it**
    - **Post comment to GitHub issue using gh CLI:**
      ```bash
-     gh issue comment {issue-number} --body "{approved Spanish stakeholder update}"
+     gh issue comment {issue-number} --body "{EXACT approved Spanish stakeholder update from step 4}"
      ```
    - Extract issue number from page properties (from URL like `123`)
    - Ensure you're in the correct repository or use `--repo user/repo` flag
