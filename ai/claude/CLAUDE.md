@@ -122,14 +122,23 @@ For PR descriptions, manager summaries, or stakeholder updates:
 
 ## 🔧 Tools
 
-### jiratui
+### acli
 
-CLI for Jira issues and comments.
+Official Atlassian CLI for Jira work items and comments.
 
-**Commands:**
-- `jiratui issues` - List/query issues
-- `jiratui comments <issue-key>` - View/add comments
-- Use `--help` on any command for options
+**Authentication:**
+- `acli jira auth login --web` - Interactive OAuth login
+- `echo <token> | acli jira auth login --site "site.atlassian.net" --email "user@example.com" --token` - API token auth
+
+**Work Items:**
+- `acli jira workitem create --summary "Task" --project "KEY" --type "Task"` - Create work item
+- `acli jira workitem view --key "KEY-123"` - View work item details
+- `acli jira workitem edit --key "KEY-123" --summary "New summary"` - Edit work item
+- `acli jira workitem transition --key "KEY-123" --status "In Progress"` - Transition status
+
+**Comments:**
+- `acli jira workitem comment create --key "KEY-123" --body "Comment text"` - Add comment
+- Use `--help` on any command for full options
 
 ### gh
 

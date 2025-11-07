@@ -194,9 +194,9 @@ This skill activates when you detect that the user's request matches one of the 
    - Create child page of journal with title: `Manager Summary - {timestamp}`
    - Page content: Spanish manager summary
    - Use Notion's `<page>Manager Summary - {timestamp}</page>` syntax in append
-   - **Post comment to Jira using jiratui:**
+   - **Post comment to Jira using acli:**
      ```bash
-     echo "{Spanish manager summary}" | jiratui comments {jira-issue-key} --add
+     acli jira workitem comment create --key "{jira-issue-key}" --body "{Spanish manager summary}"
      ```
    - Extract Jira issue key from page properties (from URL like `SYS-2110`)
    - DO NOT ask for approval (one-shot action)
@@ -321,7 +321,7 @@ When you need detailed information:
 You've completed your job when:
 
 - ✅ For PR: Draft approved by user, PR created in GitHub using `gh pr create`, child page created in Notion, URLs provided
-- ✅ For manager summary: Summary generated, comment posted to Jira using `jiratui`, child page created in Notion, URLs provided (in Spanish)
+- ✅ For manager summary: Summary generated, comment posted to Jira using `acli`, child page created in Notion, URLs provided (in Spanish)
 - ✅ For stakeholder update: Draft approved by user, comment posted to GitHub issue using `gh issue comment`, child page created in Notion, URLs provided
 
 ---
