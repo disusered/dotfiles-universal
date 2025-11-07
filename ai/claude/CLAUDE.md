@@ -9,35 +9,94 @@
 
 **IMPORTANT**: This project uses the **Notion MCP** for ALL work and issue tracking.
 
-### Core Policy
-
-- ✅ **ALWAYS** invoke the `work-journal` skill **before** starting any multi-step task
-- ✅ **ALWAYS** log work as it happens (append to the page), not at the end
-- ❌ **DO NOT** use markdown TODOs, local files, or other tracking methods
-- ❌ **DO NOT** guess required properties - if missing, **STOP and ASK the user**
-- ❌ **DO NOT** print summaries when finished - **report completion ONLY with the URL**
-  - **Correct:** "✅ Task complete. The work has been logged to Notion: [URL]"
-  - **Incorrect:** "Perfect! I've logged... Summary: ..."
-
 ### When to Track Work (PROACTIVE)
 
-**AUTOMATICALLY invoke the `work-journal` skill** when starting ANY of these tasks:
+**AUTOMATICALLY create a Notion page BEFORE starting ANY of these tasks:**
 - Investigation/debugging (multi-step)
 - Feature development
 - Bug fixes
 - Code refactoring
 - Any work requiring multiple commands/steps
 
-**You MUST invoke the skill BEFORE executing commands, not after.**
+**You MUST create the page BEFORE executing commands, not after.**
+
+### Creating the Notion Page
+
+1. **Validate properties first:**
+   ```bash
+   python ai/claude/skills/work-journal/scripts/validate_properties.py --priority X --project "Y" --type Z [--jira ID] [--github NUM --repo user/repo]
+   ```
+
+2. **If Priority, Project, or Type missing: STOP and ASK the user**
+
+3. **Create page using `mcp__notion__notion-create-pages`:**
+   ```json
+   {
+     "parent": {"data_source_id": "2a0d1aba-3b72-8031-aedc-000b7ba2c45f"},
+     "pages": [{
+       "properties": {
+         "Name": "Brief description",
+         "Priority": 0-4,
+         "Project": "Team/Project name",
+         "Type": "bug|feature|task|epic|chore",
+         "Jira issue #": "https://odasoftmx.atlassian.net/browse/ID" (optional),
+         "Github issue #": "https://github.com/user/repo/issues/NUM" (optional),
+         "Status": "In Progress"
+       },
+       "content": "## Work Log\n\nStarting work...\n"
+     }]
+   }
+   ```
 
 ### Logging Behavior (CONTINUOUS)
 
-Once a Notion page is created for work:
+**After creating the page, log continuously using `mcp__notion__append_to_page_content`:**
+
 - **Log THINKING, not DOING** - focus on decisions, discoveries, and reasoning
 - **Append after EVERY significant action** - don't batch at the end
-- **Use real timestamps** from `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
-- **Filter busywork** - don't log git operations, commit messages, file saves (see skill for full list)
+- **Use real timestamps** from `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'` before EACH append
 - **Chronological only** - ALWAYS append to end, NEVER restructure or read entire page
+
+**What to Log:**
+- Approaches attempted and WHY chosen
+- Failures and root cause analysis
+- Decisions made and reasoning
+- Technical insights/discoveries
+- Alternative approaches considered and WHY rejected
+- Code snippets ONLY IF explanatory (showing bug logic, design pattern)
+
+**What NOT to Log (Busywork):**
+- Commit message writing/editing/rewriting
+- PR text revisions
+- Git operations (push, pull, checkout, branch, merge, rebase, add, etc.)
+- File saves, basic file edits
+- Running tests (only log significant RESULTS)
+- Installing dependencies
+- Formatting code
+- Any information available in Git/GitHub/Jira logs
+
+**Philosophy:** Document DECISIONS and DISCOVERIES, not ACTIONS. If it's in git history, DON'T duplicate it.
+
+**Entry Format:**
+```markdown
+### [Descriptive entry name - NO metadata like dates/issue#s]
+
+**Timestamp:** [from TZ='America/Tijuana' date '+%Y-%m-%d %H:%M']
+
+**Context:** [What you were investigating]
+
+**Finding/Decision:** [What you discovered/decided and WHY]
+
+**Notes:** [Implications, next steps]
+```
+
+### Completing Work
+
+When finished:
+1. Append final summary to page content
+2. Update Status property to "Done" using `mcp__notion__update_page_properties`
+3. Respond ONLY with: `✅ Task complete. The work has been logged to Notion: [URL]`
+4. **DO NOT print the work summary** - it's already in Notion
 
 ### Required Properties
 
@@ -50,11 +109,16 @@ Once a Notion page is created for work:
 ### Notion Database
 
 - **Data Source:** `collection://2a0d1aba-3b72-8031-aedc-000b7ba2c45f`
-- All work pages **MUST** use this as parent: `{"data_source_id": "2a0d1aba-3b72-8031-aedc-000b7ba2c45f"}`
+- All work pages **MUST** use this as parent
 
 ---
 
-**Note:** Detailed workflow implementation is handled by the `work-journal` skill (see `~/.claude/skills/work-journal/`).
+### Specialized Outputs (Use Skills)
+
+For PR descriptions, manager summaries, or stakeholder updates:
+- **Invoke the `work-journal` skill** and specify the workflow
+- These require templates, iteration, and approval
+- See `~/.claude/skills/work-journal/` for details
 
 ## 🔧 Tools
 
