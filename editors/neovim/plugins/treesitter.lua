@@ -36,6 +36,7 @@ return {
       "powershell",
       -- TODO: Built automatically, current install was manually built in shell
       -- "norg", -- Manually built, see build script at ~/.cache/nvim/tree-sitter-norg/build.sh
+      "norg_meta",
       "svelte",
       "vim",
       "vimdoc",
