@@ -56,6 +56,25 @@ This skill activates when you detect that the user's request matches one of the 
 
 ## Critical Rules (Apply to ALL Workflows)
 
+### NEVER Update Status to "Done"
+
+**CRITICAL: Creating artifacts does NOT complete work.**
+
+- ❌ **NEVER call `mcp__notion__update_page_properties` to change Status**
+- ❌ **NEVER mark work as "Done" when creating PR descriptions**
+- ❌ **NEVER mark work as "Done" when creating manager summaries**
+- ❌ **NEVER mark work as "Done" when creating stakeholder updates**
+
+**These are communication artifacts. They document work, but don't complete it.**
+
+**Work is ONLY marked "Done" when:**
+- Code is merged AND deployed
+- OR work doesn't require a PR and is fully complete
+- NOT when PR is created
+- NOT when summaries/updates are posted
+
+**If you see yourself about to call `mcp__notion__update_page_properties` to update Status: STOP. Don't do it.**
+
 ### Emoji Usage Policy
 
 **CRITICAL: Minimize emoji usage across all outputs.**
@@ -114,11 +133,13 @@ This skill activates when you detect that the user's request matches one of the 
 4. You generate a Spanish PR description (once, get user approval)
 5. You CREATE A NESTED CHILD PAGE under the work log with the PR text
 6. You create the PR in GitHub with that exact text
+7. **YOU DO NOT UPDATE STATUS - work stays "In Progress" until merged**
 
 **YOU DO NOT:**
 - Modify or translate the work log (it's read-only input)
 - Append to the work log (create child page instead)
 - Regenerate content after user approves
+- **Update Status to "Done" - creating a PR does NOT complete the work**
 
 ### Process:
 
@@ -167,13 +188,16 @@ This skill activates when you detect that the user's request matches one of the 
      ```bash
      gh pr create --base {target} --head {source} --title "{title}" --body "{EXACT approved PR text in Spanish from step 5}"
      ```
-   - **CRITICAL: DO NOT update Status to "Done"** - Work is not complete until PR is merged
-   - Leave Status as "In Progress" after PR creation
+   - **CRITICAL: DO NOT CALL `mcp__notion__update_page_properties`**
+   - **CRITICAL: DO NOT update Status to "Done"**
+   - **CRITICAL: DO NOT change Status property at all**
+   - Creating a PR does NOT complete the work - it stays "In Progress" until merged
+   - Leave the Notion page EXACTLY as is after creating the child page and PR
 
 7. **Confirm (English)**
    - `✅ PR created: [GitHub PR URL]`
    - `✅ PR description archived to Notion: [child page URL]`
-   - `⚠️ Work remains In Progress until PR is merged`
+   - `⚠️ Work remains "In Progress" - NOT marked as Done (will be Done after merge)`
 
 ---
 
@@ -192,12 +216,14 @@ This skill activates when you detect that the user's request matches one of the 
 4. You generate a Spanish manager summary (once, concisely)
 5. You CREATE A NESTED CHILD PAGE under the work log with the summary
 6. You post the summary to Jira as a comment
+7. **YOU DO NOT UPDATE STATUS - manager summaries don't complete work**
 
 **YOU DO NOT:**
 - Create a new work log page (one already exists)
 - Modify or translate the work log (it's read-only input)
 - Append to the work log (create child page instead)
 - Regenerate content after showing the user
+- **Update Status to "Done" - creating a summary does NOT complete the work**
 
 ### Process:
 
@@ -249,6 +275,11 @@ This skill activates when you detect that the user's request matches one of the 
      echo "{EXACT Spanish manager summary from step 3}" | jiratui comments {jira-issue-key} --add
      ```
    - Extract Jira issue key from page properties (from URL like `CM-2765`)
+   - **CRITICAL: DO NOT CALL `mcp__notion__update_page_properties`**
+   - **CRITICAL: DO NOT update Status to "Done"**
+   - **CRITICAL: DO NOT change Status property at all**
+   - Creating a manager summary does NOT complete the work
+   - Leave the Notion page EXACTLY as is after creating the child page
    - DO NOT ask for approval (one-shot action)
 
 5. **Confirm (English)**
@@ -272,11 +303,13 @@ This skill activates when you detect that the user's request matches one of the 
 3. You generate a Spanish stakeholder update (once, get user approval)
 4. You CREATE A NESTED CHILD PAGE under the work log with the update
 5. You post the update to GitHub issue as a comment
+6. **YOU DO NOT UPDATE STATUS - stakeholder updates don't complete work**
 
 **YOU DO NOT:**
 - Modify or translate the work log (it's read-only input)
 - Append to the work log (create child page instead)
 - Regenerate content after user approves
+- **Update Status to "Done" - creating an update does NOT complete the work**
 
 ### Process:
 
@@ -325,6 +358,11 @@ This skill activates when you detect that the user's request matches one of the 
      ```
    - Extract issue number from page properties (from URL like `123`)
    - Ensure you're in the correct repository or use `--repo user/repo` flag
+   - **CRITICAL: DO NOT CALL `mcp__notion__update_page_properties`**
+   - **CRITICAL: DO NOT update Status to "Done"**
+   - **CRITICAL: DO NOT change Status property at all**
+   - Creating a stakeholder update does NOT complete the work
+   - Leave the Notion page EXACTLY as is after creating the child page
 
 6. **Confirm (English)**
    - `✅ Stakeholder update posted to GitHub: [GitHub issue URL]`
@@ -397,6 +435,7 @@ You've completed your job when:
 
 ## Important Notes
 
+- **NEVER Update Status:** Creating artifacts (PR descriptions, manager summaries, stakeholder updates) does NOT complete work. NEVER call `mcp__notion__update_page_properties` to change Status. Work stays "In Progress" until merged and deployed.
 - **Language Awareness:** All artifacts (PR, manager, stakeholder) use Spanish. Agent ↔ user communication uses English.
 - **Approval Gates:** PR and stakeholder updates require user approval. Manager summaries are one-shot (no approval).
 - **Work Logging:** Basic work logging is NOT handled by this skill - see CLAUDE.md for those directives.
