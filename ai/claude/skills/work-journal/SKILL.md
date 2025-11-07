@@ -146,10 +146,13 @@ This skill activates when you detect that the user's request matches one of the 
      ```bash
      gh pr create --base {target} --head {source} --title "{title}" --body "{approved PR text in Spanish}"
      ```
+   - **CRITICAL: DO NOT update Status to "Done"** - Work is not complete until PR is merged
+   - Leave Status as "In Progress" after PR creation
 
 7. **Confirm (English)**
    - `✅ PR created: [GitHub PR URL]`
    - `✅ PR description archived to Notion: [child page URL]`
+   - `⚠️ Work remains In Progress until PR is merged`
 
 ---
 

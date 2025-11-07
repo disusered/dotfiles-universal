@@ -61,19 +61,16 @@ The PR description itself must be in Spanish, but all questions, confirmations, 
    git log origin/{target-branch}..{source-branch} --oneline
    ```
 
-2. **Create high-level summary**
-   - What files were modified?
-   - What components/services were affected?
-   - What patterns or approaches were used?
+2. **Understand the changes conceptually**
+   - What was the goal/objective?
+   - What approach was taken?
+   - Why was this approach chosen?
 
-3. **Categorize changes**
-   - New functionality added
-   - Bugs fixed
-   - Refactoring performed
-   - Tests added/modified
-   - Documentation updated
-
-**Note:** Don't copy the full diff. Synthesize the key changes.
+**CRITICAL:**
+- **NO line numbers** - They're meaningless without commit context
+- **NO file lists** - The diff already shows this
+- **NO "what changed"** - The diff shows this
+- **FOCUS ON "WHY"** - Context, reasoning, decisions
 
 ### Step 4: Draft PR Description in Spanish
 
@@ -94,18 +91,6 @@ The PR description itself must be in Spanish, but all questions, confirmations, 
 - Jira: [ISSUE-123](https://odasoftmx.atlassian.net/browse/ISSUE-123) _(si aplica)_
 - GitHub Issue: [#456](https://github.com/user/repo/issues/456) _(si aplica)_
 
-## Cambios Realizados
-
-### [Categoría 1: ej. Corrección de Bugs]
-- **[Archivo/Componente]**: [Descripción del cambio y por qué]
-- **[Archivo/Componente]**: [Descripción del cambio y por qué]
-
-### [Categoría 2: ej. Nuevas Funcionalidades]
-- **[Archivo/Componente]**: [Descripción del cambio y por qué]
-
-### [Categoría 3: ej. Tests]
-- **[Archivo]**: [Qué se agregó/modificó para testing]
-
 ## Contexto Técnico
 
 [Detalles técnicos del log de Notion que explican por qué era necesario el cambio]
@@ -118,15 +103,6 @@ The PR description itself must be in Spanish, but all questions, confirmations, 
 
 **Impacto:**
 [Qué mejora esto: rendimiento, seguridad, mantenibilidad, etc.]
-
-## Plan de Pruebas
-
-[Cómo se verificó que los cambios funcionan]
-
-- [ ] Tests unitarios pasando
-- [ ] Tests de integración pasando _(si aplica)_
-- [ ] Verificación manual: [pasos específicos]
-- [ ] [Otros criterios de aceptación]
 
 ## Notas para Revisores
 
@@ -214,32 +190,28 @@ The PR description itself must be in Spanish, but all questions, confirmations, 
 - Breaking changes
 - Technical debt introduced/resolved
 
-### Exclude:
-- Full code diff (GitHub shows this)
-- List of every modified file (GitHub shows this)
-- Detailed commit history (should be part of git log)
-- Obvious context that all developers know
+### Exclude (NEVER include these):
+- ❌ **Line numbers** (meaningless without commit hash)
+- ❌ **File-by-file change lists** (redundant with diff)
+- ❌ **Code snippets from diff** (already in GitHub)
+- ❌ **"Cambios Realizados" section** (redundant)
+- ❌ **Testing instructions for QA** (condescending)
+- ❌ **List of modified files** (GitHub shows this)
+- ❌ **Commit history** (git log shows this)
+- ❌ **Fabricated information** (only describe what you did)
 
 ## Example Output
 
 ```markdown
 ## Resumen
 
-Este PR corrige un bug crítico en el flujo de renovación de tokens OAuth que causaba errores `invalid_grant` para los usuarios. El problema se originó por un operador de asignación (`=`) usado incorrectamente en lugar de un operador de comparación (`==`) en la verificación de expiración del token, lo que marcaba los tokens como expirados inmediatamente después de la creación.
+Este PR corrige un bug crítico en el flujo de renovación de tokens OAuth que causaba errores `invalid_grant` para los usuarios. El problema se originó por un operador de asignación (`=`) usado incorrectamente en lugar de un operador de comparación (`<=`) en la verificación de expiración del token, lo que marcaba los tokens como expirados inmediatamente después de la creación.
 
 ## Trabajo Relacionado
 
 - Notion: [Fix OAuth Token Refresh Bug](https://www.notion.so/Fix-OAuth-Token-Refresh-Bug-abc123...)
 - Jira: [SYS-2110](https://odasoftmx.atlassian.net/browse/SYS-2110)
 - GitHub Issue: [#123](https://github.com/odasoftmx/app/issues/123)
-
-## Cambios Realizados
-
-### Corrección de Bugs
-- **src/auth/oauth.js (línea 167)**: Corregido operador de asignación a comparación en verificación de expiración del token. Cambio de `if (token.expires_at = Date.now())` a `if (token.expires_at <= Date.now())`. Se usó `<=` en lugar de `==` para manejar defensivamente el caso límite de timestamp exacto.
-
-### Tests
-- **tests/auth/oauth.test.js**: Todos los tests existentes ahora pasan con la corrección aplicada.
 
 ## Contexto Técnico
 
@@ -256,16 +228,9 @@ Se eligió `<=` sobre `==` porque proporciona comportamiento más robusto cuando
 - Experiencia del usuario: Elimina errores `invalid_grant` que confunden a los usuarios
 - Confiabilidad: Los tokens ahora se manejan correctamente durante su ciclo de vida completo
 
-## Plan de Pruebas
-
-- [x] Tests unitarios pasando (todos los 15 tests en oauth.test.js)
-- [x] Verificación manual: Creado token, esperado tiempo de expiración, confirmado que no se renueva prematuramente
-- [x] Regresión: Verificado que tokens válidos no se renuevan antes de la expiración
-
 ## Notas para Revisores
 
 - **Seguridad:** Este cambio no introduce nuevos vectores de seguridad. De hecho, reduce llamadas innecesarias a la API de OAuth.
-- **Áreas de enfoque:** Por favor revisen la línea 167 en `src/auth/oauth.js` cuidadosamente para confirmar que la lógica de comparación es correcta.
 - **Trabajo futuro:** Se creó [#456](https://github.com/odasoftmx/app/issues/456) para agregar test de regresión específico para este bug de operador y agregar este archivo a la configuración de ESLint.
 
 ---
@@ -275,11 +240,23 @@ Se eligió `<=` sobre `==` porque proporciona comportamiento más robusto cuando
 
 ## Common Errors to Avoid
 
-❌ **Copying the full git diff**
-- Synthesize key changes, don't paste the diff
+❌ **Including line numbers**
+- Line numbers are meaningless without commit context. NEVER include them.
+
+❌ **Creating a "Cambios Realizados" section**
+- This duplicates information in the diff. Focus on WHY, not WHAT.
+
+❌ **Listing modified files**
+- The diff already shows this. Redundant and verbose.
+
+❌ **Adding testing instructions**
+- Condescending. QA knows how to test. Only describe WHAT was fixed.
+
+❌ **Copying code from the diff**
+- The diff is already there. Don't repeat it.
 
 ❌ **Omitting the "why"**
-- Reviewers need context, not just a list of changes
+- Reviewers need context: root cause, reasoning, decisions
 
 ❌ **Creating child page without user approval**
 - Always iterate on the draft first
@@ -290,14 +267,11 @@ Se eligió `<=` sobre `==` porque proporciona comportamiento más robusto cuando
 ❌ **Communicating with user in Spanish**
 - ALL agent ↔ user communication must be in English
 
-❌ **Vague or generic description**
-- Be specific about files, components, and reasons
-
 ❌ **Omitting links to related work**
 - Always link to Notion page, and Jira/GitHub if applicable
 
-❌ **Forgetting to verify Spanish output**
-- Double-check the PR description is in Spanish before proceeding
+❌ **Fabricating information**
+- Only describe what actually happened. Don't make shit up.
 
 ## Template Variables
 

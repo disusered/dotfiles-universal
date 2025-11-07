@@ -178,5 +178,35 @@ Before creating a page:
    - Check if repository is known
    - If unknown, STOP and ASK for full repository name
    - Construct full URL
-5. Use `scripts/validate_properties.py` to verify all properties
-6. Only proceed with page creation after validation passes
+5. Create the page with required properties
+6. If MCP errors occur, handle gracefully (see Troubleshooting below)
+
+## Troubleshooting
+
+### Property Name Errors
+
+If you get an error like: `Property "Github issue #" not found`
+
+**This means the property name in the user's database is different.**
+
+**How to handle:**
+1. Ask the user: "What's the exact name of the GitHub/Jira property in your Notion database?"
+2. Update your call with the correct property name
+3. Document the correct names for future reference
+
+**Common variations:**
+- "Github issue #" vs "GitHub issue #" vs "GitHub Issue"
+- "Jira issue #" vs "Jira Issue #" vs "Jira"
+
+**Note:** Property names are case-sensitive and must match exactly.
+
+### Collection Fetch Errors
+
+If you get: `URL type webpage not currently supported for fetch tool`
+
+**This means you tried to fetch a collection URL instead of a page URL.**
+
+**How to handle:**
+- Use `mcp__notion__query_database` to search the database
+- Use `mcp__notion__notion-fetch` only for specific page IDs, not collections
+- Don't try to "discover" the schema - use the documentation in this file
