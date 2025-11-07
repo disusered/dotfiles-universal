@@ -193,7 +193,7 @@ This is your primary source for the **resolution**.
 ```markdown
 ---
 
-## Resumen de Jira (para {JIRA-ID})
+## {JIRA-ID}
 
 **Resumen Ejecutivo**
 [1-2 frases sobre el progreso general. Enfocarse en qué se logró y el impacto.]
@@ -248,7 +248,21 @@ This is your primary source for the **resolution**.
 5. **DO NOT ask for approval** - This is a one-shot action: generate and create immediately
 6. **Use the Jira ID** you found in Step 2 for the summary heading
 
-### Step 6: Final Step (English)
+### Step 6: Add Artifact Link to Work Log
+
+**After creating the child page, append a link to the work log:**
+
+1. **Check if "## Artifacts" section exists** in the work log
+   - If not, create it by appending `\n## Artifacts\n\n`
+
+2. **Append the artifact link** using `mcp__notion__append_to_page_content`:
+   ```markdown
+   - [Manager Summary - {timestamp}]({child-page-url})
+   ```
+
+**This creates a clear reference in the work log to all generated artifacts.**
+
+### Step 7: Final Step (English)
 
 **Confirm to the user (in English) that the summary has been generated and saved to Notion.**
 
@@ -322,7 +336,7 @@ From GitHub issue (if available):
 ```markdown
 ---
 
-## Resumen de Jira (para SYS-2110)
+## SYS-2110
 
 **Resumen Ejecutivo**
 Se corrigió bug crítico en OAuth que causaba errores `invalid_grant`. El operador de asignación en lugar de comparación marcaba tokens como expirados inmediatamente.

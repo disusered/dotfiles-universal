@@ -1,7 +1,7 @@
 ---
 name: work-journal
 description: Generate audience-specific communications from Notion work logs. Use when creating PR descriptions, or generating status updates for managers and stakeholders. (Note: Basic work logging is handled by CLAUDE.md directives, not this skill.)
-allowed-tools: mcp__notion__query_database, mcp__notion__notion-fetch, mcp__notion__create_page, Bash, gh
+allowed-tools: mcp__notion__query_database, mcp__notion__notion-fetch, mcp__notion__create_page, mcp__notion__append_to_page_content, Bash, Skill
 ---
 
 # Work Journal Communication Generation
@@ -50,6 +50,34 @@ This skill activates when you detect that the user's request matches one of the 
 **Then dispatch to the appropriate template.**
 
 **Note:** If user mentions "log work" or "track work", that's handled by CLAUDE.md, not this skill.
+
+## Tool Skills Integration
+
+**When you need to use CLI tools, invoke the appropriate tool skill:**
+
+### For Jira operations:
+```
+Invoke the `jira` skill when you need to:
+- View Jira issues
+- Add comments to Jira issues
+- Query Jira issues
+```
+
+### For GitHub operations:
+```
+Invoke the `gh` skill when you need to:
+- View GitHub issues or PRs
+- Create PRs
+- Add comments to issues/PRs
+```
+
+**Example workflow:**
+1. User requests: "Create manager summary and post to Jira"
+2. Generate manager summary (this skill)
+3. Invoke `jira` skill to learn how to use jiratui
+4. Use `jiratui comments add` to post summary to Jira
+
+**Note:** These tool skills provide detailed CLI syntax and examples via progressive disclosure, keeping this skill focused on tone and presentation.
 
 ---
 
