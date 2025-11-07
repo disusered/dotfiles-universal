@@ -17,11 +17,17 @@ The summary should:
 
 ## Language
 
+**CRITICAL - READ CAREFULLY:**
+
 **ALL agent ↔ user communication: ENGLISH**
+**ALL work log content: ENGLISH (DO NOT TRANSLATE)**
+**ONLY manager summary artifact: SPANISH (formal business Spanish)**
 
-**Final artifact output: SPANISH (formal business Spanish)**
-
-The manager summary itself must be in Spanish, but all questions, confirmations, and communication with the user are in English.
+The manager summary itself must be in Spanish, but:
+- All questions to user: English
+- All confirmations: English
+- Work logs: English (NEVER translate)
+- Manager summary artifact: Spanish
 
 ## Critical Rules
 
@@ -87,20 +93,25 @@ Dates are already in Notion properties and GitHub. Don't invent or assume undocu
 
 ## Workflow
 
-### Step 1: PRIMARY DIRECTIVE - Find Notion Page ID (English)
+### Step 1: PRIMARY DIRECTIVE - Find Notion Page (English)
 
-**Your first and only job is to find the Notion Page ID.**
+**Your first job is to find the Notion Page.**
 
-1. Look in the user's most recent message
-2. Look for a Notion Page ID (UUID) or URL
+**If user provides Jira URL:**
+1. Extract the Jira issue key (e.g., CM-2765 from https://odasoftmx.atlassian.net/browse/CM-2765)
+2. Use `mcp__notion__query_database` to search for page where Jira property matches that URL
+3. If found, use that page ID
+4. If not found, STOP and tell user no page exists for that Jira issue
+
+**If user provides Notion page URL/ID:**
+1. Extract page ID from URL or use ID directly
+2. Use that page ID
 
 **If NOT clearly provided:**
-
 - **STOP** immediately
-- **ASK** (in English) for the Notion Page ID only
-- Example: "What's the Notion page ID for the work log?"
+- **ASK** (in English): "What's the Notion page or Jira URL for the work log?"
 
-**Do not proceed to any other step until you have this ID.**
+**Do not proceed to any other step until you have the page ID.**
 
 ### Step 2: Get Page Data (CRITICAL)
 
@@ -110,16 +121,16 @@ Dates are already in Notion properties and GitHub. Don't invent or assume undocu
    - Use `mcp__notion__notion-fetch` with the page ID
 
 2. **Extract required properties:**
-   - **Jira ID:** Extract the `Jira issue #` URL
+   - **Jira ID:** Extract the `Jira` property URL
      - If **empty**, **STOP** and ask the user (in English) for the Jira ID
      - Example: "I need the Jira ID for this work (e.g., PROJ-123). Can you provide it?"
-   - **GitHub ID:** Extract the `Github issue #` URL (if available)
+   - **GitHub ID:** Extract the `Github` property URL (if available)
 
 ### Step 3: Get GitHub Context (if available)
 
-**If a `Github issue #` URL was found:**
+**If a `Github` property URL was found:**
 
-1. Use `mcp__github__issue_read` to read the GitHub issue
+1. Use `gh issue view` to read the GitHub issue
 2. Extract the **original problem definition**:
    - Reported bug description
    - Expected vs actual behavior
@@ -165,6 +176,17 @@ This is your primary source for the **resolution**.
 **CRITICAL: The manager summary output must be in Spanish.**
 
 **Synthesize your findings into a conceptual technical summary in formal Mexican Spanish.**
+
+**CONCISENESS RULE:**
+- 2-3 sentences per section MAX
+- No bullet lists longer than 3 items
+- Clear, direct language - no fluff
+- If you can say it in 10 words, don't use 20
+
+**CONSISTENCY RULE:**
+- The summary you create in the child page MUST match what you show the user
+- DO NOT change wording, structure, or content between preview and final output
+- Generate it once and use that exact version
 
 **Formato requerido:**
 
@@ -290,78 +312,66 @@ From GitHub issue (if available):
 ## Resumen de Jira (para SYS-2110)
 
 **Resumen Ejecutivo**
-Se corrigió un bug crítico en el sistema de autenticación OAuth que causaba errores `invalid_grant` para usuarios al intentar renovar tokens de acceso. El problema afectaba aproximadamente 15% de las sesiones de usuario diariamente.
+Se corrigió bug crítico en OAuth que causaba errores `invalid_grant`. El operador de asignación en lugar de comparación marcaba tokens como expirados inmediatamente.
 
 **Logros Clave**
-
-- Identificación y corrección de bug lógico en verificación de expiración de tokens (operador incorrecto causaba evaluación prematura)
-- Validación completa con 15 tests unitarios pasando exitosamente
-- Eliminación de reintentos innecesarios de renovación, reduciendo llamadas a API de OAuth en ~40%
+- Corregido operador lógico en validación de tokens
+- 15 tests unitarios pasando
+- Reducción de 40% en llamadas innecesarias a API de OAuth
 
 **Contexto Técnico**
-El sistema de autenticación usaba un operador de asignación en lugar de comparación en la validación de expiración de tokens. Esto causaba que todos los tokens se marcaran como expirados inmediatamente después de su creación, forzando intentos de renovación constantes que fallaban con error `invalid_grant`.
-
-La solución corrigió la lógica de comparación para evaluar correctamente la expiración del token, usando un operador de comparación defensivo que maneja casos límite de timestamp. Este cambio es backward-compatible y no requiere migraciones.
+El código usaba `=` (asignación) en lugar de `==` (comparación) en la verificación de expiración. La solución corrigió el operador y es backward-compatible.
 
 **Siguiente Pasos**
-
-- Rollout de fix a producción esta semana (esperando aprobación de QA)
-- Agregar test de regresión específico para prevenir bug similar en futuro (issue #456 creado)
-- Incluir archivo en configuración de ESLint para detección automática de este tipo de errores
+- Deploy a producción esta semana
+- Agregar test de regresión (issue #456)
 
 **Bloqueadores**
-Ninguno. El trabajo está completo y listo para merge.
+Ninguno.
 ```
 
 ## Common Errors to Avoid
 
-❌ **Fabricating information**
+❌ **Asking to create new page when Jira URL provided**
+- Extract Jira key and query for existing page first
+- DO NOT ask to create new - find the existing work log
 
+❌ **Translating work log to Spanish**
+- Work logs stay in ENGLISH
+- Only the manager summary artifact is in Spanish
+
+❌ **Appending summary to work log instead of creating child page**
+- Use `mcp__notion__create_page` to create CHILD PAGE
+- DO NOT use `append_to_page_content` on the work log
+
+❌ **Communicating with user in Spanish**
+- ALL agent ↔ user communication must be in English
+
+❌ **Being verbose or adding unnecessary formatting**
+- Keep it concise: 2-3 sentences per section MAX
+- No decorative emojis, no excessive bullets
+
+❌ **Changing content between preview and final output**
+- Generate once, use that exact version for both preview and child page
+- Don't rewrite or "improve" it after showing the user
+
+❌ **Fabricating information**
 - Only report what's in the sources
 
 ❌ **Copying the diff or mentioning specific lines**
-
 - Explain the logic conceptually
 
 ❌ **Including code snippets**
-
 - GitHub already shows the code, you synthesize the "what" and "why"
 
-❌ **Using casual headings or decorative emojis**
-
-- Maintain professional report tone
-
-❌ **Inventing dates**
-
-- Don't say "Completed on..." without documented date
-
-❌ **Creating "Related Tickets" section**
-
-- Main tickets are already in Notion properties
-
 ❌ **Asking for user approval**
-
 - This is a one-shot process, generate and create immediately
 
 ❌ **Reprinting the summary to the user**
-
 - Only provide the Notion child page URL
 
 ❌ **Proceeding without Jira ID**
-
 - Stop and ask if missing
-
-❌ **Using English for the manager summary**
-
-- The artifact output must be in Spanish
-
-❌ **Communicating with user in Spanish**
-
-- ALL agent ↔ user communication must be in English
-
-❌ **Forgetting to verify Spanish output**
-
-- Double-check the manager summary is in Spanish before proceeding
 
 ## Template Variables
 

@@ -15,14 +15,22 @@ This skill generates audience-appropriate communications from Notion work logs t
 
 ## Language Rule
 
-**ALL agent ↔ user communication: ENGLISH**
+**CRITICAL - READ THIS CAREFULLY:**
+
+**ALL agent ↔ user communication: ENGLISH ONLY**
+**ALL work log content: ENGLISH ONLY**
 **ONLY final artifact outputs: SPANISH**
 
-| Workflow | You ask questions | You confirm | Artifact output |
-|----------|------------------|-------------|-----------------|
-| PR | English | English | **Spanish** (PR text) |
-| Manager | English | English | **Spanish** (summary) |
-| Stakeholder | English | English | **Spanish** (update) |
+| Content Type | Language |
+|-------------|----------|
+| Questions to user | English |
+| Confirmations | English |
+| Work log entries | **ENGLISH** |
+| PR descriptions | Spanish |
+| Manager summaries | Spanish |
+| Stakeholder updates | Spanish |
+
+**NEVER translate existing work logs to Spanish. Work logs stay in English.**
 
 ## Supported Workflows
 
@@ -166,10 +174,12 @@ This skill activates when you detect that the user's request matches one of the 
 
 ### Process:
 
-1. **Gather inputs (English)**
-   - Ask: "What's the Notion page ID for the work log?"
-   - If missing: STOP and ASK
-   - If Jira issue # property is empty: STOP and ASK
+1. **Find the work log page (English)**
+   - If user provides Jira URL: Extract issue key and query database by Jira property
+   - If user provides Notion page URL/ID: Use that directly
+   - Use `mcp__notion__query_database` to search by Jira property if given Jira URL
+   - If page not found or Jira property is empty: STOP and ASK
+   - **DO NOT create new pages - only work with existing work logs**
 
 2. **Analyze context**
    - Use `mcp__notion__notion-fetch` to read page
@@ -185,23 +195,27 @@ This skill activates when you detect that the user's request matches one of the 
    - Use format from `templates/manager-summary.md`
    - **VERIFY output language is Spanish before proceeding**
    - **CRITICAL RULES:**
+     - BE CONCISE - 2-3 paragraphs max, clear and direct
      - DO NOT FABRICATE - Only summarize from sources
      - CONCEPTUAL SUMMARY, NOT DIFF - Explain logic, not line changes
      - NO GITHUB DUPLICATION - No code snippets, line numbers, SHAs
-     - PROFESSIONAL FORMATTING - No decorative emojis in headings
+     - NO DECORATIVE FORMATTING - No emojis, no excessive bullets
      - NO INVENTED DATES
-   - Tone: Strategic, high-level, business-impact focused
+     - WRITE LIKE A HUMAN - Clear, direct, professional
+   - Tone: Strategic, high-level, business-impact focused, CONCISE
 
-4. **Create child page with summary AND post to Jira**
+4. **Create CHILD PAGE (not append!) AND post to Jira**
    - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
-   - Create child page of journal with title: `Manager Summary - {timestamp}`
-   - Page content: Spanish manager summary
-   - Use Notion's `<page>Manager Summary - {timestamp}</page>` syntax in append
+   - **CRITICAL:** Use `mcp__notion__create_page` to create a NEW CHILD PAGE
+   - Parent: The work log page ID you found in step 1
+   - Child page title: `Manager Summary - {timestamp}`
+   - Child page content: Spanish manager summary
+   - **DO NOT use append_to_page_content on the work log - CREATE CHILD PAGE**
    - **Post comment to Jira using jiratui:**
      ```bash
      echo "{Spanish manager summary}" | jiratui comments {jira-issue-key} --add
      ```
-   - Extract Jira issue key from page properties (from URL like `SYS-2110`)
+   - Extract Jira issue key from page properties (from URL like `CM-2765`)
    - DO NOT ask for approval (one-shot action)
 
 5. **Confirm (English)**
