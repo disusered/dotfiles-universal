@@ -1,0 +1,49 @@
+# JiraTUI Configuration
+# https://jiratui.readthedocs.io/en/latest/users/configuration/
+
+# Theme: catppuccin-mocha (built-in)
+# For other themes, run: jiratui themes
+theme: "catppuccin-mocha"
+
+# Jira API Configuration (required)
+# Get your API token from: https://id.atlassian.com/manage-profile/security/api-tokens
+jira_api_username: "carlos.rosquillas@odasoft.com.mx"
+jira_api_base_url: "https://odasoftmx.atlassian.net"
+jira_api_token: ""
+
+# Search Configuration
+search_results_per_page: 50
+search_issues_default_day_interval: 30
+show_issue_web_links: true
+
+# Optional: Default project
+# default_project_key_or_id: 'PROJECT-KEY'
+
+# Optional: Pre-defined JQL queries for quick access
+# Vim/lazygit-inspired: Quick access to common views
+pre_defined_jql_expressions:
+  1:
+    label: "My open issues"
+    expression: "assignee = currentUser() AND resolution = Unresolved ORDER BY updated DESC"
+  2:
+    label: "Recently updated"
+    expression: "updated >= -7d ORDER BY updated DESC"
+  3:
+    label: "Current sprint"
+    expression: "sprint in openSprints() ORDER BY rank"
+  4:
+    label: "Watching"
+    expression: "watcher = currentUser() AND resolution = Unresolved ORDER BY updated DESC"
+# Default JQL for quick search (optional)
+# jql_expression_id_for_work_items_search: 1
+
+# Note: Vim keybindings are not currently built-in to jiratui
+# There's an open feature request: https://github.com/whyisdifficult/jiratui/issues/53
+#
+# Some vim-like shortcuts that DO work in jiratui:
+# - J/K: May work for navigation in some contexts
+# - Ctrl+R: Execute search
+# - N: Add new items (comments, related work)
+# - D: Delete items (when focused)
+# - V: View details
+# - . (dot): Open filtering when focused on results
