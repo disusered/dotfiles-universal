@@ -219,7 +219,9 @@ This skill activates when you detect that the user's request matches one of the 
 7. **YOU DO NOT UPDATE STATUS - manager summaries don't complete work**
 
 **YOU DO NOT:**
-- Create a new work log page (one already exists)
+- **Create a new work log page** (one already exists - FIND it, don't create it)
+- **Ask for Priority, Project, or Type** (you're not creating a page)
+- **Use `mcp__notion__create_page` for the work log** (only for the child summary page)
 - Modify or translate the work log (it's read-only input)
 - Append to the work log (create child page instead)
 - Regenerate content after showing the user
@@ -228,11 +230,14 @@ This skill activates when you detect that the user's request matches one of the 
 ### Process:
 
 1. **Find the existing work log page (English)**
+   - **CRITICAL: You are NOT creating a new work log - you are FINDING an existing one**
    - If user provides Jira URL: Extract issue key (e.g., CM-2765) and query database
    - Use `mcp__notion__query_database` to search where Jira property = that URL
    - If user provides Notion page URL/ID: Use that directly
    - If page not found: STOP and tell user no work log exists for that Jira issue
+   - **DO NOT ask for Priority, Project, Type - you are NOT creating a page**
    - **DO NOT ask to create new page - work log should already exist**
+   - **DO NOT use `mcp__notion__create_page` - you are only FINDING, not creating**
 
 2. **Analyze context (READ-ONLY)**
    - Use `mcp__notion__notion-fetch` to read page content
