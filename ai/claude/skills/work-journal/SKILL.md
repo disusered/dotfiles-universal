@@ -1,7 +1,7 @@
 ---
 name: work-journal
 description: Generate audience-specific communications from Notion work logs. Use when creating PR descriptions, or generating status updates for managers and stakeholders. (Note: Basic work logging is handled by CLAUDE.md directives, not this skill.)
-allowed-tools: mcp__notion__query_database, mcp__notion__update_page_properties, mcp__notion__append_to_page_content, mcp__notion__notion-update-page, mcp__notion__notion-fetch, mcp__notion__create_page, Read, Grep, Bash, mcp__git__git_status, mcp__git__git_diff, mcp__git__git_log, mcp__git__git_show, gh
+allowed-tools: mcp__notion__query_database, mcp__notion__notion-fetch, mcp__notion__create_page, Bash, gh
 ---
 
 # Work Journal Communication Generation
