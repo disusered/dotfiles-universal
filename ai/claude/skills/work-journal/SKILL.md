@@ -1,7 +1,7 @@
 ---
 name: work-journal
 description: Generate audience-specific communications from Notion work logs. Use when creating PR descriptions, or generating status updates for managers and stakeholders. (Note: Basic work logging is handled by CLAUDE.md directives, not this skill.)
-allowed-tools: mcp__notion__query_database, mcp__notion__update_page_properties, mcp__notion__append_to_page_content, mcp__notion__notion-update-page, mcp__notion__notion-fetch, mcp__github__issue_read, mcp__github__issue_comment, mcp__github__pull_request_create, Read, Grep, Bash, mcp__git__git_status, mcp__git__git_diff, mcp__git__git_log, mcp__git__git_show
+allowed-tools: mcp__notion__query_database, mcp__notion__update_page_properties, mcp__notion__append_to_page_content, mcp__notion__notion-update-page, mcp__notion__notion-fetch, Read, Grep, Bash, mcp__git__git_status, mcp__git__git_diff, mcp__git__git_log, mcp__git__git_show
 model: Sonnet
 ---
 
@@ -137,15 +137,19 @@ This skill activates when you detect that the user's request matches one of the 
    - Adjust based on feedback
    - Repeat until approved
 
-6. **Create child page with PR text**
+6. **Create child page with PR text AND create PR in GitHub**
    - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
    - Create child page of journal with title: `PR Description - {timestamp}`
    - Page content: Approved Spanish PR text
    - Use Notion's `<page>PR Description - {timestamp}</page>` syntax in append
+   - **Create PR using gh CLI:**
+     ```bash
+     gh pr create --base {target} --head {source} --title "{title}" --body "{approved PR text in Spanish}"
+     ```
 
 7. **Confirm (English)**
-   - `✅ PR description created: [child page URL]`
-   - User can copy text from child page to GitHub PR
+   - `✅ PR created: [GitHub PR URL]`
+   - `✅ PR description archived to Notion: [child page URL]`
 
 ---
 
@@ -166,7 +170,7 @@ This skill activates when you detect that the user's request matches one of the 
 
 2. **Analyze context**
    - Use `mcp__notion__notion-fetch` to read page
-   - If GitHub issue # available, use `mcp__github__issue_read` for context
+   - If GitHub issue # available, use `gh issue view {number}` for context
    - Extract:
      - Context (what system/component)
      - Technical root cause (conceptual, not line-by-line)
@@ -185,15 +189,21 @@ This skill activates when you detect that the user's request matches one of the 
      - NO INVENTED DATES
    - Tone: Strategic, high-level, business-impact focused
 
-4. **Create child page with summary**
+4. **Create child page with summary AND post to Jira**
    - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
    - Create child page of journal with title: `Manager Summary - {timestamp}`
    - Page content: Spanish manager summary
    - Use Notion's `<page>Manager Summary - {timestamp}</page>` syntax in append
+   - **Post comment to Jira using jiratui:**
+     ```bash
+     echo "{Spanish manager summary}" | jiratui comments {jira-issue-key} --add
+     ```
+   - Extract Jira issue key from page properties (from URL like `SYS-2110`)
    - DO NOT ask for approval (one-shot action)
 
 5. **Confirm (English)**
-   - `✅ Manager summary created: [child page URL]`
+   - `✅ Manager summary posted to Jira: [Jira issue URL]`
+   - `✅ Manager summary archived to Notion: [child page URL]`
    - DO NOT reprint the summary text
 
 ---
@@ -235,15 +245,21 @@ This skill activates when you detect that the user's request matches one of the 
    - Adjust based on feedback
    - Repeat until approved
 
-5. **Create child page with update**
+5. **Create child page with update AND post to GitHub**
    - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
    - Create child page of journal with title: `Stakeholder Update - {timestamp}`
    - Page content: Approved Spanish stakeholder update
    - Use Notion's `<page>Stakeholder Update - {timestamp}</page>` syntax in append
+   - **Post comment to GitHub issue using gh CLI:**
+     ```bash
+     gh issue comment {issue-number} --body "{approved Spanish stakeholder update}"
+     ```
+   - Extract issue number from page properties (from URL like `123`)
+   - Ensure you're in the correct repository or use `--repo user/repo` flag
 
 6. **Confirm (English)**
-   - `✅ Stakeholder update created: [child page URL]`
-   - User can copy text from child page to GitHub or other communication channels
+   - `✅ Stakeholder update posted to GitHub: [GitHub issue URL]`
+   - `✅ Stakeholder update archived to Notion: [child page URL]`
 
 ---
 
@@ -304,9 +320,9 @@ When you need detailed information:
 
 You've completed your job when:
 
-- ✅ For PR: Draft approved by user, child page created in Notion, URL provided
-- ✅ For manager summary: Summary generated, child page created in Notion, URL provided (in Spanish)
-- ✅ For stakeholder update: Draft approved by user, child page created in Notion, URL provided
+- ✅ For PR: Draft approved by user, PR created in GitHub using `gh pr create`, child page created in Notion, URLs provided
+- ✅ For manager summary: Summary generated, comment posted to Jira using `jiratui`, child page created in Notion, URLs provided (in Spanish)
+- ✅ For stakeholder update: Draft approved by user, comment posted to GitHub issue using `gh issue comment`, child page created in Notion, URLs provided
 
 ---
 
