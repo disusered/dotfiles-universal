@@ -55,3 +55,14 @@ Once a Notion page is created for work:
 ---
 
 **Note:** Detailed workflow implementation is handled by the `work-journal` skill (see `~/.claude/skills/work-journal/`).
+
+## 🔧 Tools
+
+### jiratui
+
+CLI for Jira issues and comments.
+
+**Commands:**
+- `jiratui issues` - List/query issues
+- `jiratui comments <issue-key>` - View/add comments
+- Use `--help` on any command for options
