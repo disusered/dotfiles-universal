@@ -84,6 +84,35 @@ return {
           ["core.summary"] = {},
         },
       })
+
+      -- Override <leader><space> in Neorg buffers to open workspace notes picker
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "norg",
+        callback = function(args)
+          vim.keymap.set("n", "<leader> ", function()
+            local neorg = require("neorg")
+            local dirman = neorg.modules.get_module("core.dirman")
+            local current_workspace = dirman.get_current_workspace()
+
+            if current_workspace[1] == "default" then
+              vim.notify("Not in a Neorg workspace", vim.log.levels.WARN)
+              return
+            end
+
+            local workspace_path = current_workspace[2]
+
+            require("snacks").picker.files({
+              cwd = workspace_path,
+              hidden = false,
+              glob = "**/*.norg",
+            })
+          end, {
+            buffer = args.buf,
+            desc = "Search notes (current workspace)",
+            silent = true,
+          })
+        end,
+      })
     end,
     keys = {
       -- Workspace picker
