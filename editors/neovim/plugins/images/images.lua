@@ -155,7 +155,7 @@ return {
 
           norg = {
             url_encode_path = false, ---@type boolean | fun(): boolean
-            template = ".image $FILE_PATH", ---@type string | fun(context: table): string
+            template = ".image $FILE_PATH\n$CURSOR", ---@type string | fun(context: table): string
             download_images = false, ---@type boolean | fun(): boolean
           },
         },
