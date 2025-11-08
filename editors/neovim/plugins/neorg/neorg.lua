@@ -258,6 +258,12 @@ return {
                 vim.cmd("Neorg toggle-concealer")
               end,
             },
+            {
+              text = "Paste Image",
+              action = function()
+                vim.cmd("PasteImage")
+              end,
+            },
           }
 
           Snacks.picker({
