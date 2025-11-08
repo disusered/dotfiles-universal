@@ -55,7 +55,7 @@ Every work page MUST have these properties set before creation:
 
 **Validation:** Must be one of the above values
 
-### Property: Jira issue #
+### Property: Jira
 
 **Type:** URL
 **Required:** No (but ask if not provided)
@@ -70,7 +70,7 @@ https://odasoftmx.atlassian.net/browse/{issue-number}
 
 **Critical:** This is a URL property, NOT text. You must provide the full constructed URL.
 
-### Property: Github issue #
+### Property: Github
 
 **Type:** URL
 **Required:** No (but ask if not provided)
@@ -146,8 +146,8 @@ When setting properties via MCP, use this format:
     "Priority": 2,
     "Project": "Project Name",
     "Type": "feature",
-    "Jira issue #": "https://odasoftmx.atlassian.net/browse/2110",
-    "Github issue #": "https://github.com/odasoftmx/app/issues/123",
+    "Jira": "https://odasoftmx.atlassian.net/browse/2110",
+    "Github": "https://github.com/odasoftmx/app/issues/123",
     "Status": "In Progress"
   }
 }
@@ -178,5 +178,18 @@ Before creating a page:
    - Check if repository is known
    - If unknown, STOP and ASK for full repository name
    - Construct full URL
-5. Use `scripts/validate_properties.py` to verify all properties
-6. Only proceed with page creation after validation passes
+5. Create the page with required properties
+6. If MCP errors occur, handle gracefully (see Troubleshooting below)
+
+## Troubleshooting
+
+### Collection Fetch Errors
+
+If you get: `URL type webpage not currently supported for fetch tool`
+
+**This means you tried to fetch a collection URL instead of a page URL.**
+
+**How to handle:**
+- Use `mcp__notion__query_database` to search the database
+- Use `mcp__notion__notion-fetch` only for specific page IDs, not collections
+- Don't try to "discover" the schema - use the documentation in this file
