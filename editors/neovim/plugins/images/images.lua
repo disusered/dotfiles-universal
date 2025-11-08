@@ -20,6 +20,14 @@ return {
           only_render_image_at_cursor = false,
           only_render_image_at_cursor_mode = "inline", -- "inline" or "popup"
         },
+        neorg = {
+          enabled = true,
+          download_remote_images = true,
+          filetypes = { "norg" },
+          clear_in_insert_mode = false,
+          only_render_image_at_cursor = false,
+          only_render_image_at_cursor_mode = "inline", -- "inline" or "popup"
+        },
         html = {
           enabled = true,
           download_remote_images = true,
@@ -144,6 +152,12 @@ return {
 ) <fig-$LABEL>
     ]], ---@type string | fun(context: table): string
           },
+
+          norg = {
+            url_encode_path = false, ---@type boolean | fun(): boolean
+            template = ".image $FILE_PATH", ---@type string | fun(context: table): string
+            download_images = false, ---@type boolean | fun(): boolean
+          },
         },
 
         -- file, directory, and custom triggered options
@@ -159,6 +173,13 @@ return {
         mode = "n",
         desc = "Paste image",
         ft = "quarto",
+      },
+      {
+        "<leader>oI",
+        ":PasteImage<cr>",
+        mode = "n",
+        desc = "Paste image",
+        ft = "norg",
       },
     },
   },
