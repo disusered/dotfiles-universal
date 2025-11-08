@@ -1,3 +1,29 @@
 linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      cd ~/.cache/nvim
+
+      # norg
+      if [ ! -d "$HOME/.cache/nvim/tree-sitter-norg" ]; then
+        git clone https://github.com/nvim-neorg/tree-sitter-norg.git
+      fi
+      cd tree-sitter-norg
+      clang -c -fPIC -O2 -I src src/parser.c -o parser.o
+      clang++ -c -fPIC -O2 -I src src/scanner.cc -std=c++14 -o scanner.o
+      clang++ -shared -o parser.so parser.o scanner.o
+      cp parser.so ~/.local/share/nvim/lazy/nvim-treesitter/parser/norg.so
+
+      # norg-meta
+      if [ ! -d "$HOME/.cache/nvim/tree-sitter-norg-meta" ]; then
+        git clone https://github.com/nvim-neorg/tree-sitter-norg-meta.git
+      fi
+      cd tree-sitter-norg
+      clang -c -fPIC -O2 -I src src/parser.c -o parser.o
+      clang++ -c -fPIC -O2 -I src src/scanner.cc -std=c++14 -o scanner.o
+      clang++ -shared -o parser.so parser.o scanner.o
+      cp parser.so ~/.local/share/nvim/lazy/nvim-treesitter/parser/norg.so
+    depends:
+      - /lib/arch
+      - /tools/git
   links:
     neorg.lua: ~/.config/nvim/lua/plugins/neorg.lua
