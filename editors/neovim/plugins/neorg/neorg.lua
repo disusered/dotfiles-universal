@@ -81,6 +81,7 @@ return {
               extensions = "all",
             },
           },
+          ["core.summary"] = {},
         },
       })
     end,
@@ -202,6 +203,83 @@ return {
         "<leader>oi",
         ":Neorg inject-metadata<CR>",
         desc = "Inject metadata",
+      },
+      -- Generate workspace summary
+      {
+        "<leader>ou",
+        ":Neorg generate-workspace-summary<CR>",
+        desc = "Generate workspace summary",
+      },
+      -- Neorg actions picker
+      {
+        "<leader>oa",
+        function()
+          local actions = {
+            {
+              text = "Generate Workspace Summary",
+              action = function()
+                vim.cmd("Neorg generate-workspace-summary")
+              end,
+            },
+            {
+              text = "Generate Summary (with metadata injection)",
+              action = function()
+                vim.cmd("Neorg inject-metadata")
+                vim.defer_fn(function()
+                  vim.cmd("Neorg generate-workspace-summary")
+                end, 100)
+              end,
+            },
+            {
+              text = "Inject Metadata",
+              action = function()
+                vim.cmd("Neorg inject-metadata")
+              end,
+            },
+            {
+              text = "Export to Markdown",
+              action = function()
+                local current_file = vim.fn.expand("%:p")
+                if not current_file:match("%.norg$") then
+                  vim.notify("Not a Neorg file", vim.log.levels.WARN)
+                  return
+                end
+                local filename = vim.fn.fnamemodify(current_file, ":t:r")
+                local export_dir = vim.fn.expand("~/Documents/exports")
+                vim.fn.mkdir(export_dir, "p")
+                local output_file = export_dir .. "/" .. filename .. ".md"
+                vim.cmd("Neorg export to-file " .. output_file)
+                vim.notify("Exported to: " .. output_file, vim.log.levels.INFO)
+              end,
+            },
+            {
+              text = "Toggle Concealer",
+              action = function()
+                vim.cmd("Neorg toggle-concealer")
+              end,
+            },
+            {
+              text = "Paste Image",
+              action = function()
+                vim.cmd("PasteImage")
+              end,
+            },
+          }
+
+          Snacks.picker({
+            title = "Neorg Actions",
+            layout = { preset = "default", preview = false },
+            items = actions,
+            format = function(item)
+              return { { item.text } }
+            end,
+            confirm = function(picker, item)
+              picker:close()
+              item.action()
+            end,
+          })
+        end,
+        desc = "Neorg actions",
       },
     },
   },

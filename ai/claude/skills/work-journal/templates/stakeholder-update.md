@@ -235,6 +235,11 @@ Por favor háznoslo saber si está funcionando como esperas.
 
 ## Common Errors to Avoid
 
+❌ **CRITICAL: Including Jira or Notion links**
+- Stakeholders are external - NEVER expose internal Jira or Notion links
+- Don't include issue numbers, commit SHAs, or internal tracking IDs
+- Focus on user impact only
+
 ❌ **Using technical jargon**
 - "OAuth token", "API endpoint", "schema validation", etc.
 

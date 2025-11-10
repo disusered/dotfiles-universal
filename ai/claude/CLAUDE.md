@@ -22,14 +22,28 @@
 
 ### Creating the Notion Page
 
-1. **Validate properties first:**
-   ```bash
-   python ai/claude/skills/work-journal/scripts/validate_properties.py --priority X --project "Y" --type Z [--jira ID] [--github NUM --repo user/repo]
-   ```
+1. **Check if page already exists (avoid duplicates):**
+   - Use `mcp__notion__query_database` to search by Jira/GitHub issue IDs
+   - **Canonical identifiers**: Jira issue # and GitHub issue # are authoritative
+   - If page exists for the issue: UPDATE it, don't create new
+   - If no issue IDs: Search by similar Name, but prefer creating new
 
-2. **If Priority, Project, or Type missing: STOP and ASK the user**
+2. **Gather required properties:**
+   - **Priority** (0-4): Ask user if not clear from context
+   - **Project**: Ask user which team/project this belongs to
+   - **Type**: Infer from context or ask (bug/feature/task/epic/chore)
+   - **Jira** (optional): Ask "Is there a Jira issue for this?" if not mentioned (blank is OK)
+   - **Github** (optional): Ask if not mentioned, ask for repo if needed
 
-3. **Create page using `mcp__notion__notion-create-pages`:**
+3. **Generate clean Name (avoid redundancy):**
+   - Extract issue number from GitHub/Jira if present
+   - Don't include "#2250" in Name if already in GitHub issue # property
+   - Format: "Fix: Ordenar categorías..." NOT "Fix #2250: Ordenar..."
+   - Keep Name concise and descriptive
+
+4. **If Priority, Project, or Type missing: STOP and ASK the user**
+
+5. **Create page using `mcp__notion__notion-create-pages`:**
    ```json
    {
      "parent": {"data_source_id": "2a0d1aba-3b72-8031-aedc-000b7ba2c45f"},
@@ -39,8 +53,8 @@
          "Priority": 0-4,
          "Project": "Team/Project name",
          "Type": "bug|feature|task|epic|chore",
-         "Jira issue #": "https://odasoftmx.atlassian.net/browse/ID" (optional),
-         "Github issue #": "https://github.com/user/repo/issues/NUM" (optional),
+         "Jira": "https://odasoftmx.atlassian.net/browse/ID" (optional),
+         "Github": "https://github.com/user/repo/issues/NUM" (optional),
          "Status": "In Progress"
        },
        "content": "## Work Log\n\nStarting work...\n"
@@ -92,7 +106,12 @@
 
 ### Completing Work
 
-When finished:
+**When to mark as "Done":**
+- ✅ Work is fully complete AND merged (or no PR needed)
+- ❌ NOT when PR is created (work is still In Progress until merged)
+- ❌ NOT when code is committed but not merged
+
+**Marking complete:**
 1. Append final summary to page content
 2. Update Status property to "Done" using `mcp__notion__update_page_properties`
 3. Respond ONLY with: `✅ Task complete. The work has been logged to Notion: [URL]`
@@ -104,7 +123,11 @@ When finished:
 - **Project** (string): Team or project name
 - **Type** (enum): `bug`, `feature`, `task`, `epic`, or `chore`
 
-**GitHub and Jira are OPTIONAL** - only include if user explicitly mentions them.
+**GitHub and Jira prompts:**
+- **Ask if not known/mentioned**: "Is there a Jira/GitHub issue for this?"
+- If user already mentioned issue number in context, don't re-ask
+- Blank/empty answers are acceptable - just omit from properties
+- If GitHub issue provided, MUST ask for repo (user/repo format)
 
 ### Notion Database
 

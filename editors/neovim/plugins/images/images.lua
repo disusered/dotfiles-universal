@@ -20,6 +20,14 @@ return {
           only_render_image_at_cursor = false,
           only_render_image_at_cursor_mode = "inline", -- "inline" or "popup"
         },
+        neorg = {
+          enabled = true,
+          download_remote_images = true,
+          filetypes = { "norg" },
+          clear_in_insert_mode = false,
+          only_render_image_at_cursor = false,
+          only_render_image_at_cursor_mode = "inline", -- "inline" or "popup"
+        },
         html = {
           enabled = true,
           download_remote_images = true,
@@ -81,8 +89,7 @@ return {
     event = "VeryLazy",
     opts = {
       -- https://github.com/hakonharnes/img-clip.nvim?tab=readme-ov-file#setup
-      {
-        default = {
+      default = {
           -- file and directory options
           use_absolute_path = false, ---@type boolean | fun(): boolean
           relative_to_current_file = false, ---@type boolean | fun(): boolean
@@ -102,29 +109,29 @@ return {
             enabled = true, ---@type boolean | fun(): boolean
             insert_mode = false, ---@type boolean | fun(): boolean
           },
+      },
+
+      -- filetype specific options
+      filetypes = {
+        markdown = {
+          url_encode_path = true, ---@type boolean | fun(): boolean
+          template = "![$CURSOR]($FILE_PATH)", ---@type string | fun(context: table): string
+          download_images = false, ---@type boolean | fun(): boolean
         },
 
-        -- filetype specific options
-        filetypes = {
-          markdown = {
-            url_encode_path = true, ---@type boolean | fun(): boolean
-            template = "![$CURSOR]($FILE_PATH)", ---@type string | fun(context: table): string
-            download_images = false, ---@type boolean | fun(): boolean
-          },
+        quarto = {
+          url_encode_path = true, ---@type boolean | fun(): boolean
+          template = "![$CURSOR]($FILE_PATH)", ---@type string | fun(context: table): string
+          download_images = false, ---@type boolean | fun(): boolean
+        },
 
-          quarto = {
-            url_encode_path = true, ---@type boolean | fun(): boolean
-            template = "![$CURSOR]($FILE_PATH)", ---@type string | fun(context: table): string
-            download_images = false, ---@type boolean | fun(): boolean
-          },
+        html = {
+          template = '<img src="$FILE_PATH" alt="$CURSOR">', ---@type string | fun(context: table): string
+        },
 
-          html = {
-            template = '<img src="$FILE_PATH" alt="$CURSOR">', ---@type string | fun(context: table): string
-          },
-
-          tex = {
-            relative_template_path = false, ---@type boolean | fun(): boolean
-            template = [[
+        tex = {
+          relative_template_path = false, ---@type boolean | fun(): boolean
+          template = [[
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.8\textwidth]{$FILE_PATH}
@@ -133,24 +140,29 @@ return {
 \end{figure}
     ]], ---@type string | fun(context: table): string
 
-            formats = { "jpeg", "jpg", "png", "pdf" }, ---@type table
-          },
+          formats = { "jpeg", "jpg", "png", "pdf" }, ---@type table
+        },
 
-          typst = {
-            template = [[
+        typst = {
+          template = [[
 #figure(
   image("$FILE_PATH", width: 80%),
   caption: [$CURSOR],
 ) <fig-$LABEL>
     ]], ---@type string | fun(context: table): string
-          },
         },
 
-        -- file, directory, and custom triggered options
-        files = {}, ---@type table | fun(): table
-        dirs = {}, ---@type table | fun(): table
-        custom = {}, ---@type table | fun(): table
+        norg = {
+          url_encode_path = false, ---@type boolean | fun(): boolean
+          template = ".image $FILE_PATH\n$CURSOR", ---@type string | fun(context: table): string
+          download_images = false, ---@type boolean | fun(): boolean
+        },
       },
+
+      -- file, directory, and custom triggered options
+      files = {}, ---@type table | fun(): table
+      dirs = {}, ---@type table | fun(): table
+      custom = {}, ---@type table | fun(): table
     },
     keys = {
       {
@@ -159,6 +171,13 @@ return {
         mode = "n",
         desc = "Paste image",
         ft = "quarto",
+      },
+      {
+        "<leader>oI",
+        ":PasteImage<cr>",
+        mode = "n",
+        desc = "Paste image",
+        ft = "norg",
       },
     },
   },
