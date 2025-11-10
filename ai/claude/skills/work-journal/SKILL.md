@@ -74,8 +74,8 @@ Invoke the `gh` skill when you need to:
 **Example workflow:**
 1. User requests: "Create manager summary and post to Jira"
 2. Generate manager summary (this skill)
-3. Invoke `jira` skill to learn how to use jiratui
-4. Use `jiratui comments add` to post summary to Jira
+3. Invoke `jira` skill to learn how to use acli
+4. Use `acli jira workitem comment create` to post summary to Jira
 
 **Note:** These tool skills provide detailed CLI syntax and examples via progressive disclosure, keeping this skill focused on tone and presentation.
 
@@ -331,9 +331,9 @@ Invoke the `gh` skill when you need to:
    - **DO NOT use `append_to_page_content` - that would modify the work log**
    - **DO NOT translate the work log - it stays in English**
    - **Upload the EXACT content from step 3 - don't regenerate or change it**
-   - **Post comment to Jira using jiratui:**
+   - **Post comment to Jira using acli:**
      ```bash
-     echo "{EXACT Spanish manager summary from step 3}" | jiratui comments {jira-issue-key} --add
+     acli jira workitem comment create --key "{jira-issue-key}" --body "{EXACT Spanish manager summary from step 3}"
      ```
    - Extract Jira issue key from page properties (from URL like `CM-2765`)
    - **CRITICAL: DO NOT CALL `mcp__notion__update_page_properties`**
@@ -494,7 +494,7 @@ When you need detailed information:
 You've completed your job when:
 
 - ✅ For PR: Draft approved by user, PR created in GitHub using `gh pr create`, child page created in Notion, URLs provided
-- ✅ For manager summary: Summary generated, comment posted to Jira using `jiratui`, child page created in Notion, URLs provided (in Spanish)
+- ✅ For manager summary: Summary generated, comment posted to Jira using `acli`, child page created in Notion, URLs provided (in Spanish)
 - ✅ For stakeholder update: Draft approved by user, comment posted to GitHub issue using `gh issue comment`, child page created in Notion, URLs provided
 
 ---
