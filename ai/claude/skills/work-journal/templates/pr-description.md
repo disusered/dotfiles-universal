@@ -1,299 +1,215 @@
-# Template: Pull Request (PR) Description
+# Template: PR Description
 
 ## Purpose
 
-This template guides the generation of technical PR descriptions for GitHub, combining the "why" context (from Notion log) with the "what" (from git changes).
+Generate technical PR descriptions in Spanish from Markdown work logs for code review.
 
 ## Audience
 
-**Developers who will review the code.**
+**Software engineers reviewing code in GitHub.**
 
-The PR description should provide reviewers with all the context they need to understand:
-- Why this change was made
-- What was changed technically
-- How to verify it works
-- What specific aspects to review
+The PR description should:
+- Explain the technical changes and why they were made
+- Focus on implementation details and testing
+- Use technical Spanish terminology
+- Be clear and actionable for code reviewers
 
 ## Language
 
+**CRITICAL - READ CAREFULLY:**
+
 **ALL agent ↔ user communication: ENGLISH**
-
-**Final artifact output: SPANISH**
-
-The PR description itself must be in Spanish, but all questions, confirmations, and communication with the user are in English.
+**ALL work log content: ENGLISH (DO NOT TRANSLATE)**
+**ONLY PR description artifact: SPANISH (technical Spanish)**
 
 ## Workflow
 
-### Step 1: Gather Inputs (English)
+### Step 1: Gather Required Inputs
 
-**Ask the user:**
-1. **Notion Page ID(s)** - All work items included in this PR
-2. **Source Branch** - Your branch (e.g., `feature/oauth-fix`)
-3. **Target Branch** - Base branch (e.g., `main` or `develop`)
+Ask the user (in English):
+- **Work log filename** (e.g., `fix-oauth-token.md` from `dev/active/`)
+- **Source branch** (e.g., `feature/fix-oauth`)
+- **Target branch** (e.g., `main` or `develop`)
 
-**If information is missing:**
-- STOP and ASK for missing inputs (in English)
-- Do not proceed until you have at least one Notion page ID and the branches
+**If any missing: STOP and ASK**
 
-### Step 2: Analyze Context (The "Why")
+### Step 2: Read Work Log (READ-ONLY)
 
-1. **Fetch Notion page(s)**
-   - Use `mcp__notion__notion-fetch` with each page ID
-   - Extract from page content:
-     - Technical Summary
-     - Goal/Objective
-     - Root Cause (for bugs)
-     - Relevant business or technical context
+**CRITICAL: The work log is READ-ONLY - you will NOT modify it**
 
-2. **Identify justification**
-   - Why this work was necessary
-   - What problem it solves
-   - What improvement it brings
+1. Use Read tool: `dev/active/{filename}.md`
+2. Extract from frontmatter:
+   - **GitHub**: Issue URL (if present)
+   - **Jira**: Issue URL (if present) - **DO NOT include in PR description** (internal only)
+   - **Type**: bug/feature/task
+   - **Priority**: 0-4
+3. Read work log content:
+   - Technical summary
+   - Root cause analysis
+   - Solution approach
+   - Testing notes
 
-### Step 3: Analyze Changes (The "What")
+### Step 3: Analyze Git Changes
 
-1. **Inspect git changes**
-   ```bash
-   # View diff between target and source branches
-   git diff origin/{target-branch}...{source-branch}
+**Get the actual code changes:**
 
-   # View commits in the branch
-   git log origin/{target-branch}..{source-branch} --oneline
-   ```
+```bash
+# See commit history
+git log origin/{target}..{source} --oneline
 
-2. **Understand the changes conceptually**
-   - What was the goal/objective?
-   - What approach was taken?
-   - Why was this approach chosen?
+# See file changes
+git diff origin/{target}...{source} --stat
 
-**CRITICAL:**
-- **NO line numbers** - They're meaningless without commit context
-- **NO file lists** - The diff already shows this
-- **NO "what changed"** - The diff shows this
-- **FOCUS ON "WHY"** - Context, reasoning, decisions
+# See detailed changes
+git diff origin/{target}...{source}
+```
 
-### Step 4: Draft PR Description in Spanish
+**Extract:**
+- Files modified
+- Core logic changes
+- Tests added/modified
+- Breaking changes (if any)
 
-**CRITICAL: The PR description output must be in Spanish.**
+### Step 4: Generate PR Description (Spanish)
 
-**Combine the "why" and "what" into a structured description.**
-
-**Formato requerido:**
+**Format:**
 
 ```markdown
 ## Resumen
 
-[1-2 párrafos que explican qué hace este PR y por qué era necesario]
+[1-2 sentences explaining what this PR does and why]
 
-## Trabajo Relacionado
+## Cambios Técnicos
 
-- GitHub Issue: [#456](https://github.com/user/repo/issues/456) _(si aplica)_
+- [Technical change 1 with reasoning]
+- [Technical change 2 with reasoning]
+- [Technical change 3 with reasoning]
 
-## Contexto Técnico
+## Testing
 
-[Detalles técnicos del log de Notion que explican por qué era necesario el cambio]
+- [Test approach 1]
+- [Test approach 2]
+- [Manual testing performed]
 
-**Causa Raíz** _(para bugs):_
-[Explicación técnica de qué causó el problema]
+## Notas para Revisión
 
-**Enfoque de Solución:**
-[Por qué se eligió este enfoque vs otras opciones]
-
-**Impacto:**
-[Qué mejora esto: rendimiento, seguridad, mantenibilidad, etc.]
-
-## Notas para Revisores
-
-[Opcional: Aspectos específicos que los revisores deben verificar]
-
-- **Seguridad:** [Consideraciones de seguridad, si aplica]
-- **Rendimiento:** [Impactos de rendimiento, si aplica]
-- **Compatibilidad:** [Cambios que rompen compatibilidad, si aplica]
-- **Áreas de enfoque:** [Archivos o lógica específicos para revisar con cuidado]
-
----
-
-🤖 Generado con [Claude Code](https://claude.com/claude-code)
+- [Important consideration 1]
+- [Important consideration 2]
+- [Breaking changes or migration notes if any]
 ```
 
-### Step 5: Iterate with User (English)
+**Content Rules:**
 
-**CRITICAL: Do not proceed without explicit approval.**
+✅ **DO include:**
+- What changed and why
+- Technical approach
+- Testing performed
+- GitHub issue link (if available)
+- Breaking changes or migrations needed
+- Important review considerations
 
-1. Present the draft to the user (PR description in Spanish)
-2. Ask (in English): "Does this PR description capture the changes correctly? Any modifications needed?"
-3. Make adjustments based on feedback
-4. Repeat until user approves
+❌ **DO NOT include:**
+- Jira issue links or numbers (internal tracking - keep private)
+- Work log file paths
+- Internal tool references
+- Commit SHAs (GitHub shows these)
+- Line-by-line diff reproduction
 
-**VERIFY:** Before proceeding, double-check that the PR description is in Spanish.
+**Tone:**
+- Technical but clear Spanish
+- Direct and concise
+- Focus on reviewer needs
 
-### Step 6: Create Child Page with PR Text
+### Step 5: Save Artifact
 
-**Only after user approval:**
+**Get timestamp:**
+```bash
+TZ='America/Tijuana' date '+%Y-%m-%d-%H%M'
+```
 
-1. **Get timestamp**
+**Save to file:**
+- Path: `dev/artifacts/{work-log-name}-pr-{timestamp}.md`
+- Content: The exact Spanish PR description
+
+**Use Write tool to create the artifact file.**
+
+### Step 6: Create PR (Optional)
+
+**If user wants to create the PR immediately:**
+
+1. Invoke the `gh` skill to get GitHub CLI syntax
+2. Use `gh pr create`:
    ```bash
-   TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'
+   gh pr create \
+     --base {target} \
+     --head {source} \
+     --title "{PR title}" \
+     --body-file dev/artifacts/{work-log-name}-pr-{timestamp}.md
    ```
 
-2. **Create child page**
-   - Parent: The Notion work log page
-   - Title: `PR Description - {timestamp}`
-   - Content: The approved Spanish PR description
-   - Use Notion's child page syntax: `<page>PR Description - {timestamp}</page>`
+**If user just wants the file:**
+- Respond: `✅ PR description created: dev/artifacts/{filename}.md`
+- **DO NOT reprint the content** (it's in the file)
 
-**Example:**
-```markdown
-<page>PR Description - 2025-01-04 14:30</page>
-[Full approved PR description in Spanish goes here]
-</page>
-```
+### Step 7: Information Flow Security
 
-### Step 7: Add Artifact Link to Work Log
+**CRITICAL: Jira references MUST NOT leak to public GitHub.**
 
-**After creating the child page, append a link to the work log:**
+- ✅ **GitHub issue links:** OK to include in PR (public repo)
+- ❌ **Jira issue links:** NEVER include (internal tracking)
+- ❌ **Work log paths:** NEVER include (internal files)
 
-1. **Check if "## Artifacts" section exists** in the work log
-   - If not, create it by appending `\n## Artifacts\n\n`
-
-2. **Append the artifact link** using `mcp__notion__append_to_page_content`:
-   ```markdown
-   - [PR Description - {timestamp}]({child-page-url})
-   ```
-
-**This creates a clear reference in the work log to all generated artifacts.**
-
-### Step 8: Confirm (English)
-
-**Notify the user:**
-```
-✅ PR description created: [child page URL]
-```
-
-**User can then copy the text from the child page to GitHub when creating the PR.**
-
-## Tone Guidelines
-
-**For agent ↔ user communication (English):**
-- Clear, direct questions
-- Professional but conversational
-- Seek clarification when needed
-
-**For PR description artifact (Spanish):**
-- **Technical:** Assume reviewers are developers with project context
-- **Detailed:** Include enough technical context to understand the "why"
-- **Code-focused:** Mention specific files, components, patterns
-- **Direct:** Get to the point, but don't omit important context
-- **Professional:** Maintain formal technical documentation tone
-
-## Content Priorities
-
-### Include (Primary):
-- Reason for the change (why it was necessary)
-- Summary of key changes (which files/components)
-- Root cause (for bugs)
-- Solution approach
-- Test plan
-- Links to related work (Notion, Jira, GitHub)
-
-### Include (Secondary):
-- Specific notes for reviewers
-- Security/performance considerations
-- Breaking changes
-- Technical debt introduced/resolved
-
-### Exclude (NEVER include these):
-- ❌ **Line numbers** (meaningless without commit hash)
-- ❌ **File-by-file change lists** (redundant with diff)
-- ❌ **Code snippets from diff** (already in GitHub)
-- ❌ **"Cambios Realizados" section** (redundant)
-- ❌ **Testing instructions for QA** (condescending)
-- ❌ **List of modified files** (GitHub shows this)
-- ❌ **Commit history** (git log shows this)
-- ❌ **Fabricated information** (only describe what you did)
+**If work is tracked in both Jira and GitHub:**
+- PR description only mentions the GitHub issue
+- Jira link stays in the work log file (internal)
 
 ## Example Output
 
 ```markdown
 ## Resumen
 
-Este PR corrige un bug crítico en el flujo de renovación de tokens OAuth que causaba errores `invalid_grant` para los usuarios. El problema se originó por un operador de asignación (`=`) usado incorrectamente en lugar de un operador de comparación (`<=`) en la verificación de expiración del token, lo que marcaba los tokens como expirados inmediatamente después de la creación.
+Corrige error en validación de tokens OAuth que causaba rechazos incorrectos. El problema era un operador de asignación (`=`) usado en lugar de comparación (`==`).
 
-## Trabajo Relacionado
+## Cambios Técnicos
 
-- GitHub Issue: [#123](https://github.com/odasoftmx/app/issues/123)
+- **Corregido operador lógico** en `lib/auth/validator.py` línea 167
+  - Cambio de `=` (asignación) a `==` (comparación)
+  - Previene que tokens válidos sean marcados como expirados
+- **Agregados tests unitarios** para validación de expiración
+  - Casos: token válido, expirado, y futuro
+  - Cobertura aumentó de 65% a 89%
 
-## Contexto Técnico
+## Testing
 
-El bug se introdujo durante una refactorización de manejo de errores donde se consolidaron múltiples verificaciones de expiración. El operador de asignación (`=`) siempre evalúa como verdadero en JavaScript, causando que la lógica de renovación se ejecutara inmediatamente después de cada creación de token.
+- 15 tests unitarios pasando (3 nuevos)
+- Testing manual con tokens reales en staging
+- Verificado que no afecta renovación automática de tokens
 
-**Causa Raíz:**
-Operador de asignación (`=`) en lugar de comparación (`==` o `<=`) en verificación condicional. Este es un error común de JavaScript que los linters modernos normalmente detectan, pero el archivo no estaba incluido en la configuración de ESLint.
+## Notas para Revisión
 
-**Enfoque de Solución:**
-Se eligió `<=` sobre `==` porque proporciona comportamiento más robusto cuando los timestamps son exactamente iguales (caso límite poco probable pero posible). Este cambio es backward-compatible y no requiere migraciones.
+- Cambio es backward-compatible
+- No requiere migración de datos
+- Considerar backport a v2.x si es aplicable
 
-**Impacto:**
-- Seguridad: Previene intentos innecesarios de renovación que podrían causar agotamiento de rate limit
-- Experiencia del usuario: Elimina errores `invalid_grant` que confunden a los usuarios
-- Confiabilidad: Los tokens ahora se manejan correctamente durante su ciclo de vida completo
-
-## Notas para Revisores
-
-- **Seguridad:** Este cambio no introduce nuevos vectores de seguridad. De hecho, reduce llamadas innecesarias a la API de OAuth.
-- **Trabajo futuro:** Se creó [#456](https://github.com/odasoftmx/app/issues/456) para agregar test de regresión específico para este bug de operador y agregar este archivo a la configuración de ESLint.
-
----
-
-🤖 Generado con [Claude Code](https://claude.com/claude-code)
+Relacionado con #123
 ```
 
 ## Common Errors to Avoid
 
-❌ **CRITICAL: Including Jira or Notion links in PR**
-- GitHub PRs are public/external - NEVER expose internal Jira or Notion links
-- Only include public GitHub issue references
-- Information flow: Jira (internal) → GitHub (public) is OK, but GitHub → Jira is FORBIDDEN
+❌ **Including Jira links in PR**
+- Jira is internal only, never expose to public GitHub
 
-❌ **Including line numbers**
-- Line numbers are meaningless without commit context. NEVER include them.
+❌ **Translating work log to Spanish**
+- Work logs stay in English, only the PR description is Spanish
 
-❌ **Creating a "Cambios Realizados" section**
-- This duplicates information in the diff. Focus on WHY, not WHAT.
+❌ **Modifying the work log file**
+- Work log is READ-ONLY input
 
-❌ **Listing modified files**
-- The diff already shows this. Redundant and verbose.
+❌ **Reprinting the artifact to user**
+- Only provide the file path
 
-❌ **Adding testing instructions**
-- Condescending. QA knows how to test. Only describe WHAT was fixed.
+❌ **Using English in PR description**
+- PR descriptions must be in Spanish
 
-❌ **Copying code from the diff**
-- The diff is already there. Don't repeat it.
-
-❌ **Omitting the "why"**
-- Reviewers need context: root cause, reasoning, decisions
-
-❌ **Creating child page without user approval**
-- Always iterate on the draft first
-
-❌ **Using English for the PR description**
-- The artifact output must be in Spanish
-
-❌ **Communicating with user in Spanish**
-- ALL agent ↔ user communication must be in English
-
-❌ **Omitting links to related work**
-- Always link to Notion page, and Jira/GitHub if applicable
-
-❌ **Fabricating information**
-- Only describe what actually happened. Don't make shit up.
-
-## Template Variables
-
-When using this template, replace:
-
-- `{source-branch}` - Branch with changes (e.g., `feature/oauth-fix`)
-- `{target-branch}` - Base branch for merge (e.g., `main`)
-- `{notion-page-id}` - ID of the Notion page with work log
-- `{timestamp}` - Get via `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
-- `{pr-description}` - The full approved PR description in Spanish
+❌ **Copying the git diff verbatim**
+- Summarize conceptually, don't paste diffs
