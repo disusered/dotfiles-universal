@@ -28,8 +28,8 @@ if [[ "$file_path" =~ \.md$ ]]; then
   exit 0
 fi
 
-# Create cache directory
-cache_dir="$CLAUDE_PROJECT_DIR/ai/claude/.cache/tool-use"
+# Create cache directory in deployed location
+cache_dir="$HOME/.claude/.cache/tool-use"
 mkdir -p "$cache_dir"
 
 # Get timestamp

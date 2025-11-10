@@ -43,9 +43,9 @@ async function main() {
     const input = readFileSync(0, 'utf-8');
     const hookInput: HookInput = JSON.parse(input);
 
-    // Load skill rules
-    const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
-    const rulesPath = join(projectDir, 'ai', 'claude', 'skills', 'skill-rules.json');
+    // Load skill rules from deployed location
+    const homeDir = process.env.HOME || process.env.USERPROFILE || '';
+    const rulesPath = join(homeDir, '.claude', 'skills', 'skill-rules.json');
 
     let skillRules: SkillRules;
     try {
