@@ -7,7 +7,7 @@
   "hooks": {
     "UserPromptSubmit": [
       {
-        "matcher": {},
+        "matcher": ".*",
         "hooks": [
           {
             "type": "command",
@@ -18,9 +18,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": {
-          "tools": ["Edit", "MultiEdit", "Write"]
-        },
+        "matcher": "Edit|MultiEdit|Write",
         "hooks": [
           {
             "type": "command",
