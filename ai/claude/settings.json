@@ -3,5 +3,17 @@
     "type": "command",
     "command": "input=$(cat); model_name=$(echo \"$input\" | jq -r '.model.display_name'); current_dir=$(echo \"$input\" | jq -r '.workspace.current_dir'); project_dir=$(echo \"$input\" | jq -r '.workspace.project_dir'); output_style=$(echo \"$input\" | jq -r '.output_style.name'); version=$(echo \"$input\" | jq -r '.version'); git_branch=$(cd \"$current_dir\" 2>/dev/null && git branch --show-current 2>/dev/null); git_status=$(cd \"$current_dir\" 2>/dev/null && git status --porcelain 2>/dev/null | wc -l); rel_path=$(realpath --relative-to=\"$project_dir\" \"$current_dir\" 2>/dev/null || basename \"$current_dir\"); printf \"\\033[2m\\033[38;2;116;199;236m\\033[0m \\033[2m\\033[1m\\033[38;2;203;166;247m%s\\033[0m\" \"$model_name\"; if [ \"$current_dir\" != \"$project_dir\" ] && [ \"$rel_path\" != \".\" ]; then printf \" \\033[2m\\033[38;2;180;190;254m%s\\033[0m\" \"$rel_path\"; fi; if [ -n \"$git_branch\" ]; then printf \" \\033[2m\\033[38;2;203;166;247m\\033[0m \\033[2m\\033[1m\\033[38;2;203;166;247m%s\\033[0m\" \"$git_branch\"; if [ \"$git_status\" -gt 0 ]; then printf \" \\033[2m\\033[38;2;249;226;175m+%s\\033[0m\" \"$git_status\"; fi; fi; if [ \"$output_style\" != \"default\" ]; then printf \" \\033[2m\\033[38;2;148;226;213m%s\\033[0m\" \"$output_style\"; fi; printf \" \\033[2m\\033[38;2;166;173;200mv%s\\033[0m\" \"$version\""
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "hooks": {
+    "UserPromptSubmit": {
+      "type": "command",
+      "command": "$CLAUDE_PROJECT_DIR/ai/claude/hooks/skill-activation-prompt.sh",
+      "matcher": ".*"
+    },
+    "PostToolUse": {
+      "type": "command",
+      "command": "$CLAUDE_PROJECT_DIR/ai/claude/hooks/post-tool-use-tracker.sh",
+      "matcher": "Edit|MultiEdit|Write"
+    }
+  }
 }

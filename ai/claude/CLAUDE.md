@@ -12,6 +12,7 @@
 ### When to Track Work (PROACTIVE)
 
 **AUTOMATICALLY create a Notion page BEFORE starting ANY of these tasks:**
+
 - Investigation/debugging (multi-step)
 - Feature development
 - Bug fixes
@@ -44,6 +45,7 @@
 4. **If Priority, Project, or Type missing: STOP and ASK the user**
 
 5. **Create page using `mcp__notion__notion-create-pages`:**
+
    ```json
    {
      "parent": {"data_source_id": "2a0d1aba-3b72-8031-aedc-000b7ba2c45f"},
@@ -72,6 +74,7 @@
 - **Chronological only** - ALWAYS append to end, NEVER restructure or read entire page
 
 **What to Log:**
+
 - Approaches attempted and WHY chosen
 - Failures and root cause analysis
 - Decisions made and reasoning
@@ -80,6 +83,7 @@
 - Code snippets ONLY IF explanatory (showing bug logic, design pattern)
 
 **What NOT to Log (Busywork):**
+
 - Commit message writing/editing/rewriting
 - PR text revisions
 - Git operations (push, pull, checkout, branch, merge, rebase, add, etc.)
@@ -92,6 +96,7 @@
 **Philosophy:** Document DECISIONS and DISCOVERIES, not ACTIONS. If it's in git history, DON'T duplicate it.
 
 **Entry Format:**
+
 ```markdown
 ### [Descriptive entry name - NO metadata like dates/issue#s]
 
@@ -107,11 +112,13 @@
 ### Completing Work
 
 **When to mark as "Done":**
+
 - ✅ Work is fully complete AND merged (or no PR needed)
 - ❌ NOT when PR is created (work is still In Progress until merged)
 - ❌ NOT when code is committed but not merged
 
 **Marking complete:**
+
 1. Append final summary to page content
 2. Update Status property to "Done" using `mcp__notion__update_page_properties`
 3. Respond ONLY with: `✅ Task complete. The work has been logged to Notion: [URL]`
@@ -124,6 +131,7 @@
 - **Type** (enum): `bug`, `feature`, `task`, `epic`, or `chore`
 
 **GitHub and Jira prompts:**
+
 - **Ask if not known/mentioned**: "Is there a Jira/GitHub issue for this?"
 - If user already mentioned issue number in context, don't re-ask
 - Blank/empty answers are acceptable - just omit from properties
@@ -139,6 +147,7 @@
 ### Specialized Outputs (Use Skills)
 
 For PR descriptions, manager summaries, or stakeholder updates:
+
 - **Invoke the `work-journal` skill** and specify the workflow
 - These require templates, iteration, and approval
 - See `~/.claude/skills/work-journal/` for details
@@ -150,12 +159,14 @@ For PR descriptions, manager summaries, or stakeholder updates:
 Official Atlassian CLI for Jira work items and comments.
 
 **Work Items:**
+
 - `acli jira workitem create --summary "Task" --project "KEY" --type "Task"` - Create work item
 - `acli jira workitem view --key "KEY-123"` - View work item details
 - `acli jira workitem edit --key "KEY-123" --summary "New summary"` - Edit work item
 - `acli jira workitem transition --key "KEY-123" --status "In Progress"` - Transition status
 
 **Comments:**
+
 - `acli jira workitem comment create --key "KEY-123" --body "Comment text"` - Add comment
 - Use `--help` on any command for full options
 
@@ -164,6 +175,7 @@ Official Atlassian CLI for Jira work items and comments.
 GitHub CLI for issues and pull requests.
 
 **Issues:**
+
 - `gh issue list` - List issues
 - `gh issue view <number>` - View issue details
 - `gh issue comment <number>` - Add comment to issue
@@ -171,6 +183,7 @@ GitHub CLI for issues and pull requests.
 - `gh issue edit <number> --remove-label <label>` - Remove labels
 
 **Pull Requests:**
+
 - `gh pr list` - List PRs
 - `gh pr view <number>` - View PR details
 - `gh pr create` - Create new PR

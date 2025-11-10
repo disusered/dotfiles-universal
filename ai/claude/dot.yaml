@@ -8,6 +8,8 @@ global:
   links:
     agents: ~/.claude/agents/
     skills: ~/.claude/skills/
+    hooks: ~/.claude/hooks
+    commands: ~/.claude/commands
     CLAUDE.md: ~/.claude/CLAUDE.md
 linux|darwin:
   links:
