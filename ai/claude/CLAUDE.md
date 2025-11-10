@@ -5,13 +5,13 @@
 - `ls` is not the default command, it is bound to `exa`
 - Commit messages should be limited to 80 characters in length
 
-## ⚡ Core Directives: Notion Work Tracking
+## ⚡ Core Directives: Work Tracking
 
-**IMPORTANT**: This project uses the **Notion MCP** for ALL work and issue tracking.
+**IMPORTANT**: This project uses **Markdown files** for ALL work and issue tracking.
 
 ### When to Track Work (PROACTIVE)
 
-**AUTOMATICALLY create a Notion page BEFORE starting ANY of these tasks:**
+**AUTOMATICALLY create a work log file BEFORE starting ANY of these tasks:**
 
 - Investigation/debugging (multi-step)
 - Feature development
@@ -19,15 +19,15 @@
 - Code refactoring
 - Any work requiring multiple commands/steps
 
-**You MUST create the page BEFORE executing commands, not after.**
+**You MUST create the file BEFORE executing commands, not after.**
 
-### Creating the Notion Page
+### Creating the Work Log File
 
-1. **Check if page already exists (avoid duplicates):**
-   - Use `mcp__notion__query_database` to search by Jira/GitHub issue IDs
+1. **Check if file already exists (avoid duplicates):**
+   - Search `dev/active/` for existing work logs by Jira/GitHub issue IDs
    - **Canonical identifiers**: Jira issue # and GitHub issue # are authoritative
-   - If page exists for the issue: UPDATE it, don't create new
-   - If no issue IDs: Search by similar Name, but prefer creating new
+   - If file exists for the issue: UPDATE it, don't create new
+   - If no issue IDs: Search by similar title, but prefer creating new
 
 2. **Gather required properties:**
    - **Priority** (0-4): Ask user if not clear from context
@@ -36,42 +36,44 @@
    - **Jira** (optional): Ask "Is there a Jira issue for this?" if not mentioned (blank is OK)
    - **Github** (optional): Ask if not mentioned, ask for repo if needed
 
-3. **Generate clean Name (avoid redundancy):**
+3. **Generate clean filename (avoid redundancy):**
    - Extract issue number from GitHub/Jira if present
-   - Don't include "#2250" in Name if already in GitHub issue # property
-   - Format: "Fix: Ordenar categorías..." NOT "Fix #2250: Ordenar..."
-   - Keep Name concise and descriptive
+   - Use kebab-case: `fix-categorias-ordenar.md`
+   - Keep filename concise and descriptive
+   - Don't include issue numbers in filename (they're in frontmatter)
 
 4. **If Priority, Project, or Type missing: STOP and ASK the user**
 
-5. **Create page using `mcp__notion__notion-create-pages`:**
+5. **Create file using Write tool:**
 
-   ```json
-   {
-     "parent": {"data_source_id": "2a0d1aba-3b72-8031-aedc-000b7ba2c45f"},
-     "pages": [{
-       "properties": {
-         "Name": "Brief description",
-         "Priority": 0-4,
-         "Project": "Team/Project name",
-         "Type": "bug|feature|task|epic|chore",
-         "Jira": "https://odasoftmx.atlassian.net/browse/ID" (optional),
-         "Github": "https://github.com/user/repo/issues/NUM" (optional),
-         "Status": "In Progress"
-       },
-       "content": "## Work Log\n\nStarting work...\n"
-     }]
-   }
+   ```markdown
+   # [Brief description]
+
+   **Status:** In Progress
+   **Priority:** 0-4
+   **Project:** Team/Project name
+   **Type:** bug|feature|task|epic|chore
+   **Jira:** https://odasoftmx.atlassian.net/browse/ID (optional)
+   **Github:** https://github.com/user/repo/issues/NUM (optional)
+   **Created:** [timestamp from TZ='America/Tijuana' date '+%Y-%m-%d %H:%M']
+
+   ---
+
+   ## Work Log
+
+   Starting work...
    ```
+
+6. **Save to:** `dev/active/{filename}.md`
 
 ### Logging Behavior (CONTINUOUS)
 
-**After creating the page, log continuously using `mcp__notion__append_to_page_content`:**
+**After creating the file, log continuously using Edit or Write:**
 
 - **Log THINKING, not DOING** - focus on decisions, discoveries, and reasoning
 - **Append after EVERY significant action** - don't batch at the end
 - **Use real timestamps** from `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'` before EACH append
-- **Chronological only** - ALWAYS append to end, NEVER restructure or read entire page
+- **Chronological only** - ALWAYS append to end, NEVER restructure
 
 **What to Log:**
 
@@ -119,10 +121,11 @@
 
 **Marking complete:**
 
-1. Append final summary to page content
-2. Update Status property to "Done" using `mcp__notion__update_page_properties`
-3. Respond ONLY with: `✅ Task complete. The work has been logged to Notion: [URL]`
-4. **DO NOT print the work summary** - it's already in Notion
+1. Append final summary to work log file
+2. Update Status field to "Done" in the file
+3. Move file from `dev/active/` to `dev/completed/`
+4. Respond ONLY with: `✅ Task complete. The work has been logged to: dev/completed/{filename}.md`
+5. **DO NOT print the work summary** - it's already in the file
 
 ### Required Properties
 
@@ -134,13 +137,14 @@
 
 - **Ask if not known/mentioned**: "Is there a Jira/GitHub issue for this?"
 - If user already mentioned issue number in context, don't re-ask
-- Blank/empty answers are acceptable - just omit from properties
+- Blank/empty answers are acceptable - just omit from frontmatter
 - If GitHub issue provided, MUST ask for repo (user/repo format)
 
-### Notion Database
+### Work Log Directories
 
-- **Data Source:** `collection://2a0d1aba-3b72-8031-aedc-000b7ba2c45f`
-- All work pages **MUST** use this as parent
+- **Active work:** `dev/active/` - All in-progress work logs
+- **Completed work:** `dev/completed/` - Finished and merged work
+- **Artifacts:** `dev/artifacts/` - PR descriptions, summaries, stakeholder updates
 
 ---
 

@@ -94,14 +94,14 @@ Consider using the Skill tool with command "work-journal"
 
 **File:** `ai/claude/commands/work-plan.md`
 
-**Purpose:** Create strategic planning documentation in Notion
+**Purpose:** Create strategic planning documentation in Markdown
 
 **Use when:** Planning large initiatives, refactors, or complex features
 
 **What it does:**
 
 - Analyzes codebase for current state
-- Creates comprehensive plan in Notion
+- Creates comprehensive plan in dev/active/
 - Breaks work into phases with tasks
 - Includes risk assessment and success metrics
 
@@ -125,7 +125,7 @@ Consider using the Skill tool with command "work-journal"
 
 **What it does:**
 
-- Updates Notion work logs with session context
+- Updates work log files with session context
 - Captures decisions, discoveries, and next steps
 - Preserves "working memory" across resets
 - Documents current state and blockers
@@ -148,7 +148,7 @@ Consider using the Skill tool with command "work-journal"
 - "manager summary", "resumen para manager"
 - "stakeholder update", "post to github"
 
-**What it does:** Generates audience-specific communications from Notion work logs
+**What it does:** Generates audience-specific communications from Markdown work logs
 
 ### gh
 

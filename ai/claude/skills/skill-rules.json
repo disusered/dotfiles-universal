@@ -5,7 +5,7 @@
       "type": "domain",
       "enforcement": "suggest",
       "priority": "high",
-      "description": "Generate audience-specific communications from Notion work logs",
+      "description": "Generate audience-specific communications from Markdown work logs",
       "triggers": {
         "promptTriggers": {
           "keywords": [
