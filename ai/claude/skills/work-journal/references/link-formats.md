@@ -2,13 +2,13 @@
 
 ## Overview
 
-When logging work to Notion page content, follow these exact markdown formats for linking to external resources.
+When logging work to Markdown files, follow these exact markdown formats for linking to external resources.
 
 **CRITICAL DISTINCTION:**
-- **Main tickets** (the primary Jira/GitHub issues this work resolves) → Go in page PROPERTIES (`Jira issue #`, `Github issue #`)
-- **Related/discovered items** (other tickets, commits, code files found during work) → Go in page BODY using formats below
+- **Main tickets** (the primary Jira/GitHub issues this work resolves) → Go in file FRONTMATTER (`Jira:`, `Github:`)
+- **Related/discovered items** (other tickets, commits, code files found during work) → Go in file BODY using formats below
 
-**DO NOT** create a "Related Tickets" section that just repeats the main issue from properties.
+**DO NOT** create a "Related Tickets" section that just repeats the main issue from frontmatter.
 
 **DO** link to discovered related items, specific commits, or code files in your work log.
 
@@ -189,10 +189,10 @@ Found problematic pattern in [lib/validation.py#L45](https://github.com/odasoftm
 
 ## Validation Checklist
 
-Before including a link in Notion page content:
+Before including a link in work log file:
 
 - [ ] Is this a **discovered** item (not the main issue)?
-- [ ] Main issue is already in page properties?
+- [ ] Main issue is already in file frontmatter?
 - [ ] URL is complete and correctly formatted?
 - [ ] For GitHub links, repository is known/confirmed?
 - [ ] For code references, using full commit SHA in URL?
