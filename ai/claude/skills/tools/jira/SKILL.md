@@ -1,134 +1,109 @@
 ---
-name: jiratui
-description: Use jiratui CLI to interact with Jira (view issues, add comments, query). Load this when you need to perform Jira operations.
+name: jira
+description: Use acli (Atlassian CLI) to interact with Jira (view work items, add comments, query). Load this when you need to perform Jira operations.
 allowed-tools: Bash
 ---
 
-# jiratui CLI Reference
+# acli Jira CLI Reference
 
-Command-line interface for Jira issues and comments.
+Official Atlassian CLI for Jira work items and comments.
 
 ## Basic Syntax
 
 ```bash
-jiratui [COMMAND] [SUBCOMMAND] [OPTIONS] [ARGS]
+acli jira [COMMAND] [OPTIONS]
 ```
 
 ## Commands
 
-### Issues
+### Work Items
 
-#### List issues
+#### View work item details
 
 ```bash
-jiratui issues list [OPTIONS]
+acli jira workitem view --key "<issue-key>"
+
+# Example:
+acli jira workitem view --key "CM-2766"
+```
+
+#### List work items
+
+```bash
+acli jira workitem list [OPTIONS]
 
 # Options:
-#   --jql TEXT          JQL query to filter issues
-#   --max-results INT   Maximum number of results (default: 50)
-#   --fields TEXT       Comma-separated list of fields to include
+#   --jql TEXT          JQL query to filter work items
+#   --max-results INT   Maximum number of results
 
 # Examples:
-jiratui issues list --jql "project = CM AND status = 'In Progress'"
-jiratui issues list --max-results 10
+acli jira workitem list --jql "project = CM AND status = 'In Progress'"
+acli jira workitem list --max-results 10
 ```
 
-#### View issue details
+#### Create work item
 
 ```bash
-jiratui issues view <issue-key>
-
-# Example:
-jiratui issues view CM-2766
-```
-
-#### Create issue
-
-```bash
-jiratui issues create [OPTIONS]
+acli jira workitem create [OPTIONS]
 
 # Options:
+#   --summary TEXT      Work item summary (required)
 #   --project TEXT      Project key (required)
-#   --summary TEXT      Issue summary (required)
-#   --description TEXT  Issue description
-#   --issue-type TEXT   Issue type (default: Task)
+#   --type TEXT         Work item type (default: Task)
+#   --description TEXT  Work item description
 
 # Example:
-jiratui issues create --project CM --summary "Fix OAuth bug" --issue-type Bug
+acli jira workitem create --summary "Fix OAuth bug" --project "CM" --type "Bug"
+```
+
+#### Edit work item
+
+```bash
+acli jira workitem edit --key "<issue-key>" [OPTIONS]
+
+# Options:
+#   --summary TEXT      New summary
+#   --description TEXT  New description
+
+# Example:
+acli jira workitem edit --key "CM-2766" --summary "Updated OAuth implementation"
+```
+
+#### Transition work item status
+
+```bash
+acli jira workitem transition --key "<issue-key>" --status "<status>"
+
+# Example:
+acli jira workitem transition --key "CM-2766" --status "In Progress"
 ```
 
 ### Comments
 
-**CRITICAL: The `comments` command ALWAYS requires a subcommand (add/list/delete).**
-
 #### Add comment
 
 ```bash
-jiratui comments add <issue-key> [OPTIONS]
-
-# Options:
-#   --body TEXT         Comment body (required if not using --file)
-#   --file PATH         Read comment from file
-#   --markdown          Treat input as markdown (use with --file)
+acli jira workitem comment create --key "<issue-key>" --body "<comment-text>"
 
 # Examples:
-jiratui comments add CM-2766 --body "Updated the implementation"
-jiratui comments add CM-2766 --file summary.md --markdown
-echo "Comment text" | jiratui comments add CM-2766 --body -
+acli jira workitem comment create --key "CM-2766" --body "Updated the implementation"
+
+# Multi-line comment:
+acli jira workitem comment create --key "CM-2766" --body "$(cat << 'EOF'
+## Resumen Ejecutivo
+
+Se corrigió bug crítico en OAuth...
+EOF
+)"
 ```
 
 #### List comments
 
 ```bash
-jiratui comments list <issue-key>
+acli jira workitem comment list --key "<issue-key>"
 
 # Example:
-jiratui comments list CM-2766
-```
-
-#### Delete comment
-
-```bash
-jiratui comments delete <issue-key> <comment-id>
-
-# Example:
-jiratui comments delete CM-2766 12345
-```
-
-## Common Errors
-
-### ❌ Missing subcommand
-
-**WRONG:**
-```bash
-jiratui comments CM-2766
-```
-
-**ERROR:** `No such command 'CM-2766'`
-
-**CORRECT:**
-```bash
-jiratui comments add CM-2766 --body "text"
-# or
-jiratui comments list CM-2766
-```
-
-**Explanation:** The `comments` command requires a subcommand (`add`, `list`, or `delete`), not just an issue key.
-
-### ❌ Missing --body or --file
-
-**WRONG:**
-```bash
-jiratui comments add CM-2766
-```
-
-**ERROR:** `Missing option '--body' or '--file'`
-
-**CORRECT:**
-```bash
-jiratui comments add CM-2766 --body "Comment text"
-# or
-jiratui comments add CM-2766 --file /tmp/comment.md --markdown
+acli jira workitem comment list --key "CM-2766"
 ```
 
 ## Common Patterns
@@ -136,45 +111,58 @@ jiratui comments add CM-2766 --file /tmp/comment.md --markdown
 ### Post manager summary to Jira
 
 ```bash
-# Create temporary file with summary
-cat > /tmp/summary.md << 'EOF'
-## CM-2766
+# Post Spanish manager summary to Jira issue
+acli jira workitem comment create --key "CM-2766" --body "$(cat << 'EOF'
+## Resumen Ejecutivo
 
-**Resumen Ejecutivo**
-Se corrigió bug crítico...
+Se corrigió bug crítico en autenticación OAuth que afectaba...
+
+**Impacto:**
+- Sistema de autenticación estabilizado
+- Reducción de errores de login en 95%
+
+**Próximos Pasos:**
+- Monitorear métricas por 48h
+- Documentar cambios
 EOF
-
-# Post to Jira issue
-jiratui comments add CM-2766 --file /tmp/summary.md --markdown
+)"
 ```
 
-### Check issue before working
+### Check work item before working
 
 ```bash
-# View full issue details
-jiratui issues view CM-2766
+# View full work item details
+acli jira workitem view --key "CM-2766"
 
 # List recent comments
-jiratui comments list CM-2766
+acli jira workitem comment list --key "CM-2766"
 ```
 
-### Query for related issues
+### Query for related work items
 
 ```bash
 # Find all in-progress issues in project
-jiratui issues list --jql "project = CM AND status = 'In Progress'"
+acli jira workitem list --jql "project = CM AND status = 'In Progress'"
 
 # Find issues assigned to you
-jiratui issues list --jql "assignee = currentUser()"
+acli jira workitem list --jql "assignee = currentUser()"
 ```
+
+## Common Errors
+
+### ❌ Invalid work item key
+
+**ERROR:** `Issue does not exist or you do not have permission to see it`
+
+**SOLUTION:** Verify the issue key format (e.g., "CM-2766") and ensure you have access to the project.
 
 ## Getting Help
 
-Use `--help` on any command or subcommand:
+Use `--help` on any command:
 
 ```bash
-jiratui --help
-jiratui issues --help
-jiratui comments --help
-jiratui comments add --help
+acli jira --help
+acli jira workitem --help
+acli jira workitem view --help
+acli jira workitem comment --help
 ```
