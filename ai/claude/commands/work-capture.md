@@ -1,10 +1,10 @@
 ---
-description: Capture session context and update Notion work logs before conversation reset
+description: Capture session context and update Markdown work logs before conversation reset
 ---
 
 # Context Capture Before Reset
 
-Update your Notion work logs with session context when approaching token limits to ensure work continuity across conversation resets.
+Update your Markdown work logs with session context when approaching token limits to ensure work continuity across conversation resets.
 
 ## When to Use
 
@@ -15,19 +15,19 @@ Update your Notion work logs with session context when approaching token limits 
 
 ## What This Command Does
 
-This command helps you capture the current session's context into your existing Notion work logs so nothing is lost during a conversation reset.
+This command helps you capture the current session's context into your existing Markdown work logs so nothing is lost during a conversation reset.
 
 ## Process
 
 1. **Identify Active Work**
 
-   Ask user: "Which Notion page(s) should I update?" or "What Jira/GitHub issues are we working on?"
+   Ask user: "Which work log file(s) should I update?" or "What tasks are we working on?"
 
-   Use `mcp__notion__query_database` to find relevant pages.
+   Look in `dev/active/` for active work log files.
 
 2. **Capture Session Context**
 
-   For each active work item, append a context capture entry:
+   For each active work item, append a context capture entry to the work log file:
 
    ```markdown
    ## Session Context Capture
@@ -82,9 +82,9 @@ This command helps you capture the current session's context into your existing 
 
    Respond with:
    ```
-   ✅ Session context captured in Notion:
-   - [Work item 1]: [URL]
-   - [Work item 2]: [URL]
+   ✅ Session context captured in work logs:
+   - dev/active/{file-1}.md
+   - dev/active/{file-2}.md
 
    Safe to reset conversation. All context preserved.
    ```
@@ -119,7 +119,7 @@ User: /work-capture
 ```
 
 The command will:
-1. Find active Notion work pages
+1. Find active work log files in dev/active/
 2. Append comprehensive context capture
 3. Update any project memory files
 4. Confirm all context preserved
@@ -127,7 +127,7 @@ The command will:
 ## Integration with Other Workflows
 
 - **Before reset**: Use this command to preserve context
-- **After reset**: Review the captured context to resume work
+- **After reset**: Review the captured context in work log files to resume work
 - **For handoffs**: Useful when switching who's working on something
 
 ## Notes

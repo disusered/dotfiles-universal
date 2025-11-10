@@ -1,14 +1,14 @@
 ---
 name: work-journal
-description: Generate audience-specific communications from Notion work logs. Use when creating PR descriptions, or generating status updates for managers and stakeholders. (Note: Basic work logging is handled by CLAUDE.md directives, not this skill.)
-allowed-tools: mcp__notion__query_database, mcp__notion__notion-fetch, mcp__notion__create_page, mcp__notion__append_to_page_content, Bash, Skill
+description: Generate audience-specific communications from Markdown work logs. Use when creating PR descriptions, or generating status updates for managers and stakeholders. (Note: Basic work logging is handled by CLAUDE.md directives, not this skill.)
+allowed-tools: Read, Write, Edit, Bash, Skill
 ---
 
 # Work Journal Communication Generation
 
 ## Purpose
 
-This skill generates audience-appropriate communications from Notion work logs that were created using CLAUDE.md directives.
+This skill generates audience-appropriate communications from Markdown work logs that were created using CLAUDE.md directives.
 
 **IMPORTANT:** This skill does NOT handle basic work logging. That's handled automatically by CLAUDE.md directives.
 
@@ -87,7 +87,7 @@ Invoke the `gh` skill when you need to:
 
 **CRITICAL: Creating artifacts does NOT complete work.**
 
-- ❌ **NEVER call `mcp__notion__update_page_properties` to change Status**
+- ❌ **NEVER update work log Status to "Done"**
 - ❌ **NEVER mark work as "Done" when creating PR descriptions**
 - ❌ **NEVER mark work as "Done" when creating manager summaries**
 - ❌ **NEVER mark work as "Done" when creating stakeholder updates**
@@ -100,8 +100,6 @@ Invoke the `gh` skill when you need to:
 - NOT when PR is created
 - NOT when summaries/updates are posted
 
-**If you see yourself about to call `mcp__notion__update_page_properties` to update Status: STOP. Don't do it.**
-
 ### Information Flow Security (CRITICAL)
 
 **CRITICAL: Internal tracking info MUST NOT leak to external channels.**
@@ -109,12 +107,12 @@ Invoke the `gh` skill when you need to:
 **Information flow rules:**
 - ✅ **Jira (internal) → can reference GitHub** (e.g., Jira comment can link to GitHub issue)
 - ❌ **GitHub (public) → MUST NOT reference Jira** (e.g., PR descriptions NEVER include Jira links)
-- ❌ **Stakeholder updates (external) → MUST NOT reference Jira or Notion** (only user-facing info)
+- ❌ **Stakeholder updates (external) → MUST NOT reference Jira or work logs** (only user-facing info)
 - ✅ **Manager summaries (internal, posted to Jira) → can reference anything**
 
 **What to EXCLUDE from public artifacts (PRs, stakeholder updates):**
 - ❌ Jira issue numbers or URLs
-- ❌ Notion page links
+- ❌ Work log file paths
 - ❌ Internal tracking IDs
 - ❌ Commit SHAs (in PR descriptions)
 - ❌ Any reference to internal tools
@@ -123,8 +121,6 @@ Invoke the `gh` skill when you need to:
 - ✅ GitHub issue numbers (in PR descriptions only)
 - ✅ User-facing impact descriptions
 - ✅ Technical context (for PRs)
-
-**If you find yourself about to include a Jira or Notion link in a PR or stakeholder update: STOP. Don't do it.**
 
 ### Emoji Usage Policy
 
@@ -141,25 +137,21 @@ Invoke the `gh` skill when you need to:
 ❌ BAD: `- ✅ Feature completada exitosamente 🎉` → Use: `- Feature completada exitosamente`
 ✅ ACCEPTABLE (sparingly): `- ✅ Tests passing` or `- ❌ Build failed`
 
-### Notion Integration Rules
+### File Integration Rules
 
-1. **Fetch Work Logs**
-   - Use `mcp__notion__notion-fetch` to read existing work log pages
-   - Extract page properties (Jira, GitHub, Project, etc.)
-   - Read page content (work log entries)
+1. **Read Work Logs**
+   - Use Read tool to read work log files from `dev/active/`
+   - Extract metadata from frontmatter (Jira, GitHub, Project, etc.)
+   - Read work log entries (chronological)
 
-2. **Create Child Pages**
-   - All artifacts (PR descriptions, summaries, updates) go in child pages
-   - Use Notion's `<page>Title</page>` syntax when appending
-   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
+2. **Create Artifact Files**
+   - All artifacts (PR descriptions, summaries, updates) go in `dev/artifacts/`
+   - Filename format: `{work-log-name}-{artifact-type}-{timestamp}.md`
+   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d-%H%M'`
 
-3. **Update Properties**
-   - Use `mcp__notion__update_page_properties` to update Status, etc.
-   - Don't recreate pages that already exist
-
-4. **URL-Only Confirmations**
-   - Final response: `✅ [Artifact type] created: [child page URL]`
-   - DO NOT reprint the artifact content (it's in Notion)
+3. **File-Only Confirmations**
+   - Final response: `✅ [Artifact type] created: dev/artifacts/{filename}.md`
+   - DO NOT reprint the artifact content (it's in the file)
 
 ### Link Formatting Rules
 
@@ -178,35 +170,26 @@ Invoke the `gh` skill when you need to:
 **Language:** All communication in English, artifact output in Spanish
 
 **CRITICAL WORKFLOW OVERVIEW:**
-1. User provides Notion page ID, source branch, target branch
+1. User provides work log filename, source branch, target branch
 2. You READ the work log (English, read-only)
 3. You analyze git changes
 4. You generate a Spanish PR description (once, get user approval)
-5. You CREATE A NESTED CHILD PAGE under the work log with the PR text
+5. You SAVE to `dev/artifacts/{work-log-name}-pr-{timestamp}.md`
 6. You create the PR in GitHub with that exact text
 7. **YOU DO NOT UPDATE STATUS - work stays "In Progress" until merged**
-
-**YOU DO NOT:**
-- **Create a new work log page** (one already exists - FIND it, don't create it)
-- **Ask for Priority, Project, or Type** (you're not creating a page)
-- **Use `mcp__notion__create_page` for the work log** (only for the child PR description page)
-- Modify or translate the work log (it's read-only input)
-- Append to the work log (create child page instead)
-- Regenerate content after user approves
-- **Update Status to "Done" - creating a PR does NOT complete the work**
 
 ### Process:
 
 1. **Gather inputs (English)**
-   - Ask: "What's the Notion page ID, source branch, and target branch?"
+   - Ask: "What's the work log filename (in dev/active/), source branch, and target branch?"
    - If missing: STOP and ASK
-   - **CRITICAL: You are NOT creating a new work log - you are using an existing one**
-   - **DO NOT ask for Priority, Project, Type - you are NOT creating a page**
+   - **CRITICAL: You are using an existing work log file**
 
 2. **Analyze context (READ-ONLY)**
-   - Use `mcp__notion__notion-fetch` to read Notion page(s)
-   - **CRITICAL: The work log page is READ-ONLY - you will NOT modify it**
-   - Extract: Technical Summary, Goal, Root Cause
+   - Use Read tool to read work log file
+   - **CRITICAL: The work log is READ-ONLY - you will NOT modify it**
+   - Extract from metadata: Jira, GitHub, Project
+   - Extract from content: Technical Summary, Goal, Root Cause
 
 3. **Analyze changes (the "what")**
    - Use git tools to inspect changes:
@@ -230,29 +213,22 @@ Invoke the `gh` skill when you need to:
    - Adjust based on feedback
    - Repeat until approved
 
-6. **Create NESTED CHILD PAGE AND create PR in GitHub**
-   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
-   - **CRITICAL: DO NOT MODIFY THE WORK LOG PAGE IN ANY WAY**
-   - **CRITICAL: Use `mcp__notion__create_page` to create a NESTED CHILD PAGE:**
-     - Parent: `{ page_id: "{work log page ID from step 1}" }`
-     - Title: `PR Description - {timestamp}`
-     - Content: The EXACT Spanish PR text approved by user in step 5
-   - This creates a SEPARATE page nested under the work log
-   - **DO NOT use `append_to_page_content` - that would modify the work log**
-   - **Upload the EXACT content from step 5 - don't regenerate or change it**
+6. **Save artifact file AND create PR in GitHub**
+   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d-%H%M'`
+   - Get work log base name: e.g., `CM-2765-fix-oauth` from `dev/active/CM-2765-fix-oauth.md`
+   - **Save to:** `dev/artifacts/{base-name}-pr-{timestamp}.md`
+   - **Content:** The EXACT Spanish PR text approved by user in step 5
    - **Create PR using gh CLI:**
      ```bash
      gh pr create --base {target} --head {source} --title "{title}" --body "{EXACT approved PR text in Spanish from step 5}"
      ```
-   - **CRITICAL: DO NOT CALL `mcp__notion__update_page_properties`**
+   - **CRITICAL: DO NOT modify work log file**
    - **CRITICAL: DO NOT update Status to "Done"**
-   - **CRITICAL: DO NOT change Status property at all**
    - Creating a PR does NOT complete the work - it stays "In Progress" until merged
-   - Leave the Notion page EXACTLY as is after creating the child page and PR
 
 7. **Confirm (English)**
    - `✅ PR created: [GitHub PR URL]`
-   - `✅ PR description archived to Notion: [child page URL]`
+   - `✅ PR description saved to: dev/artifacts/{filename}.md`
    - `⚠️ Work remains "In Progress" - NOT marked as Done (will be Done after merge)`
 
 ---
@@ -266,40 +242,27 @@ Invoke the `gh` skill when you need to:
 **Language:** All communication in English, artifact output in Spanish
 
 **CRITICAL WORKFLOW OVERVIEW:**
-1. User gives you a Jira URL (e.g., https://odasoftmx.atlassian.net/browse/CM-2765)
-2. You FIND the existing Notion work log by querying for that Jira URL
+1. User provides work log filename or Jira issue
+2. You FIND the work log file (search dev/active/ if needed)
 3. You READ the work log (it's in English, don't touch it)
 4. You generate a Spanish manager summary (once, concisely)
-5. You CREATE A NESTED CHILD PAGE under the work log with the summary
+5. You SAVE to `dev/artifacts/{work-log-name}-manager-{timestamp}.md`
 6. You post the summary to Jira as a comment
 7. **YOU DO NOT UPDATE STATUS - manager summaries don't complete work**
 
-**YOU DO NOT:**
-- **Create a new work log page** (one already exists - FIND it, don't create it)
-- **Ask for Priority, Project, or Type** (you're not creating a page)
-- **Use `mcp__notion__create_page` for the work log** (only for the child summary page)
-- Modify or translate the work log (it's read-only input)
-- Append to the work log (create child page instead)
-- Regenerate content after showing the user
-- **Update Status to "Done" - creating a summary does NOT complete the work**
-
 ### Process:
 
-1. **Find the existing work log page (English)**
-   - **CRITICAL: You are NOT creating a new work log - you are FINDING an existing one**
-   - If user provides Jira URL: Extract issue key (e.g., CM-2765) and query database
-   - Use `mcp__notion__query_database` to search where Jira property = that URL
-   - If user provides Notion page URL/ID: Use that directly
-   - If page not found: STOP and tell user no work log exists for that Jira issue
-   - **DO NOT ask for Priority, Project, Type - you are NOT creating a page**
-   - **DO NOT ask to create new page - work log should already exist**
-   - **DO NOT use `mcp__notion__create_page` - you are only FINDING, not creating**
+1. **Find the work log file (English)**
+   - **CRITICAL: You are FINDING an existing work log file**
+   - If user provides filename: Use that directly
+   - If user provides Jira URL: Search `dev/active/` for file with that Jira in metadata
+   - Use: `grep -l "Jira: .*{jira-id}" dev/active/*.md`
+   - If not found: STOP and tell user no work log exists
 
 2. **Analyze context (READ-ONLY)**
-   - Use `mcp__notion__notion-fetch` to read page content
-   - **CRITICAL: The work log page is READ-ONLY - you will NOT modify it**
-   - If GitHub issue # available, use `gh issue view {number}` for context
-   - Extract from the ENGLISH work log:
+   - Use Read tool to read work log file
+   - **CRITICAL: The work log is READ-ONLY - you will NOT modify it**
+   - Extract from ENGLISH work log:
      - Context (what system/component)
      - Technical root cause (conceptual, not line-by-line)
      - Solution applied (logical changes)
@@ -308,7 +271,7 @@ Invoke the `gh` skill when you need to:
 
 3. **Draft manager summary in Spanish (generate ONCE)**
    - Use format from `templates/manager-summary.md`
-   - **GENERATE THE SUMMARY ONCE - don't regenerate after showing user**
+   - **GENERATE THE SUMMARY ONCE - don't regenerate**
    - **VERIFY output language is Spanish before proceeding**
    - **CRITICAL RULES:**
      - BE CONCISE - 2-3 paragraphs max, clear and direct
@@ -320,32 +283,23 @@ Invoke the `gh` skill when you need to:
      - WRITE LIKE A HUMAN - Clear, direct, professional
    - Tone: Strategic, high-level, business-impact focused, CONCISE
 
-4. **Create NESTED CHILD PAGE (DO NOT TOUCH WORK LOG) AND post to Jira**
-   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
-   - **CRITICAL: DO NOT MODIFY THE WORK LOG PAGE IN ANY WAY**
-   - **CRITICAL: Use `mcp__notion__create_page` to create a NESTED CHILD PAGE:**
-     - Parent: `{ page_id: "{work log page ID from step 1}" }`
-     - Title: `Manager Summary - {timestamp}`
-     - Content: The EXACT Spanish summary you generated in step 3
-   - This creates a SEPARATE page nested under the work log
-   - **DO NOT use `append_to_page_content` - that would modify the work log**
-   - **DO NOT translate the work log - it stays in English**
-   - **Upload the EXACT content from step 3 - don't regenerate or change it**
+4. **Save artifact AND post to Jira**
+   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d-%H%M'`
+   - Get work log base name from filename
+   - **Save to:** `dev/artifacts/{base-name}-manager-{timestamp}.md`
+   - **Content:** The EXACT Spanish summary from step 3
    - **Post comment to Jira using acli:**
      ```bash
      acli jira workitem comment create --key "{jira-issue-key}" --body "{EXACT Spanish manager summary from step 3}"
      ```
-   - Extract Jira issue key from page properties (from URL like `CM-2765`)
-   - **CRITICAL: DO NOT CALL `mcp__notion__update_page_properties`**
+   - Extract Jira issue key from work log metadata
+   - **CRITICAL: DO NOT modify work log file**
    - **CRITICAL: DO NOT update Status to "Done"**
-   - **CRITICAL: DO NOT change Status property at all**
-   - Creating a manager summary does NOT complete the work
-   - Leave the Notion page EXACTLY as is after creating the child page
    - DO NOT ask for approval (one-shot action)
 
 5. **Confirm (English)**
    - `✅ Manager summary posted to Jira: [Jira issue URL]`
-   - `✅ Manager summary archived to Notion: [child page URL]`
+   - `✅ Manager summary saved to: dev/artifacts/{filename}.md`
    - DO NOT reprint the summary text
 
 ---
@@ -359,33 +313,22 @@ Invoke the `gh` skill when you need to:
 **Language:** All communication in English, artifact output in Spanish
 
 **CRITICAL WORKFLOW OVERVIEW:**
-1. User provides Notion page ID for work log
+1. User provides work log filename
 2. You READ the work log (English, read-only)
 3. You generate a Spanish stakeholder update (once, get user approval)
-4. You CREATE A NESTED CHILD PAGE under the work log with the update
+4. You SAVE to `dev/artifacts/{work-log-name}-stakeholder-{timestamp}.md`
 5. You post the update to GitHub issue as a comment
 6. **YOU DO NOT UPDATE STATUS - stakeholder updates don't complete work**
-
-**YOU DO NOT:**
-- **Create a new work log page** (one already exists - FIND it, don't create it)
-- **Ask for Priority, Project, or Type** (you're not creating a page)
-- **Use `mcp__notion__create_page` for the work log** (only for the child stakeholder update page)
-- Modify or translate the work log (it's read-only input)
-- Append to the work log (create child page instead)
-- Regenerate content after user approves
-- **Update Status to "Done" - creating an update does NOT complete the work**
 
 ### Process:
 
 1. **Gather inputs (English)**
-   - Ask: "What's the Notion page ID for the work log?"
+   - Ask: "What's the work log filename (in dev/active/)?"
    - If missing: STOP and ASK
-   - **CRITICAL: You are NOT creating a new work log - you are using an existing one**
-   - **DO NOT ask for Priority, Project, Type - you are NOT creating a page**
 
 2. **Analyze work log (READ-ONLY)**
-   - Use `mcp__notion__notion-fetch` to read page
-   - **CRITICAL: The work log page is READ-ONLY - you will NOT modify it**
+   - Use Read tool to read work log file
+   - **CRITICAL: The work log is READ-ONLY - you will NOT modify it**
    - Focus on:
      - Business Impact / Goal sections
      - User-facing changes
@@ -408,31 +351,23 @@ Invoke the `gh` skill when you need to:
    - Adjust based on feedback
    - Repeat until approved
 
-5. **Create NESTED CHILD PAGE AND post to GitHub**
-   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
-   - **CRITICAL: DO NOT MODIFY THE WORK LOG PAGE IN ANY WAY**
-   - **CRITICAL: Use `mcp__notion__create_page` to create a NESTED CHILD PAGE:**
-     - Parent: `{ page_id: "{work log page ID from step 1}" }`
-     - Title: `Stakeholder Update - {timestamp}`
-     - Content: The EXACT Spanish update approved by user in step 4
-   - This creates a SEPARATE page nested under the work log
-   - **DO NOT use `append_to_page_content` - that would modify the work log**
-   - **Upload the EXACT content from step 4 - don't regenerate or change it**
+5. **Save artifact AND post to GitHub**
+   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d-%H%M'`
+   - Get work log base name from filename
+   - **Save to:** `dev/artifacts/{base-name}-stakeholder-{timestamp}.md`
+   - **Content:** The EXACT Spanish update approved by user in step 4
    - **Post comment to GitHub issue using gh CLI:**
      ```bash
      gh issue comment {issue-number} --body "{EXACT approved Spanish stakeholder update from step 4}"
      ```
-   - Extract issue number from page properties (from URL like `123`)
+   - Extract issue number from work log metadata
    - Ensure you're in the correct repository or use `--repo user/repo` flag
-   - **CRITICAL: DO NOT CALL `mcp__notion__update_page_properties`**
+   - **CRITICAL: DO NOT modify work log file**
    - **CRITICAL: DO NOT update Status to "Done"**
-   - **CRITICAL: DO NOT change Status property at all**
-   - Creating a stakeholder update does NOT complete the work
-   - Leave the Notion page EXACTLY as is after creating the child page
 
 6. **Confirm (English)**
    - `✅ Stakeholder update posted to GitHub: [GitHub issue URL]`
-   - `✅ Stakeholder update archived to Notion: [child page URL]`
+   - `✅ Stakeholder update saved to: dev/artifacts/{filename}.md`
 
 ---
 
@@ -457,28 +392,28 @@ When you need detailed information:
 
 **Your response:**
 1. Identify both outputs requested: PR + manager summary
-2. Fetch Notion page data once (shared context)
+2. Read work log file once (shared context)
 3. Load `templates/pr-description.md`
 4. Generate PR description
 5. Iterate with user until approved
-6. Create PR
+6. Save artifact and create PR
 7. Load `templates/manager-summary.md`
 8. Generate manager summary
-9. Append to Notion immediately (no approval needed for this)
+9. Save artifact and post to Jira immediately (no approval needed)
 10. Confirm both completed
 
 ---
 
 ## Error Handling
 
-### Page Fetch Fails
-- Verify page ID is correct
-- Ask user for the correct Notion page URL/ID
-- Ensure page exists
+### File Read Fails
+- Verify filename is correct
+- Check file exists in dev/active/
+- Ask user for the correct filename
 
-### Child Page Creation Fails
-- Verify parent page ID is correct
-- Check markdown is valid Notion-flavored markdown
+### Artifact Save Fails
+- Ensure dev/artifacts/ directory exists (create if needed)
+- Check markdown is valid
 - Retry the operation
 
 ### User Blocks During Iteration
@@ -493,17 +428,17 @@ When you need detailed information:
 
 You've completed your job when:
 
-- ✅ For PR: Draft approved by user, PR created in GitHub using `gh pr create`, child page created in Notion, URLs provided
-- ✅ For manager summary: Summary generated, comment posted to Jira using `acli`, child page created in Notion, URLs provided (in Spanish)
-- ✅ For stakeholder update: Draft approved by user, comment posted to GitHub issue using `gh issue comment`, child page created in Notion, URLs provided
+- ✅ For PR: Draft approved by user, PR created in GitHub using `gh pr create`, artifact saved, paths provided
+- ✅ For manager summary: Summary generated, comment posted to Jira using `acli`, artifact saved, paths provided (in Spanish)
+- ✅ For stakeholder update: Draft approved by user, comment posted to GitHub issue using `gh issue comment`, artifact saved, paths provided
 
 ---
 
 ## Important Notes
 
-- **NEVER Update Status:** Creating artifacts (PR descriptions, manager summaries, stakeholder updates) does NOT complete work. NEVER call `mcp__notion__update_page_properties` to change Status. Work stays "In Progress" until merged and deployed.
+- **NEVER Update Status:** Creating artifacts (PR descriptions, manager summaries, stakeholder updates) does NOT complete work. NEVER modify work log Status. Work stays "In Progress" until merged and deployed.
 - **Language Awareness:** All artifacts (PR, manager, stakeholder) use Spanish. Agent ↔ user communication uses English.
 - **Approval Gates:** PR and stakeholder updates require user approval. Manager summaries are one-shot (no approval).
 - **Work Logging:** Basic work logging is NOT handled by this skill - see CLAUDE.md for those directives.
 - **URL Construction:** Always use full, absolute URLs per `references/link-formats.md`.
-- **No Redundant Content:** Never reprint artifact content; just provide child page URL.
+- **No Redundant Content:** Never reprint artifact content; just provide file path.

@@ -1,5 +1,5 @@
 ---
-description: Create strategic planning documentation for development initiatives in Notion
+description: Create strategic planning documentation for development initiatives in Markdown
 ---
 
 # Strategic Work Planning
@@ -8,7 +8,7 @@ Create a comprehensive strategic plan for the development initiative you describ
 
 ## What This Command Does
 
-This command analyzes your codebase and creates detailed strategic planning documentation in Notion for complex development initiatives.
+This command analyzes your codebase and creates detailed strategic planning documentation in Markdown for complex development initiatives.
 
 ## Process
 
@@ -17,18 +17,18 @@ This command analyzes your codebase and creates detailed strategic planning docu
    - Examine the codebase to understand current state
    - Identify key components and dependencies
 
-2. **Create Notion Planning Page**
-   - Use `mcp__notion__create_page` with the work database
-   - Set properties:
+2. **Create Planning Work Log**
+   - Use Write tool to create file in `dev/active/`
+   - Filename format: `{date}-plan-{brief-description}.md`
+   - Set metadata:
      - Priority: Based on initiative impact
      - Project: The team/project name
      - Type: "epic" for large initiatives, "task" for smaller ones
-     - Name: Brief description of the initiative
-   - Set Status: "Not started" (planning phase)
+     - Status: "Not started" (planning phase)
 
 3. **Generate Strategic Plan Content**
 
-   Append comprehensive plan to the Notion page using `mcp__notion__append_to_page_content`:
+   Write comprehensive plan to the work log file:
 
    ```markdown
    ## Executive Summary
@@ -74,18 +74,18 @@ This command analyzes your codebase and creates detailed strategic planning docu
    [Team members, time estimates, external dependencies]
    ```
 
-4. **Create Child Task Pages (Optional)**
+4. **Create Child Task Files (Optional)**
 
-   For each major task, offer to create child Notion pages with:
-   - Parent: The planning page
+   For each major task, offer to create separate work log files in `dev/active/`:
+   - Filename: `{parent-name}-task-{N}-{description}.md`
    - Detailed breakdown of subtasks
    - Technical context and references
 
-5. **Provide Notion URL**
+5. **Provide File Path**
 
-   Respond with the planning page URL only:
+   Respond with the planning file path only:
    ```
-   ✅ Strategic plan created in Notion: [URL]
+   ✅ Strategic plan created: dev/active/{filename}.md
    ```
 
 ## Key Principles
@@ -105,18 +105,18 @@ User: /work-plan refactor authentication to use JWT tokens
 The command will:
 1. Ask about current auth implementation
 2. Examine relevant codebase files
-3. Create strategic plan in Notion
+3. Create strategic plan in Markdown file
 4. Break down into phases with tasks
-5. Provide Notion URL
+5. Provide file path
 
 ## Integration with Other Workflows
 
 - **After planning**: Use regular work logging (CLAUDE.md directives) when executing tasks
 - **For updates**: Use the work-journal skill to create stakeholder/manager summaries
-- **For tracking**: Update the planning page Status as phases complete
+- **For tracking**: Update the planning file Status in metadata as phases complete
 
 ## Notes
 
 - This is for **planning**, not **logging** - use CLAUDE.md directives for ongoing work
-- Plans persist in Notion and can be referenced across conversations
-- Update the plan as you learn more during implementation
+- Plans persist in `dev/active/` and can be referenced across conversations
+- Update the plan file as you learn more during implementation

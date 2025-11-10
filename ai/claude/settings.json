@@ -5,15 +5,29 @@
   },
   "alwaysThinkingEnabled": true,
   "hooks": {
-    "UserPromptSubmit": {
-      "type": "command",
-      "command": "$CLAUDE_PROJECT_DIR/ai/claude/hooks/skill-activation-prompt.sh",
-      "matcher": ".*"
-    },
-    "PostToolUse": {
-      "type": "command",
-      "command": "$CLAUDE_PROJECT_DIR/ai/claude/hooks/post-tool-use-tracker.sh",
-      "matcher": "Edit|MultiEdit|Write"
-    }
+    "UserPromptSubmit": [
+      {
+        "matcher": {},
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/ai/claude/hooks/skill-activation-prompt.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": {
+          "tools": ["Edit", "MultiEdit", "Write"]
+        },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/ai/claude/hooks/post-tool-use-tracker.sh"
+          }
+        ]
+      }
+    ]
   }
 }

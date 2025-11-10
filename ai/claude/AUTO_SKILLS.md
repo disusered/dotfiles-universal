@@ -1,6 +1,6 @@
 # Automatic Skill Activation System
 
-This document explains the automatic skill activation system integrated from the [claude-code-infrastructure-showcase](https://github.com/diet103/claude-code-infrastructure-showcase) repository.
+This document explains the automatic skill activation system integrated from the [claude-code-infrastructure-showcase](https://github.com/diet103/claude-code-infrastructure-showcase) repository, adapted for Markdown-based work logging.
 
 ## Overview
 
@@ -10,6 +10,8 @@ The automatic skill activation system uses hooks and configuration to suggest re
 - **File changes** - Types of files being edited
 
 This ensures Claude automatically recommends the right skills without explicit invocation.
+
+**Key Adaptation:** This implementation uses **Markdown files** for work logging instead of Notion, following the showcase's file-based approach.
 
 ## Components
 
@@ -329,14 +331,15 @@ npm install tsx @types/node
 
 ## Credits
 
-This automatic skill activation system is adapted from the [claude-code-infrastructure-showcase](https://github.com/diet103/claude-code-infrastructure-showcase) repository by diet103, with modifications for our Notion-based workflow.
+This automatic skill activation system is adapted from the [claude-code-infrastructure-showcase](https://github.com/diet103/claude-code-infrastructure-showcase) repository by diet103, with modifications for our Markdown-based workflow.
 
 Key adaptations:
 
 - Changed directory structure from `.claude/` to `ai/claude/`
-- Adapted slash commands for Notion work logging
+- Adapted for **Markdown work logging** instead of Notion (following showcase's file-based approach)
 - Configured skills for our specific tools (gh, acli, ast-grep)
 - Simplified post-tool-use-tracker for our use case
+- Updated hooks format for latest Claude Code version
 
 ## See Also
 
