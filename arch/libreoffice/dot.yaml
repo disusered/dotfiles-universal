@@ -1,0 +1,11 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      sudo pacman -S --noconfirm \
+        ttf-caladea ttf-carlito noto-fonts adobe-source-code-pro-fonts \
+        adobe-source-serif-fonts adobe-source-sans-fonts ttf-liberation \
+        ttf-linux-libertine-g ttf-dejavu \
+        hunspell hunspell-es_mx hunspell-en_us \
+        hyphen hyphen-es hyphen-en libmythes mythes-es mythes-en \
+        languagetool
+      yay -S --noconfirm libreoffice-fresh ttf-gentium-basic
