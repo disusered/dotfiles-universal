@@ -8,16 +8,6 @@ allowed-tools: Bash
 
 Official Atlassian CLI for Jira work items and comments.
 
-## Authentication
-
-```bash
-# Interactive OAuth login (recommended)
-acli jira auth login --web
-
-# API token authentication
-echo <token> | acli jira auth login --site "site.atlassian.net" --email "user@example.com" --token
-```
-
 ## Basic Syntax
 
 ```bash
@@ -159,15 +149,6 @@ acli jira workitem list --jql "assignee = currentUser()"
 ```
 
 ## Common Errors
-
-### ❌ Missing authentication
-
-**ERROR:** `Authentication required`
-
-**SOLUTION:**
-```bash
-acli jira auth login --web
-```
 
 ### ❌ Invalid work item key
 

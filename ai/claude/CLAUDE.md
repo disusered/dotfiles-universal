@@ -149,10 +149,6 @@ For PR descriptions, manager summaries, or stakeholder updates:
 
 Official Atlassian CLI for Jira work items and comments.
 
-**Authentication:**
-- `acli jira auth login --web` - Interactive OAuth login
-- `echo <token> | acli jira auth login --site "site.atlassian.net" --email "user@example.com" --token` - API token auth
-
 **Work Items:**
 - `acli jira workitem create --summary "Task" --project "KEY" --type "Task"` - Create work item
 - `acli jira workitem view --key "KEY-123"` - View work item details
