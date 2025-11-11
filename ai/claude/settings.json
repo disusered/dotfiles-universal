@@ -5,6 +5,17 @@
   },
   "alwaysThinkingEnabled": true,
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/auto-approve-date.sh"
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "matcher": ".*",

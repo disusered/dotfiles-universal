@@ -88,6 +88,23 @@ Consider using the Skill tool with command "work-journal"
 
 **Cache location:** `ai/claude/.cache/tool-use/`
 
+#### auto-approve-date (PreToolUse)
+
+**File:** `ai/claude/hooks/auto-approve-date.sh`
+
+**What it does:**
+
+- Runs before Bash commands execute
+- Auto-approves safe date commands without permission prompts
+- Matches commands like `date` and `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
+- Returns `permissionDecision: allow` to bypass approval
+
+**Why this exists:**
+
+- Work logging requires frequent timestamp generation
+- `allowedTools` in settings.json doesn't work reliably with environment variables
+- PreToolUse hooks provide more robust pattern matching
+
 ### 3. Slash Commands
 
 #### /work-plan
