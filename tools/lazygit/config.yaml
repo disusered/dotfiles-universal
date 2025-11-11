@@ -5,9 +5,9 @@ os:
   editInTerminal: true
 # Use Git Delta for diffs
 git:
-  paging:
-    colorArg: always
-    pager: delta --features lazygit
+  pagers:
+    - colorArg: always
+      pager: delta --features lazygit
 # Use neovim for writing commit messages by default
 keybinding:
   files:
@@ -52,6 +52,5 @@ gui:
       - "#cdd6f4"
     searchingActiveBorderColor:
       - "#f9e2af"
-
   authorColors:
     "*": "#b4befe"

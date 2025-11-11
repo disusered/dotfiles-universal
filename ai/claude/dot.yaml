@@ -1,6 +1,6 @@
 global:
   installs:
-    cmd: npm install -g @anthropic-ai/claude-code
+    cmd: npm install -g @anthropic-ai/claude-code tsx
     depends:
       - /languages/node/latest
       - /ai/postgres-mcp
@@ -8,6 +8,8 @@ global:
   links:
     agents: ~/.claude/agents/
     skills: ~/.claude/skills/
+    hooks: ~/.claude/hooks
+    commands: ~/.claude/commands
     CLAUDE.md: ~/.claude/CLAUDE.md
 linux|darwin:
   links:

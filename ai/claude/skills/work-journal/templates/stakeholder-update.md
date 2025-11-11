@@ -2,287 +2,249 @@
 
 ## Purpose
 
-This template guides the generation of non-technical updates for stakeholders (domain experts, product managers, QA specialists), informing them about completed work from a user perspective.
+Generate non-technical status updates in Spanish for external stakeholders from Markdown work logs.
 
 ## Audience
 
-**Non-technical stakeholders:** Product managers, domain experts, QA specialists who are not developers.
+**Non-technical stakeholders (product managers, business owners, clients).**
 
 The update should:
-- Translate complex technical logs into simple, clear language
-- Focus on **what** was done from the user's perspective
-- Explain **what** they need to test
-- **Avoid all technical jargon**
+- Focus on user-facing impact and business value
+- Avoid technical jargon and implementation details
+- Be clear about what changed from the user perspective
+- Highlight progress and next steps
 
 ## Language
 
+**CRITICAL - READ CAREFULLY:**
+
 **ALL agent ↔ user communication: ENGLISH**
+**ALL work log content: ENGLISH (DO NOT TRANSLATE)**
+**ONLY stakeholder update artifact: SPANISH (non-technical business Spanish)**
 
-**Final artifact output: SPANISH**
+## Critical Rules
 
-The stakeholder update itself must be in Spanish, but all questions, confirmations, and communication with the user are in English.
+### RULE 1: NON-TECHNICAL LANGUAGE
+
+This is for **non-technical stakeholders**. Avoid technical terms.
+
+❌ **AVOID:**
+- Technical jargon ("OAuth", "API", "authentication token")
+- Code references
+- System architecture details
+- Implementation specifics
+
+✅ **USE:**
+- User-facing impact ("login errors", "slow performance")
+- Business outcomes ("improved reliability", "faster checkout")
+- Plain Spanish ("el sistema", "la aplicación", "los usuarios")
+
+### RULE 2: EXTERNAL AUDIENCE - NO INTERNAL REFERENCES
+
+**CRITICAL: This is a public/external update.**
+
+DO NOT include:
+- ❌ Jira issue links or numbers
+- ❌ Internal work log references
+- ❌ Internal tool names
+- ❌ GitHub issue numbers (unless repo is public AND stakeholder has context)
+- ❌ Technical debugging details
+- ❌ Code snippets or file paths
+
+✅ **DO include:**
+- User-visible changes
+- Business impact
+- Timeline for users
+- Next user-facing features
+
+### RULE 3: PROFESSIONAL FORMATTING
+
+- ❌ DO NOT use decorative emojis
+- ❌ DO NOT use casual language
+- ✅ DO maintain professional business tone
+- ✅ DO use plain Spanish
+
+### RULE 4: DO NOT FABRICATE
+
+Only report what's in the work log or GitHub issue. Do not invent:
+- Metrics not documented
+- Dates not specified
+- Features not mentioned
+- Business impact not stated
 
 ## Workflow
 
-### Step 1: Gather Inputs (English)
+### Step 1: Gather Required Inputs
 
-**Ask the user:**
-1. **Notion Page ID** of the completed work item
+Ask the user (in English):
+- **Work log filename** (e.g., `fix-oauth-token.md` from `dev/active/`)
 
-**If information is missing:**
-- STOP and ASK for missing inputs (in English)
-- Do not proceed without the Notion page ID
+**If missing: STOP and ASK**
 
-### Step 2: Analyze Work Log
+### Step 2: Read Work Log (READ-ONLY)
 
-1. **Fetch the Notion page**
-   - Use `mcp__notion__notion-fetch` with the page ID
+**CRITICAL: The work log is READ-ONLY - you will NOT modify it**
 
-2. **Look for relevant sections:**
-   - "Business Impact" or "Impacto al Negocio"
-   - "Goal" or "Objetivo"
-   - "Summary" or "Resumen"
+1. Use Read tool: `dev/active/{filename}.md`
+2. Extract from frontmatter:
+   - **GitHub**: Issue URL (if available and public)
+   - **Type**: bug/feature/task
+   - **Priority**: 0-4
+3. Read work log content:
+   - Problem from user perspective
+   - Solution impact
+   - Testing performed
+   - Next steps
 
-3. **Ignore low-level details:**
-   - Technical implementation
-   - Specific code changes
-   - Architecture details
-   - File or function names
+### Step 3: Get GitHub Context (if available and public)
 
-4. **Focus on user perspective:**
-   - What can the user do now?
-   - What bug will the user no longer see?
-   - What new functionality is available?
-   - What flow improved?
+**If GitHub URL found in frontmatter AND repo is public:**
 
-### Step 3: Draft Stakeholder Update in Spanish
+1. Use `gh issue view` to read the GitHub issue
+2. Extract **user-facing context**:
+   - Original problem report
+   - User impact
+   - Expected behavior
 
-**CRITICAL: The stakeholder update output must be in Spanish.**
+**If repo is private or internal:** Skip GitHub, use work log only.
 
-**Create a simple, professional message.**
+### Step 4: Analyze for User Impact
 
-**Required format:**
+**Focus on translating technical work into business value:**
+
+1. **What was the user problem?**
+   - What were users experiencing?
+   - How did it affect their work?
+
+2. **What did we fix?**
+   - How does this improve the user experience?
+   - What can users do now that they couldn't before?
+
+3. **What's the business impact?**
+   - Improved reliability/performance?
+   - Reduced errors?
+   - New capability?
+
+4. **What's next?**
+   - Follow-up improvements mentioned
+   - Future features planned
+
+### Step 5: Generate Stakeholder Update (Spanish)
+
+**CRITICAL: The update must be in non-technical Spanish.**
+
+**CONCISENESS RULE:**
+- 2-3 sentences per section MAX
+- Clear, simple language
+- Focus on "what" and "why", not "how"
+
+**Format:**
 
 ```markdown
-Este issue ya está resuelto. [Simple explanation from user perspective in 1-2 sentences].
+## Actualización: [Brief title]
 
-[What changed for the user in 1-2 sentences].
+**Resumen**
+[1-2 sentences explaining what was fixed/improved from user perspective]
 
-**Para probar:**
-- [Specific step 1 user can do]
-- [Specific step 2 user can do]
-- [Expected result they should see]
+**Impacto para Usuarios**
 
-Por favor háznoslo saber si está funcionando como esperas.
+- [User benefit 1]
+- [User benefit 2]
+- [User benefit 3]
+
+**Estado Actual**
+[Current status: testing, deployed, in progress]
+
+**Próximos Pasos**
+
+- [Next user-facing improvement, if planned]
+- [Timeline if available]
 ```
 
-**Content guidelines:**
+**Tone:**
+- Professional business Spanish
+- Non-technical but informative
+- Focus on user and business value
 
-- **Simple language:** Don't use terms like "OAuth", "token", "API", "validation", "conditional", etc.
-- **User perspective:** Describe in terms of what the user experiences
-- **Concrete test steps:** Give specific actions they can perform
-- **Clear expected result:** Say what they should see if it works correctly
-- **Professional tone:** No "Gracias por reportar!" (not client-like)
-- **NO metadata sections:** No "Para:", "Estado:", "When released:", "Test coverage:", or ETAs
-- **NO emojis:** Don't use emojis in stakeholder updates (no ✅, 🎉, 🔥, etc.)
+### Step 6: Save Artifact
 
-**Translation examples (technical → non-technical):**
+**Get timestamp:**
+```bash
+TZ='America/Tijuana' date '+%Y-%m-%d-%H%M'
+```
 
-| ❌ Technical | ✅ Non-technical |
-|--------------|------------------|
-| "Corregimos un bug en la lógica de renovación de tokens OAuth" | "Arreglamos un problema que causaba errores de sesión" |
-| "La validación de expiración usaba operador incorrecto" | "El sistema ahora mantiene tu sesión activa correctamente" |
-| "Implementamos nuevo endpoint para exportación de datos" | "Ahora puedes descargar tus datos en formato Excel" |
-| "Refactorizamos el componente de autenticación" | "Mejoramos la confiabilidad del inicio de sesión" |
+**Save to file:**
+- Path: `dev/artifacts/{work-log-name}-stakeholder-{timestamp}.md`
+- Content: The exact Spanish stakeholder update
 
-### Step 4: Iterate with User (English)
+**Use Write tool to create the artifact file.**
 
-**CRITICAL: Do not proceed without explicit approval.**
+### Step 7: Post to GitHub or Share (Optional)
 
-1. Present the draft to the user (stakeholder update in Spanish)
-2. Ask (in English): "Does this stakeholder update communicate the changes clearly?"
-3. Make adjustments based on feedback
-4. Repeat until user approves
+**If user wants to post to GitHub issue:**
 
-**VERIFY:** Before proceeding, double-check that the stakeholder update is in Spanish.
-
-### Step 5: Create Child Page with Update
-
-**Only after user approval:**
-
-1. **Get timestamp**
+1. Invoke the `gh` skill to get GitHub CLI syntax
+2. Use `gh issue comment`:
    ```bash
-   TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'
+   gh issue comment {issue-number} \
+     --body-file dev/artifacts/{work-log-name}-stakeholder-{timestamp}.md
    ```
 
-2. **Create child page**
-   - Parent: The Notion work log page
-   - Title: `Stakeholder Update - {timestamp}`
-   - Content: The approved Spanish stakeholder update
-   - Use Notion's child page syntax: `<page>Stakeholder Update - {timestamp}</page>`
-
-**Example:**
-```markdown
-<page>Stakeholder Update - 2025-01-04 15:45</page>
-[Full approved stakeholder update in Spanish goes here]
-</page>
-```
-
-### Step 6: Confirm (English)
-
-**Notify the user:**
-```
-✅ Stakeholder update created: [child page URL]
-```
-
-**User can then copy the text from the child page to GitHub or other communication channels.**
-
-## Tone Guidelines
-
-**For agent ↔ user communication (English):**
-- Clear, direct questions
-- Professional but conversational
-- Seek clarification when needed
-
-**For stakeholder update artifact (Spanish):**
-- **Friendly:** Use professional but warm tone
-- **Simple:** Non-technical vocabulary
-- **Clear:** Short, direct sentences
-- **Helpful:** Provide concrete test steps
-- **Professional:** Maintain courtesy and respect (no client-like "Gracias por reportar!")
-- **Value-oriented:** Emphasize benefit for the user
-
-## Content Priorities
-
-### Include (Primary):
-- What was fixed/added from user perspective
-- What the user can do now (or what problem they won't see)
-- Specific steps to test the change
-- Expected result from tests
-- Request for feedback
-
-### Include (Secondary):
-- Business context (if it helps understanding)
-- Benefit or impact to user flow
-
-### Exclude (CRITICAL - Do NOT Duplicate System Data):
-- Technical implementation details
-- File or component names
-- Development jargon (API, endpoint, token, etc.)
-- Code changes
-- Architecture information
-- Technical metrics (tests, performance)
-- Metadata sections (Para:, Estado:, When released:, Test coverage:, ETAs)
-- Fabricated information not in work log
-- **GitHub issue numbers** (already visible in GitHub and Notion properties)
-- **Jira issue numbers** (already visible in Jira and Notion properties)
-- **Commit information** (visible in git log)
-- **PR details** (visible in GitHub)
-
-**Remember: Don't repeat data that stakeholders can see in their tools. Focus on USER IMPACT.**
+**If user just wants the file:**
+- Respond: `✅ Stakeholder update created: dev/artifacts/{filename}.md`
+- **DO NOT reprint the content** (it's in the file)
 
 ## Example Output
 
-### Example 1: Bug Fix
-
 ```markdown
-Este issue ya está resuelto. Arreglamos el problema que causaba que tu sesión se cerrara inesperadamente cuando intentabas renovar tu acceso.
+## Actualización: Mejora en Sistema de Acceso
 
-Ahora cuando tu sesión esté por expirar, el sistema la renovará automáticamente sin errores ni interrupciones.
+**Resumen**
+Se corrigió un error que causaba problemas de login intermitentes para usuarios. El sistema ahora valida correctamente las sesiones activas.
 
-**Para probar:**
-- Inicia sesión en la aplicación
-- Deja la sesión abierta por más de 1 hora
-- Intenta realizar alguna acción (ej. ver un reporte)
-- Deberías poder continuar trabajando sin necesidad de volver a iniciar sesión
+**Impacto para Usuarios**
 
-Por favor háznoslo saber si está funcionando como esperas.
-```
+- Reducción de errores de login (40% menos llamadas fallidas)
+- Experiencia de inicio de sesión más confiable
+- Usuarios ya no necesitan reintentar múltiples veces
 
-### Example 2: New Feature
+**Estado Actual**
+Implementado y verificado en ambiente de pruebas. Despliegue a producción programado para esta semana.
 
-```markdown
-Este issue ya está resuelto. Agregamos la funcionalidad que solicitaste para exportar datos de estudiantes a Excel.
+**Próximos Pasos**
 
-Ahora puedes descargar la lista completa de estudiantes con toda su información en un archivo Excel que puedes abrir y editar en tu computadora.
-
-**Para probar:**
-- Ve a la sección "Estudiantes" en el menú principal
-- Haz clic en el botón "Exportar" en la esquina superior derecha
-- Selecciona "Formato Excel"
-- Descarga el archivo y ábrelo en Excel
-- Deberías ver todas las columnas de información de los estudiantes correctamente organizadas
-
-Por favor háznoslo saber si está funcionando como esperas.
-```
-
-### Example 3: UX Improvement
-
-```markdown
-Este issue ya está resuelto. Mejoramos el proceso de carga de documentos para que sea más rápido y confiable.
-
-Ahora cuando subas un documento, verás una barra de progreso clara y el documento se guardará correctamente sin necesidad de reintentar.
-
-**Para probar:**
-- Ve a la sección donde subes documentos
-- Selecciona un archivo de tu computadora (prueba con uno de al menos 5MB)
-- Observa la barra de progreso mientras se sube
-- Confirma que aparece el mensaje de éxito cuando termina
-- Verifica que el documento aparece en tu lista de documentos subidos
-
-Por favor háznoslo saber si está funcionando como esperas.
+- Monitoreo de métricas de login post-despliegue
+- Mejora adicional en velocidad de autenticación (próximo sprint)
 ```
 
 ## Common Errors to Avoid
 
-❌ **CRITICAL: Including Jira or Notion links**
-- Stakeholders are external - NEVER expose internal Jira or Notion links
-- Don't include issue numbers, commit SHAs, or internal tracking IDs
-- Focus on user impact only
-
 ❌ **Using technical jargon**
-- "OAuth token", "API endpoint", "schema validation", etc.
+- Keep language simple and user-focused
+- Avoid terms like "OAuth", "API", "token validation"
 
-❌ **Explaining how it was implemented**
-- "We changed the operator on line 167"
+❌ **Including internal references**
+- NO Jira links, work log paths, or internal tool names
+- This is an external/public update
 
-❌ **Being vague about tests**
-- "Test that it works" → Give specific steps
+❌ **Including GitHub issue numbers without context**
+- Only if repo is public AND stakeholder understands GitHub
 
-❌ **Forgetting to mention expected result**
-- User won't know if the test was successful
+❌ **Translating work log to Spanish**
+- Work logs stay in ENGLISH
+- Only the stakeholder update artifact is in Spanish
 
-❌ **Using English for the stakeholder update**
-- The artifact output must be in Spanish
+❌ **Modifying the work log file**
+- Work log is READ-ONLY input
 
 ❌ **Communicating with user in Spanish**
 - ALL agent ↔ user communication must be in English
 
-❌ **Too formal or technical tone**
-- Should be friendly and accessible (but professional, not client-like)
+❌ **Reprinting the update to the user**
+- Only provide the artifact file path
 
-❌ **Publishing without user approval**
-- Always iterate on the draft first
+❌ **Fabricating metrics or dates**
+- Only report what's documented in sources
 
-❌ **Assuming technical context**
-- Explain in terms of user experience
-
-❌ **Adding metadata sections**
-- No "Para:", "Estado:", "When released:", "Test coverage:", or ETAs
-
-❌ **Fabricating information**
-- Only include what's documented in the work log
-
-❌ **Client-like tone**
-- No "Gracias por reportar!" - maintain professional colleague tone
-
-## Template Variables
-
-When using this template, replace:
-
-- `{notion-page-id}` - The UUID of the Notion page
-- `{timestamp}` - Get via `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
-- `{simple-explanation}` - What was fixed/added in non-technical language
-- `{user-perspective}` - What changed for the user
-- `{test-steps}` - Specific, concrete actions
-- `{expected-result}` - What they should see if it works
+❌ **Explaining the technical fix**
+- Focus on user impact, not implementation details

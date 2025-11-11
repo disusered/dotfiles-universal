@@ -1,0 +1,118 @@
+{
+  "version": "1.0",
+  "skills": {
+    "work-journal": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Generate audience-specific communications from Markdown work logs",
+      "triggers": {
+        "promptTriggers": {
+          "keywords": [
+            "PR description",
+            "pull request description",
+            "create PR",
+            "manager summary",
+            "resumen para manager",
+            "stakeholder update",
+            "post to github",
+            "post to jira",
+            "actualización"
+          ],
+          "intentPatterns": [
+            "generate.*pr.*description",
+            "create.*pull.*request.*description",
+            "write.*manager.*summary",
+            "create.*stakeholder.*update",
+            "post.*summary.*jira"
+          ]
+        }
+      }
+    },
+    "gh": {
+      "type": "tool",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Use GitHub CLI to interact with issues and pull requests",
+      "triggers": {
+        "promptTriggers": {
+          "keywords": [
+            "github",
+            "gh issue",
+            "gh pr",
+            "pull request",
+            "create issue",
+            "comment on issue",
+            "create pr",
+            "merge pr",
+            "review pr"
+          ],
+          "intentPatterns": [
+            "github.*issue",
+            "github.*pull.*request",
+            "gh\\s+",
+            "create.*pr.*github",
+            "view.*github.*issue"
+          ]
+        }
+      }
+    },
+    "jira": {
+      "type": "tool",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Use acli to interact with Jira work items and comments",
+      "triggers": {
+        "promptTriggers": {
+          "keywords": [
+            "jira",
+            "acli",
+            "jira issue",
+            "jira comment",
+            "workitem",
+            "atlassian"
+          ],
+          "intentPatterns": [
+            "jira.*issue",
+            "jira.*comment",
+            "acli\\s+",
+            "create.*jira",
+            "view.*jira",
+            "post.*jira"
+          ]
+        }
+      }
+    },
+    "ast-grep": {
+      "type": "tool",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "Structural code search and analysis tool",
+      "triggers": {
+        "promptTriggers": {
+          "keywords": [
+            "ast-grep",
+            "search code",
+            "find function",
+            "find class",
+            "structural search",
+            "code pattern",
+            "find all uses",
+            "find all calls"
+          ],
+          "intentPatterns": [
+            "ast-grep",
+            "search.*code.*structure",
+            "find.*function.*definition",
+            "find.*class.*definition",
+            "find.*all.*uses",
+            "find.*all.*calls",
+            "structural.*search",
+            "where.*is.*function",
+            "where.*is.*class"
+          ]
+        }
+      }
+    }
+  }
+}

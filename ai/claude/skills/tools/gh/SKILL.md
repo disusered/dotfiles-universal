@@ -215,11 +215,11 @@ gh pr merge 456 --merge
 gh pr create --title "Fix: OAuth token validation" --body-file /tmp/pr-description.md
 ```
 
-### Post work log link to issue
+### Post work log reference to issue
 
 ```bash
-# After creating Notion work log
-gh issue comment 123 --body "Work log: https://notion.so/..."
+# After creating work log in dev/active/
+gh issue comment 123 --body "Work log: dev/active/fix-oauth-token.md"
 ```
 
 ### Check issue details before starting work
