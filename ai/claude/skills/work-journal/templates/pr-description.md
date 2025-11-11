@@ -123,9 +123,7 @@ git diff origin/{target}...{source}
 ### Step 5: Save Artifact
 
 **Get timestamp:**
-```bash
-TZ='America/Tijuana' date '+%Y-%m-%d-%H%M'
-```
+Use current time from injected context (format: YYYY-MM-DD-HHMM)
 
 **Save to file:**
 - Path: `dev/artifacts/{work-log-name}-pr-{timestamp}.md`

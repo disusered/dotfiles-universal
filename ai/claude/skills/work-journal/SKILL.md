@@ -147,7 +147,7 @@ Invoke the `gh` skill when you need to:
 2. **Create Artifact Files**
    - All artifacts (PR descriptions, summaries, updates) go in `dev/artifacts/`
    - Filename format: `{work-log-name}-{artifact-type}-{timestamp}.md`
-   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d-%H%M'`
+   - Get timestamp from injected context (format: YYYY-MM-DD-HHMM)
 
 3. **File-Only Confirmations**
    - Final response: `✅ [Artifact type] created: dev/artifacts/{filename}.md`
@@ -225,7 +225,7 @@ Invoke the `gh` skill when you need to:
    - Repeat until approved
 
 6. **Save artifact file**
-   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d-%H%M'`
+   - Get timestamp from injected context (format: YYYY-MM-DD-HHMM)
    - Get work log base name: e.g., `CM-2765-fix-oauth` from `dev/active/CM-2765-fix-oauth.md`
    - **Save to:** `dev/artifacts/{base-name}-pr-{timestamp}.md`
    - **Content:** The EXACT Spanish PR text approved by user in step 5
@@ -302,7 +302,7 @@ Invoke the `gh` skill when you need to:
    - Tone: Strategic, high-level, business-impact focused, CONCISE
 
 4. **Save artifact AND post to Jira**
-   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d-%H%M'`
+   - Get timestamp from injected context (format: YYYY-MM-DD-HHMM)
    - Get work log base name from filename
    - **Save to:** `dev/artifacts/{base-name}-manager-{timestamp}.md`
    - **Content:** The EXACT Spanish summary from step 3
@@ -370,7 +370,7 @@ Invoke the `gh` skill when you need to:
    - Repeat until approved
 
 5. **Save artifact AND post to GitHub**
-   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d-%H%M'`
+   - Get timestamp from injected context (format: YYYY-MM-DD-HHMM)
    - Get work log base name from filename
    - **Save to:** `dev/artifacts/{base-name}-stakeholder-{timestamp}.md`
    - **Content:** The EXACT Spanish update approved by user in step 4

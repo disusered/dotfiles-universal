@@ -12,13 +12,13 @@ This command analyzes your codebase and creates detailed strategic planning docu
 
 ## Process
 
-**CRITICAL: DO NOT use the Task tool or launch any agents during this command. Use only direct tools (Read, Grep, Glob, Bash) for all operations.**
+**CRITICAL: DO NOT use the Task tool or launch any agents during this command. Use only direct tools (Read, Grep, Glob, Bash, ast-grep) for all operations.**
 
 **LANGUAGE: ALL content (questions, planning file, communication) MUST be in ENGLISH. Spanish is ONLY for final artifacts (PR descriptions, manager summaries, stakeholder updates) via the work-journal skill.**
 
 1. **Understand the Initiative**
    - Ask clarifying questions about scope and goals
-   - Examine the codebase to understand current state (using Read, Grep, Glob directly)
+   - Examine the codebase to understand current state (using Read, Grep, Glob, ast-grep directly)
    - Identify key components and dependencies
 
 2. **Gather Metadata (Ask Once)**
