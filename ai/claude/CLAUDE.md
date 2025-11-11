@@ -9,6 +9,8 @@
 
 **IMPORTANT**: This project uses **Markdown files** for ALL work and issue tracking.
 
+**LANGUAGE RULE**: ALL work logs, planning files, and internal communication MUST be in **ENGLISH**. Spanish is ONLY for external-facing artifacts (PR descriptions, manager summaries, stakeholder updates) created via the work-journal skill.
+
 ### When to Track Work (PROACTIVE)
 
 **AUTOMATICALLY create a work log file BEFORE starting ANY of these tasks:**
