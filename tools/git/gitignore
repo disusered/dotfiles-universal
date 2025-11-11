@@ -15,4 +15,6 @@ opencode.jsonc
 CLAUDE.md
 !ai/claude/CLAUDE.md
 .mcp.json
-.beads
+dev/active/
+dev/completed/
+dev/artifacts/
