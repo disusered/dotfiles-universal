@@ -1,7 +1,30 @@
 ## 🏠️ Baseline rules
 
-- `cd` is not the default command, it is zoxide via `eval "$(zoxide init --cmd cd zsh)"`
-- Use the shell's `builtin cd` to change directories, zoxide-bound `cd` will fail.
+### Directory Navigation - CRITICAL RULE
+
+**ALWAYS use `builtin cd` to change directories. NEVER use naked `cd`.**
+
+- `cd` is overridden by zoxide via `eval "$(zoxide init --cmd cd zsh)"`
+- Using `cd` without `builtin` will fail in this environment
+- **ONLY use `builtin` with the `cd` command**
+- **NEVER use `builtin` with other commands** (e.g., `builtin dotnet` is WRONG)
+
+**Correct:**
+```bash
+builtin cd /path/to/directory
+builtin cd ../
+builtin cd ~
+```
+
+**WRONG:**
+```bash
+cd /path/to/directory  # Will fail - zoxide conflict
+builtin dotnet         # Nonsensical - dotnet is not a shell builtin
+builtin npm            # Nonsensical - npm is not a shell builtin
+```
+
+### Other Shell Overrides
+
 - `ls` is not the default command, it is bound to `exa`
 - Commit messages should be limited to 80 characters in length
 
