@@ -12,21 +12,34 @@ This command analyzes your codebase and creates detailed strategic planning docu
 
 ## Process
 
+**CRITICAL: DO NOT use the Task tool or launch any agents during this command. Use only direct tools (Read, Grep, Glob, Bash, ast-grep) for all operations.**
+
+**LANGUAGE: ALL content (questions, planning file, communication) MUST be in ENGLISH. Spanish is ONLY for final artifacts (PR descriptions, manager summaries, stakeholder updates) via the work-journal skill.**
+
 1. **Understand the Initiative**
    - Ask clarifying questions about scope and goals
-   - Examine the codebase to understand current state
+   - Examine the codebase to understand current state (using Read, Grep, Glob, ast-grep directly)
    - Identify key components and dependencies
 
-2. **Create Planning Work Log**
+2. **Gather Metadata (Ask Once)**
+   - **Priority** (0-4): Ask user if not clear from context
+   - **Project**: Ask user which team/project this belongs to
+   - **Type**: Ask user (epic/task/feature)
+   - **Jira** (optional): Ask "Is there a Jira issue for this?"
+   - **Github** (optional): Ask if not mentioned
+
+3. **Create Planning Work Log**
    - Use Write tool to create file in `dev/active/`
    - Filename format: `{date}-plan-{brief-description}.md`
-   - Set metadata:
-     - Priority: Based on initiative impact
+   - Set metadata from step 2:
+     - Priority: 0-4
      - Project: The team/project name
      - Type: "epic" for large initiatives, "task" for smaller ones
      - Status: "Not started" (planning phase)
+     - Jira: URL if provided
+     - Github: URL if provided
 
-3. **Generate Strategic Plan Content**
+4. **Generate Strategic Plan Content**
 
    Write comprehensive plan to the work log file:
 
@@ -74,14 +87,14 @@ This command analyzes your codebase and creates detailed strategic planning docu
    [Team members, time estimates, external dependencies]
    ```
 
-4. **Create Child Task Files (Optional)**
+5. **Create Child Task Files (Optional)**
 
    For each major task, offer to create separate work log files in `dev/active/`:
    - Filename: `{parent-name}-task-{N}-{description}.md`
    - Detailed breakdown of subtasks
    - Technical context and references
 
-5. **Provide File Path**
+6. **Provide File Path**
 
    Respond with the planning file path only:
    ```

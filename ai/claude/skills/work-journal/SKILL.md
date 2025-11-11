@@ -147,7 +147,7 @@ Invoke the `gh` skill when you need to:
 2. **Create Artifact Files**
    - All artifacts (PR descriptions, summaries, updates) go in `dev/artifacts/`
    - Filename format: `{work-log-name}-{artifact-type}-{timestamp}.md`
-   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d-%H%M'`
+   - Get timestamp from injected context (format: YYYY-MM-DD-HHMM)
 
 3. **File-Only Confirmations**
    - Final response: `✅ [Artifact type] created: dev/artifacts/{filename}.md`
@@ -170,19 +170,30 @@ Invoke the `gh` skill when you need to:
 **Language:** All communication in English, artifact output in Spanish
 
 **CRITICAL WORKFLOW OVERVIEW:**
-1. User provides work log filename, source branch, target branch
-2. You READ the work log (English, read-only)
-3. You analyze git changes
-4. You generate a Spanish PR description (once, get user approval)
-5. You SAVE to `dev/artifacts/{work-log-name}-pr-{timestamp}.md`
-6. You create the PR in GitHub with that exact text
-7. **YOU DO NOT UPDATE STATUS - work stays "In Progress" until merged**
+1. User provides work log filename
+2. You detect source branch and determine target branch using git-flow conventions (hotfix/* → main, feature/* → develop)
+3. You confirm branches with user
+4. You READ the work log (English, read-only)
+5. You analyze git changes
+6. You generate a Spanish PR description (once, get user approval)
+7. You SAVE to `dev/artifacts/{work-log-name}-pr-{timestamp}.md`
+8. You ASK permission to create PR
+9. If approved, you create the PR in GitHub with that exact text
+10. **YOU DO NOT UPDATE STATUS - work stays "In Progress" until merged**
 
 ### Process:
 
 1. **Gather inputs (English)**
-   - Ask: "What's the work log filename (in dev/active/), source branch, and target branch?"
-   - If missing: STOP and ASK
+   - Ask: "What's the work log filename (in dev/active/)?"
+   - Detect current branch: `git branch --show-current`
+   - **Determine target branch using git-flow conventions:**
+     - `hotfix/*` → `main` (or `master` if main doesn't exist)
+     - `feature/*` → `develop`
+     - `release/*` → `main` (or `master` if main doesn't exist)
+     - `bugfix/*` → `develop`
+     - Other branch names → Ask user for target branch
+   - Confirm with user: "Detected source branch: {source}, target branch: {target}. Is this correct?"
+   - If user says no or provides different target: Use their target instead
    - **CRITICAL: You are using an existing work log file**
 
 2. **Analyze context (READ-ONLY)**
@@ -213,21 +224,28 @@ Invoke the `gh` skill when you need to:
    - Adjust based on feedback
    - Repeat until approved
 
-6. **Save artifact file AND create PR in GitHub**
-   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d-%H%M'`
+6. **Save artifact file**
+   - Get timestamp from injected context (format: YYYY-MM-DD-HHMM)
    - Get work log base name: e.g., `CM-2765-fix-oauth` from `dev/active/CM-2765-fix-oauth.md`
    - **Save to:** `dev/artifacts/{base-name}-pr-{timestamp}.md`
    - **Content:** The EXACT Spanish PR text approved by user in step 5
+
+7. **Ask permission to create PR**
+   - Ask (in English): "Should I create the PR now? (y/n)"
+   - If user says no: Stop here and provide artifact file path
+   - If user says yes: Proceed to step 8
+
+8. **Create PR in GitHub**
    - **Create PR using gh CLI:**
      ```bash
-     gh pr create --base {target} --head {source} --title "{title}" --body "{EXACT approved PR text in Spanish from step 5}"
+     gh pr create --base {target} --head {source} --title "{title}" --body "{EXACT approved PR text in Spanish from step 6}"
      ```
    - **CRITICAL: DO NOT modify work log file**
    - **CRITICAL: DO NOT update Status to "Done"**
    - Creating a PR does NOT complete the work - it stays "In Progress" until merged
 
-7. **Confirm (English)**
-   - `✅ PR created: [GitHub PR URL]`
+9. **Confirm (English)**
+   - If PR was created: `✅ PR created: [GitHub PR URL]`
    - `✅ PR description saved to: dev/artifacts/{filename}.md`
    - `⚠️ Work remains "In Progress" - NOT marked as Done (will be Done after merge)`
 
@@ -284,7 +302,7 @@ Invoke the `gh` skill when you need to:
    - Tone: Strategic, high-level, business-impact focused, CONCISE
 
 4. **Save artifact AND post to Jira**
-   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d-%H%M'`
+   - Get timestamp from injected context (format: YYYY-MM-DD-HHMM)
    - Get work log base name from filename
    - **Save to:** `dev/artifacts/{base-name}-manager-{timestamp}.md`
    - **Content:** The EXACT Spanish summary from step 3
@@ -352,7 +370,7 @@ Invoke the `gh` skill when you need to:
    - Repeat until approved
 
 5. **Save artifact AND post to GitHub**
-   - Get timestamp: `TZ='America/Tijuana' date '+%Y-%m-%d-%H%M'`
+   - Get timestamp from injected context (format: YYYY-MM-DD-HHMM)
    - Get work log base name from filename
    - **Save to:** `dev/artifacts/{base-name}-stakeholder-{timestamp}.md`
    - **Content:** The EXACT Spanish update approved by user in step 4
@@ -392,15 +410,18 @@ When you need detailed information:
 
 **Your response:**
 1. Identify both outputs requested: PR + manager summary
-2. Read work log file once (shared context)
-3. Load `templates/pr-description.md`
-4. Generate PR description
-5. Iterate with user until approved
-6. Save artifact and create PR
-7. Load `templates/manager-summary.md`
-8. Generate manager summary
-9. Save artifact and post to Jira immediately (no approval needed)
-10. Confirm both completed
+2. Detect branches and confirm with user
+3. Read work log file once (shared context)
+4. Load `templates/pr-description.md`
+5. Generate PR description
+6. Iterate with user until approved
+7. Save artifact
+8. Ask permission to create PR
+9. If approved, create PR
+10. Load `templates/manager-summary.md`
+11. Generate manager summary
+12. Save artifact and post to Jira immediately (no approval needed)
+13. Confirm both completed
 
 ---
 
@@ -428,7 +449,7 @@ When you need detailed information:
 
 You've completed your job when:
 
-- ✅ For PR: Draft approved by user, PR created in GitHub using `gh pr create`, artifact saved, paths provided
+- ✅ For PR: Draft approved by user, artifact saved, PR created in GitHub (only if user approves PR creation), paths provided
 - ✅ For manager summary: Summary generated, comment posted to Jira using `acli`, artifact saved, paths provided (in Spanish)
 - ✅ For stakeholder update: Draft approved by user, comment posted to GitHub issue using `gh issue comment`, artifact saved, paths provided
 
@@ -438,7 +459,7 @@ You've completed your job when:
 
 - **NEVER Update Status:** Creating artifacts (PR descriptions, manager summaries, stakeholder updates) does NOT complete work. NEVER modify work log Status. Work stays "In Progress" until merged and deployed.
 - **Language Awareness:** All artifacts (PR, manager, stakeholder) use Spanish. Agent ↔ user communication uses English.
-- **Approval Gates:** PR and stakeholder updates require user approval. Manager summaries are one-shot (no approval).
+- **Approval Gates:** PR descriptions and stakeholder updates require user approval for content AND for posting to GitHub. Manager summaries are one-shot (no approval).
 - **Work Logging:** Basic work logging is NOT handled by this skill - see CLAUDE.md for those directives.
 - **URL Construction:** Always use full, absolute URLs per `references/link-formats.md`.
 - **No Redundant Content:** Never reprint artifact content; just provide file path.

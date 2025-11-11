@@ -9,6 +9,8 @@
 
 **IMPORTANT**: This project uses **Markdown files** for ALL work and issue tracking.
 
+**LANGUAGE RULE**: ALL work logs, planning files, and internal communication MUST be in **ENGLISH**. Spanish is ONLY for external-facing artifacts (PR descriptions, manager summaries, stakeholder updates) created via the work-journal skill.
+
 ### When to Track Work (PROACTIVE)
 
 **AUTOMATICALLY create a work log file BEFORE starting ANY of these tasks:**
@@ -55,7 +57,7 @@
    **Type:** bug|feature|task|epic|chore
    **Jira:** https://odasoftmx.atlassian.net/browse/ID (optional)
    **Github:** https://github.com/user/repo/issues/NUM (optional)
-   **Created:** [timestamp from TZ='America/Tijuana' date '+%Y-%m-%d %H:%M']
+   **Created:** [current timestamp from injected context]
 
    ---
 
@@ -72,7 +74,7 @@
 
 - **Log THINKING, not DOING** - focus on decisions, discoveries, and reasoning
 - **Append after EVERY significant action** - don't batch at the end
-- **Use real timestamps** from `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'` before EACH append
+- **Use real timestamps** from injected context (America/Tijuana) before EACH append
 - **Chronological only** - ALWAYS append to end, NEVER restructure
 
 **What to Log:**
@@ -102,7 +104,7 @@
 ```markdown
 ### [Descriptive entry name - NO metadata like dates/issue#s]
 
-**Timestamp:** [from TZ='America/Tijuana' date '+%Y-%m-%d %H:%M']
+**Timestamp:** [from injected context]
 
 **Context:** [What you were investigating]
 

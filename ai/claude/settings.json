@@ -7,6 +7,14 @@
   "hooks": {
     "UserPromptSubmit": [
       {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/inject-time.sh"
+          }
+        ]
+      },
+      {
         "matcher": ".*",
         "hooks": [
           {
