@@ -5,18 +5,15 @@
   },
   "alwaysThinkingEnabled": true,
   "hooks": {
-    "PreToolUse": [
+    "UserPromptSubmit": [
       {
-        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/hooks/auto-approve-date.sh"
+            "command": "$HOME/.claude/hooks/inject-time.sh"
           }
         ]
-      }
-    ],
-    "UserPromptSubmit": [
+      },
       {
         "matcher": ".*",
         "hooks": [

@@ -88,22 +88,21 @@ Consider using the Skill tool with command "work-journal"
 
 **Cache location:** `ai/claude/.cache/tool-use/`
 
-#### auto-approve-date (PreToolUse)
+#### inject-time (UserPromptSubmit)
 
-**File:** `ai/claude/hooks/auto-approve-date.sh`
+**File:** `ai/claude/hooks/inject-time.sh`
 
 **What it does:**
 
-- Runs before Bash commands execute
-- Auto-approves safe date commands without permission prompts
-- Matches commands like `date` and `TZ='America/Tijuana' date '+%Y-%m-%d %H:%M'`
-- Returns `permissionDecision: allow` to bypass approval
+- Runs before Claude processes every prompt
+- Injects current time (America/Tijuana timezone) into context
+- Eliminates need for Claude to run `date` commands during work logging
 
-**Why this exists:**
+**Why this approach:**
 
-- Work logging requires frequent timestamp generation
-- `allowedTools` in settings.json doesn't work reliably with environment variables
-- PreToolUse hooks provide more robust pattern matching
+- UserPromptSubmit hooks can inject context that persists throughout the conversation
+- Simpler than intercepting Bash commands with PreToolUse hooks
+- No permission prompts needed since time is injected as context, not executed
 
 ### 3. Slash Commands
 
