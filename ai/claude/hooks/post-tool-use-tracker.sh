@@ -2,13 +2,18 @@
 
 # Post-tool-use tracker: Logs file changes for tracking and context
 # This hook runs after Edit, Write, and MultiEdit operations
+#
+# SECURITY WARNING: The input JSON contains sensitive data including file contents,
+# old_string, new_string, and other parameters that may contain passwords or credentials.
+# NEVER log or echo the full $input variable. Only extract and log safe metadata.
 
 set -e
 
 # Read tool metadata from stdin
+# WARNING: This contains sensitive data - do not log the raw input!
 input=$(cat)
 
-# Extract tool info
+# Extract ONLY safe metadata - never log content, old_string, new_string, etc.
 tool_name=$(echo "$input" | jq -r '.tool_name // empty')
 file_path=$(echo "$input" | jq -r '.file_path // empty')
 session_id=$(echo "$input" | jq -r '.session_id // empty')
@@ -25,6 +30,18 @@ fi
 
 # Skip markdown files (documentation)
 if [[ "$file_path" =~ \.md$ ]]; then
+  exit 0
+fi
+
+# Skip files that commonly contain credentials/secrets
+# This is a defense-in-depth measure to avoid logging even file paths for sensitive files
+if [[ "$file_path" =~ \.(env|credentials|secret|key|pem|p12|pfx)(\.|$) ]] || \
+   [[ "$file_path" =~ (password|credential|secret|api[_-]?key|token|auth)s?\.json$ ]] || \
+   [[ "$file_path" =~ (^|/)\.?env($|\.) ]] || \
+   [[ "$file_path" =~ (^|/)(secret|credential|password)s?($|\.|/) ]] || \
+   [[ "$file_path" =~ \.ssh/ ]] || \
+   [[ "$file_path" =~ \.aws/ ]] || \
+   [[ "$file_path" =~ \.gnupg/ ]]; then
   exit 0
 fi
 
