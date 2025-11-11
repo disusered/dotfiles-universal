@@ -95,14 +95,16 @@ Consider using the Skill tool with command "work-journal"
 **What it does:**
 
 - Runs before Claude processes every prompt
-- Injects current time (America/Tijuana timezone) into context
+- Reads JSON input from stdin (per hook specification)
+- Injects current time (America/Tijuana timezone) as additional context
 - Eliminates need for Claude to run `date` commands during work logging
 
 **Why this approach:**
 
-- UserPromptSubmit hooks can inject context that persists throughout the conversation
-- Simpler than intercepting Bash commands with PreToolUse hooks
-- No permission prompts needed since time is injected as context, not executed
+- UserPromptSubmit hooks inject context visible to Claude throughout the conversation
+- Context injection avoids permission prompts entirely (no command execution)
+- Follows official pattern from https://code.claude.com/docs/en/hooks.md
+- Simpler and more reliable than PreToolUse hooks intercepting Bash commands
 
 ### 3. Slash Commands
 
