@@ -113,6 +113,40 @@
           ]
         }
       }
+    },
+    "jq": {
+      "type": "tool",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "JSON processor for parsing, filtering, and transforming JSON data",
+      "triggers": {
+        "promptTriggers": {
+          "keywords": [
+            "parse json",
+            "json file",
+            "json data",
+            "extract from json",
+            "filter json",
+            "transform json",
+            "package.json",
+            "tsconfig.json",
+            "json array",
+            "json object",
+            "large json"
+          ],
+          "intentPatterns": [
+            "parse.*json",
+            "extract.*from.*json",
+            "filter.*json",
+            "read.*json.*file",
+            "process.*json",
+            "json.*query",
+            "json.*field",
+            "analyze.*json",
+            "json.*response"
+          ]
+        }
+      }
     }
   }
 }
