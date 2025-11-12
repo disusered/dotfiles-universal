@@ -204,6 +204,18 @@ Consider using the Skill tool with command "work-journal"
 
 **What it does:** Provides structural code search reference and patterns
 
+### jq
+
+**Type:** CLI tool
+
+**Triggers when you mention:**
+
+- "parse json", "json file", "json data"
+- "extract from json", "filter json"
+- "package.json", "tsconfig.json", "large json"
+
+**What it does:** Provides JSON processing, filtering, and transformation reference
+
 ## How It Works
 
 ### User Experience Flow
@@ -364,4 +376,6 @@ Key adaptations:
 - [CLAUDE.md](./CLAUDE.md) - Core directives and work logging
 - [skills/work-journal/SKILL.md](./skills/work-journal/SKILL.md) - Work journal skill documentation
 - [skills/tools/gh/SKILL.md](./skills/tools/gh/SKILL.md) - GitHub CLI skill
+- [skills/tools/jira/SKILL.md](./skills/tools/jira/SKILL.md) - Jira CLI skill
 - [skills/tools/ast-grep/SKILL.md](./skills/tools/ast-grep/SKILL.md) - ast-grep skill
+- [skills/tools/jq/SKILL.md](./skills/tools/jq/SKILL.md) - jq JSON processor skill
