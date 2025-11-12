@@ -35,5 +35,17 @@
         ]
       }
     ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git show-branch:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(jq:*)",
+      "Bash(ast-grep:*)",
+      "Bash(docker compose logs:*)",
+      "Bash(awk:*)",
+      "Bash(sqlite3:*)"
+    ]
   }
 }
