@@ -23,9 +23,22 @@ builtin dotnet         # Nonsensical - dotnet is not a shell builtin
 builtin npm            # Nonsensical - npm is not a shell builtin
 ```
 
-### Other Shell Overrides
+### File Listing - Shell Alias
 
-- `ls` is not the default command, it is bound to `exa`
+**`ls` is aliased to `exa` for enhanced output.**
+
+- The shell alias `ls` → `exa` provides colored, formatted output
+- If you need the actual `ls` binary, use `/bin/ls`
+- Most of the time, you can just use `ls` (exa) normally
+
+**Correct:**
+```bash
+ls -la                    # Uses exa alias
+/bin/ls -la               # Uses actual ls binary if needed
+```
+
+### General Rules
+
 - Commit messages should be limited to 80 characters in length
 
 ## ⚡ Core Directives: Work Tracking
