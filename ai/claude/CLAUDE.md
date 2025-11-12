@@ -23,18 +23,24 @@ builtin dotnet         # Nonsensical - dotnet is not a shell builtin
 builtin npm            # Nonsensical - npm is not a shell builtin
 ```
 
-### File Listing - Shell Alias
+### File Listing - ALWAYS Use /bin/ls
 
-**`ls` is aliased to `exa` for enhanced output.**
+**ALWAYS use `/bin/ls`. NEVER use naked `ls`.**
 
-- The shell alias `ls` → `exa` provides colored, formatted output
-- If you need the actual `ls` binary, use `/bin/ls`
-- Most of the time, you can just use `ls` (exa) normally
+- `ls` is aliased to `exa` in the shell
+- Claude should bypass this alias and use the actual `ls` binary
+- Use `/bin/ls` for all file listing operations
 
 **Correct:**
 ```bash
-ls -la                    # Uses exa alias
-/bin/ls -la               # Uses actual ls binary if needed
+/bin/ls -la               # Use actual ls binary
+/bin/ls -lh               # Use actual ls binary
+/bin/ls                   # Use actual ls binary
+```
+
+**WRONG:**
+```bash
+ls -la                    # Will use exa alias (don't do this)
 ```
 
 ### General Rules
