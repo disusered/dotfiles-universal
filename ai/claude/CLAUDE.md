@@ -1,8 +1,50 @@
 ## 🏠️ Baseline rules
 
-- `cd` is not the default command, it is zoxide via `eval "$(zoxide init --cmd cd zsh)"`
-- Use the shell's `builtin cd` to change directories, zoxide-bound `cd` will fail.
-- `ls` is not the default command, it is bound to `exa`
+### Directory Navigation - CRITICAL RULE
+
+**ALWAYS use `builtin cd` to change directories. NEVER use naked `cd`.**
+
+- `cd` is overridden by zoxide via `eval "$(zoxide init --cmd cd zsh)"`
+- Using `cd` without `builtin` will fail in this environment
+- **ONLY use `builtin` with the `cd` command**
+- **NEVER use `builtin` with other commands** (e.g., `builtin dotnet` is WRONG)
+
+**Correct:**
+```bash
+builtin cd /path/to/directory
+builtin cd ../
+builtin cd ~
+```
+
+**WRONG:**
+```bash
+cd /path/to/directory  # Will fail - zoxide conflict
+builtin dotnet         # Nonsensical - dotnet is not a shell builtin
+builtin npm            # Nonsensical - npm is not a shell builtin
+```
+
+### File Listing - ALWAYS Use /bin/ls
+
+**ALWAYS use `/bin/ls`. NEVER use naked `ls`.**
+
+- `ls` is aliased to `exa` in the shell
+- Claude should bypass this alias and use the actual `ls` binary
+- Use `/bin/ls` for all file listing operations
+
+**Correct:**
+```bash
+/bin/ls -la               # Use actual ls binary
+/bin/ls -lh               # Use actual ls binary
+/bin/ls                   # Use actual ls binary
+```
+
+**WRONG:**
+```bash
+ls -la                    # Will use exa alias (don't do this)
+```
+
+### General Rules
+
 - Commit messages should be limited to 80 characters in length
 
 ## ⚡ Core Directives: Work Tracking
