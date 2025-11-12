@@ -47,6 +47,20 @@ ls -la                    # Will use exa alias (don't do this)
 
 - Commit messages should be limited to 80 characters in length
 
+## 🔒 Security: Sensitive Data Handling
+
+**CRITICAL**: Hooks and logging tools receive full tool parameters including file contents, passwords, and credentials.
+
+**For Developers/Maintainers:**
+
+- **NEVER log or echo** the raw `$input` variable in hooks - it contains sensitive data
+- **Only extract safe metadata**: tool names, file paths, timestamps, session IDs
+- **Skip logging** for files containing credentials: `.env`, `.credentials`, `.secret`, `.key`, `.pem`, API keys, tokens, auth files
+- **Defense in depth**: Even if not currently logged, assume hook input contains secrets
+- See `hooks/post-tool-use-tracker.sh` for reference implementation
+
+**For hook modifications**: Always audit what data is being logged/stored/transmitted.
+
 ## ⚡ Core Directives: Work Tracking
 
 **IMPORTANT**: This project uses **Markdown files** for ALL work and issue tracking.
