@@ -202,6 +202,33 @@ For PR descriptions, manager summaries, or stakeholder updates:
 
 ## 🔧 Tools
 
+### jq
+
+JSON processor for parsing, filtering, and transforming JSON data. Use this instead of grep when working with JSON files.
+
+**Basic Usage:**
+
+- `jq '.' file.json` - Pretty-print JSON
+- `jq '.fieldname' file.json` - Extract field
+- `jq '.array[]' file.json` - Iterate array elements
+- `jq '.[] | select(.status == "active")' file.json` - Filter objects
+- `jq -r '.field'` - Raw output (no quotes)
+- `jq -c '.'` - Compact output
+
+**Common Patterns:**
+
+- `jq '.items[] | {id, name, price}'` - Extract specific fields
+- `jq 'map(select(.price > 100))'` - Filter and map
+- `jq 'group_by(.category)'` - Group by field
+- `jq '[.[] | .id]'` - Collect values into array
+
+**With Other Tools:**
+
+- `ast-grep --json | jq '.[] | .file' -r` - Parse ast-grep output
+- `curl api.example.com | jq '.users[].email'` - Parse API responses
+
+Use `jq --help` for more options. See the jq skill for comprehensive reference.
+
 ### acli
 
 Official Atlassian CLI for Jira work items and comments.
