@@ -1,5 +1,39 @@
 ## 🏠️ Baseline rules
 
+### Git Operations - CRITICAL SAFETY RULES
+
+**NEVER perform destructive git operations without explicit user permission:**
+
+- ❌ **NEVER** use `git rebase` without explicit user permission
+- ❌ **NEVER** use `git reset --hard` without explicit user permission
+- ❌ **NEVER** use `git push --force` or `git push -f` without explicit user permission
+- ❌ **NEVER** use `git cherry-pick` without explicit user permission
+- ❌ **NEVER** delete branches without explicit user permission
+- ❌ **NEVER** amend commits that might be shared/pushed
+
+**If you perform any of these operations without permission, the user could lose work and you will be replaced.**
+
+### Gitflow Branch Targeting - CRITICAL RULE
+
+**ALWAYS determine the correct target branch based on gitflow conventions:**
+
+```
+hotfix/*    → main (or master if main doesn't exist)
+feature/*   → develop
+release/*   → main (or master if main doesn't exist)
+bugfix/*    → develop
+claude/*    → Ask user for target branch
+```
+
+**Before creating ANY PR:**
+1. Detect source branch: `git branch --show-current`
+2. Determine target using table above
+3. **ALWAYS confirm with user**: "Detected source: {source}, target: {target}. Is this correct?"
+4. If user says no, use their target instead
+5. NEVER assume - ALWAYS confirm
+
+**If you target the wrong branch, you could break production. This is unacceptable.**
+
 ### Directory Navigation - CRITICAL RULE
 
 **ALWAYS use `builtin cd` to change directories. NEVER use naked `cd`.**

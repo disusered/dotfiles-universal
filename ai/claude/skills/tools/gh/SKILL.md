@@ -16,6 +16,32 @@ Command-line interface for GitHub issues and pull requests.
 - ✅ **DO** ask permission BEFORE running `gh pr create`
 - If user says "it's already committed and pushed", BELIEVE THEM
 
+**Gitflow Branch Targeting (NEVER IGNORE THIS):**
+
+Before creating ANY PR, determine target branch:
+```
+hotfix/*    → main (or master if main doesn't exist)
+feature/*   → develop
+release/*   → main (or master if main doesn't exist)
+bugfix/*    → develop
+claude/*    → Ask user for target branch
+```
+
+**ALWAYS confirm with user:**
+1. Detect source: `git branch --show-current`
+2. Determine target from table above
+3. Ask: "Detected source: {source}, target: {target}. Is this correct?"
+4. Wait for confirmation before proceeding
+5. If wrong, use user's target instead
+
+**Targeting wrong branch can break production. This is unacceptable.**
+
+**Destructive Git Operations - FORBIDDEN:**
+- ❌ **NEVER** use `git rebase` without explicit permission
+- ❌ **NEVER** use `git push --force` without explicit permission
+- ❌ **NEVER** use `git reset --hard` without explicit permission
+- These operations can destroy work and will get you replaced
+
 **User Authorization:**
 - All write operations (`gh pr create`, `gh pr comment`, etc.) REQUIRE user approval
 - Read operations (`gh pr list`, `gh pr view`) do NOT require approval
