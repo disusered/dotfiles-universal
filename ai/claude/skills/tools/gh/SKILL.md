@@ -8,6 +8,23 @@ allowed-tools: Bash
 
 Command-line interface for GitHub issues and pull requests.
 
+## CRITICAL Rules
+
+**Understanding "Create a PR" requests:**
+- When user says "create a PR", they mean use `gh pr create`
+- ❌ **DO NOT** run `git commit` or `git push` first - assume already committed
+- ✅ **DO** ask permission BEFORE running `gh pr create`
+- If user says "it's already committed and pushed", BELIEVE THEM
+
+**User Authorization:**
+- All write operations (`gh pr create`, `gh pr comment`, etc.) REQUIRE user approval
+- Read operations (`gh pr list`, `gh pr view`) do NOT require approval
+
+**NO Footers or Signatures:**
+- ❌ **NEVER** add "Generated with Claude Code" or similar footers to PR descriptions
+- ❌ **NEVER** add attribution, tool credits, or robot emojis (🤖)
+- PR content must be professional and end with actual content, not meta-commentary
+
 ## Basic Syntax
 
 ```bash

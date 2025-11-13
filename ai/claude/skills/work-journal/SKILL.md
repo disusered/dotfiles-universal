@@ -137,6 +137,17 @@ Invoke the `gh` skill when you need to:
 ❌ BAD: `- ✅ Feature completada exitosamente 🎉` → Use: `- Feature completada exitosamente`
 ✅ ACCEPTABLE (sparingly): `- ✅ Tests passing` or `- ❌ Build failed`
 
+### Footer and Attribution Policy
+
+**CRITICAL: NEVER add footers, signatures, or tool attribution to any artifact.**
+
+- ❌ **NEVER** add "Generated with Claude Code" or similar footers
+- ❌ **NEVER** add attribution links or tool credits
+- ❌ **NEVER** add signatures, timestamps, or meta-commentary at the end of artifacts
+- ❌ **NEVER** add robot emojis (🤖) or similar decorative elements
+- All artifacts (PR descriptions, manager summaries, stakeholder updates) must end with actual content, not meta-information about how they were created
+- This is unprofessional and could get the user fired
+
 ### File Integration Rules
 
 1. **Read Work Logs**
@@ -236,10 +247,13 @@ Invoke the `gh` skill when you need to:
    - If user says yes: Proceed to step 8
 
 8. **Create PR in GitHub**
+   - **CRITICAL: If user says code is already committed/pushed, DO NOT commit again**
+   - **CRITICAL: "Create a PR" means use gh pr create, NOT git commit**
    - **Create PR using gh CLI:**
      ```bash
      gh pr create --base {target} --head {source} --title "{title}" --body "{EXACT approved PR text in Spanish from step 6}"
      ```
+   - **Verify the body contains NO footers or "Generated with" signatures**
    - **CRITICAL: DO NOT modify work log file**
    - **CRITICAL: DO NOT update Status to "Done"**
    - Creating a PR does NOT complete the work - it stays "In Progress" until merged

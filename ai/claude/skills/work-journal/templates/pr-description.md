@@ -120,6 +120,12 @@ git diff origin/{target}...{source}
 - Direct and concise
 - Focus on reviewer needs
 
+**CRITICAL - NO FOOTERS OR SIGNATURES:**
+- ❌ **NEVER** add footer links like "Generated with Claude Code"
+- ❌ **NEVER** add attribution, signatures, or tool credits
+- ❌ **NEVER** add emojis like 🤖 or decorative elements at the end
+- The PR description must end with actual content, not meta-commentary about how it was created
+
 ### Step 5: Save Artifact
 
 **Get timestamp:**
