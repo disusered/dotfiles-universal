@@ -1,27 +1,66 @@
 ## 🏠️ Baseline rules
 
+### Git Operations - CRITICAL SAFETY RULES
+
+**NEVER perform destructive git operations without explicit user permission:**
+
+- ❌ **NEVER** use `git rebase` without explicit user permission
+- ❌ **NEVER** use `git reset --hard` without explicit user permission
+- ❌ **NEVER** use `git push --force` or `git push -f` without explicit user permission
+- ❌ **NEVER** use `git cherry-pick` without explicit user permission
+- ❌ **NEVER** delete branches without explicit user permission
+- ❌ **NEVER** amend commits that might be shared/pushed
+
+**If you perform any of these operations without permission, the user could lose work and you will be replaced.**
+
+### Gitflow Branch Targeting - CRITICAL RULE
+
+**ALWAYS determine the correct target branch based on gitflow conventions:**
+
+```
+hotfix/*    → main (or master if main doesn't exist)
+feature/*   → develop
+release/*   → main (or master if main doesn't exist)
+bugfix/*    → develop
+claude/*    → Ask user for target branch
+```
+
+**Before creating ANY PR:**
+1. Detect source branch: `git branch --show-current`
+2. Determine target using table above
+3. **ALWAYS confirm with user**: "Detected source: {source}, target: {target}. Is this correct?"
+4. If user says no, use their target instead
+5. NEVER assume - ALWAYS confirm
+
+**If you target the wrong branch, you could break production. This is unacceptable.**
+
 ### Directory Navigation - CRITICAL RULE
 
 **ALWAYS use `builtin cd` to change directories. NEVER use naked `cd`.**
 
 - `cd` is overridden by zoxide via `eval "$(zoxide init --cmd cd zsh)"`
 - Using `cd` without `builtin` will fail in this environment
-- **ONLY use `builtin` with the `cd` command**
-- **NEVER use `builtin` with other commands** (e.g., `builtin dotnet` is WRONG)
+- **ONLY use `builtin` with the `cd` command - it is the ONLY command that needs `builtin`**
+- **NEVER use `builtin` with ANY other command** (e.g., `builtin git`, `builtin dotnet`, `builtin npm` are ALL WRONG)
 
 **Correct:**
 ```bash
 builtin cd /path/to/directory
 builtin cd ../
 builtin cd ~
+git status              # Just git, NO builtin
+npm install             # Just npm, NO builtin
 ```
 
 **WRONG:**
 ```bash
-cd /path/to/directory  # Will fail - zoxide conflict
-builtin dotnet         # Nonsensical - dotnet is not a shell builtin
-builtin npm            # Nonsensical - npm is not a shell builtin
+cd /path/to/directory   # Will fail - zoxide conflict
+builtin git status      # WRONG - git is not a shell builtin, just use: git status
+builtin dotnet         # WRONG - dotnet is not a shell builtin
+builtin npm            # WRONG - npm is not a shell builtin
 ```
+
+**REMEMBER: `builtin` is ONLY for `cd`. Everything else uses the normal command name.**
 
 ### File Listing - ALWAYS Use /bin/ls
 
@@ -46,6 +85,11 @@ ls -la                    # Will use exa alias (don't do this)
 ### General Rules
 
 - Commit messages should be limited to 80 characters in length
+- **NEVER add footers, signatures, or tool attribution** to any output (PRs, commits, comments, etc.)
+  - ❌ NO "Generated with Claude Code" or similar footers
+  - ❌ NO attribution links or tool credits
+  - ❌ NO robot emojis (🤖) or meta-commentary
+  - All outputs must be professional and contain only relevant content
 
 ## 🔒 Security: Sensitive Data Handling
 
@@ -262,6 +306,24 @@ Official Atlassian CLI for Jira work items and comments.
 ### gh
 
 GitHub CLI for issues and pull requests.
+
+**CRITICAL - Understanding "Create a PR" Requests:**
+
+When the user says "create a PR" or "create a pull request":
+- ❌ **DO NOT** run `git commit` or `git push` - assume code is already committed
+- ❌ **DO NOT** commit anything - the user already did that
+- ✅ **DO** use `gh pr create` to create the PR in GitHub
+- ✅ **DO** ask for permission BEFORE running `gh pr create`
+- If the user says "it's already committed and pushed", BELIEVE THEM and just create the PR
+
+**User Authorization Required:**
+
+All `gh` commands that modify state REQUIRE user approval before execution:
+- `gh pr create` - REQUIRES approval
+- `gh pr comment` - REQUIRES approval
+- `gh issue create` - REQUIRES approval
+- `gh issue comment` - REQUIRES approval
+- Read-only commands (`gh pr list`, `gh pr view`, etc.) do NOT require approval
 
 **Issues:**
 

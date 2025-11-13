@@ -137,6 +137,17 @@ Invoke the `gh` skill when you need to:
 ❌ BAD: `- ✅ Feature completada exitosamente 🎉` → Use: `- Feature completada exitosamente`
 ✅ ACCEPTABLE (sparingly): `- ✅ Tests passing` or `- ❌ Build failed`
 
+### Footer and Attribution Policy
+
+**CRITICAL: NEVER add footers, signatures, or tool attribution to any artifact.**
+
+- ❌ **NEVER** add "Generated with Claude Code" or similar footers
+- ❌ **NEVER** add attribution links or tool credits
+- ❌ **NEVER** add signatures, timestamps, or meta-commentary at the end of artifacts
+- ❌ **NEVER** add robot emojis (🤖) or similar decorative elements
+- All artifacts (PR descriptions, manager summaries, stakeholder updates) must end with actual content, not meta-information about how they were created
+- This is unprofessional and could get the user fired
+
 ### File Integration Rules
 
 1. **Read Work Logs**
@@ -171,29 +182,35 @@ Invoke the `gh` skill when you need to:
 
 **CRITICAL WORKFLOW OVERVIEW:**
 1. User provides work log filename
-2. You detect source branch and determine target branch using git-flow conventions (hotfix/* → main, feature/* → develop)
-3. You confirm branches with user
+2. **GITFLOW TARGETING (NEVER SKIP)**: You detect source branch and determine target using gitflow (hotfix/* → main, feature/* → develop)
+3. **ALWAYS CONFIRM**: Ask user "Detected source: {source}, target: {target}. Is this correct?" and WAIT for response
 4. You READ the work log (English, read-only)
 5. You analyze git changes
 6. You generate a Spanish PR description (once, get user approval)
 7. You SAVE to `dev/artifacts/{work-log-name}-pr-{timestamp}.md`
 8. You ASK permission to create PR
-9. If approved, you create the PR in GitHub with that exact text
+9. If approved, you create the PR in GitHub with that exact text **using the confirmed target branch**
 10. **YOU DO NOT UPDATE STATUS - work stays "In Progress" until merged**
+
+**CRITICAL: Targeting wrong branch (e.g., hotfix → develop) can break production. NEVER skip confirmation.**
 
 ### Process:
 
 1. **Gather inputs (English)**
    - Ask: "What's the work log filename (in dev/active/)?"
    - Detect current branch: `git branch --show-current`
-   - **Determine target branch using git-flow conventions:**
-     - `hotfix/*` → `main` (or `master` if main doesn't exist)
-     - `feature/*` → `develop`
-     - `release/*` → `main` (or `master` if main doesn't exist)
-     - `bugfix/*` → `develop`
-     - Other branch names → Ask user for target branch
-   - Confirm with user: "Detected source branch: {source}, target branch: {target}. Is this correct?"
+   - **Determine target branch using git-flow conventions (NEVER IGNORE):**
+     ```
+     hotfix/*    → main (or master if main doesn't exist)
+     feature/*   → develop
+     release/*   → main (or master if main doesn't exist)
+     bugfix/*    → develop
+     claude/*    → Ask user for target branch
+     ```
+   - **ALWAYS confirm with user**: "Detected source branch: {source}, target branch: {target}. Is this correct?"
+   - **WAIT for user confirmation before proceeding**
    - If user says no or provides different target: Use their target instead
+   - **CRITICAL: Targeting wrong branch can break production - this is unacceptable**
    - **CRITICAL: You are using an existing work log file**
 
 2. **Analyze context (READ-ONLY)**
@@ -236,10 +253,15 @@ Invoke the `gh` skill when you need to:
    - If user says yes: Proceed to step 8
 
 8. **Create PR in GitHub**
+   - **CRITICAL: If user says code is already committed/pushed, DO NOT commit again**
+   - **CRITICAL: "Create a PR" means use gh pr create, NOT git commit**
+   - **CRITICAL: Use the target branch you confirmed with user in step 1**
+   - **NEVER use git rebase, git push --force, or any destructive git operations**
    - **Create PR using gh CLI:**
      ```bash
-     gh pr create --base {target} --head {source} --title "{title}" --body "{EXACT approved PR text in Spanish from step 6}"
+     gh pr create --base {CONFIRMED_TARGET} --head {source} --title "{title}" --body "{EXACT approved PR text in Spanish from step 6}"
      ```
+   - **Verify the body contains NO footers or "Generated with" signatures**
    - **CRITICAL: DO NOT modify work log file**
    - **CRITICAL: DO NOT update Status to "Done"**
    - Creating a PR does NOT complete the work - it stays "In Progress" until merged
