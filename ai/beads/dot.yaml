@@ -1,3 +1,0 @@
-linux[whoami.distro^="Arch"]:
-  installs:
-    cmd: go install github.com/steveyegge/beads/cmd/bd@latest
