@@ -163,47 +163,51 @@ Ask the user (in English):
 
 **Format:**
 
-**CRITICAL: Generate PLAIN TEXT format (not markdown) for Jira compatibility.**
+**CRITICAL: Generate MARKDOWN format, then convert to ADF for Jira.**
 
-Since `acli` does not render markdown in Jira comments, use plain text formatting:
+Generate standard markdown that will be converted to ADF (Atlassian Document Format):
 
-```
-{JIRA-ID}
+```markdown
+## {JIRA-ID}
 
-RESUMEN EJECUTIVO
+**Resumen Ejecutivo**
+
 [1-2 sentences about general progress. Focus on what was accomplished and impact.]
 
-LOGROS CLAVE
-• [Achievement 1 with metric, if available]
-• [Achievement 2 with metric, if available]
-• [Achievement 3 with business or technical impact]
+**Logros Clave**
 
-CONTEXTO TÉCNICO
+- [Achievement 1 with metric, if available]
+- [Achievement 2 with metric, if available]
+- [Achievement 3 with business or technical impact]
+
+**Contexto Técnico**
+
 [Conceptual explanation of root cause and solution. No code, no line numbers, just logic.]
 
-SIGUIENTES PASOS
-• [Next high-priority work, if documented]
-• [Next medium-priority work, if documented]
+**Siguientes Pasos**
 
-BLOQUEADORES
+- [Next high-priority work, if documented]
+- [Next medium-priority work, if documented]
+
+**Bloqueadores**
+
 [Only if there are documented blockers. Include impact and required action.]
-• [Blocker with impact + necessary action]
+
+- [Blocker with impact + necessary action]
 ```
 
-**Formatting rules for plain text:**
-- Section headers: ALL CAPS (no markdown `##` or `**bold**`)
-- Bullets: Use `•` character (not markdown `-`)
-- No markdown syntax (`**`, `##`, ` ` ` for code, etc.)
-- Keep it simple and readable as plain text
+**Formatting rules:**
+- Use standard markdown syntax (`##` headings, `**bold**`, `-` bullets)
+- This markdown will be converted to ADF for proper Jira rendering
 
 ### Step 6: Save Artifact
 
 **Get timestamp:**
 Use current time from injected context (format: YYYY-MM-DD-HHMM)
 
-**Save to file:**
+**Save markdown file:**
 - Path: `dev/artifacts/{work-log-name}-manager-{timestamp}.md`
-- Content: The exact Spanish manager summary
+- Content: The exact Spanish manager summary in markdown format
 
 **Use Write tool to create the artifact file.**
 
@@ -212,14 +216,21 @@ Use current time from injected context (format: YYYY-MM-DD-HHMM)
 **If user wants to post to Jira:**
 
 1. Invoke the `jira` skill to get acli syntax
-2. Use `acli jira workitem comment create` with the plain text file:
+2. Convert markdown to ADF and post to Jira:
    ```bash
+   # Convert markdown to ADF JSON
+   ~/dotfiles-universal/bin/md-to-adf dev/artifacts/{work-log-name}-manager-{timestamp}.md > /tmp/manager-summary-adf.json
+
+   # Post ADF to Jira comment
    acli jira workitem comment create \
      --key "{JIRA-ID}" \
-     --body-file dev/artifacts/{work-log-name}-manager-{timestamp}.md
+     --body "$(cat /tmp/manager-summary-adf.json)"
    ```
 
-**IMPORTANT:** The artifact file is now in **plain text format** (not markdown) to ensure it displays correctly in Jira. The `acli` tool does not render markdown syntax in Jira comments.
+**How it works:**
+1. The markdown file is saved for version control and human readability
+2. The `md-to-adf` script converts markdown to ADF (Atlassian Document Format)
+3. The ADF JSON is posted to Jira, which renders it with proper formatting (headings, bold, bullets)
 
 **If user just wants the file:**
 - Respond: `✅ Manager summary created: dev/artifacts/{filename}.md`
@@ -227,25 +238,30 @@ Use current time from injected context (format: YYYY-MM-DD-HHMM)
 
 ## Example Output
 
-```
-SYS-2110
+```markdown
+## SYS-2110
 
-RESUMEN EJECUTIVO
+**Resumen Ejecutivo**
+
 Se corrigió bug crítico en OAuth que causaba errores invalid_grant. El operador de asignación en lugar de comparación marcaba tokens como expirados inmediatamente.
 
-LOGROS CLAVE
-• Corregido operador lógico en validación de tokens
-• 15 tests unitarios pasando
-• Reducción de 40% en llamadas innecesarias a API de OAuth
+**Logros Clave**
 
-CONTEXTO TÉCNICO
-El código usaba = (asignación) en lugar de == (comparación) en la verificación de expiración. La solución corrigió el operador y es backward-compatible.
+- Corregido operador lógico en validación de tokens
+- 15 tests unitarios pasando
+- Reducción de 40% en llamadas innecesarias a API de OAuth
 
-SIGUIENTES PASOS
-• Deploy a producción esta semana
-• Agregar test de regresión (issue #456)
+**Contexto Técnico**
 
-BLOQUEADORES
+El código usaba `=` (asignación) en lugar de `==` (comparación) en la verificación de expiración. La solución corrigió el operador y es backward-compatible.
+
+**Siguientes Pasos**
+
+- Deploy a producción esta semana
+- Agregar test de regresión (issue #456)
+
+**Bloqueadores**
+
 Ninguno.
 ```
 
@@ -263,12 +279,6 @@ Ninguno.
 
 ❌ **Communicating with user in Spanish**
 - ALL agent ↔ user communication must be in English
-
-❌ **Using markdown syntax in the Jira comment**
-- DO NOT use `##`, `**bold**`, or ` ` ` code blocks in the output
-- Use ALL CAPS for section headers instead
-- Use `•` bullets instead of `-` markdown bullets
-- The output must be plain text that looks good in Jira without rendering
 
 ❌ **Being verbose or adding unnecessary formatting**
 - Keep it concise: 2-3 sentences per section MAX

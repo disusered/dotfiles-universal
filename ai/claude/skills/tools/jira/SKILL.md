@@ -82,30 +82,30 @@ acli jira workitem transition --key "CM-2766" --status "In Progress"
 
 #### Add comment
 
-**IMPORTANT:** `acli` does NOT render markdown in Jira comments. Use plain text formatting.
+**IMPORTANT:** `acli` requires ADF (Atlassian Document Format) for rich text formatting.
 
 ```bash
 acli jira workitem comment create --key "<issue-key>" --body "<comment-text>"
 
-# Examples:
+# Simple text comment:
 acli jira workitem comment create --key "CM-2766" --body "Updated the implementation"
 
-# Multi-line comment (plain text format, NOT markdown):
-acli jira workitem comment create --key "CM-2766" --body "$(cat << 'EOF'
-RESUMEN EJECUTIVO
+# Rich text comment using ADF (from markdown):
+# Step 1: Write markdown
+cat > summary.md << 'EOF'
+## Summary
 
-Se corrigió bug crítico en OAuth...
+**Bold text** and *italic*.
 
-LOGROS CLAVE
-• Corrección implementada
-• Tests pasando
-
-Use ALL CAPS for headers and • for bullets (not markdown ## or **bold** or -)
+- Bullet 1
+- Bullet 2
 EOF
-)"
 
-# Post from file (file should be plain text, not markdown):
-acli jira workitem comment create --key "CM-2766" --body-file path/to/plain-text-summary.md
+# Step 2: Convert markdown to ADF
+~/dotfiles-universal/bin/md-to-adf summary.md > summary-adf.json
+
+# Step 3: Post ADF to Jira
+acli jira workitem comment create --key "CM-2766" --body "$(cat summary-adf.json)"
 ```
 
 #### List comments
@@ -122,25 +122,18 @@ acli jira workitem comment list --key "CM-2766"
 ### Post manager summary to Jira
 
 ```bash
-# Post Spanish manager summary to Jira issue (plain text format, NOT markdown)
-acli jira workitem comment create --key "CM-2766" --body "$(cat << 'EOF'
-CM-2766
+# Post Spanish manager summary to Jira issue with rich formatting
+# Step 1: Manager summary is saved as markdown in dev/artifacts/
+# (e.g., dev/artifacts/fix-oauth-manager-2025-11-14-1430.md)
 
-RESUMEN EJECUTIVO
-Se corrigió bug crítico en autenticación OAuth que afectaba...
+# Step 2: Convert markdown to ADF
+~/dotfiles-universal/bin/md-to-adf dev/artifacts/fix-oauth-manager-2025-11-14-1430.md > /tmp/manager-adf.json
 
-IMPACTO
-• Sistema de autenticación estabilizado
-• Reducción de errores de login en 95%
+# Step 3: Post ADF to Jira
+acli jira workitem comment create --key "CM-2766" --body "$(cat /tmp/manager-adf.json)"
 
-PRÓXIMOS PASOS
-• Monitorear métricas por 48h
-• Documentar cambios
-EOF
-)"
-
-# Alternative: Use --body-file with a plain text file
-acli jira workitem comment create --key "CM-2766" --body-file dev/artifacts/summary.md
+# One-liner version:
+acli jira workitem comment create --key "CM-2766" --body "$(~/dotfiles-universal/bin/md-to-adf dev/artifacts/fix-oauth-manager-2025-11-14-1430.md)"
 ```
 
 ### Check work item before working
@@ -171,17 +164,25 @@ acli jira workitem list --jql "assignee = currentUser()"
 
 **SOLUTION:** Verify the issue key format (e.g., "CM-2766") and ensure you have access to the project.
 
-### ❌ Comment posted as raw markdown instead of formatted text
+### ❌ Comment posted as raw markdown or JSON instead of formatted text
 
-**PROBLEM:** Comments using markdown syntax (`## Heading`, `**bold**`, `- bullets`) appear as raw text in Jira.
+**PROBLEM:** Comments appear as raw markdown (`## Heading`, `**bold**`) or raw JSON in Jira.
 
-**CAUSE:** The `acli` tool does NOT render markdown in Jira comments. There is no `--format markdown` flag.
+**CAUSE:** Jira requires ADF (Atlassian Document Format) for rich text. Markdown is not automatically converted.
 
-**SOLUTION:** Use plain text formatting:
-- Section headers: ALL CAPS (e.g., `RESUMEN EJECUTIVO`)
-- Bullets: Use `•` character (not `-`)
-- Emphasis: ALL CAPS or simple text (not `**bold**`)
-- No markdown syntax: Avoid `##`, `**`, ` ` `, etc.
+**SOLUTION:** Convert markdown to ADF before posting:
+
+```bash
+# Convert markdown to ADF, then post to Jira
+~/dotfiles-universal/bin/md-to-adf summary.md | \
+  xargs -0 -I {} acli jira workitem comment create --key "CM-123" --body "{}"
+
+# Or save intermediate ADF file:
+~/dotfiles-universal/bin/md-to-adf summary.md > summary-adf.json
+acli jira workitem comment create --key "CM-123" --body "$(cat summary-adf.json)"
+```
+
+**Tool:** The `md-to-adf` script is located at `~/dotfiles-universal/bin/md-to-adf` and uses the `marklassian` library (requires `npm install -g marklassian`)
 
 ## Getting Help
 

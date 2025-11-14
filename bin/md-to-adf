@@ -1,0 +1,85 @@
+#!/usr/bin/env node
+
+/**
+ * Converts Markdown to Atlassian Document Format (ADF)
+ *
+ * Usage:
+ *   md-to-adf <input.md>              # Convert file to ADF JSON (outputs to stdout)
+ *   md-to-adf < input.md              # Convert from stdin
+ *   echo "# Hello" | md-to-adf        # Pipe markdown
+ *
+ * Examples:
+ *   md-to-adf summary.md > summary.json
+ *   md-to-adf summary.md | jq .
+ *   cat summary.md | md-to-adf | acli jira workitem comment create --key CM-123 --body "$(cat)"
+ */
+
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+// Ensure NODE_PATH includes global modules
+const globalNodeModules = execSync('npm root -g', { encoding: 'utf8' }).trim();
+if (process.env.NODE_PATH) {
+  process.env.NODE_PATH = `${process.env.NODE_PATH}:${globalNodeModules}`;
+} else {
+  process.env.NODE_PATH = globalNodeModules;
+}
+require('module').Module._initPaths();
+
+// Load marklassian from global install
+let markdownToAdf;
+try {
+  markdownToAdf = require('marklassian').markdownToAdf;
+} catch (e) {
+  console.error('Error: marklassian not found.');
+  console.error('');
+  console.error('Please install marklassian globally:');
+  console.error('  npm install -g marklassian');
+  console.error('');
+  console.error('Or ensure NODE_PATH includes marklassian location.');
+  process.exit(1);
+}
+
+async function main() {
+  let markdown;
+
+  // Read from file argument or stdin
+  if (process.argv[2] && process.argv[2] !== '-') {
+    const filePath = process.argv[2];
+
+    if (!fs.existsSync(filePath)) {
+      console.error(`Error: File not found: ${filePath}`);
+      process.exit(1);
+    }
+
+    markdown = fs.readFileSync(filePath, 'utf8');
+  } else {
+    // Read from stdin
+    const chunks = [];
+
+    for await (const chunk of process.stdin) {
+      chunks.push(chunk);
+    }
+
+    markdown = Buffer.concat(chunks).toString('utf8');
+  }
+
+  if (!markdown.trim()) {
+    console.error('Error: No markdown content provided');
+    process.exit(1);
+  }
+
+  try {
+    // Convert markdown to ADF
+    const adf = markdownToAdf(markdown);
+
+    // Output ADF as JSON
+    console.log(JSON.stringify(adf, null, 2));
+  } catch (error) {
+    console.error('Error converting markdown to ADF:', error.message);
+    process.exit(1);
+  }
+}
+
+main();
