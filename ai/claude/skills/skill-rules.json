@@ -61,7 +61,7 @@
       "type": "tool",
       "enforcement": "suggest",
       "priority": "medium",
-      "description": "Use acli to interact with Jira work items and comments",
+      "description": "Use acli to interact with Jira work items and comments (NOT Confluence)",
       "triggers": {
         "promptTriggers": {
           "keywords": [
@@ -69,16 +69,49 @@
             "acli",
             "jira issue",
             "jira comment",
-            "workitem",
-            "atlassian"
+            "jira workitem",
+            "jira ticket",
+            "sprint",
+            "epic"
           ],
           "intentPatterns": [
             "jira.*issue",
             "jira.*comment",
-            "acli\\s+",
-            "create.*jira",
-            "view.*jira",
-            "post.*jira"
+            "jira.*workitem",
+            "jira.*ticket",
+            "acli\\s+jira",
+            "create.*jira.*issue",
+            "view.*jira.*issue",
+            "post.*jira.*comment",
+            "update.*jira"
+          ]
+        }
+      }
+    },
+    "confluence": {
+      "type": "tool",
+      "enforcement": "suggest",
+      "priority": "medium",
+      "description": "Use Atlassian MCP to interact with Confluence pages and spaces",
+      "triggers": {
+        "promptTriggers": {
+          "keywords": [
+            "confluence",
+            "confluence page",
+            "confluence space",
+            "wiki page",
+            "atlassian confluence",
+            "create page",
+            "edit page"
+          ],
+          "intentPatterns": [
+            "confluence.*page",
+            "confluence.*space",
+            "create.*confluence",
+            "view.*confluence",
+            "update.*confluence",
+            "search.*confluence",
+            "wiki.*page"
           ]
         }
       }
