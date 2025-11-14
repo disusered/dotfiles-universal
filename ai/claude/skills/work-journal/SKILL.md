@@ -63,6 +63,15 @@ Invoke the `jira` skill when you need to:
 - Query Jira issues
 ```
 
+### For Confluence operations:
+```
+Invoke the `confluence` skill when you need to:
+- Create or update Confluence pages
+- Search Confluence content
+- Manage Confluence spaces
+- Add comments to Confluence pages
+```
+
 ### For GitHub operations:
 ```
 Invoke the `gh` skill when you need to:

@@ -289,7 +289,7 @@ Use `jq --help` for more options. See the jq skill for comprehensive reference.
 
 ### acli
 
-Official Atlassian CLI for Jira work items and comments.
+Official Atlassian CLI for **Jira only** (NOT Confluence - use Atlassian MCP for Confluence).
 
 **Work Items:**
 
@@ -302,6 +302,43 @@ Official Atlassian CLI for Jira work items and comments.
 
 - `acli jira workitem comment create --key "KEY-123" --body "Comment text"` - Add comment
 - Use `--help` on any command for full options
+
+**Note:** For Confluence operations (pages, spaces, wiki), use the Atlassian MCP server instead.
+
+### Atlassian MCP
+
+Model Context Protocol server for **Confluence** (NOT Jira - use acli for Jira).
+
+The Atlassian MCP server provides tools for interacting with Confluence through the Model Context Protocol. It's automatically available when configured.
+
+**Confluence Operations:**
+
+- **Spaces**: List and manage Confluence spaces
+- **Pages**: Create, read, update, delete pages with full CRUD operations
+- **Search**: Use CQL (Confluence Query Language) for content discovery
+- **Comments**: Add and manage threaded comments on pages
+- **Labels**: Manage page labels
+- **Hierarchy**: Navigate page relationships (ancestors, children)
+
+**Configuration:**
+
+The MCP server requires API credentials stored in `~/.atlassian-mcp.json`:
+
+```json
+{
+  "domain": "your-domain.atlassian.net",
+  "email": "your-email@example.com",
+  "apiToken": "your-api-token-here"
+}
+```
+
+Create an API token at: https://id.atlassian.com/manage-profile/security/api-tokens
+
+**Usage:**
+
+When you need to interact with Confluence, the Confluence skill will automatically invoke the appropriate MCP tools. You can also directly request Confluence operations and the MCP server will handle them.
+
+**Note:** For Jira operations (issues, comments, workitems), use acli instead.
 
 ### gh
 

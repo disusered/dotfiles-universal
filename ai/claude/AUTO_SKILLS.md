@@ -188,9 +188,22 @@ Consider using the Skill tool with command "work-journal"
 
 - "jira", "acli"
 - "jira issue", "jira comment"
-- "workitem"
+- "jira workitem", "jira ticket"
+- "sprint", "epic"
 
-**What it does:** Provides Jira CLI (acli) reference and syntax
+**What it does:** Provides Jira CLI (acli) reference and syntax for Jira work items and comments (NOT Confluence)
+
+### confluence
+
+**Type:** CLI tool
+
+**Triggers when you mention:**
+
+- "confluence", "confluence page", "confluence space"
+- "wiki page", "atlassian confluence"
+- "create page", "edit page"
+
+**What it does:** Provides Atlassian MCP reference for Confluence pages, spaces, and content management (NOT Jira)
 
 ### ast-grep
 
@@ -376,6 +389,7 @@ Key adaptations:
 - [CLAUDE.md](./CLAUDE.md) - Core directives and work logging
 - [skills/work-journal/SKILL.md](./skills/work-journal/SKILL.md) - Work journal skill documentation
 - [skills/tools/gh/SKILL.md](./skills/tools/gh/SKILL.md) - GitHub CLI skill
-- [skills/tools/jira/SKILL.md](./skills/tools/jira/SKILL.md) - Jira CLI skill
+- [skills/tools/jira/SKILL.md](./skills/tools/jira/SKILL.md) - Jira CLI skill (acli)
+- [skills/tools/confluence/SKILL.md](./skills/tools/confluence/SKILL.md) - Confluence MCP skill
 - [skills/tools/ast-grep/SKILL.md](./skills/tools/ast-grep/SKILL.md) - ast-grep skill
 - [skills/tools/jq/SKILL.md](./skills/tools/jq/SKILL.md) - jq JSON processor skill
