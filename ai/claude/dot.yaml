@@ -5,7 +5,6 @@ global:
       - /languages/node/latest
       - /ai/postgres-mcp
       - /ai/mcp-chrome
-      - /ai/atlassian-mcp
   links:
     agents: ~/.claude/agents/
     skills: ~/.claude/skills/

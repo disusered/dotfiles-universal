@@ -1,5 +1,0 @@
-global:
-  installs:
-    cmd: npm install -g @xuandev/atlassian-mcp
-    depends:
-      - /languages/node/latest
