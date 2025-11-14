@@ -163,31 +163,38 @@ Ask the user (in English):
 
 **Format:**
 
-```markdown
-## {JIRA-ID}
+**CRITICAL: Generate PLAIN TEXT format (not markdown) for Jira compatibility.**
 
-**Resumen Ejecutivo**
+Since `acli` does not render markdown in Jira comments, use plain text formatting:
+
+```
+{JIRA-ID}
+
+RESUMEN EJECUTIVO
 [1-2 sentences about general progress. Focus on what was accomplished and impact.]
 
-**Logros Clave**
+LOGROS CLAVE
+• [Achievement 1 with metric, if available]
+• [Achievement 2 with metric, if available]
+• [Achievement 3 with business or technical impact]
 
-- [Achievement 1 with metric, if available]
-- [Achievement 2 with metric, if available]
-- [Achievement 3 with business or technical impact]
-
-**Contexto Técnico**
+CONTEXTO TÉCNICO
 [Conceptual explanation of root cause and solution. No code, no line numbers, just logic.]
 
-**Siguiente Pasos**
+SIGUIENTES PASOS
+• [Next high-priority work, if documented]
+• [Next medium-priority work, if documented]
 
-- [Next high-priority work, if documented]
-- [Next medium-priority work, if documented]
-
-**Bloqueadores**
+BLOQUEADORES
 [Only if there are documented blockers. Include impact and required action.]
-
-- [Blocker with impact + necessary action]
+• [Blocker with impact + necessary action]
 ```
+
+**Formatting rules for plain text:**
+- Section headers: ALL CAPS (no markdown `##` or `**bold**`)
+- Bullets: Use `•` character (not markdown `-`)
+- No markdown syntax (`**`, `##`, ` ` ` for code, etc.)
+- Keep it simple and readable as plain text
 
 ### Step 6: Save Artifact
 
@@ -205,12 +212,14 @@ Use current time from injected context (format: YYYY-MM-DD-HHMM)
 **If user wants to post to Jira:**
 
 1. Invoke the `jira` skill to get acli syntax
-2. Use `acli jira workitem comment create`:
+2. Use `acli jira workitem comment create` with the plain text file:
    ```bash
    acli jira workitem comment create \
      --key "{JIRA-ID}" \
      --body-file dev/artifacts/{work-log-name}-manager-{timestamp}.md
    ```
+
+**IMPORTANT:** The artifact file is now in **plain text format** (not markdown) to ensure it displays correctly in Jira. The `acli` tool does not render markdown syntax in Jira comments.
 
 **If user just wants the file:**
 - Respond: `✅ Manager summary created: dev/artifacts/{filename}.md`
@@ -218,25 +227,25 @@ Use current time from injected context (format: YYYY-MM-DD-HHMM)
 
 ## Example Output
 
-```markdown
-## SYS-2110
+```
+SYS-2110
 
-**Resumen Ejecutivo**
-Se corrigió bug crítico en OAuth que causaba errores `invalid_grant`. El operador de asignación en lugar de comparación marcaba tokens como expirados inmediatamente.
+RESUMEN EJECUTIVO
+Se corrigió bug crítico en OAuth que causaba errores invalid_grant. El operador de asignación en lugar de comparación marcaba tokens como expirados inmediatamente.
 
-**Logros Clave**
-- Corregido operador lógico en validación de tokens
-- 15 tests unitarios pasando
-- Reducción de 40% en llamadas innecesarias a API de OAuth
+LOGROS CLAVE
+• Corregido operador lógico en validación de tokens
+• 15 tests unitarios pasando
+• Reducción de 40% en llamadas innecesarias a API de OAuth
 
-**Contexto Técnico**
-El código usaba `=` (asignación) en lugar de `==` (comparación) en la verificación de expiración. La solución corrigió el operador y es backward-compatible.
+CONTEXTO TÉCNICO
+El código usaba = (asignación) en lugar de == (comparación) en la verificación de expiración. La solución corrigió el operador y es backward-compatible.
 
-**Siguiente Pasos**
-- Deploy a producción esta semana
-- Agregar test de regresión (issue #456)
+SIGUIENTES PASOS
+• Deploy a producción esta semana
+• Agregar test de regresión (issue #456)
 
-**Bloqueadores**
+BLOQUEADORES
 Ninguno.
 ```
 
@@ -254,6 +263,12 @@ Ninguno.
 
 ❌ **Communicating with user in Spanish**
 - ALL agent ↔ user communication must be in English
+
+❌ **Using markdown syntax in the Jira comment**
+- DO NOT use `##`, `**bold**`, or ` ` ` code blocks in the output
+- Use ALL CAPS for section headers instead
+- Use `•` bullets instead of `-` markdown bullets
+- The output must be plain text that looks good in Jira without rendering
 
 ❌ **Being verbose or adding unnecessary formatting**
 - Keep it concise: 2-3 sentences per section MAX

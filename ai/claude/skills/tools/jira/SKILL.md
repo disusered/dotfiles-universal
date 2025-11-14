@@ -82,19 +82,30 @@ acli jira workitem transition --key "CM-2766" --status "In Progress"
 
 #### Add comment
 
+**IMPORTANT:** `acli` does NOT render markdown in Jira comments. Use plain text formatting.
+
 ```bash
 acli jira workitem comment create --key "<issue-key>" --body "<comment-text>"
 
 # Examples:
 acli jira workitem comment create --key "CM-2766" --body "Updated the implementation"
 
-# Multi-line comment:
+# Multi-line comment (plain text format, NOT markdown):
 acli jira workitem comment create --key "CM-2766" --body "$(cat << 'EOF'
-## Resumen Ejecutivo
+RESUMEN EJECUTIVO
 
 Se corrigió bug crítico en OAuth...
+
+LOGROS CLAVE
+• Corrección implementada
+• Tests pasando
+
+Use ALL CAPS for headers and • for bullets (not markdown ## or **bold** or -)
 EOF
 )"
+
+# Post from file (file should be plain text, not markdown):
+acli jira workitem comment create --key "CM-2766" --body-file path/to/plain-text-summary.md
 ```
 
 #### List comments
@@ -111,21 +122,25 @@ acli jira workitem comment list --key "CM-2766"
 ### Post manager summary to Jira
 
 ```bash
-# Post Spanish manager summary to Jira issue
+# Post Spanish manager summary to Jira issue (plain text format, NOT markdown)
 acli jira workitem comment create --key "CM-2766" --body "$(cat << 'EOF'
-## Resumen Ejecutivo
+CM-2766
 
+RESUMEN EJECUTIVO
 Se corrigió bug crítico en autenticación OAuth que afectaba...
 
-**Impacto:**
-- Sistema de autenticación estabilizado
-- Reducción de errores de login en 95%
+IMPACTO
+• Sistema de autenticación estabilizado
+• Reducción de errores de login en 95%
 
-**Próximos Pasos:**
-- Monitorear métricas por 48h
-- Documentar cambios
+PRÓXIMOS PASOS
+• Monitorear métricas por 48h
+• Documentar cambios
 EOF
 )"
+
+# Alternative: Use --body-file with a plain text file
+acli jira workitem comment create --key "CM-2766" --body-file dev/artifacts/summary.md
 ```
 
 ### Check work item before working
@@ -155,6 +170,18 @@ acli jira workitem list --jql "assignee = currentUser()"
 **ERROR:** `Issue does not exist or you do not have permission to see it`
 
 **SOLUTION:** Verify the issue key format (e.g., "CM-2766") and ensure you have access to the project.
+
+### ❌ Comment posted as raw markdown instead of formatted text
+
+**PROBLEM:** Comments using markdown syntax (`## Heading`, `**bold**`, `- bullets`) appear as raw text in Jira.
+
+**CAUSE:** The `acli` tool does NOT render markdown in Jira comments. There is no `--format markdown` flag.
+
+**SOLUTION:** Use plain text formatting:
+- Section headers: ALL CAPS (e.g., `RESUMEN EJECUTIVO`)
+- Bullets: Use `•` character (not `-`)
+- Emphasis: ALL CAPS or simple text (not `**bold**`)
+- No markdown syntax: Avoid `##`, `**`, ` ` `, etc.
 
 ## Getting Help
 
