@@ -287,6 +287,34 @@ JSON processor for parsing, filtering, and transforming JSON data. Use this inst
 
 Use `jq --help` for more options. See the jq skill for comprehensive reference.
 
+### psql
+
+PostgreSQL command-line client for database operations. **CRITICAL: ALWAYS run through docker compose, NEVER locally.**
+
+**Basic Usage:**
+
+- `docker compose exec -it postgres psql -U postgres -d myapp_db` - Connect to database
+- `docker compose exec -it postgres psql -U postgres -d myapp_db -c "SQL"` - Run single command
+- `docker compose exec -T postgres psql -U postgres -d myapp_db < file.sql` - Execute SQL file
+
+**Common Meta-Commands:**
+
+- `\l` - List all databases
+- `\dt` - List all tables
+- `\d table_name` - Describe table
+- `\du` - List users/roles
+- `\c database_name` - Connect to database
+- `\q` - Quit
+
+**Database Operations:**
+
+- `docker compose exec -T postgres pg_dump -U postgres -d myapp_db > backup.sql` - Backup database
+- `docker compose exec -T postgres psql -U postgres -d myapp_db < backup.sql` - Restore database
+- `docker compose logs postgres` - Check database logs
+- `docker compose restart postgres` - Restart database
+
+Use the psql skill for comprehensive reference including SQL operations, migrations, and troubleshooting.
+
 ### acli
 
 Official Atlassian CLI for **Jira only** (NOT Confluence - use Atlassian MCP for Confluence).
