@@ -229,6 +229,19 @@ Consider using the Skill tool with command "work-journal"
 
 **What it does:** Provides JSON processing, filtering, and transformation reference
 
+### psql
+
+**Type:** CLI tool
+
+**Triggers when you mention:**
+
+- "psql", "postgres", "postgresql", "database"
+- "sql query", "pg_dump", "pg_restore"
+- "database backup", "database restore"
+- "sql migration", "create table", "alter table"
+
+**What it does:** Provides PostgreSQL command-line reference with emphasis on docker compose usage (NOT local psql)
+
 ## How It Works
 
 ### User Experience Flow

@@ -180,6 +180,45 @@
           ]
         }
       }
+    },
+    "psql": {
+      "type": "tool",
+      "enforcement": "suggest",
+      "priority": "high",
+      "description": "PostgreSQL command-line client - ALWAYS use through docker compose",
+      "triggers": {
+        "promptTriggers": {
+          "keywords": [
+            "psql",
+            "postgres",
+            "postgresql",
+            "database",
+            "sql query",
+            "pg_dump",
+            "pg_restore",
+            "database backup",
+            "database restore",
+            "sql migration",
+            "create table",
+            "alter table"
+          ],
+          "intentPatterns": [
+            "connect.*database",
+            "run.*sql",
+            "execute.*sql",
+            "query.*database",
+            "postgres.*database",
+            "postgresql.*query",
+            "database.*migration",
+            "backup.*database",
+            "restore.*database",
+            "psql.*command",
+            "create.*table",
+            "alter.*table",
+            "select.*from"
+          ]
+        }
+      }
     }
   }
 }
