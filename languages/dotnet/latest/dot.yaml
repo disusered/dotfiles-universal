@@ -13,9 +13,11 @@ linux[whoami.distro^="Fedora"]:
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      yes | sudo pacman -S \
+      sudo pacman -S --noconfirm \
+        dotnet-sdk-10.0 \
         dotnet-sdk-9.0 \
         dotnet-sdk-8.0 \
+        aspnet-runtime-10.0 \
         aspnet-runtime-9.0 \
         aspnet-runtime-8.0
   links:
