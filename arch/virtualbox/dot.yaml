@@ -1,0 +1,10 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      sudo pacman -S --noconfirm virtualbox virtualbox-host-modules-arch \
+        virtualbox-guest-iso
+      yay -S --noconfirm virtualbox-ext-oracle
+      sudo gpasswd -a $USER vboxusers
+  links:
+    virtualbox.conf: ~/.config/hypr/conf.d/virtualbox.conf
+    virtualbox.desktop: ~/.local/share/applications/virtualbox.desktop
