@@ -6,4 +6,6 @@ linux[whoami.distro^="Fedora"]:
     sshexe.zsh: ~/.config/zsh/0016_sshexe.zsh
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S openssh
+    cmd: |
+      sudo pacman -S --noconfirm openssh
+      sudo systemctl enable --now sshd
