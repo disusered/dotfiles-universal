@@ -48,9 +48,17 @@ return {
       }
     end
 
+    -- Define the custom xmlformat formatter
+    opts.formatters["xmlformat"] = {
+      command = "xmlformat",
+      args = { "--selfclose", "--blanks", "-" },
+      stdin = true,
+    }
+
     -- Assign formatters to filetypes
     opts.formatters_by_ft["sql"] = vim.list_extend(opts.formatters_by_ft["sql"] or {}, { "sqlfluff" })
     opts.formatters_by_ft["cs"] = vim.list_extend(opts.formatters_by_ft["cs"] or {}, { "csharpier" })
     opts.formatters_by_ft["ps1"] = { "ps_formatter" }
+    opts.formatters_by_ft["xml"] = { "xmlformat" }
   end,
 }

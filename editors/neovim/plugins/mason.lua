@@ -12,6 +12,7 @@ return {
       "shfmt", -- Formatter
       -- C#
       "csharpier", -- Formatter
+      "xmlformatter", -- Formatter
       -- CSS / HTML
       "css-lsp",
       "html-lsp",
