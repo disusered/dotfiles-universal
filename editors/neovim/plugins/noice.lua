@@ -19,6 +19,14 @@ return {
       inc_rename = false,
     },
     routes = {
+      -- Disable all LSP progress messages
+      {
+        filter = {
+          event = "lsp",
+          kind = "progress",
+        },
+        opts = { skip = true },
+      },
       {
         filter = {
           event = "notify",
