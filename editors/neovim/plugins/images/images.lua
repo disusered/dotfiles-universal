@@ -43,6 +43,7 @@ return {
     -- Diagram rendering in Neovim
     "3rd/diagram.nvim",
     dependencies = { "3rd/image.nvim" },
+    ft = { "markdown", "quarto", "norg" },
     config = function()
       -- Extend markdown integration with Quarto filetype
       local markdown_integration = require("diagram.integrations.markdown")
