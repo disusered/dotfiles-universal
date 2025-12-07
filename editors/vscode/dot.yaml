@@ -16,6 +16,7 @@ linux[whoami.distro^="Arch"]:
       code --install-extension GitHub.copilot
       code --install-extension GitHub.copilot-chat
       code --install-extension anthropic.claude-code
+      code --install-extension google.gemini-cli-vscode-ide-companion
 
       # Language
       code --install-extension ms-vscode.makefile-tools
