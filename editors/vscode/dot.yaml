@@ -1,0 +1,23 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      sudo pacman -S --noconfirm visual-studio-code-bin
+
+      # Visual
+      code --install-extension Catppuccin.catppuccin-vsc
+      code --install-extension Catppuccin.catppuccin-vsc-icons
+
+      # IDE
+      code --install-extension EditorConfig.EditorConfig
+      code --install-extension ms-azuretools.vscode-containers
+      code --install-extension asvetliakov.vscode-neovim
+
+      # AI
+      code --install-extension GitHub.copilot
+      code --install-extension GitHub.copilot-chat
+      code --install-extension anthropic.claude-code
+
+      # Language
+      code --install-extension ms-vscode.makefile-tools
+  links:
+    settings.json: ~/.config/Code/User/settings.json
