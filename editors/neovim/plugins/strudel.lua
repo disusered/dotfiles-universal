@@ -1,6 +1,7 @@
 return {
   {
     "gruvw/strudel.nvim",
+    lazy = false,
     build = "npm install",
     config = function()
       require("strudel").setup({
