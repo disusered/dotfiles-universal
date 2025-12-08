@@ -1,0 +1,8 @@
+flavor = "mocha"
+accent = "blue"
+
+[fonts]
+mono = "JetBrainsMono Nerd Font"
+mono_size = 10
+sans = "Noto Sans"
+sans_size = 11
