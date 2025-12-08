@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: cargo build --release
+  links:
+    target/release/cfg: ~/.local/bin/cfg
