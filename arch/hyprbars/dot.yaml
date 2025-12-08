@@ -1,0 +1,10 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      hyprpm update
+      hyprpm add --force https://github.com/hyprwm/hyprland-plugins
+      hyprpm enable hyprbars
+    # depends:
+    #   - /arch/hyprland
+  links:
+    hyprbars.conf: ~/.config/hypr/conf.d/hyprbars.conf
