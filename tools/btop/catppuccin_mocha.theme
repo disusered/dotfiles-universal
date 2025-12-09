@@ -32,7 +32,7 @@ theme[proc_misc]="#f5e0dc"
 theme[cpu_box]="#cba6f7" #Mauve
 theme[mem_box]="#a6e3a1" #Green
 theme[net_box]="#eba0ac" #Maroon
-theme[proc_box]="#89b4fa" #Blue
+theme[proc_box]="#89b4fa" #Accent
 
 # Box divider line and small boxes line color
 theme[div_line]="#6c7086"

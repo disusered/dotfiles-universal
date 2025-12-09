@@ -33,7 +33,7 @@ theme[proc_misc]="{{ rosewater_hex }}"
 theme[cpu_box]="{{ mauve_hex }}" #Mauve
 theme[mem_box]="{{ green_hex }}" #Green
 theme[net_box]="{{ maroon_hex }}" #Maroon
-theme[proc_box]="{{ accent_color_hex }}" #Blue
+theme[proc_box]="{{ accent_color_hex }}" #Accent
 
 # Box divider line and small boxes line color
 theme[div_line]="{{ overlay0_hex }}"

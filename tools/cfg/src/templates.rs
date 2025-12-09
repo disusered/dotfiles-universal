@@ -7,6 +7,8 @@ use serde::Deserialize;
 pub struct TemplateConfig {
     pub path: String,
     pub reload: Option<String>,
+    /// Rotz module to re-link after rendering (e.g., "/arch/wlogout")
+    pub link: Option<String>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -46,5 +48,23 @@ pub fn reload_app(cmd: &str) -> Result<(), String> {
         Ok(())
     } else {
         Err(format!("Reload command failed with exit code: {:?}", status.code()))
+    }
+}
+
+/// Run rotz link for a specific module
+pub fn rotz_link(module: &str) -> Result<(), String> {
+    let home = std::env::var("HOME").map_err(|_| "HOME not set")?;
+    let rotz_bin = format!("{}/.rotz/bin/rotz", home);
+
+    let status = Command::new(&rotz_bin)
+        .arg("link")
+        .arg(module)
+        .status()
+        .map_err(|e| format!("Failed to execute rotz link: {}", e))?;
+
+    if status.success() {
+        Ok(())
+    } else {
+        Err(format!("rotz link failed with exit code: {:?}", status.code()))
     }
 }

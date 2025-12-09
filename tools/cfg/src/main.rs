@@ -11,7 +11,7 @@ use color::format_color;
 use config::Config;
 use palette::Palette;
 use render::{build_context, discover_templates, render_to_file};
-use templates::{reload_app, TemplatesFile};
+use templates::{reload_app, rotz_link, TemplatesFile};
 
 #[derive(Parser)]
 #[command(name = "cfg")]
@@ -34,6 +34,8 @@ enum Command {
         #[arg(long)]
         force: bool,
     },
+    /// Sync: render templates + update symlinks + reload apps
+    Sync,
     /// Theme management (Catppuccin colors, reload)
     Theme {
         #[command(subcommand)]
@@ -54,6 +56,9 @@ enum ThemeCommand {
         get: Option<String>,
         #[arg(long)]
         set: Option<String>,
+        /// After setting, immediately render + link + reload
+        #[arg(long)]
+        apply: bool,
     },
     /// Output palette colors
     Palette {
@@ -75,8 +80,6 @@ enum ThemeCommand {
         #[arg(long)]
         all: bool,
     },
-    /// Render + reload (convenience)
-    Apply,
 }
 
 #[derive(Subcommand)]
@@ -117,6 +120,74 @@ fn get_dotfiles_dir() -> String {
         let home = std::env::var("HOME").expect("HOME not set");
         format!("{}/.dotfiles", home)
     })
+}
+
+/// Run full sync: render templates + run rotz link + reload apps
+fn run_sync(cfg_dir: &str, dotfiles_dir: &str) {
+    // Load config and palette
+    let config = Config::load(&format!("{}/config.toml", cfg_dir)).unwrap_or_default();
+    let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
+    let palette = match Palette::load(&palette_path) {
+        Ok(p) => p,
+        Err(e) => {
+            eprintln!("Error loading palette: {}", e);
+            std::process::exit(1);
+        }
+    };
+
+    let context = build_context(&config, &palette);
+
+    // Render all templates
+    println!("Rendering templates...");
+    let templates_list = discover_templates(&PathBuf::from(dotfiles_dir));
+    for template_path in &templates_list {
+        match render_to_file(template_path, &context, false) {
+            Ok(output) => {
+                println!("  {}  →  {}", template_path.display(), output.display());
+            }
+            Err(e) => {
+                eprintln!("  Error: {}", e);
+            }
+        }
+    }
+
+    // Load templates registry for link and reload commands
+    let templates_path = format!("{}/templates.toml", cfg_dir);
+    if let Ok(templates) = TemplatesFile::load(&templates_path) {
+        // Run rotz link for apps that need it
+        let mut linked: std::collections::HashSet<String> = std::collections::HashSet::new();
+        println!("\nLinking...");
+        for name in templates.names() {
+            if let Some(tpl_config) = templates.get(name) {
+                if let Some(link_module) = &tpl_config.link {
+                    if !linked.contains(link_module) {
+                        print!("  rotz link {}... ", link_module);
+                        match rotz_link(link_module) {
+                            Ok(()) => println!("ok"),
+                            Err(e) => println!("failed: {}", e),
+                        }
+                        linked.insert(link_module.clone());
+                    }
+                }
+            }
+        }
+
+        // Reload all apps
+        println!("\nReloading apps...");
+        for name in templates.names() {
+            if let Some(tpl_config) = templates.get(name) {
+                if let Some(cmd) = &tpl_config.reload {
+                    print!("  {}... ", name);
+                    match reload_app(cmd) {
+                        Ok(()) => println!("ok"),
+                        Err(e) => println!("failed: {}", e),
+                    }
+                }
+            }
+        }
+    }
+
+    println!("\nDone!");
 }
 
 fn main() {
@@ -189,9 +260,15 @@ fn main() {
                 std::process::exit(1);
             }
         }
+        Command::Sync => {
+            let cfg_dir = get_cfg_dir();
+            let dotfiles_dir = get_dotfiles_dir();
+            run_sync(&cfg_dir, &dotfiles_dir);
+        }
         Command::Theme { command } => match command {
-            ThemeCommand::Config { get, set } => {
+            ThemeCommand::Config { get, set, apply } => {
                 let cfg_dir = get_cfg_dir();
+                let dotfiles_dir = get_dotfiles_dir();
                 let config_path = format!("{}/config.toml", cfg_dir);
 
                 let mut config = Config::load(&config_path).unwrap_or_default();
@@ -212,6 +289,11 @@ fn main() {
                         std::process::exit(1);
                     }
                     println!("{}={}", parts[0], parts[1]);
+
+                    // If --apply flag is set, run full sync
+                    if apply {
+                        run_sync(&cfg_dir, &dotfiles_dir);
+                    }
                 } else if let Some(key) = get {
                     match config.get(&key) {
                         Some(value) => println!("{}", value),
@@ -297,57 +379,6 @@ fn main() {
                         }
                     }
                 }
-            }
-            ThemeCommand::Apply => {
-                // Render all + reload all
-                let cfg_dir = get_cfg_dir();
-                let dotfiles_dir = get_dotfiles_dir();
-
-                // Load config and palette
-                let config = Config::load(&format!("{}/config.toml", cfg_dir)).unwrap_or_default();
-                let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
-                let palette = match Palette::load(&palette_path) {
-                    Ok(p) => p,
-                    Err(e) => {
-                        eprintln!("Error loading palette: {}", e);
-                        std::process::exit(1);
-                    }
-                };
-
-                let context = build_context(&config, &palette);
-
-                // Render all templates
-                println!("Rendering templates...");
-                let templates_list = discover_templates(&PathBuf::from(&dotfiles_dir));
-                for template_path in &templates_list {
-                    match render_to_file(template_path, &context, false) {
-                        Ok(output) => {
-                            println!("  {}  →  {}", template_path.display(), output.display());
-                        }
-                        Err(e) => {
-                            eprintln!("  Error: {}", e);
-                        }
-                    }
-                }
-
-                // Reload all apps
-                println!("\nReloading apps...");
-                let templates_path = format!("{}/templates.toml", cfg_dir);
-                if let Ok(templates) = TemplatesFile::load(&templates_path) {
-                    for name in templates.names() {
-                        if let Some(tpl_config) = templates.get(name) {
-                            if let Some(cmd) = &tpl_config.reload {
-                                print!("  {}... ", name);
-                                match reload_app(cmd) {
-                                    Ok(()) => println!("ok"),
-                                    Err(e) => println!("failed: {}", e),
-                                }
-                            }
-                        }
-                    }
-                }
-
-                println!("\nDone!");
             }
         },
         Command::Font { command } => match command {

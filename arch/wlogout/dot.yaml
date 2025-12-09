@@ -6,4 +6,4 @@ linux[whoami.distro^="Arch"]:
   links:
     wlogout.conf: ~/.config/hypr/conf.d/wlogout.conf
     blue.css: ~/.config/wlogout/style.css
-    mocha/blue: ~/.config/wlogout/icons
+    mocha/{{ eval "~/.dotfiles/tools/cfg/target/release/cfg theme config --get accent | cut -d= -f2" }}: ~/.config/wlogout/icons

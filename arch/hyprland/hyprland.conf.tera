@@ -1,3 +1,4 @@
+# vi: ft=hyprlang
 ################
 ### MONITORS ###
 ################
@@ -39,33 +40,33 @@ source = ~/.config/hypr/conf.d/*
 ### LOOK AND FEEL ###
 #####################
 
-$rosewater = rgb(f5e0dc)
-$flamingo = rgb(f2cdcd)
-$pink = rgb(f5c2e7)
-$mauve = rgb(cba6f7)
-$red = rgb(f38ba8)
-$maroon = rgb(eba0ac)
-$peach = rgb(fab387)
-$yellow = rgb(f9e2af)
-$green = rgb(a6e3a1)
-$teal = rgb(94e2d5)
-$sky = rgb(89dceb)
-$sapphire = rgb(74c7ec)
-$blue = rgb(89b4fa)
-$lavender = rgb(b4befe)
-$text = rgb(cdd6f4)
-$subtext1 = rgb(bac2de)
-$subtext0 = rgb(a6adc8)
-$overlay2 = rgb(9399b2)
-$overlay1 = rgb(7f849c)
-$overlay0 = rgb(6c7086)
-$surface2 = rgb(585b70)
-$surface1 = rgb(45475a)
-$surface0 = rgb(313244)
-$base = rgb(1e1e2e)
-$mantle = rgb(181825)
-$crust = rgb(11111b)
-$accent = rgb(89b4fa)
+$rosewater = {{ rosewater_hyprlang }}
+$flamingo = {{ flamingo_hyprlang }}
+$pink = {{ pink_hyprlang }}
+$mauve = {{ mauve_hyprlang }}
+$red = {{ red_hyprlang }}
+$maroon = {{ maroon_hyprlang }}
+$peach = {{ peach_hyprlang }}
+$yellow = {{ yellow_hyprlang }}
+$green = {{ green_hyprlang }}
+$teal = {{ teal_hyprlang }}
+$sky = {{ sky_hyprlang }}
+$sapphire = {{ sapphire_hyprlang }}
+$blue = {{ blue_hyprlang }}
+$lavender = {{ lavender_hyprlang }}
+$text = {{ text_hyprlang }}
+$subtext1 = {{ subtext1_hyprlang }}
+$subtext0 = {{ subtext0_hyprlang }}
+$overlay2 = {{ overlay2_hyprlang }}
+$overlay1 = {{ overlay1_hyprlang }}
+$overlay0 = {{ overlay0_hyprlang }}
+$surface2 = {{ surface2_hyprlang }}
+$surface1 = {{ surface1_hyprlang }}
+$surface0 = {{ surface0_hyprlang }}
+$base = {{ base_hyprlang }}
+$mantle = {{ mantle_hyprlang }}
+$crust = {{ crust_hyprlang }}
+$accent = {{ accent_color_hyprlang }}
 
 general {
     gaps_in = 3

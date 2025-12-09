@@ -1,0 +1,82 @@
+# vi: ft=hyprlang
+
+$rosewater = {{ rosewater_hyprlang }}
+$rosewaterAlpha = {{ rosewater }}
+
+$flamingo = {{ flamingo_hyprlang }}
+$flamingoAlpha = {{ flamingo }}
+
+$pink = {{ pink_hyprlang }}
+$pinkAlpha = {{ pink }}
+
+$mauve = {{ mauve_hyprlang }}
+$mauveAlpha = {{ mauve }}
+
+$red = {{ red_hyprlang }}
+$redAlpha = {{ red }}
+
+$maroon = {{ maroon_hyprlang }}
+$maroonAlpha = {{ maroon }}
+
+$peach = {{ peach_hyprlang }}
+$peachAlpha = {{ peach }}
+
+$yellow = {{ yellow_hyprlang }}
+$yellowAlpha = {{ yellow }}
+
+$green = {{ green_hyprlang }}
+$greenAlpha = {{ green }}
+
+$teal = {{ teal_hyprlang }}
+$tealAlpha = {{ teal }}
+
+$sky = {{ sky_hyprlang }}
+$skyAlpha = {{ sky }}
+
+$sapphire = {{ sapphire_hyprlang }}
+$sapphireAlpha = {{ sapphire }}
+
+$blue = {{ blue_hyprlang }}
+$blueAlpha = {{ blue }}
+
+$lavender = {{ lavender_hyprlang }}
+$lavenderAlpha = {{ lavender }}
+
+$text = {{ text_hyprlang }}
+$textAlpha = {{ text }}
+
+$subtext1 = {{ subtext1_hyprlang }}
+$subtext1Alpha = {{ subtext1 }}
+
+$subtext0 = {{ subtext0_hyprlang }}
+$subtext0Alpha = {{ subtext0 }}
+
+$overlay2 = {{ overlay2_hyprlang }}
+$overlay2Alpha = {{ overlay2 }}
+
+$overlay1 = {{ overlay1_hyprlang }}
+$overlay1Alpha = {{ overlay1 }}
+
+$overlay0 = {{ overlay0_hyprlang }}
+$overlay0Alpha = {{ overlay0 }}
+
+$surface2 = {{ surface2_hyprlang }}
+$surface2Alpha = {{ surface2 }}
+
+$surface1 = {{ surface1_hyprlang }}
+$surface1Alpha = {{ surface1 }}
+
+$surface0 = {{ surface0_hyprlang }}
+$surface0Alpha = {{ surface0 }}
+
+$base = {{ base_hyprlang }}
+$baseAlpha = {{ base }}
+
+$mantle = {{ mantle_hyprlang }}
+$mantleAlpha = {{ mantle }}
+
+$crust = {{ crust_hyprlang }}
+$crustAlpha = {{ crust }}
+
+$accent = {{ accent_color_hyprlang }}
+$accentAlpha = {{ accent_color }}

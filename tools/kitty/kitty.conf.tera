@@ -1,3 +1,4 @@
+# vi: ft=conf
 # Environment
 env ZDOTDIR=$HOME
 
@@ -26,7 +27,7 @@ underline_hyperlinks hover
 # thick|thin, dense|sparse
 undercurl_style thick-sparse
 open_url_with default
-url_color #89b4fa
+url_color {{ accent_color_hex }}
 url_style curly
 
 # Performance
@@ -40,8 +41,8 @@ window_margin_width 1
 remember_window_size yes
 initial_window_width 1200
 initial_window_height 800
-active_border_color #89b4fa
-inactive_border_color #313244
+active_border_color {{ accent_color_hex }}
+inactive_border_color {{ surface0_hex }}
 window_border_width 1pt
 enabled_layouts splits
 
@@ -50,51 +51,51 @@ tab_bar_style powerline
 tab_bar_edge top
 tab_powerline_style round
 
-# Catppuccin Mocha Theme
-background #1e1e2e
-foreground #cdd6f4
-selection_background #585b70
-selection_foreground #cdd6f4
-cursor #f5e0dc
-cursor_text_color #1e1e2e
+# Catppuccin {{ flavor | capitalize }} Theme
+background {{ base_hex }}
+foreground {{ text_hex }}
+selection_background {{ surface2_hex }}
+selection_foreground {{ text_hex }}
+cursor {{ rosewater_hex }}
+cursor_text_color {{ base_hex }}
 
 # Black
-color0 #45475a
-color8 #585b70
+color0 {{ surface1_hex }}
+color8 {{ surface2_hex }}
 
 # Red
-color1 #f38ba8
-color9 #f38ba8
+color1 {{ red_hex }}
+color9 {{ red_hex }}
 
 # Green
-color2  #a6e3a1
-color10 #a6e3a1
+color2  {{ green_hex }}
+color10 {{ green_hex }}
 
 # Yellow
-color3  #f9e2af
-color11 #f9e2af
+color3  {{ yellow_hex }}
+color11 {{ yellow_hex }}
 
 # Blue
-color4  #89b4fa
-color12 #89b4fa
+color4  {{ blue_hex }}
+color12 {{ blue_hex }}
 
 # Magenta
-color5  #f5c2e7
-color13 #f5c2e7
+color5  {{ pink_hex }}
+color13 {{ pink_hex }}
 
 # Cyan
-color6  #94e2d5
-color14 #94e2d5
+color6  {{ teal_hex }}
+color14 {{ teal_hex }}
 
 # White
-color7  #bac2de
-color15 #a6adc8
+color7  {{ subtext1_hex }}
+color15 {{ subtext0_hex }}
 
 # Tab colors
-active_tab_background #89b4fa
-active_tab_foreground #1e1e2e
-inactive_tab_background #313244
-inactive_tab_foreground #cdd6f4
+active_tab_background {{ accent_color_hex }}
+active_tab_foreground {{ base_hex }}
+inactive_tab_background {{ surface0_hex }}
+inactive_tab_foreground {{ text_hex }}
 
 # Window opacity
 background_opacity 0.9
