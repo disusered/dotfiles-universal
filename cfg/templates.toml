@@ -1,0 +1,12 @@
+# Template registry
+# Maps template paths to names and reload commands
+
+[templates]
+# name = { path = "relative/to/dotfiles", reload = "command" }
+mako = { path = "tools/mako/config.tera", reload = "makoctl reload" }
+btop = { path = "tools/btop/catppuccin_mocha.theme.tera" }
+eza = { path = "tools/eza/catppuccin.yml.tera" }
+wlogout = { path = "arch/wlogout/blue.css.tera" }
+hyprbars = { path = "arch/hyprbars/hyprbars.conf.tera", reload = "hyprctl reload" }
+swappy = { path = "arch/swappy/config.tera" }
+bat = { path = "tools/bat/config.tera" }

@@ -1,0 +1,103 @@
+# vi: ft=yaml
+colourful: true
+
+filekinds:
+  normal: { foreground: "{{ subtext1_hex_upper }}" }
+  directory: { foreground: "{{ accent_color_hex_upper }}" }
+  symlink: { foreground: "{{ sky_hex_upper }}" }
+  pipe: { foreground: "{{ overlay1_hex_upper }}" }
+  block_device: { foreground: "{{ maroon_hex_upper }}" }
+  char_device: { foreground: "{{ maroon_hex_upper }}" }
+  socket: { foreground: "{{ surface2_hex_upper }}" }
+  special: { foreground: "{{ mauve_hex_upper }}" }
+  executable: { foreground: "{{ green_hex_upper }}" }
+  mount_point: { foreground: "{{ sapphire_hex_upper }}" }
+
+perms:
+  user_read: { foreground: "{{ text_hex_upper }}" }
+  user_write: { foreground: "{{ yellow_hex_upper }}" }
+  user_execute_file: { foreground: "{{ green_hex_upper }}" }
+  user_execute_other: { foreground: "{{ green_hex_upper }}" }
+  group_read: { foreground: "{{ subtext1_hex_upper }}" }
+  group_write: { foreground: "{{ yellow_hex_upper }}" }
+  group_execute: { foreground: "{{ green_hex_upper }}" }
+  other_read: { foreground: "{{ subtext0_hex_upper }}" }
+  other_write: { foreground: "{{ yellow_hex_upper }}" }
+  other_execute: { foreground: "{{ green_hex_upper }}" }
+  special_user_file: { foreground: "{{ mauve_hex_upper }}" }
+  special_other: { foreground: "{{ surface2_hex_upper }}" }
+  attribute: { foreground: "{{ subtext0_hex_upper }}" }
+
+size:
+  major: { foreground: "{{ subtext0_hex_upper }}" }
+  minor: { foreground: "{{ sky_hex_upper }}" }
+  number_byte: { foreground: "{{ text_hex_upper }}" }
+  number_kilo: { foreground: "{{ subtext1_hex_upper }}" }
+  number_mega: { foreground: "{{ blue_hex_upper }}" }
+  number_giga: { foreground: "{{ mauve_hex_upper }}" }
+  number_huge: { foreground: "{{ mauve_hex_upper }}" }
+  unit_byte: { foreground: "{{ subtext0_hex_upper }}" }
+  unit_kilo: { foreground: "{{ blue_hex_upper }}" }
+  unit_mega: { foreground: "{{ mauve_hex_upper }}" }
+  unit_giga: { foreground: "{{ mauve_hex_upper }}" }
+  unit_huge: { foreground: "{{ sapphire_hex_upper }}" }
+
+users:
+  user_you: { foreground: "{{ text_hex_upper }}" }
+  user_root: { foreground: "{{ red_hex_upper }}" }
+  user_other: { foreground: "{{ mauve_hex_upper }}" }
+  group_yours: { foreground: "{{ subtext1_hex_upper }}" }
+  group_other: { foreground: "{{ overlay1_hex_upper }}" }
+  group_root: { foreground: "{{ red_hex_upper }}" }
+
+links:
+  normal: { foreground: "{{ sky_hex_upper }}" }
+  multi_link_file: { foreground: "{{ sapphire_hex_upper }}" }
+
+git:
+  new: { foreground: "{{ green_hex_upper }}" }
+  modified: { foreground: "{{ yellow_hex_upper }}" }
+  deleted: { foreground: "{{ red_hex_upper }}" }
+  renamed: { foreground: "{{ teal_hex_upper }}" }
+  typechange: { foreground: "{{ pink_hex_upper }}" }
+  ignored: { foreground: "{{ overlay1_hex_upper }}" }
+  conflicted: { foreground: "{{ maroon_hex_upper }}" }
+
+git_repo:
+  branch_main: { foreground: "{{ text_hex_upper }}" }
+  branch_other: { foreground: "{{ mauve_hex_upper }}" }
+  git_clean: { foreground: "{{ green_hex_upper }}" }
+  git_dirty: { foreground: "{{ red_hex_upper }}" }
+
+security_context:
+  colon: { foreground: "{{ overlay1_hex_upper }}" }
+  user: { foreground: "{{ subtext1_hex_upper }}" }
+  role: { foreground: "{{ mauve_hex_upper }}" }
+  typ: { foreground: "{{ surface2_hex_upper }}" }
+  range: { foreground: "{{ mauve_hex_upper }}" }
+
+file_type:
+  image: { foreground: "{{ yellow_hex_upper }}" }
+  video: { foreground: "{{ red_hex_upper }}" }
+  music: { foreground: "{{ green_hex_upper }}" }
+  lossless: { foreground: "{{ teal_hex_upper }}" }
+  crypto: { foreground: "{{ surface2_hex_upper }}" }
+  document: { foreground: "{{ text_hex_upper }}" }
+  compressed: { foreground: "{{ pink_hex_upper }}" }
+  temp: { foreground: "{{ maroon_hex_upper }}" }
+  compiled: { foreground: "{{ sapphire_hex_upper }}" }
+  build: { foreground: "{{ surface2_hex_upper }}" }
+  source: { foreground: "{{ blue_hex_upper }}" }
+
+punctuation: { foreground: "{{ overlay1_hex_upper }}" }
+date: { foreground: "{{ yellow_hex_upper }}" }
+inode: { foreground: "{{ subtext0_hex_upper }}" }
+blocks: { foreground: "{{ overlay2_hex_upper }}" }
+header: { foreground: "{{ text_hex_upper }}" }
+octal: { foreground: "{{ teal_hex_upper }}" }
+flags: { foreground: "{{ mauve_hex_upper }}" }
+
+symlink_path: { foreground: "{{ sky_hex_upper }}" }
+control_char: { foreground: "{{ sapphire_hex_upper }}" }
+broken_symlink: { foreground: "{{ red_hex_upper }}" }
+broken_path_overlay: { foreground: "{{ surface2_hex_upper }}" }

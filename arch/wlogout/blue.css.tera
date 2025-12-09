@@ -1,3 +1,4 @@
+# vi: ft=css
 * {
   background-image: none;
   box-shadow: none;
@@ -9,10 +10,10 @@ window {
 
 button {
   border-radius: 0;
-  border-color: #89b4fa;
-  text-decoration-color: #cdd6f4;
-  color: #cdd6f4;
-  background-color: #181825;
+  border-color: {{ accent_color_hex }};
+  text-decoration-color: {{ text_hex }};
+  color: {{ text_hex }};
+  background-color: {{ mantle_hex }};
   border-style: solid;
   border-width: 1px;
   background-repeat: no-repeat;
@@ -24,7 +25,7 @@ button:focus,
 button:active,
 button:hover {
   /* 20% Overlay 2, 80% mantle */
-  background-color: rgb(49, 50, 68);
+  background-color: {{ surface0_rgb_css }};
   outline-style: none;
 }
 

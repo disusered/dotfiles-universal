@@ -1,0 +1,8 @@
+# vi: ft=dosini
+background-color={{ base_hex }}
+text-color={{ text_hex }}
+border-color={{ accent_color_hex }}
+progress-color=over {{ surface0_hex }}
+
+[urgency=high]
+border-color={{ peach_hex }}
