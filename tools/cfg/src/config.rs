@@ -6,6 +6,8 @@ use std::path::Path;
 pub struct Config {
     pub flavor: String,
     pub accent: String,
+    #[serde(default = "default_secondary")]
+    pub secondary: String,
     #[serde(default)]
     pub fonts: FontConfig,
 }
@@ -20,6 +22,10 @@ pub struct FontConfig {
     pub sans: String,
     #[serde(default = "default_sans_size")]
     pub sans_size: u32,
+}
+
+fn default_secondary() -> String {
+    "mauve".to_string()
 }
 
 fn default_mono() -> String {
@@ -54,8 +60,7 @@ impl Config {
 
         // Ensure parent directory exists
         if let Some(parent) = Path::new(path).parent() {
-            fs::create_dir_all(parent)
-                .map_err(|e| format!("Failed to create directory: {}", e))?;
+            fs::create_dir_all(parent).map_err(|e| format!("Failed to create directory: {}", e))?;
         }
 
         fs::write(path, content)
@@ -67,6 +72,7 @@ impl Config {
         match key {
             "flavor" => Some(self.flavor.clone()),
             "accent" => Some(self.accent.clone()),
+            "secondary" => Some(self.secondary.clone()),
             "fonts.mono" => Some(self.fonts.mono.clone()),
             "fonts.mono_size" => Some(self.fonts.mono_size.to_string()),
             "fonts.sans" => Some(self.fonts.sans.clone()),
@@ -91,12 +97,17 @@ impl Config {
                 self.accent = value.to_string();
                 Ok(())
             }
+            "secondary" => {
+                self.secondary = value.to_string();
+                Ok(())
+            }
             "fonts.mono" => {
                 self.fonts.mono = value.to_string();
                 Ok(())
             }
             "fonts.mono_size" => {
-                self.fonts.mono_size = value.parse()
+                self.fonts.mono_size = value
+                    .parse()
                     .map_err(|_| format!("Invalid number: {}", value))?;
                 Ok(())
             }
@@ -105,7 +116,8 @@ impl Config {
                 Ok(())
             }
             "fonts.sans_size" => {
-                self.fonts.sans_size = value.parse()
+                self.fonts.sans_size = value
+                    .parse()
                     .map_err(|_| format!("Invalid number: {}", value))?;
                 Ok(())
             }
@@ -119,6 +131,7 @@ impl Default for Config {
         Config {
             flavor: "mocha".to_string(),
             accent: "blue".to_string(),
+            secondary: "mauve".to_string(),
             fonts: FontConfig::default(),
         }
     }

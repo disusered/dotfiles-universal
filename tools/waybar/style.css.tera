@@ -8,12 +8,12 @@
 }
 
 window#waybar {
-  background-color: {{ base_hex }};
-  color: {{ text_hex }};
+  background-color: #{{ base | hex }};
+  color: #{{ text | hex }};
 }
 
 #workspaces {
-  background-color: {{ surface0_hex }};
+  background-color: #{{ surface0 | hex }};
   margin: 5px;
   padding: 0px 5px;
   border-radius: 10px;
@@ -21,22 +21,22 @@ window#waybar {
 
 #workspaces button {
   padding: 0px 15px;
-  color: {{ text_hex }};
+  color: #{{ text | hex }};
   border-radius: 10px;
 }
 
 #workspaces button.active {
-  color: {{ base_hex }};
-  background-color: {{ accent_color_hex }};
+  color: #{{ base | hex }};
+  background-color: #{{ accent | hex }};
 }
 
 #workspaces button:hover {
-  background-color: {{ surface1_hex }};
-  color: {{ text_hex }};
+  background-color: #{{ surface1 | hex }};
+  color: #{{ text | hex }};
 }
 
 #tray {
-  background-color: {{ surface0_hex }};
+  background-color: #{{ surface0 | hex }};
   margin: 5px;
   padding: 0px 10px;
   border-radius: 10px;
@@ -48,7 +48,7 @@ window#waybar {
 
 #tray>.needs-attention {
   -gtk-icon-effect: highlight;
-  background-color: {{ red_hex }};
+  background-color: #{{ red | hex }};
 }
 
 #clock,
@@ -57,14 +57,14 @@ window#waybar {
 #privacy,
 #custom-weather,
 #custom-powermenu {
-  background-color: {{ surface0_hex }};
-  color: {{ text_hex }};
+  background-color: #{{ surface0 | hex }};
+  color: #{{ text | hex }};
   padding: 0px 15px;
   margin: 5px;
   border-radius: 10px;
 }
 
 #privacy {
-  background-color: {{ red_hex }};
-  color: {{ surface0_hex }};
+  background-color: #{{ red | hex }};
+  color: #{{ surface0 | hex }};
 }

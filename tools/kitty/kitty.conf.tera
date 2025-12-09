@@ -27,7 +27,7 @@ underline_hyperlinks hover
 # thick|thin, dense|sparse
 undercurl_style thick-sparse
 open_url_with default
-url_color {{ accent_color_hex }}
+url_color #{{ accent | hex }}
 url_style curly
 
 # Performance
@@ -41,8 +41,8 @@ window_margin_width 1
 remember_window_size yes
 initial_window_width 1200
 initial_window_height 800
-active_border_color {{ accent_color_hex }}
-inactive_border_color {{ surface0_hex }}
+active_border_color #{{ accent | hex }}
+inactive_border_color #{{ surface0 | hex }}
 window_border_width 1pt
 enabled_layouts splits
 
@@ -52,50 +52,50 @@ tab_bar_edge top
 tab_powerline_style round
 
 # Catppuccin {{ flavor | capitalize }} Theme
-background {{ base_hex }}
-foreground {{ text_hex }}
-selection_background {{ surface2_hex }}
-selection_foreground {{ text_hex }}
-cursor {{ rosewater_hex }}
-cursor_text_color {{ base_hex }}
+background #{{ base | hex }}
+foreground #{{ text | hex }}
+selection_background #{{ surface2 | hex }}
+selection_foreground #{{ text | hex }}
+cursor #{{ rosewater | hex }}
+cursor_text_color #{{ base | hex }}
 
 # Black
-color0 {{ surface1_hex }}
-color8 {{ surface2_hex }}
+color0 #{{ surface1 | hex }}
+color8 #{{ surface2 | hex }}
 
 # Red
-color1 {{ red_hex }}
-color9 {{ red_hex }}
+color1 #{{ red | hex }}
+color9 #{{ red | hex }}
 
 # Green
-color2  {{ green_hex }}
-color10 {{ green_hex }}
+color2  #{{ green | hex }}
+color10 #{{ green | hex }}
 
 # Yellow
-color3  {{ yellow_hex }}
-color11 {{ yellow_hex }}
+color3  #{{ yellow | hex }}
+color11 #{{ yellow | hex }}
 
 # Blue
-color4  {{ blue_hex }}
-color12 {{ blue_hex }}
+color4  #{{ blue | hex }}
+color12 #{{ blue | hex }}
 
 # Magenta
-color5  {{ pink_hex }}
-color13 {{ pink_hex }}
+color5  #{{ pink | hex }}
+color13 #{{ pink | hex }}
 
 # Cyan
-color6  {{ teal_hex }}
-color14 {{ teal_hex }}
+color6  #{{ teal | hex }}
+color14 #{{ teal | hex }}
 
 # White
-color7  {{ subtext1_hex }}
-color15 {{ subtext0_hex }}
+color7  #{{ subtext1 | hex }}
+color15 #{{ subtext0 | hex }}
 
 # Tab colors
-active_tab_background {{ accent_color_hex }}
-active_tab_foreground {{ base_hex }}
-inactive_tab_background {{ surface0_hex }}
-inactive_tab_foreground {{ text_hex }}
+active_tab_background #{{ accent | hex }}
+active_tab_foreground #{{ base | hex }}
+inactive_tab_background #{{ surface0 | hex }}
+inactive_tab_foreground #{{ text | hex }}
 
 # Window opacity
 background_opacity 0.9

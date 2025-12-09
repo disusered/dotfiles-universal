@@ -1,9 +1,17 @@
+use serde::{Deserialize, Serialize};
+
 /// Represents an RGB color
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Color {
     pub r: u8,
     pub g: u8,
     pub b: u8,
+}
+
+impl std::fmt::Display for Color {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}", self.to_hex())
+    }
 }
 
 impl Color {
@@ -25,14 +33,14 @@ impl Color {
         format!("{:02x}{:02x}{:02x}", self.r, self.g, self.b)
     }
 
+    /// Output as hex without # in uppercase (e.g., "89B4FA")
+    pub fn to_hex_upper(&self) -> String {
+        format!("{:02X}{:02X}{:02X}", self.r, self.g, self.b)
+    }
+
     /// Output as hex with # (e.g., "#89b4fa")
     pub fn to_hex_hash(&self) -> String {
         format!("#{:02x}{:02x}{:02x}", self.r, self.g, self.b)
-    }
-
-    /// Output as hex with # in uppercase (e.g., "#89B4FA")
-    pub fn to_hex_hash_upper(&self) -> String {
-        format!("#{:02X}{:02X}{:02X}", self.r, self.g, self.b)
     }
 
     /// Output as space-separated RGB (e.g., "137 180 250")
@@ -59,6 +67,16 @@ impl Color {
     pub fn to_hyprlang_rgba(&self, alpha: f32) -> String {
         let alpha_byte = (alpha * 255.0).round() as u8;
         format!("rgba({:02x}{:02x}{:02x}{:02x})", self.r, self.g, self.b, alpha_byte)
+    }
+
+    /// Blend this color with another (amount = percentage of this color, 0-100)
+    pub fn blend(&self, other: &Color, amount: u8) -> Color {
+        let ratio = amount as f32 / 100.0;
+        Color {
+            r: ((self.r as f32 * ratio) + (other.r as f32 * (1.0 - ratio))).round() as u8,
+            g: ((self.g as f32 * ratio) + (other.g as f32 * (1.0 - ratio))).round() as u8,
+            b: ((self.b as f32 * ratio) + (other.b as f32 * (1.0 - ratio))).round() as u8,
+        }
     }
 }
 

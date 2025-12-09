@@ -10,10 +10,10 @@ window {
 
 button {
   border-radius: 0;
-  border-color: {{ accent_color_hex }};
-  text-decoration-color: {{ text_hex }};
-  color: {{ text_hex }};
-  background-color: {{ mantle_hex }};
+  border-color: #{{ accent | hex }};
+  text-decoration-color: #{{ text | hex }};
+  color: #{{ text | hex }};
+  background-color: #{{ mantle | hex }};
   border-style: solid;
   border-width: 1px;
   background-repeat: no-repeat;
@@ -25,7 +25,7 @@ button:focus,
 button:active,
 button:hover {
   /* 20% Overlay 2, 80% mantle */
-  background-color: {{ surface0_rgb_css }};
+  background-color: {{ surface0 | rgb_css }};
   outline-style: none;
 }
 

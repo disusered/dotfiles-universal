@@ -34,23 +34,23 @@ gui:
   # Theme (Catppuccin {{ flavor | capitalize }})
   theme:
     activeBorderColor:
-      - "{{ accent_color_hex }}"
+      - "#{{ accent | hex }}"
       - bold
     inactiveBorderColor:
-      - "{{ subtext0_hex }}"
+      - "#{{ subtext0 | hex }}"
     optionsTextColor:
-      - "{{ accent_color_hex }}"
+      - "#{{ accent | hex }}"
     selectedLineBgColor:
-      - "{{ surface0_hex }}"
+      - "#{{ surface0 | hex }}"
     cherryPickedCommitBgColor:
-      - "{{ surface1_hex }}"
+      - "#{{ surface1 | hex }}"
     cherryPickedCommitFgColor:
-      - "{{ accent_color_hex }}"
+      - "#{{ accent | hex }}"
     unstagedChangesColor:
-      - "{{ red_hex }}"
+      - "#{{ red | hex }}"
     defaultFgColor:
-      - "{{ text_hex }}"
+      - "#{{ text | hex }}"
     searchingActiveBorderColor:
-      - "{{ yellow_hex }}"
+      - "#{{ yellow | hex }}"
   authorColors:
-    "*": "{{ lavender_hex }}"
+    "*": "#{{ lavender | hex }}"

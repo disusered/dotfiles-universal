@@ -1,82 +1,82 @@
 # vi: ft=hyprlang
 
-$rosewater = {{ rosewater_hyprlang }}
-$rosewaterAlpha = {{ rosewater }}
+$rosewater = {{ rosewater | hyprlang }}
+$rosewaterAlpha = {{ rosewater | hex }}
 
-$flamingo = {{ flamingo_hyprlang }}
-$flamingoAlpha = {{ flamingo }}
+$flamingo = {{ flamingo | hyprlang }}
+$flamingoAlpha = {{ flamingo | hex }}
 
-$pink = {{ pink_hyprlang }}
-$pinkAlpha = {{ pink }}
+$pink = {{ pink | hyprlang }}
+$pinkAlpha = {{ pink | hex }}
 
-$mauve = {{ mauve_hyprlang }}
-$mauveAlpha = {{ mauve }}
+$mauve = {{ mauve | hyprlang }}
+$mauveAlpha = {{ mauve | hex }}
 
-$red = {{ red_hyprlang }}
-$redAlpha = {{ red }}
+$red = {{ red | hyprlang }}
+$redAlpha = {{ red | hex }}
 
-$maroon = {{ maroon_hyprlang }}
-$maroonAlpha = {{ maroon }}
+$maroon = {{ maroon | hyprlang }}
+$maroonAlpha = {{ maroon | hex }}
 
-$peach = {{ peach_hyprlang }}
-$peachAlpha = {{ peach }}
+$peach = {{ peach | hyprlang }}
+$peachAlpha = {{ peach | hex }}
 
-$yellow = {{ yellow_hyprlang }}
-$yellowAlpha = {{ yellow }}
+$yellow = {{ yellow | hyprlang }}
+$yellowAlpha = {{ yellow | hex }}
 
-$green = {{ green_hyprlang }}
-$greenAlpha = {{ green }}
+$green = {{ green | hyprlang }}
+$greenAlpha = {{ green | hex }}
 
-$teal = {{ teal_hyprlang }}
-$tealAlpha = {{ teal }}
+$teal = {{ teal | hyprlang }}
+$tealAlpha = {{ teal | hex }}
 
-$sky = {{ sky_hyprlang }}
-$skyAlpha = {{ sky }}
+$sky = {{ sky | hyprlang }}
+$skyAlpha = {{ sky | hex }}
 
-$sapphire = {{ sapphire_hyprlang }}
-$sapphireAlpha = {{ sapphire }}
+$sapphire = {{ sapphire | hyprlang }}
+$sapphireAlpha = {{ sapphire | hex }}
 
-$blue = {{ blue_hyprlang }}
-$blueAlpha = {{ blue }}
+$blue = {{ blue | hyprlang }}
+$blueAlpha = {{ blue | hex }}
 
-$lavender = {{ lavender_hyprlang }}
-$lavenderAlpha = {{ lavender }}
+$lavender = {{ lavender | hyprlang }}
+$lavenderAlpha = {{ lavender | hex }}
 
-$text = {{ text_hyprlang }}
-$textAlpha = {{ text }}
+$text = {{ text | hyprlang }}
+$textAlpha = {{ text | hex }}
 
-$subtext1 = {{ subtext1_hyprlang }}
-$subtext1Alpha = {{ subtext1 }}
+$subtext1 = {{ subtext1 | hyprlang }}
+$subtext1Alpha = {{ subtext1 | hex }}
 
-$subtext0 = {{ subtext0_hyprlang }}
-$subtext0Alpha = {{ subtext0 }}
+$subtext0 = {{ subtext0 | hyprlang }}
+$subtext0Alpha = {{ subtext0 | hex }}
 
-$overlay2 = {{ overlay2_hyprlang }}
-$overlay2Alpha = {{ overlay2 }}
+$overlay2 = {{ overlay2 | hyprlang }}
+$overlay2Alpha = {{ overlay2 | hex }}
 
-$overlay1 = {{ overlay1_hyprlang }}
-$overlay1Alpha = {{ overlay1 }}
+$overlay1 = {{ overlay1 | hyprlang }}
+$overlay1Alpha = {{ overlay1 | hex }}
 
-$overlay0 = {{ overlay0_hyprlang }}
-$overlay0Alpha = {{ overlay0 }}
+$overlay0 = {{ overlay0 | hyprlang }}
+$overlay0Alpha = {{ overlay0 | hex }}
 
-$surface2 = {{ surface2_hyprlang }}
-$surface2Alpha = {{ surface2 }}
+$surface2 = {{ surface2 | hyprlang }}
+$surface2Alpha = {{ surface2 | hex }}
 
-$surface1 = {{ surface1_hyprlang }}
-$surface1Alpha = {{ surface1 }}
+$surface1 = {{ surface1 | hyprlang }}
+$surface1Alpha = {{ surface1 | hex }}
 
-$surface0 = {{ surface0_hyprlang }}
-$surface0Alpha = {{ surface0 }}
+$surface0 = {{ surface0 | hyprlang }}
+$surface0Alpha = {{ surface0 | hex }}
 
-$base = {{ base_hyprlang }}
-$baseAlpha = {{ base }}
+$base = {{ base | hyprlang }}
+$baseAlpha = {{ base | hex }}
 
-$mantle = {{ mantle_hyprlang }}
-$mantleAlpha = {{ mantle }}
+$mantle = {{ mantle | hyprlang }}
+$mantleAlpha = {{ mantle | hex }}
 
-$crust = {{ crust_hyprlang }}
-$crustAlpha = {{ crust }}
+$crust = {{ crust | hyprlang }}
+$crustAlpha = {{ crust | hex }}
 
-$accent = {{ accent_color_hyprlang }}
-$accentAlpha = {{ accent_color }}
+$accent = {{ accent | hyprlang }}
+$accentAlpha = {{ accent | hex }}

@@ -22,9 +22,9 @@
   trustctime = false
   excludesfile = ~/.gitignore_global
 [pretty]
-  basic = %C(magenta bold)%h%C(reset) %C(auto)%d%C(reset) %s
-  extended = %C(magenta bold)%h%C(reset) %C(blue bold)%aN%C(reset) %C(auto)%d%C(reset) %s %C(8)(%cr)%C(reset)
-  reflog = %C(magenta bold)%h%C(reset)  %C(blue bold)%gd%C(reset) %gs %C(8)(%cr)%C(reset)
+  basic = %C({{ secondary_name | ansi }} bold)%h%C(reset) %C(auto)%d%C(reset) %s
+  extended = %C({{ secondary_name | ansi }} bold)%h%C(reset) %C({{ accent_name | ansi }} bold)%aN%C(reset) %C(auto)%d%C(reset) %s %C(8)(%cr)%C(reset)
+  reflog = %C({{ secondary_name | ansi }} bold)%h%C(reset)  %C({{ accent_name | ansi }} bold)%gd%C(reset) %gs %C(8)(%cr)%C(reset)
 [alias]
   l = log --color --pretty=extended --graph --date=relative
   la = log --color --pretty=extended --graph --date=relative --branches --tags --remotes
@@ -76,29 +76,29 @@
   paging = never
 [delta "catppuccin-mocha"] # https://github.com/catppuccin/delta
   true-color = always
-  blame-palette = "#1e1e2e #181825 #11111b #313244 #45475a"
-  commit-decoration-style = "#6c7086" bold box ul
+  blame-palette = "#{{ base | hex }} #{{ mantle | hex }} #{{ crust | hex }} #{{ surface0 | hex }} #{{ surface1 | hex }}"
+  commit-decoration-style = "#{{ overlay0 | hex }}" bold box ul
   dark = true
-  file-decoration-style = "#6c7086"
-  file-style = "#cdd6f4"
-  hunk-header-decoration-style = "#6c7086" box ul
+  file-decoration-style = "#{{ overlay0 | hex }}"
+  file-style = "#{{ text | hex }}"
+  hunk-header-decoration-style = "#{{ overlay0 | hex }}" box ul
   hunk-header-file-style = bold
-  hunk-header-line-number-style = bold "#a6adc8"
+  hunk-header-line-number-style = bold "#{{ subtext0 | hex }}"
   hunk-header-style = file line-number syntax
-  line-numbers-left-style = "#6c7086"
-  line-numbers-minus-style = bold "#80748b"
-  line-numbers-plus-style = bold "#75818a"
-  line-numbers-right-style = "#6c7086"
-  line-numbers-zero-style = "#6c7086"
-  minus-emph-style = bold syntax "#53394d"
-  minus-style = syntax "#33293a"
-  plus-emph-style = bold syntax "#404f4b"
-  plus-style = syntax "#2c323a"
+  line-numbers-left-style = "#{{ overlay0 | hex }}"
+  line-numbers-minus-style = bold "#{{ overlay0 | blend(base=red, amount=85) | hex }}"
+  line-numbers-plus-style = bold "#{{ overlay0 | blend(base=green, amount=85) | hex }}"
+  line-numbers-right-style = "#{{ overlay0 | hex }}"
+  line-numbers-zero-style = "#{{ overlay0 | hex }}"
+  minus-emph-style = bold syntax "#{{ red | blend(base=base, amount=25) | hex }}"
+  minus-style = syntax "#{{ red | blend(base=base, amount=10) | hex }}"
+  plus-emph-style = bold syntax "#{{ green | blend(base=base, amount=25) | hex }}"
+  plus-style = syntax "#{{ green | blend(base=base, amount=10) | hex }}"
   map-styles = \
-    bold purple => syntax "#494060", \
-    bold blue => syntax "#394461", \
-    bold cyan => syntax "#3c4f58", \
-    bold yellow => syntax "#554f4e"
+    bold purple => syntax "#{{ mauve | blend(base=base, amount=25) | hex }}", \
+    bold blue => syntax "#{{ blue | blend(base=base, amount=25) | hex }}", \
+    bold cyan => syntax "#{{ teal | blend(base=base, amount=25) | hex }}", \
+    bold yellow => syntax "#{{ yellow | blend(base=base, amount=25) | hex }}"
 # Should match the name of the bat theme
 # bat --list-themes
-  syntax-theme = Catppuccin Mocha
+  syntax-theme = Catppuccin {{ flavor | capitalize }}

@@ -194,7 +194,12 @@ fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Command::Render { name, all, dry_run, force: _ } => {
+        Command::Render {
+            name,
+            all,
+            dry_run,
+            force: _,
+        } => {
             let cfg_dir = get_cfg_dir();
             let dotfiles_dir = get_dotfiles_dir();
 
@@ -220,11 +225,7 @@ fn main() {
                 let all_templates = discover_templates(&PathBuf::from(&dotfiles_dir));
                 all_templates
                     .into_iter()
-                    .filter(|p| {
-                        p.to_str()
-                            .map(|s| s.contains(&name))
-                            .unwrap_or(false)
-                    })
+                    .filter(|p| p.to_str().map(|s| s.contains(&name)).unwrap_or(false))
                     .collect()
             };
 
@@ -256,7 +257,10 @@ fn main() {
             }
 
             if error_count > 0 {
-                eprintln!("\nRendered {} templates, {} errors", success_count, error_count);
+                eprintln!(
+                    "\nRendered {} templates, {} errors",
+                    success_count, error_count
+                );
                 std::process::exit(1);
             }
         }
@@ -305,6 +309,7 @@ fn main() {
                 } else {
                     // Show all config
                     println!("flavor={}", config.flavor);
+                    println!("secondary={}", config.secondary);
                     println!("accent={}", config.accent);
                     println!("fonts.mono={}", config.fonts.mono);
                     println!("fonts.mono_size={}", config.fonts.mono_size);
@@ -312,7 +317,12 @@ fn main() {
                     println!("fonts.sans_size={}", config.fonts.sans_size);
                 }
             }
-            ThemeCommand::Palette { color, format, alpha, flavor } => {
+            ThemeCommand::Palette {
+                color,
+                format,
+                alpha,
+                flavor,
+            } => {
                 let cfg_dir = get_cfg_dir();
                 let palette_path = format!("{}/palettes/{}.toml", cfg_dir, flavor);
                 let palette = match Palette::load(&palette_path) {

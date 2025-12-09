@@ -17,3 +17,4 @@ waybar-style = { path = "tools/waybar/style.css.tera", reload = "systemctl --use
 waybar-config = { path = "tools/waybar/config.jsonc.tera", reload = "systemctl --user restart waybar" }
 rofi = { path = "tools/rofi/catppuccin-mocha.rasi.tera" }
 lazygit = { path = "tools/lazygit/config.yaml.tera" }
+gitconfig = { path = "tools/git/gitconfig.tera" }

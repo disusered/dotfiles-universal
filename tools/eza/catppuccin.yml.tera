@@ -2,102 +2,102 @@
 colourful: true
 
 filekinds:
-  normal: { foreground: "{{ subtext1_hex_upper }}" }
-  directory: { foreground: "{{ accent_color_hex_upper }}" }
-  symlink: { foreground: "{{ sky_hex_upper }}" }
-  pipe: { foreground: "{{ overlay1_hex_upper }}" }
-  block_device: { foreground: "{{ maroon_hex_upper }}" }
-  char_device: { foreground: "{{ maroon_hex_upper }}" }
-  socket: { foreground: "{{ surface2_hex_upper }}" }
-  special: { foreground: "{{ mauve_hex_upper }}" }
-  executable: { foreground: "{{ green_hex_upper }}" }
-  mount_point: { foreground: "{{ sapphire_hex_upper }}" }
+  normal: { foreground: "#{{ subtext1 | upper }}" }
+  directory: { foreground: "#{{ accent | upper }}" }
+  symlink: { foreground: "#{{ sky | upper }}" }
+  pipe: { foreground: "#{{ overlay1 | upper }}" }
+  block_device: { foreground: "#{{ maroon | upper }}" }
+  char_device: { foreground: "#{{ maroon | upper }}" }
+  socket: { foreground: "#{{ surface2 | upper }}" }
+  special: { foreground: "#{{ mauve | upper }}" }
+  executable: { foreground: "#{{ green | upper }}" }
+  mount_point: { foreground: "#{{ sapphire | upper }}" }
 
 perms:
-  user_read: { foreground: "{{ text_hex_upper }}" }
-  user_write: { foreground: "{{ yellow_hex_upper }}" }
-  user_execute_file: { foreground: "{{ green_hex_upper }}" }
-  user_execute_other: { foreground: "{{ green_hex_upper }}" }
-  group_read: { foreground: "{{ subtext1_hex_upper }}" }
-  group_write: { foreground: "{{ yellow_hex_upper }}" }
-  group_execute: { foreground: "{{ green_hex_upper }}" }
-  other_read: { foreground: "{{ subtext0_hex_upper }}" }
-  other_write: { foreground: "{{ yellow_hex_upper }}" }
-  other_execute: { foreground: "{{ green_hex_upper }}" }
-  special_user_file: { foreground: "{{ mauve_hex_upper }}" }
-  special_other: { foreground: "{{ surface2_hex_upper }}" }
-  attribute: { foreground: "{{ subtext0_hex_upper }}" }
+  user_read: { foreground: "#{{ text | upper }}" }
+  user_write: { foreground: "#{{ yellow | upper }}" }
+  user_execute_file: { foreground: "#{{ green | upper }}" }
+  user_execute_other: { foreground: "#{{ green | upper }}" }
+  group_read: { foreground: "#{{ subtext1 | upper }}" }
+  group_write: { foreground: "#{{ yellow | upper }}" }
+  group_execute: { foreground: "#{{ green | upper }}" }
+  other_read: { foreground: "#{{ subtext0 | upper }}" }
+  other_write: { foreground: "#{{ yellow | upper }}" }
+  other_execute: { foreground: "#{{ green | upper }}" }
+  special_user_file: { foreground: "#{{ mauve | upper }}" }
+  special_other: { foreground: "#{{ surface2 | upper }}" }
+  attribute: { foreground: "#{{ subtext0 | upper }}" }
 
 size:
-  major: { foreground: "{{ subtext0_hex_upper }}" }
-  minor: { foreground: "{{ sky_hex_upper }}" }
-  number_byte: { foreground: "{{ text_hex_upper }}" }
-  number_kilo: { foreground: "{{ subtext1_hex_upper }}" }
-  number_mega: { foreground: "{{ blue_hex_upper }}" }
-  number_giga: { foreground: "{{ mauve_hex_upper }}" }
-  number_huge: { foreground: "{{ mauve_hex_upper }}" }
-  unit_byte: { foreground: "{{ subtext0_hex_upper }}" }
-  unit_kilo: { foreground: "{{ blue_hex_upper }}" }
-  unit_mega: { foreground: "{{ mauve_hex_upper }}" }
-  unit_giga: { foreground: "{{ mauve_hex_upper }}" }
-  unit_huge: { foreground: "{{ sapphire_hex_upper }}" }
+  major: { foreground: "#{{ subtext0 | upper }}" }
+  minor: { foreground: "#{{ sky | upper }}" }
+  number_byte: { foreground: "#{{ text | upper }}" }
+  number_kilo: { foreground: "#{{ subtext1 | upper }}" }
+  number_mega: { foreground: "#{{ blue | upper }}" }
+  number_giga: { foreground: "#{{ mauve | upper }}" }
+  number_huge: { foreground: "#{{ mauve | upper }}" }
+  unit_byte: { foreground: "#{{ subtext0 | upper }}" }
+  unit_kilo: { foreground: "#{{ blue | upper }}" }
+  unit_mega: { foreground: "#{{ mauve | upper }}" }
+  unit_giga: { foreground: "#{{ mauve | upper }}" }
+  unit_huge: { foreground: "#{{ sapphire | upper }}" }
 
 users:
-  user_you: { foreground: "{{ text_hex_upper }}" }
-  user_root: { foreground: "{{ red_hex_upper }}" }
-  user_other: { foreground: "{{ mauve_hex_upper }}" }
-  group_yours: { foreground: "{{ subtext1_hex_upper }}" }
-  group_other: { foreground: "{{ overlay1_hex_upper }}" }
-  group_root: { foreground: "{{ red_hex_upper }}" }
+  user_you: { foreground: "#{{ text | upper }}" }
+  user_root: { foreground: "#{{ red | upper }}" }
+  user_other: { foreground: "#{{ mauve | upper }}" }
+  group_yours: { foreground: "#{{ subtext1 | upper }}" }
+  group_other: { foreground: "#{{ overlay1 | upper }}" }
+  group_root: { foreground: "#{{ red | upper }}" }
 
 links:
-  normal: { foreground: "{{ sky_hex_upper }}" }
-  multi_link_file: { foreground: "{{ sapphire_hex_upper }}" }
+  normal: { foreground: "#{{ sky | upper }}" }
+  multi_link_file: { foreground: "#{{ sapphire | upper }}" }
 
 git:
-  new: { foreground: "{{ green_hex_upper }}" }
-  modified: { foreground: "{{ yellow_hex_upper }}" }
-  deleted: { foreground: "{{ red_hex_upper }}" }
-  renamed: { foreground: "{{ teal_hex_upper }}" }
-  typechange: { foreground: "{{ pink_hex_upper }}" }
-  ignored: { foreground: "{{ overlay1_hex_upper }}" }
-  conflicted: { foreground: "{{ maroon_hex_upper }}" }
+  new: { foreground: "#{{ green | upper }}" }
+  modified: { foreground: "#{{ yellow | upper }}" }
+  deleted: { foreground: "#{{ red | upper }}" }
+  renamed: { foreground: "#{{ teal | upper }}" }
+  typechange: { foreground: "#{{ pink | upper }}" }
+  ignored: { foreground: "#{{ overlay1 | upper }}" }
+  conflicted: { foreground: "#{{ maroon | upper }}" }
 
 git_repo:
-  branch_main: { foreground: "{{ text_hex_upper }}" }
-  branch_other: { foreground: "{{ mauve_hex_upper }}" }
-  git_clean: { foreground: "{{ green_hex_upper }}" }
-  git_dirty: { foreground: "{{ red_hex_upper }}" }
+  branch_main: { foreground: "#{{ text | upper }}" }
+  branch_other: { foreground: "#{{ mauve | upper }}" }
+  git_clean: { foreground: "#{{ green | upper }}" }
+  git_dirty: { foreground: "#{{ red | upper }}" }
 
 security_context:
-  colon: { foreground: "{{ overlay1_hex_upper }}" }
-  user: { foreground: "{{ subtext1_hex_upper }}" }
-  role: { foreground: "{{ mauve_hex_upper }}" }
-  typ: { foreground: "{{ surface2_hex_upper }}" }
-  range: { foreground: "{{ mauve_hex_upper }}" }
+  colon: { foreground: "#{{ overlay1 | upper }}" }
+  user: { foreground: "#{{ subtext1 | upper }}" }
+  role: { foreground: "#{{ mauve | upper }}" }
+  typ: { foreground: "#{{ surface2 | upper }}" }
+  range: { foreground: "#{{ mauve | upper }}" }
 
 file_type:
-  image: { foreground: "{{ yellow_hex_upper }}" }
-  video: { foreground: "{{ red_hex_upper }}" }
-  music: { foreground: "{{ green_hex_upper }}" }
-  lossless: { foreground: "{{ teal_hex_upper }}" }
-  crypto: { foreground: "{{ surface2_hex_upper }}" }
-  document: { foreground: "{{ text_hex_upper }}" }
-  compressed: { foreground: "{{ pink_hex_upper }}" }
-  temp: { foreground: "{{ maroon_hex_upper }}" }
-  compiled: { foreground: "{{ sapphire_hex_upper }}" }
-  build: { foreground: "{{ surface2_hex_upper }}" }
-  source: { foreground: "{{ blue_hex_upper }}" }
+  image: { foreground: "#{{ yellow | upper }}" }
+  video: { foreground: "#{{ red | upper }}" }
+  music: { foreground: "#{{ green | upper }}" }
+  lossless: { foreground: "#{{ teal | upper }}" }
+  crypto: { foreground: "#{{ surface2 | upper }}" }
+  document: { foreground: "#{{ text | upper }}" }
+  compressed: { foreground: "#{{ pink | upper }}" }
+  temp: { foreground: "#{{ maroon | upper }}" }
+  compiled: { foreground: "#{{ sapphire | upper }}" }
+  build: { foreground: "#{{ surface2 | upper }}" }
+  source: { foreground: "#{{ blue | upper }}" }
 
-punctuation: { foreground: "{{ overlay1_hex_upper }}" }
-date: { foreground: "{{ yellow_hex_upper }}" }
-inode: { foreground: "{{ subtext0_hex_upper }}" }
-blocks: { foreground: "{{ overlay2_hex_upper }}" }
-header: { foreground: "{{ text_hex_upper }}" }
-octal: { foreground: "{{ teal_hex_upper }}" }
-flags: { foreground: "{{ mauve_hex_upper }}" }
+punctuation: { foreground: "#{{ overlay1 | upper }}" }
+date: { foreground: "#{{ yellow | upper }}" }
+inode: { foreground: "#{{ subtext0 | upper }}" }
+blocks: { foreground: "#{{ overlay2 | upper }}" }
+header: { foreground: "#{{ text | upper }}" }
+octal: { foreground: "#{{ teal | upper }}" }
+flags: { foreground: "#{{ mauve | upper }}" }
 
-symlink_path: { foreground: "{{ sky_hex_upper }}" }
-control_char: { foreground: "{{ sapphire_hex_upper }}" }
-broken_symlink: { foreground: "{{ red_hex_upper }}" }
-broken_path_overlay: { foreground: "{{ surface2_hex_upper }}" }
+symlink_path: { foreground: "#{{ sky | upper }}" }
+control_char: { foreground: "#{{ sapphire | upper }}" }
+broken_symlink: { foreground: "#{{ red | upper }}" }
+broken_path_overlay: { foreground: "#{{ surface2 | upper }}" }
