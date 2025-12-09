@@ -3,8 +3,6 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       sudo pacman -S --noconfirm waybar
       sudo systemctl enable --now waybar.service
-      mkdir -p ~/.config/waybar
-      curl -sL https://raw.githubusercontent.com/catppuccin/waybar/main/themes/mocha.css -o ~/.config/waybar/mocha.css
     depends:
       - /tools/hyprland
       - /lib/pipewire

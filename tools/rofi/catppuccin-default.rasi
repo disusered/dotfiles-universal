@@ -3,11 +3,10 @@
 // @import "catppuccin-macchiato"
 @import "catppuccin-mocha"
 
-// TODO: Accent color
 * {
   font: "Noto Sans Regular 13";
   selected-active-foreground:  @background;
-  lightfg:                     @blue;
+  lightfg:                     @accent;
   separatorcolor:              @foreground;
   urgent-foreground:           @red;
   alternate-urgent-background: @lightbg;
@@ -22,8 +21,8 @@
   alternate-normal-foreground: @foreground;
   urgent-background:           @background;
   selected-normal-foreground:  @lightbg;
-  active-foreground:           @blue;
-  selected-active-background:  @blue;
+  active-foreground:           @accent;
+  selected-active-background:  @accent;
   active-background:           @background;
   selected-normal-background:  @lightfg;
   alternate-normal-background: @lightbg;
@@ -31,7 +30,7 @@
   selected-urgent-foreground:  @background;
   normal-foreground:           @foreground;
   alternate-urgent-foreground: @red;
-  alternate-active-foreground: @blue;
+  alternate-active-foreground: @accent;
 
 }
 element {

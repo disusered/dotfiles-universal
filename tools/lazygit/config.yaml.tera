@@ -1,6 +1,6 @@
 os:
-  edit: '[ -z "$NVIM" ] && (nvim -- {{filename}}) || (nvim --server "$NVIM" --remote-tab {{filename}})'
-  editAtLine: '[ -z "$NVIM" ] && (nvim +{{line}} -- {{filename}}) || (nvim --server "$NVIM" --remote-tab {{filename}} && nvim --server "$NVIM" --remote-send ":{{line}}<CR>")'
+  edit: '[ -z "$NVIM" ] && (nvim -- {% raw %}{{filename}}{% endraw %}) || (nvim --server "$NVIM" --remote-tab {% raw %}{{filename}}{% endraw %})'
+  editAtLine: '[ -z "$NVIM" ] && (nvim +{% raw %}{{line}}{% endraw %} -- {% raw %}{{filename}}{% endraw %}) || (nvim --server "$NVIM" --remote-tab {% raw %}{{filename}}{% endraw %} && nvim --server "$NVIM" --remote-send ":{% raw %}{{line}}{% endraw %}<CR>")'
   # Whether lazygit suspends until an edit process returns
   editInTerminal: true
 # Use Git Delta for diffs
@@ -31,26 +31,26 @@ gui:
   border: single
   skipRewordInEditorWarning: true
   skipAmendWarning: true
-  # Theme (Catppuccin Mocha)
+  # Theme (Catppuccin {{ flavor | capitalize }})
   theme:
     activeBorderColor:
-      - "#89b4fa"
+      - "{{ accent_color_hex }}"
       - bold
     inactiveBorderColor:
-      - "#a6adc8"
+      - "{{ subtext0_hex }}"
     optionsTextColor:
-      - "#89b4fa"
+      - "{{ accent_color_hex }}"
     selectedLineBgColor:
-      - "#313244"
+      - "{{ surface0_hex }}"
     cherryPickedCommitBgColor:
-      - "#45475a"
+      - "{{ surface1_hex }}"
     cherryPickedCommitFgColor:
-      - "#89b4fa"
+      - "{{ accent_color_hex }}"
     unstagedChangesColor:
-      - "#f38ba8"
+      - "{{ red_hex }}"
     defaultFgColor:
-      - "#cdd6f4"
+      - "{{ text_hex }}"
     searchingActiveBorderColor:
-      - "#f9e2af"
+      - "{{ yellow_hex }}"
   authorColors:
-    "*": "#b4befe"
+    "*": "{{ lavender_hex }}"

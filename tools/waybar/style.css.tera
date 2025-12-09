@@ -1,4 +1,5 @@
-/* Catppuccin Mocha */
+/* vi: ft=css */
+/* Catppuccin {{ flavor | capitalize }} */
 
 * {
   font-family: "Noto Sans Regular", sans-serif;
@@ -7,12 +8,12 @@
 }
 
 window#waybar {
-  background-color: #1e1e2e;
-  color: #cdd6f4;
+  background-color: {{ base_hex }};
+  color: {{ text_hex }};
 }
 
 #workspaces {
-  background-color: #313244;
+  background-color: {{ surface0_hex }};
   margin: 5px;
   padding: 0px 5px;
   border-radius: 10px;
@@ -20,22 +21,22 @@ window#waybar {
 
 #workspaces button {
   padding: 0px 15px;
-  color: #cdd6f4;
+  color: {{ text_hex }};
   border-radius: 10px;
 }
 
 #workspaces button.active {
-  color: #1e1e2e;
-  background-color: #89b4fa;
+  color: {{ base_hex }};
+  background-color: {{ accent_color_hex }};
 }
 
 #workspaces button:hover {
-  background-color: #45475a;
-  color: #cdd6f4;
+  background-color: {{ surface1_hex }};
+  color: {{ text_hex }};
 }
 
 #tray {
-  background-color: #313244;
+  background-color: {{ surface0_hex }};
   margin: 5px;
   padding: 0px 10px;
   border-radius: 10px;
@@ -47,7 +48,7 @@ window#waybar {
 
 #tray>.needs-attention {
   -gtk-icon-effect: highlight;
-  background-color: #f38ba8;
+  background-color: {{ red_hex }};
 }
 
 #clock,
@@ -56,14 +57,14 @@ window#waybar {
 #privacy,
 #custom-weather,
 #custom-powermenu {
-  background-color: #313244;
-  color: #cdd6f4;
+  background-color: {{ surface0_hex }};
+  color: {{ text_hex }};
   padding: 0px 15px;
   margin: 5px;
   border-radius: 10px;
 }
 
 #privacy {
-  background-color: #f38ba8;
-  color: #313244;
+  background-color: {{ red_hex }};
+  color: {{ surface0_hex }};
 }
