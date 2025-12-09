@@ -49,11 +49,11 @@
         "weeks-pos": "right",
         "on-scroll": 1,
         "format": {
-          "months": "<span color='#cba6f7'><b>{}</b></span>",
-          "days": "<span color='#cdd6f4'><b>{}</b></span>",
-          "weeks": "<span color='#89b4fa'><b>W{}</b></span>",
-          "weekdays": "<span color='#b4befe'><b>{}</b></span>",
-          "today": "<span color='#89b4fa'><b><u>{}</u></b></span>"
+          "months": "<span color='{{ mauve_hex }}'><b>{}</b></span>",
+          "days": "<span color='{{ text_hex }}'><b>{}</b></span>",
+          "weeks": "<span color='{{ accent_color_hex }}'><b>W{}</b></span>",
+          "weekdays": "<span color='{{ lavender_hex }}'><b>{}</b></span>",
+          "today": "<span color='{{ accent_color_hex }}'><b><u>{}</u></b></span>"
         }
       }
     },
@@ -156,11 +156,11 @@
         "weeks-pos": "right",
         "on-scroll": 1,
         "format": {
-          "months": "<span color='#cba6f7'><b>{}</b></span>",
-          "days": "<span color='#cdd6f4'><b>{}</b></span>",
-          "weeks": "<span color='#89b4fa'><b>W{}</b></span>",
-          "weekdays": "<span color='#b4befe'><b>{}</b></span>",
-          "today": "<span color='#89b4fa'><b><u>{}</u></b></span>"
+          "months": "<span color='{{ mauve_hex }}'><b>{}</b></span>",
+          "days": "<span color='{{ text_hex }}'><b>{}</b></span>",
+          "weeks": "<span color='{{ accent_color_hex }}'><b>W{}</b></span>",
+          "weekdays": "<span color='{{ lavender_hex }}'><b>{}</b></span>",
+          "today": "<span color='{{ accent_color_hex }}'><b><u>{}</u></b></span>"
         }
       }
     }
