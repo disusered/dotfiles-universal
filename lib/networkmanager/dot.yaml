@@ -4,5 +4,8 @@ linux[whoami.distro^="Arch"]:
       sudo pacman -S --noconfirm networkmanager
       sudo systemctl enable --now NetworkManager
       sudo systemctl enable --now systemd-networkd.service
+
+      # force  unlock wifi
+      rfkill unblock wifi
     depends:
       - /tools/iwd
