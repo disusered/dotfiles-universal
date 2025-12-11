@@ -1,5 +1,18 @@
 ## 🏠️ Baseline rules
 
+When encountering an error or unexpected behavior:
+
+1. Stop. Do not immediately write code to "fix" it.
+2. Ask: What is the correct end state? What should the data look like after this operation succeeds?
+3. Trace backwards: Given that end state, what operations are needed?
+4. Only then write the fix.
+
+Fixing an error is not the same as achieving the requirement. Making an error go away (unique constraint violation, nil reference, etc.) without understanding the full consequence creates broken states that surface later.
+
+If you've already written logic for one case, apply the same reasoning to similar cases without being prompted. The user should not have to drag each realization out of you separately.
+
+Do not ask questions you already have the answer to. Do not ask questions to appear thorough when you haven't actually thought through the problem. The user can see your reasoning. Pretending to be confused wastes time and erodes trust.
+
 ### Git Operations - CRITICAL SAFETY RULES
 
 **NEVER perform destructive git operations without explicit user permission:**
@@ -26,6 +39,7 @@ claude/*    → Ask user for target branch
 ```
 
 **Before creating ANY PR:**
+
 1. Detect source branch: `git branch --show-current`
 2. Determine target using table above
 3. **ALWAYS confirm with user**: "Detected source: {source}, target: {target}. Is this correct?"
@@ -44,6 +58,7 @@ claude/*    → Ask user for target branch
 - **NEVER use `builtin` with ANY other command** (e.g., `builtin git`, `builtin dotnet`, `builtin npm` are ALL WRONG)
 
 **Correct:**
+
 ```bash
 builtin cd /path/to/directory
 builtin cd ../
@@ -53,6 +68,7 @@ npm install             # Just npm, NO builtin
 ```
 
 **WRONG:**
+
 ```bash
 cd /path/to/directory   # Will fail - zoxide conflict
 builtin git status      # WRONG - git is not a shell builtin, just use: git status
@@ -71,6 +87,7 @@ builtin npm            # WRONG - npm is not a shell builtin
 - Use `/bin/ls` for all file listing operations
 
 **Correct:**
+
 ```bash
 /bin/ls -la               # Use actual ls binary
 /bin/ls -lh               # Use actual ls binary
@@ -78,6 +95,7 @@ builtin npm            # WRONG - npm is not a shell builtin
 ```
 
 **WRONG:**
+
 ```bash
 ls -la                    # Will use exa alias (don't do this)
 ```
@@ -332,7 +350,7 @@ The MCP server requires API credentials stored in `~/.atlassian-mcp.json`:
 }
 ```
 
-Create an API token at: https://id.atlassian.com/manage-profile/security/api-tokens
+Create an API token at: <https://id.atlassian.com/manage-profile/security/api-tokens>
 
 **Usage:**
 
@@ -347,6 +365,7 @@ GitHub CLI for issues and pull requests.
 **CRITICAL - Understanding "Create a PR" Requests:**
 
 When the user says "create a PR" or "create a pull request":
+
 - ❌ **DO NOT** run `git commit` or `git push` - assume code is already committed
 - ❌ **DO NOT** commit anything - the user already did that
 - ✅ **DO** use `gh pr create` to create the PR in GitHub
@@ -356,6 +375,7 @@ When the user says "create a PR" or "create a pull request":
 **User Authorization Required:**
 
 All `gh` commands that modify state REQUIRE user approval before execution:
+
 - `gh pr create` - REQUIRES approval
 - `gh pr comment` - REQUIRES approval
 - `gh issue create` - REQUIRES approval
