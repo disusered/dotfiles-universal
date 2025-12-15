@@ -1,6 +1,9 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm firefox
+    cmd: |
+      sudo pacman -S --noconfirm firefox
+      sudo mkdir -p /etc/firefox/policies
+      sudo cp ~/.dotfiles/arch/firefox/policies.json /etc/firefox/policies/
     depends:
       - /arch/speech
   links:

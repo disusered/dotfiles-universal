@@ -1,0 +1,10 @@
+{
+  "policies": {
+    "ExtensionSettings": {
+      "FirefoxColor@mozilla.com": {
+        "installation_mode": "force_installed",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/firefox-color/latest.xpi"
+      }
+    }
+  }
+}

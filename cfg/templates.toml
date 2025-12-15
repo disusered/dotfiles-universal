@@ -18,3 +18,4 @@ waybar-config = { path = "tools/waybar/config.jsonc.tera", reload = "systemctl -
 rofi = { path = "tools/rofi/catppuccin-mocha.rasi.tera" }
 lazygit = { path = "tools/lazygit/config.yaml.tera" }
 gitconfig = { path = "tools/git/gitconfig.tera" }
+firefox-theme = { path = "arch/firefox/theme-url.txt.tera", reload = "firefox \"$(cat ~/.dotfiles/arch/firefox/theme-url.txt)\"" }
