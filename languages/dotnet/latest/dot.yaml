@@ -14,11 +14,9 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       sudo pacman -S --noconfirm \
-        dotnet-sdk-10.0 \
-        dotnet-sdk-9.0 \
-        dotnet-sdk-8.0 \
-        aspnet-runtime-10.0 \
-        aspnet-runtime-9.0 \
-        aspnet-runtime-8.0
+        dotnet-sdk-bin \
+        dotnet-targeting-pack-bin \
+        aspnet-runtime-bin \
+        aspnet-targeting-pack-bin
   links:
     dotnet.zsh: ~/.config/zsh/0500_dotnet.zsh
