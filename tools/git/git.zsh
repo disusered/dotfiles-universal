@@ -30,7 +30,7 @@ function gli() {
   while out=$(
       git l $@ |
       fzf --ansi --no-sort --reverse --multi --query="$q" \
-          --print-query --expect=ctrl-d,ctrl-c,ctrl-i,ctrl-r,ctrl-s,ctrl-p --toggle-sort=\`); do
+          --print-query --expect=ctrl-d,ctrl-c,ctrl-i,ctrl-r,ctrl-s,ctrl-p,ctrl-v --toggle-sort=\`); do
     q=$(head -1 <<< "$out")
     k=$(head -2 <<< "$out" | tail -1)
     shas=$(sed '1,2d;s/^[^a-z0-9]*//;/^$/d' <<< "$out" | awk '{print $1}' | tr '\n' ' ')
@@ -58,6 +58,11 @@ function gli() {
       break
     elif [ "$k" = ctrl-r ]; then
       git reset --hard $shas
+      break
+    elif [ "$k" = ctrl-v ]; then
+      for sha in $shas; do
+        git difftool --no-symlinks --dir-diff $sha^..$sha
+      done
       break
     elif [ "$k" = ctrl-c ]; then
       break

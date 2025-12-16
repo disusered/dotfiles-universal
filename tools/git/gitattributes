@@ -1,0 +1,10 @@
+# Image files use custom diff driver (bypasses delta, renders in Kitty)
+*.png  diff=image
+*.jpg  diff=image
+*.jpeg diff=image
+*.gif  diff=image
+*.webp diff=image
+*.ico  diff=image
+*.bmp  diff=image
+*.tiff diff=image
+*.tif  diff=image

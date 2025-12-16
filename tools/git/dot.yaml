@@ -25,4 +25,5 @@ linux[whoami.distro^="Arch"]:
       - /tools/1password
   links:
     gitconfig: ~/.gitconfig
+    gitattributes: ~/.config/git/attributes
     git.zsh: ~/.config/zsh/0015_git.zsh

@@ -54,3 +54,9 @@ gui:
       - "#f9e2af"
   authorColors:
     "*": "#b4befe"
+customCommands:
+  - key: D
+    description: "Visual diff (kitten diff)"
+    command: "git difftool --no-symlinks -y -- {{.SelectedFile.Name}}"
+    context: files
+    output: terminal

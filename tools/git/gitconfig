@@ -21,6 +21,7 @@
   autocrlf = input
   trustctime = false
   excludesfile = ~/.gitignore_global
+  attributesFile = ~/.config/git/attributes
 [pretty]
   basic = %C(magenta bold)%h%C(reset) %C(auto)%d%C(reset) %s
   extended = %C(magenta bold)%h%C(reset) %C(blue bold)%aN%C(reset) %C(auto)%d%C(reset) %s %C(8)(%cr)%C(reset)
@@ -38,7 +39,7 @@
   a = add
   p = push
   pf = push --force
-  d = diff --no-ext-diff
+  d = diff
   dt = difftool
   m = merge
   mt = mergetool
@@ -60,6 +61,15 @@
   rebase = true
 [interactive]
   diffFilter = delta --color-only
+[diff "image"]
+  command = sh -c 'kitten diff "$2" "$5"' -
+[diff]
+  tool = kitty
+[difftool]
+  prompt = false
+  trustExitCode = true
+[difftool "kitty"]
+  cmd = kitten diff $LOCAL $REMOTE
 [delta]
   features = catppuccin-mocha shell links
 [delta "links"]

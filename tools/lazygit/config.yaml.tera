@@ -54,3 +54,9 @@ gui:
       - "#{{ yellow | hex }}"
   authorColors:
     "*": "#{{ lavender | hex }}"
+customCommands:
+  - key: D
+    description: "Visual diff (kitten diff)"
+    command: "git difftool --no-symlinks -y -- {% raw %}{{.SelectedFile.Name}}{% endraw %}"
+    context: files
+    subprocess: true
