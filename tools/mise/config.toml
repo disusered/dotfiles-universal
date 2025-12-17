@@ -1,6 +1,18 @@
 [settings]
 idiomatic_version_file_enable_tools = ["ruby"]
 
+# CRITICAL: Disable python management globally.
+# This ensures that when you type 'python' in your home directory,
+# mise ignores it, and the shell falls back to /usr/bin/python.
+disable_tools = ["python"]
+
+# Optional: Disable aggressive activation to ensure system PATHs 
+# are respected if they are set in.bashrc/.zshrc.
+activate_aggressive = false
+
+# Set the default jobs to parallelize installs (good for Arch)
+jobs = 4
+
 [tools]
 go = "1.25.2"
 node = "24.10.0"
