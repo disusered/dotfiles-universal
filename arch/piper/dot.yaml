@@ -1,3 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S --noconfirm piper usbutils
+    cmd: |
+      yay -S --noconfirm piper libratbag usbutils
+      pip install evdev PyGObject

@@ -20,3 +20,4 @@ lazygit = { path = "tools/lazygit/config.yaml.tera" }
 gitconfig = { path = "tools/git/gitconfig.tera" }
 starship = { path = "tools/starship/starship.toml.tera" }
 firefox-theme = { path = "arch/firefox/theme-url.txt.tera", reload = "firefox \"$(cat ~/.dotfiles/arch/firefox/theme-url.txt)\"" }
+mouse-leds = { path = "arch/piper/set-leds.sh.tera", reload = "~/.dotfiles/arch/piper/set-leds.sh" }
