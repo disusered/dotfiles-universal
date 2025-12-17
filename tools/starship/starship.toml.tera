@@ -44,8 +44,8 @@ $memory_usage\
 $time"""
 
 [shell]
-zsh_indicator = ' '
-powershell_indicator = ' '
+zsh_indicator = ' '
+powershell_indicator = ' '
 style = 'cyan bold'
 disabled = false
 
@@ -69,7 +69,7 @@ format = '\([$state( $progress_current/$progress_total)]($style)\) '
 style = "red"
 
 [git_branch]
-symbol = " "
+symbol = " "
 format = '[$symbol$branch(:$remote_branch)]($style) '
 style = "bold mauve"
 
@@ -98,87 +98,87 @@ utc_time_offset = "local"
 style = "italic dimmed white"
 
 [bun]
-symbol = " "
+symbol = " "
 format = "[$symbol bun $version ]($style)"
 style = "bright-black"
 
 [c]
-symbol = " "
+symbol = " "
 format = "[$symbol c $version(-$name) ]($style)"
 style = "bright-black"
 
 [cpp]
-symbol = " "
+symbol = " "
 format = "[$symbol cpp $version(-$name) ]($style)"
 style = "bright-black"
 
 [cmake]
-symbol = " "
+symbol = " "
 format = "[$symbol cmake $version ]($style)"
 style = "bright-black"
 
 [conda]
-symbol = " "
+symbol = " "
 format = "[$symbol conda $version ]($style)"
 style = "bright-black"
 
 [deno]
-symbol = " "
+symbol = " "
 format = "[$symbol deno $version ]($style)"
 style = "bright-black"
 
 [dotnet]
-symbol = ""
+symbol = ""
 format = "[$symbol deno $version (🎯 $tfm )]($style)"
 style = "bright-black"
 
 [docker_context]
-symbol = " "
+symbol = " "
 format = "[$symbol docker $version ]($style)"
 style = "bright-black"
 
 [elixir]
-symbol = " "
+symbol = " "
 format = "[$symbol elixir $version (OTP $otp_version )]($style)"
 style = "bright-black"
 
 [golang]
-symbol = " "
+symbol = " "
 format = "[$symbol go $version ]($style)"
 style = "bright-black"
 
 [haskell]
-symbol = " "
+symbol = " "
 format = "[$symbol haskell $version ]($style)"
 style = "bright-black"
 
 [java]
-symbol = " "
+symbol = " "
 format = "[$symbol java $version ]($style)"
 style = "bright-black"
 
 [julia]
-symbol = " "
+symbol = " "
 format = "[$symbol julia $version ]($style)"
 style = "bright-black"
 
 [lua]
-symbol = " "
+symbol = " "
 format = "[$symbol lua $version ]($style)"
 style = "bright-black"
 
 [nodejs]
-symbol = " "
+symbol = " "
 format = "[$symbol node $version ]($style)"
 style = "bright-black"
 
 [perl]
-symbol = " "
+symbol = " "
 format = "[$symbol perl $version ]($style)"
 style = "bright-black"
 
 [php]
-symbol = " "
+symbol = " "
 format = "[$symbol php $version ]($style)"
 style = "bright-black"
 
@@ -188,7 +188,7 @@ format = "[$symbol R $version ]($style)"
 style = "bright-black"
 
 [ruby]
-symbol = " "
+symbol = " "
 format = "[$symbol ruby $version ]($style)"
 style = "bright-black"
 
@@ -198,12 +198,12 @@ format = "[$symbol rust $version ]($style)"
 style = "bright-black"
 
 [swift]
-symbol = " "
+symbol = " "
 format = "[$symbol swift $version ]($style)"
 style = "bright-black"
 
 [python]
-symbol = " "
+symbol = " "
 format = "($virtualenv) [$symbol python $pyenv_prefix($version )]($style)"
 style = "bright-black"
 
