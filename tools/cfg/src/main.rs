@@ -35,7 +35,10 @@ enum Command {
         force: bool,
     },
     /// Sync: render templates + update symlinks + reload apps
-    Sync,
+    Sync {
+        /// Template name filter (substring match)
+        name: Option<String>,
+    },
     /// Theme management (Catppuccin colors, reload)
     Theme {
         #[command(subcommand)]
@@ -123,7 +126,7 @@ fn get_dotfiles_dir() -> String {
 }
 
 /// Run full sync: render templates + run rotz link + reload apps
-fn run_sync(cfg_dir: &str, dotfiles_dir: &str) {
+fn run_sync(cfg_dir: &str, dotfiles_dir: &str, name_filter: Option<&str>) {
     // Load config and palette
     let config = Config::load(&format!("{}/config.toml", cfg_dir)).unwrap_or_default();
     let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
@@ -137,9 +140,22 @@ fn run_sync(cfg_dir: &str, dotfiles_dir: &str) {
 
     let context = build_context(&config, &palette);
 
-    // Render all templates
+    // Render templates (filtered if name provided)
     println!("Rendering templates...");
-    let templates_list = discover_templates(&PathBuf::from(dotfiles_dir));
+    let all_templates = discover_templates(&PathBuf::from(dotfiles_dir));
+    let templates_list: Vec<PathBuf> = match name_filter {
+        Some(name) => all_templates
+            .into_iter()
+            .filter(|p| p.to_str().map(|s| s.contains(name)).unwrap_or(false))
+            .collect(),
+        None => all_templates,
+    };
+
+    if templates_list.is_empty() {
+        eprintln!("No templates found");
+        std::process::exit(1);
+    }
+
     for template_path in &templates_list {
         match render_to_file(template_path, &context, false) {
             Ok(output) => {
@@ -154,13 +170,28 @@ fn run_sync(cfg_dir: &str, dotfiles_dir: &str) {
     // Load templates registry for link and reload commands
     let templates_path = format!("{}/templates.toml", cfg_dir);
     if let Ok(templates) = TemplatesFile::load(&templates_path) {
-        // Run rotz link for apps that need it
+        // Build set of rendered template paths for filtering
+        let rendered_paths: std::collections::HashSet<String> = templates_list
+            .iter()
+            .filter_map(|p| p.to_str().map(|s| s.to_string()))
+            .collect();
+
+        // Run rotz link for apps that need it (filtered by rendered templates)
         let mut linked: std::collections::HashSet<String> = std::collections::HashSet::new();
-        println!("\nLinking...");
+        let mut any_links = false;
         for name in templates.names() {
             if let Some(tpl_config) = templates.get(name) {
+                // Skip if this template wasn't rendered
+                let full_path = format!("{}/{}", dotfiles_dir, tpl_config.path);
+                if !rendered_paths.iter().any(|p| p.contains(&full_path) || full_path.contains(p)) {
+                    continue;
+                }
                 if let Some(link_module) = &tpl_config.link {
                     if !linked.contains(link_module) {
+                        if !any_links {
+                            println!("\nLinking...");
+                            any_links = true;
+                        }
                         print!("  rotz link {}... ", link_module);
                         match rotz_link(link_module) {
                             Ok(()) => println!("ok"),
@@ -172,11 +203,20 @@ fn run_sync(cfg_dir: &str, dotfiles_dir: &str) {
             }
         }
 
-        // Reload all apps
-        println!("\nReloading apps...");
+        // Reload apps (filtered by rendered templates)
+        let mut any_reloads = false;
         for name in templates.names() {
             if let Some(tpl_config) = templates.get(name) {
+                // Skip if this template wasn't rendered
+                let full_path = format!("{}/{}", dotfiles_dir, tpl_config.path);
+                if !rendered_paths.iter().any(|p| p.contains(&full_path) || full_path.contains(p)) {
+                    continue;
+                }
                 if let Some(cmd) = &tpl_config.reload {
+                    if !any_reloads {
+                        println!("\nReloading apps...");
+                        any_reloads = true;
+                    }
                     print!("  {}... ", name);
                     match reload_app(cmd) {
                         Ok(()) => println!("ok"),
@@ -264,10 +304,10 @@ fn main() {
                 std::process::exit(1);
             }
         }
-        Command::Sync => {
+        Command::Sync { name } => {
             let cfg_dir = get_cfg_dir();
             let dotfiles_dir = get_dotfiles_dir();
-            run_sync(&cfg_dir, &dotfiles_dir);
+            run_sync(&cfg_dir, &dotfiles_dir, name.as_deref());
         }
         Command::Theme { command } => match command {
             ThemeCommand::Config { get, set, apply } => {
@@ -296,7 +336,7 @@ fn main() {
 
                     // If --apply flag is set, run full sync
                     if apply {
-                        run_sync(&cfg_dir, &dotfiles_dir);
+                        run_sync(&cfg_dir, &dotfiles_dir, None);
                     }
                 } else if let Some(key) = get {
                     match config.get(&key) {
