@@ -4,5 +4,5 @@
 DEVICE="warbling-mara"
 
 # Profile 0 only (active profile)
-ratbagctl $DEVICE profile 0 led 0 set color {{ accent | darken(amount=15) | hex }}
+ratbagctl $DEVICE profile 0 led 0 set color {{ accent | darken(amount=30) | hex }}
 ratbagctl $DEVICE profile 0 led 1 set color {{ secondary | hex }}
