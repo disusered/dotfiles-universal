@@ -8,10 +8,12 @@ windows:
       scoop install Hasklig
     depends:
       - /packages/scoop
-linux[whoami.distro^="Arch"]|darwin:
+linux[whoami.distro^="Arch"]:
   installs:
-    cmd: >
-      sudo pacman -S --noconfirm ttf-fira-code ttf-cascadia-code-nerd otf-hasklig-nerd ttf-hack
+    cmd: |
+      sudo pacman -S --noconfirm ttf-fira-code ttf-cascadia-code-nerd \
+        otf-hasklig-nerd ttf-hack
+      yay -S --noconfirm otf-stix
     depends:
       - /lib/arch
 linux[whoami.distro^="Fedora"]:
@@ -19,4 +21,3 @@ linux[whoami.distro^="Fedora"]:
     cmd: >
       sudo dnf install -y ttf-fira-code cascadia-code-nf-fonts
     # TODO: Manually install Hasklig and hack-font
-
