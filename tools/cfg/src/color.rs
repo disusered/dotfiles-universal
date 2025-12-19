@@ -78,6 +78,20 @@ impl Color {
             b: ((self.b as f32 * ratio) + (other.b as f32 * (1.0 - ratio))).round() as u8,
         }
     }
+
+    /// Lighten this color by a percentage (0-100)
+    /// amount = 0: no change, amount = 100: pure white
+    pub fn lighten(&self, amount: u8) -> Color {
+        let white = Color { r: 255, g: 255, b: 255 };
+        self.blend(&white, 100 - amount)
+    }
+
+    /// Darken this color by a percentage (0-100)
+    /// amount = 0: no change, amount = 100: pure black
+    pub fn darken(&self, amount: u8) -> Color {
+        let black = Color { r: 0, g: 0, b: 0 };
+        self.blend(&black, 100 - amount)
+    }
 }
 
 /// Format a color in the specified format
@@ -120,5 +134,39 @@ mod tests {
         assert_eq!(c.to_rgb_css(), "rgb(137, 180, 250)");
         assert_eq!(c.to_hyprlang(), "rgb(89b4fa)");
         assert_eq!(c.to_rgba(0.9), "rgba(137, 180, 250, 0.9)");
+    }
+
+    #[test]
+    fn test_lighten() {
+        let c = Color::from_hex("89b4fa").unwrap();
+
+        // Lighten by 0% should return same color
+        let l0 = c.lighten(0);
+        assert_eq!(l0.to_hex(), "89b4fa");
+
+        // Lighten by 100% should return white
+        let l100 = c.lighten(100);
+        assert_eq!(l100.to_hex(), "ffffff");
+
+        // Lighten by 50% should be halfway to white
+        let l50 = c.lighten(50);
+        assert_eq!(l50.to_hex(), "c4dafd");
+    }
+
+    #[test]
+    fn test_darken() {
+        let c = Color::from_hex("89b4fa").unwrap();
+
+        // Darken by 0% should return same color
+        let d0 = c.darken(0);
+        assert_eq!(d0.to_hex(), "89b4fa");
+
+        // Darken by 100% should return black
+        let d100 = c.darken(100);
+        assert_eq!(d100.to_hex(), "000000");
+
+        // Darken by 50% should be halfway to black
+        let d50 = c.darken(50);
+        assert_eq!(d50.to_hex(), "455a7d");
     }
 }

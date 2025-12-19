@@ -138,6 +138,28 @@ fn blend_filter(value: &Value, args: &HashMap<String, Value>) -> TeraResult<Valu
     Ok(tera::to_value(blended)?)
 }
 
+/// Custom Tera filter: lighten color
+/// Usage: {{ blue | lighten(amount=15) }}
+fn lighten_filter(value: &Value, args: &HashMap<String, Value>) -> TeraResult<Value> {
+    let color = value_to_color(value)?;
+    let amount = args
+        .get("amount")
+        .and_then(|v| v.as_u64())
+        .ok_or_else(|| tera::Error::msg("lighten: missing 'amount' argument"))? as u8;
+    Ok(tera::to_value(color.lighten(amount))?)
+}
+
+/// Custom Tera filter: darken color
+/// Usage: {{ blue | darken(amount=15) }}
+fn darken_filter(value: &Value, args: &HashMap<String, Value>) -> TeraResult<Value> {
+    let color = value_to_color(value)?;
+    let amount = args
+        .get("amount")
+            .and_then(|v| v.as_u64())
+            .ok_or_else(|| tera::Error::msg("darken: missing 'amount' argument"))? as u8;
+    Ok(tera::to_value(color.darken(amount))?)
+}
+
 /// Discover all .tera template files in a directory (recursively)
 pub fn discover_templates(root: &Path) -> Vec<PathBuf> {
     let pattern = format!("{}/**/*.tera", root.display());
@@ -206,6 +228,8 @@ pub fn render_template(template_path: &Path, context: &Context) -> Result<String
     tera.register_filter("hyprlang_rgba", hyprlang_rgba_filter);
     tera.register_filter("ansi", ansi_filter);
     tera.register_filter("blend", blend_filter);
+    tera.register_filter("lighten", lighten_filter);
+    tera.register_filter("darken", darken_filter);
     tera.add_raw_template("template", &content).map_err(|e| {
         format!(
             "Failed to parse template '{}': {}",
