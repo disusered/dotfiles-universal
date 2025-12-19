@@ -2,7 +2,7 @@ colourful: true
 
 filekinds:
   normal: { foreground: "#BAC2DE" }
-  directory: { foreground: "#89B4FA" }
+  directory: { foreground: "#A6E3A1" }
   symlink: { foreground: "#89DCEB" }
   pipe: { foreground: "#7F849C" }
   block_device: { foreground: "#EBA0AC" }

@@ -1,6 +1,6 @@
 flavor = "mocha"
-accent = "blue"
-secondary = "mauve"
+accent = "green"
+secondary = "rosewater"
 
 [fonts]
 mono = "JetBrainsMono Nerd Font"

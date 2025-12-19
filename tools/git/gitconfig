@@ -23,9 +23,9 @@
   excludesfile = ~/.gitignore_global
   attributesFile = ~/.config/git/attributes
 [pretty]
-  basic = %C(magenta bold)%h%C(reset) %C(auto)%d%C(reset) %s
-  extended = %C(magenta bold)%h%C(reset) %C(blue bold)%aN%C(reset) %C(auto)%d%C(reset) %s %C(8)(%cr)%C(reset)
-  reflog = %C(magenta bold)%h%C(reset)  %C(blue bold)%gd%C(reset) %gs %C(8)(%cr)%C(reset)
+  basic = %C(brightwhite bold)%h%C(reset) %C(auto)%d%C(reset) %s
+  extended = %C(brightwhite bold)%h%C(reset) %C(green bold)%aN%C(reset) %C(auto)%d%C(reset) %s %C(8)(%cr)%C(reset)
+  reflog = %C(brightwhite bold)%h%C(reset)  %C(green bold)%gd%C(reset) %gs %C(8)(%cr)%C(reset)
 [alias]
   l = log --color --pretty=extended --graph --date=relative
   la = log --color --pretty=extended --graph --date=relative --branches --tags --remotes
