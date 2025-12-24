@@ -42,3 +42,4 @@ global:
     whichkey.lua: ~/.config/nvim/lua/plugins/whichkey.lua
     venv-selector.lua: ~/.config/nvim/lua/plugins/venv-selector.lua
     custom-zen.lua: ~/.config/nvim/lua/plugins/zen.lua
+    table-mode.lua: ~/.config/nvim/lua/plugins/table-mode.lua
