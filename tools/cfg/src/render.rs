@@ -107,6 +107,14 @@ fn hyprlang_rgba_filter(value: &Value, args: &HashMap<String, Value>) -> TeraRes
     Ok(Value::String(color.to_hyprlang_rgba(alpha)))
 }
 
+/// Custom Tera filter: Qt ARGB hex format
+/// Usage: {{ blue | hex_argb }} or {{ blue | hex_argb(alpha=0.5) }}
+fn hex_argb_filter(value: &Value, args: &HashMap<String, Value>) -> TeraResult<Value> {
+    let color = value_to_color(value)?;
+    let alpha = args.get("alpha").and_then(|v| v.as_f64()).unwrap_or(1.0) as f32;
+    Ok(Value::String(color.to_hex_argb(alpha)))
+}
+
 /// Custom Tera filter: ANSI color name
 /// Usage: {{ blue_name | ansi }} or {{ accent_name | ansi }}
 /// Input: Catppuccin color name string (e.g., "blue", "text", "mauve")
@@ -226,6 +234,7 @@ pub fn render_template(template_path: &Path, context: &Context) -> Result<String
     tera.register_filter("rgba_css", rgba_css_filter);
     tera.register_filter("hyprlang", hyprlang_filter);
     tera.register_filter("hyprlang_rgba", hyprlang_rgba_filter);
+    tera.register_filter("hex_argb", hex_argb_filter);
     tera.register_filter("ansi", ansi_filter);
     tera.register_filter("blend", blend_filter);
     tera.register_filter("lighten", lighten_filter);

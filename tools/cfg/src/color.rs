@@ -69,6 +69,12 @@ impl Color {
         format!("rgba({:02x}{:02x}{:02x}{:02x})", self.r, self.g, self.b, alpha_byte)
     }
 
+    /// Output as Qt ARGB format (e.g., "#ff89b4fa")
+    pub fn to_hex_argb(&self, alpha: f32) -> String {
+        let alpha_byte = (alpha * 255.0).round() as u8;
+        format!("#{:02x}{:02x}{:02x}{:02x}", alpha_byte, self.r, self.g, self.b)
+    }
+
     /// Blend this color with another (amount = percentage of this color, 0-100)
     pub fn blend(&self, other: &Color, amount: u8) -> Color {
         let ratio = amount as f32 / 100.0;
