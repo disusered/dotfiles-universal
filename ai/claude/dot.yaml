@@ -10,6 +10,7 @@ global:
     hooks: ~/.claude/hooks
     commands: ~/.claude/commands
     agents: ~/.claude/agents/
+    reference: ~/.claude/reference/
     CLAUDE.md: ~/.claude/CLAUDE.md
 linux|darwin:
   links:

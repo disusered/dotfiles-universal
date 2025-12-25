@@ -1,10 +1,10 @@
 ---
-name: confluence
-description: Use Atlassian MCP server to interact with Confluence (pages, spaces, search, comments). Load this when you need to perform Confluence operations. NOT for Jira - use acli for Jira.
+name: managing-confluence
+description: Reads, creates, and updates Confluence pages via MCP. Use when working with wiki pages, documentation, knowledge bases, CQL searches, or page hierarchies in Confluence. For Jira issues, use managing-jira instead.
 allowed-tools: Bash
 ---
 
-# Atlassian MCP - Confluence Reference
+# Managing Confluence
 
 Model Context Protocol server for Confluence pages, spaces, and content management.
 

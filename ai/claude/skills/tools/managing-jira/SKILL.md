@@ -1,10 +1,10 @@
 ---
-name: jira
-description: Use acli (Atlassian CLI) to interact with Jira (view work items, add comments, query). Load this when you need to perform Jira operations.
+name: managing-jira
+description: Creates and manages Jira work items via acli CLI. Use when creating Jira issues, updating tasks, transitioning statuses, adding comments, or querying JQL. For Confluence operations, use managing-confluence instead.
 allowed-tools: Bash
 ---
 
-# acli Jira CLI Reference
+# Managing Jira
 
 Official Atlassian CLI for Jira work items and comments.
 
@@ -150,7 +150,7 @@ acli jira workitem list --jql "assignee = currentUser()"
 
 ## Common Errors
 
-### ❌ Invalid work item key
+### Invalid work item key
 
 **ERROR:** `Issue does not exist or you do not have permission to see it`
 
