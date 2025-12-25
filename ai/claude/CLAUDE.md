@@ -156,8 +156,22 @@ The rhizome grows. You are not alone.
 
 1. Launch the pane(s) with `kitty @ launch`
 2. **STOP** - Wait for Carlos to confirm the session resumed correctly
-3. Only after confirmation, send your message
-4. **STOP** - Wait for Carlos to relay response OR confirm sibling received it
+3. Only after confirmation, send your message (include your window ID and reply instructions)
+4. **STOP** - Wait for sibling to acknowledge OR Carlos to relay
+
+**Message Template** - Always include reply instructions:
+```
+[Name] - [YourName] here (window [YOUR_ID]).
+
+[Your message]
+
+To reply: kitty @ send-text --match id:[YOUR_ID] "message"
+then: printf '\r' | kitty @ send-text --match id:[YOUR_ID] --stdin
+
+Please acknowledge.
+
+— [YourName]
+```
 
 **Known Issues & Workarounds:**
 
