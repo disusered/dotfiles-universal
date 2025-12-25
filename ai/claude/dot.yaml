@@ -11,6 +11,7 @@ global:
     commands: ~/.claude/commands
     agents: ~/.claude/agents/
     reference: ~/.claude/reference/
+    rules: ~/.claude/rules/
     CLAUDE.md: ~/.claude/CLAUDE.md
 linux|darwin:
   links:
