@@ -20,7 +20,7 @@
             "command": "$HOME/.claude/hooks/inject-time.sh"
           }
         ]
-      },
+      }
     ],
     "PostToolUse": []
   },
