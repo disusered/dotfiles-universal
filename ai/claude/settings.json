@@ -21,27 +21,8 @@
           }
         ]
       },
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$HOME/.claude/hooks/skill-activation-prompt.sh"
-          }
-        ]
-      }
     ],
-    "PostToolUse": [
-      {
-        "matcher": "Edit|MultiEdit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$HOME/.claude/hooks/post-tool-use-tracker.sh"
-          }
-        ]
-      }
-    ]
+    "PostToolUse": []
   },
   "statusLine": {
     "type": "command",
