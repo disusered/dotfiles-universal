@@ -16,6 +16,8 @@ linux[whoami.distro^="Arch"]:
       yay -S --noconfirm otf-stix
     depends:
       - /lib/arch
+  links:
+    fonts.conf: {{ dirs.base.config }}/fontconfig/fonts.conf
 linux[whoami.distro^="Fedora"]:
   installs:
     cmd: >
