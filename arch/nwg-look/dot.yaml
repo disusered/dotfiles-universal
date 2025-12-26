@@ -1,8 +1,11 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S --noconfirm nwg-look
+    cmd: |
+      yay -S --noconfirm nwg-look
+      sudo pacman -S --noconfirm adw-gtk-theme
   links:
     settings.ini: {{ dirs.base.config }}/gtk-3.0/settings.ini
+    gtk.css: {{ dirs.base.config }}/gtk-3.0/gtk.css
     gtkrc-2.0: {{ dirs.base.home }}/.gtkrc-2.0
     xsettingsd.conf: {{ dirs.base.config}}/xsettingsd/xsettingsd.conf
     gtk-4.0: {{ dirs.base.config }}/gtk-4.0

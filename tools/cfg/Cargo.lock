@@ -124,6 +124,7 @@ dependencies = [
  "clap",
  "glob",
  "serde",
+ "serde_json",
  "tera",
  "toml",
 ]

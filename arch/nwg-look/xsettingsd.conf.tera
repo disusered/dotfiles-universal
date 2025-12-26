@@ -1,5 +1,5 @@
-Net/ThemeName "adw-gtk3-dark"
-Net/IconThemeName "Papirus-Dark"
+Net/ThemeName "{{ gtk_theme }}"
+Net/IconThemeName "{{ icon_theme }}"
 Gtk/CursorThemeName "default"
 Net/EnableEventSounds 1
 EnableInputFeedbackSounds 0

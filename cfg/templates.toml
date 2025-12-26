@@ -21,3 +21,21 @@ gitconfig = { path = "tools/git/gitconfig.tera" }
 starship = { path = "tools/starship/starship.toml.tera" }
 firefox-theme = { path = "arch/firefox/theme-url.txt.tera", reload = "firefox \"$(cat ~/.dotfiles/arch/firefox/theme-url.txt)\"" }
 mouse-leds = { path = "arch/piper/set-leds.sh.tera", reload = "~/.dotfiles/arch/piper/set-leds.sh" }
+
+# Qt
+qt6ct-colors = { path = "lib/qt/qt6ct/style-colors.conf.tera" }
+qt6ct-config = { path = "lib/qt/qt6ct/qt6ct.conf.tera" }
+
+# GTK / NWG-Look
+gtk3-settings = { path = "arch/nwg-look/settings.ini.tera" }
+gtk4-settings = { path = "arch/nwg-look/gtk-4.0/settings.ini.tera" }
+gtk2-settings = { path = "arch/nwg-look/gtkrc-2.0.tera" }
+xsettingsd = { path = "arch/nwg-look/xsettingsd.conf.tera" }
+gtk3-css = { path = "arch/nwg-look/gtk.css.tera" }
+gtk4-css = { path = "arch/nwg-look/gtk-4.0/gtk.css.tera" }
+
+# KDE / Dolphin
+kdeglobals = { path = "arch/dolphin/kdeglobals.tera" }
+
+# Icons
+papirus-folders = { path = "tools/papirus/set-folders.sh.tera", reload = "~/.dotfiles/tools/papirus/set-folders.sh" }

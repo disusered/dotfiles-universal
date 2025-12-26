@@ -12,4 +12,3 @@ linux[whoami.distro^="Arch"]:
   links:
     qt.zsh: {{ dirs.base.config }}/zsh/1000_qt.zsh
     qt6ct: {{ dirs.base.config }}/qt6ct
-    qt5ct: {{ dirs.base.config }}/qt5ct

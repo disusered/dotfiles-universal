@@ -1,0 +1,83 @@
+/* Catppuccin mocha theme for GTK3 */
+
+/* Catppuccin colors */
+@define-color accent #a6e3a1;
+@define-color red #f38ba8;
+@define-color green #a6e3a1;
+@define-color yellow #f9e2af;
+@define-color blue #89b4fa;
+@define-color text #cdd6f4;
+@define-color subtext_1 #bac2de;
+@define-color subtext_0 #a6adc8;
+@define-color overlay_2 #9399b2;
+@define-color overlay_1 #7f849c;
+@define-color overlay_0 #6c7086;
+@define-color surface_2 #585b70;
+@define-color surface_1 #45475a;
+@define-color surface_0 #313244;
+@define-color base #1e1e2e;
+@define-color mantle #181825;
+@define-color crust #11111b;
+
+/* Adwaita color mappings */
+@define-color accent_color @accent;
+@define-color accent_bg_color @accent;
+@define-color accent_fg_color @crust;
+
+@define-color window_bg_color @base;
+@define-color window_fg_color @text;
+
+@define-color headerbar_bg_color @base;
+@define-color headerbar_fg_color @text;
+@define-color headerbar_backdrop_color @mantle;
+@define-color headerbar_shade_color @crust;
+@define-color headerbar_border_color @surface_0;
+
+@define-color popover_bg_color @surface_0;
+@define-color popover_fg_color @text;
+@define-color popover_shade_color @crust;
+
+@define-color dialog_bg_color @surface_0;
+@define-color dialog_fg_color @text;
+
+@define-color sidebar_bg_color @mantle;
+@define-color sidebar_fg_color @text;
+@define-color sidebar_backdrop_color @mantle;
+@define-color sidebar_shade_color @crust;
+@define-color sidebar_border_color @surface_0;
+
+@define-color secondary_sidebar_bg_color @mantle;
+@define-color secondary_sidebar_fg_color @text;
+@define-color secondary_sidebar_backdrop_color @mantle;
+@define-color secondary_sidebar_shade_color @crust;
+@define-color secondary_sidebar_border_color @surface_0;
+
+@define-color view_bg_color @base;
+@define-color view_fg_color @text;
+
+@define-color card_bg_color @surface_0;
+@define-color card_fg_color @text;
+@define-color card_shade_color @crust;
+
+@define-color thumbnail_bg_color @surface_1;
+@define-color thumbnail_fg_color @text;
+
+@define-color warning_bg_color @yellow;
+@define-color warning_fg_color @crust;
+@define-color warning_color @yellow;
+
+@define-color error_bg_color @red;
+@define-color error_fg_color @crust;
+@define-color error_color @red;
+
+@define-color success_bg_color @green;
+@define-color success_fg_color @crust;
+@define-color success_color @green;
+
+@define-color destructive_bg_color @red;
+@define-color destructive_fg_color @crust;
+@define-color destructive_color @red;
+
+@define-color shade_color @crust;
+@define-color scrollbar_outline_color @surface_1;
+@define-color borders @surface_0;

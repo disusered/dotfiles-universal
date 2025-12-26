@@ -1,0 +1,7 @@
+[Settings]
+gtk-theme-name={{ gtk_theme }}
+gtk-icon-theme-name={{ icon_theme }}
+gtk-font-name={{ font_sans }} {{ font_sans_size }}
+gtk-cursor-theme-name=default
+gtk-cursor-theme-size=24
+gtk-application-prefer-dark-theme=1

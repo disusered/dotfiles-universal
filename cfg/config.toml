@@ -2,6 +2,8 @@ flavor = "mocha"
 accent = "green"
 secondary = "rosewater"
 icon_theme = "Papirus-Dark"
+gtk_theme = "adw-gtk3-dark"
+qt_style = "Darkly"
 
 [fonts]
 mono = "JetBrainsMono Nerd Font"
