@@ -21,29 +21,31 @@ cp target/release/cfg ./cfg
 
 ## Usage
 
+All commands follow the same pattern:
+- No args = show current state
+- `--list` = show available options
+- `--set X=Y --apply` = change + apply
+
 ```bash
-# Render all templates
-cfg render --all
+# Update (render + symlink + reload)
+cfg update              # Update all
+cfg update --list       # List available templates
+cfg update mako kitty   # Update specific templates
+cfg update --dry-run    # Preview without writing
 
-# Render a specific template
-cfg render mako
+# Theme
+cfg theme               # Show current (flavor, accent, secondary)
+cfg theme --list        # Show palette colors
+cfg theme --get accent  # Get specific value
+cfg theme --set accent=green              # Set value only
+cfg theme --set accent=green --apply      # Set + update all
+cfg theme --set accent=green --apply mako # Set + update specific
 
-# Dry-run (preview without writing)
-cfg render --all --dry-run
-
-# Theme commands
-cfg theme config                     # Show flavor and accent
-cfg theme config --get flavor        # Get specific value
-cfg theme config --set accent=green  # Set value
-cfg theme palette                    # List all palette colors
-cfg theme palette base --format hex-hash   # Get specific color
-cfg theme reload --all               # Reload all apps
-cfg theme apply                      # Render + reload
-
-# Font commands
-cfg font list                        # List all fonts
-cfg font list --mono                 # Monospace only
-cfg font config                      # Show font settings
+# Font
+cfg font                # Show current (mono, sans, sizes)
+cfg font --list         # List available fonts (stub)
+cfg font --get mono     # Get specific value
+cfg font --set mono=X --apply  # Set + update (stub)
 ```
 
 ## Pipeline
@@ -51,8 +53,7 @@ cfg font config                      # Show font settings
 On a new machine:
 
 ```bash
-cfg render --all    # Generate configs from templates
-rotz link           # Symlink to system locations
+cfg render          # Generate configs + symlink
 rotz install        # Run installation commands
 ```
 

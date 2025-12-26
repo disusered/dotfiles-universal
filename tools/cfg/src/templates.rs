@@ -51,13 +51,14 @@ pub fn reload_app(cmd: &str) -> Result<(), String> {
     }
 }
 
-/// Run rotz link for a specific module
+/// Run rotz link for a specific module (with -f to force overwrite)
 pub fn rotz_link(module: &str) -> Result<(), String> {
     let home = std::env::var("HOME").map_err(|_| "HOME not set")?;
     let rotz_bin = format!("{}/.rotz/bin/rotz", home);
 
     let status = Command::new(&rotz_bin)
         .arg("link")
+        .arg("-f")
         .arg(module)
         .status()
         .map_err(|e| format!("Failed to execute rotz link: {}", e))?;
