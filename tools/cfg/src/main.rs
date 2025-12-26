@@ -76,6 +76,12 @@ enum ThemeCommand {
         /// Flavor to use (mocha, macchiato, frappe, latte)
         #[arg(long, default_value = "mocha")]
         flavor: String,
+        /// Output as JSON
+        #[arg(long)]
+        json: bool,
+        /// Output as raw key=value (no color blocks)
+        #[arg(long)]
+        raw: bool,
     },
     /// Reload applications
     Reload {
@@ -362,6 +368,8 @@ fn main() {
                 format,
                 alpha,
                 flavor,
+                json,
+                raw,
             } => {
                 let cfg_dir = get_cfg_dir();
                 let palette_path = format!("{}/palettes/{}.toml", cfg_dir, flavor);
@@ -376,7 +384,20 @@ fn main() {
                 match color {
                     Some(name) => {
                         if let Some(c) = palette.get(&name) {
-                            println!("{}", format_color(c, &format, alpha));
+                            if json {
+                                // Single color JSON: {"hex": "89b4fa", "rgb": [137, 180, 250]}
+                                let obj = serde_json::json!({
+                                    "hex": c.to_hex(),
+                                    "rgb": [c.r, c.g, c.b]
+                                });
+                                println!("{}", serde_json::to_string(&obj).unwrap());
+                            } else if raw {
+                                // Raw: just the formatted value
+                                println!("{}", format_color(c, &format, alpha));
+                            } else {
+                                // Default: color block + hex
+                                println!("\x1b[38;2;{};{};{}m██\x1b[0m {}", c.r, c.g, c.b, c.to_hex_hash());
+                            }
                         } else {
                             eprintln!("Unknown color: {}", name);
                             std::process::exit(1);
@@ -385,9 +406,30 @@ fn main() {
                     None => {
                         let mut names: Vec<_> = palette.colors.keys().collect();
                         names.sort();
-                        for name in names {
-                            let c = palette.get(name).unwrap();
-                            println!("{}={}", name, format_color(c, &format, alpha));
+
+                        if json {
+                            // Full palette JSON
+                            let mut obj = serde_json::Map::new();
+                            for name in &names {
+                                let c = palette.get(name).unwrap();
+                                obj.insert(name.to_string(), serde_json::json!({
+                                    "hex": c.to_hex(),
+                                    "rgb": [c.r, c.g, c.b]
+                                }));
+                            }
+                            println!("{}", serde_json::to_string_pretty(&serde_json::Value::Object(obj)).unwrap());
+                        } else if raw {
+                            // Raw: key=value
+                            for name in &names {
+                                let c = palette.get(name).unwrap();
+                                println!("{}={}", name, format_color(c, &format, alpha));
+                            }
+                        } else {
+                            // Default: color blocks + name + hex
+                            for name in &names {
+                                let c = palette.get(name).unwrap();
+                                println!("\x1b[38;2;{};{};{}m██\x1b[0m {:12} {}", c.r, c.g, c.b, name, c.to_hex_hash());
+                            }
                         }
                     }
                 }
