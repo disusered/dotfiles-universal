@@ -8,6 +8,12 @@ pub struct Config {
     pub accent: String,
     #[serde(default = "default_secondary")]
     pub secondary: String,
+    #[serde(default = "default_icon_theme")]
+    pub icon_theme: String,
+    #[serde(default = "default_gtk_theme")]
+    pub gtk_theme: String,
+    #[serde(default = "default_qt_style")]
+    pub qt_style: String,
     #[serde(default)]
     pub fonts: FontConfig,
 }
@@ -44,6 +50,18 @@ fn default_sans_size() -> u32 {
     11
 }
 
+fn default_icon_theme() -> String {
+    "Papirus-Dark".to_string()
+}
+
+fn default_gtk_theme() -> String {
+    "Adwaita".to_string()
+}
+
+fn default_qt_style() -> String {
+    "Darkly".to_string()
+}
+
 impl Config {
     /// Load config from a TOML file
     pub fn load(path: &str) -> Result<Self, String> {
@@ -73,6 +91,9 @@ impl Config {
             "flavor" => Some(self.flavor.clone()),
             "accent" => Some(self.accent.clone()),
             "secondary" => Some(self.secondary.clone()),
+            "icon_theme" => Some(self.icon_theme.clone()),
+            "gtk_theme" => Some(self.gtk_theme.clone()),
+            "qt_style" => Some(self.qt_style.clone()),
             "fonts.mono" => Some(self.fonts.mono.clone()),
             "fonts.mono_size" => Some(self.fonts.mono_size.to_string()),
             "fonts.sans" => Some(self.fonts.sans.clone()),
@@ -99,6 +120,18 @@ impl Config {
             }
             "secondary" => {
                 self.secondary = value.to_string();
+                Ok(())
+            }
+            "icon_theme" => {
+                self.icon_theme = value.to_string();
+                Ok(())
+            }
+            "gtk_theme" => {
+                self.gtk_theme = value.to_string();
+                Ok(())
+            }
+            "qt_style" => {
+                self.qt_style = value.to_string();
                 Ok(())
             }
             "fonts.mono" => {
@@ -132,6 +165,9 @@ impl Default for Config {
             flavor: "mocha".to_string(),
             accent: "blue".to_string(),
             secondary: "mauve".to_string(),
+            icon_theme: "Papirus-Dark".to_string(),
+            gtk_theme: "Adwaita".to_string(),
+            qt_style: "Darkly".to_string(),
             fonts: FontConfig::default(),
         }
     }

@@ -1,6 +1,7 @@
 flavor = "mocha"
 accent = "green"
 secondary = "rosewater"
+icon_theme = "Papirus-Dark"
 
 [fonts]
 mono = "JetBrainsMono Nerd Font"
