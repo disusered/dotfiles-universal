@@ -64,7 +64,7 @@ enum Command {
         /// Set a value (format: key=value)
         #[arg(long)]
         set: Option<String>,
-        /// List available fonts
+        /// List available fonts (with inline graphics samples)
         #[arg(long)]
         list: bool,
         /// After --set, update (render + reload). Optionally scope to specific names.
@@ -76,6 +76,9 @@ enum Command {
         /// Filter --list to sans-serif fonts
         #[arg(long, requires = "list")]
         sans: bool,
+        /// Preview current font at multiple sizes and variants
+        #[arg(long, conflicts_with = "list")]
+        preview: bool,
     },
 }
 
@@ -291,14 +294,37 @@ fn main() {
                 println!("secondary={}", config.secondary);
             }
         }
-        Command::Font { get, set, list, apply, mono, sans } => {
+        Command::Font { get, set, list, apply, mono, sans, preview } => {
             let cfg_dir = get_cfg_dir();
             let dotfiles_dir = get_dotfiles_dir();
             let config_path = format!("{}/config.toml", cfg_dir);
 
             let mut config = Config::load(&config_path).unwrap_or_default();
 
-            if list {
+            if preview {
+                // Show current font at multiple sizes and variants
+                println!("Size preview (OSC 66 text sizing):");
+                fonts::preview_font_sizes(&config.fonts.mono);
+                println!();
+                println!("Variant preview:");
+                fonts::preview_font_variants(&config.fonts.mono);
+            } else if list {
+                // Load palette for colors
+                let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
+                let palette = Palette::load(&palette_path).ok();
+
+                // Get accent color for highlighting current font
+                let accent = palette.as_ref()
+                    .and_then(|p| p.get(&config.accent))
+                    .map(|c| format!("\x1b[38;2;{};{};{}m", c.r, c.g, c.b))
+                    .unwrap_or_default();
+                let green = palette.as_ref()
+                    .and_then(|p| p.get("green"))
+                    .map(|c| format!("\x1b[38;2;{};{};{}m", c.r, c.g, c.b))
+                    .unwrap_or_else(|| "\x1b[32m".to_string());
+                let dim = "\x1b[2m";
+                let reset = "\x1b[0m";
+
                 // Determine category filter
                 let category = if mono {
                     Some(fonts::FontCategory::Mono)
@@ -314,15 +340,44 @@ fn main() {
                 let show_mono = !sans;
                 let show_sans = !mono;
 
+                // Helper to print a font row
+                let print_font = |font: &fonts::FontListing, is_current: bool| {
+                    let status = if font.installed { format!("{}✓{}", green, reset) } else { " ".to_string() };
+                    let lig = if font.ligatures { format!("{}lig{}", dim, reset) } else { "   ".to_string() };
+                    let nerd = if font.nerd_font { format!("{}\u{f002d}{}", dim, reset) } else { " ".to_string() };
+
+                    // Highlight current font with accent color
+                    let (name_start, name_end) = if is_current {
+                        (accent.as_str(), reset)
+                    } else if !font.installed {
+                        (dim, reset)
+                    } else {
+                        ("", "")
+                    };
+
+                    // Table layout: status name lig nerd description
+                    println!(
+                        "{} {}{:<28}{} {} {} {}",
+                        status, name_start, font.name, name_end, lig, nerd, font.description
+                    );
+
+                    // Show inline graphics sample for installed fonts
+                    if font.installed {
+                        let sample = "The quick brown fox jumps over the lazy dog";
+                        if let Ok(png) = fonts::render_font_sample(font.name, sample, 14) {
+                            fonts::display_kitty_image(&png);
+                            println!();
+                        }
+                    }
+                };
+
                 if show_mono {
-                    println!("Monospace (coding):");
+                    println!("{}Monospace:{}", accent, reset);
                     for font in listings.iter().filter(|f| {
                         fonts::is_valid_font(f.name, fonts::FontCategory::Mono)
                     }) {
-                        let status = if font.installed { "✓" } else { " " };
-                        let lig = if font.ligatures { "lig" } else { "   " };
-                        let current = if font.name == config.fonts.mono { " ←" } else { "" };
-                        println!("  {} {} {:30} {}{}", status, lig, font.name, font.description, current);
+                        let is_current = font.name == config.fonts.mono;
+                        print_font(font, is_current);
                     }
                 }
 
@@ -330,18 +385,17 @@ fn main() {
                     if show_mono {
                         println!();
                     }
-                    println!("Sans-serif (UI):");
+                    println!("{}Sans-serif:{}", accent, reset);
                     for font in listings.iter().filter(|f| {
                         fonts::is_valid_font(f.name, fonts::FontCategory::Sans)
                     }) {
-                        let status = if font.installed { "✓" } else { " " };
-                        let current = if font.name == config.fonts.sans { " ←" } else { "" };
-                        println!("  {}     {:30} {}{}", status, font.name, font.description, current);
+                        let is_current = font.name == config.fonts.sans;
+                        print_font(font, is_current);
                     }
                 }
 
                 println!();
-                println!("✓ = installed, lig = has ligatures, ← = current");
+                println!("{}✓{} installed  {}lig{} ligatures  {}\u{f002d}{} nerd font", green, reset, dim, reset, dim, reset);
             } else if let Some(key_value) = set {
                 // Parse key=value
                 let parts: Vec<&str> = key_value.splitn(2, '=').collect();

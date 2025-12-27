@@ -11,11 +11,15 @@ windows:
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm ttf-fira-code ttf-cascadia-code-nerd \
-        otf-hasklig-nerd ttf-hack
-      yay -S --noconfirm otf-stix
-    depends:
-      - /lib/arch
+      sudo pacman -S --noconfirm --needed \
+      noto-fonts adwaita-fonts cantarell-fonts adobe-source-sans-fonts \
+      ttf-cascadia-code-nerd otf-hasklig-nerd
+      yay -S --noconfirm --needed \
+        ttf-jetbrains-mono-nerd ttf-firacode-nerd ttf-hack-nerd \
+        ttf-iosevka-nerd ttf-victor-mono-nerd ttf-ubuntu-mono-nerd \
+        ttf-roboto-mono-nerd ttf-mononoki-nerd otf-geist-mono-nerd \
+        otf-commit-mono-nerd ttf-zed-mono-nerd inter-font \
+        ttf-ubuntu-font-family ttf-roboto ttf-ibm-plex
   links:
     fonts.conf: {{ dirs.base.config }}/fontconfig/fonts.conf
 linux[whoami.distro^="Fedora"]:

@@ -12,6 +12,8 @@ pub struct FontEntry {
     pub category: FontCategory,
     /// Has programming ligatures
     pub ligatures: bool,
+    /// Is a Nerd Font (has icons/glyphs)
+    pub nerd_font: bool,
     /// Short description
     pub description: &'static str,
 }
@@ -29,6 +31,7 @@ const MONO_FONTS: &[FontEntry] = &[
         package: "ttf-jetbrains-mono-nerd",
         category: FontCategory::Mono,
         ligatures: true,
+        nerd_font: true,
         description: "JetBrains IDE font, excellent readability",
     },
     FontEntry {
@@ -36,6 +39,7 @@ const MONO_FONTS: &[FontEntry] = &[
         package: "ttf-firacode-nerd",
         category: FontCategory::Mono,
         ligatures: true,
+        nerd_font: true,
         description: "Mozilla's monospace with rich ligatures",
     },
     FontEntry {
@@ -43,6 +47,7 @@ const MONO_FONTS: &[FontEntry] = &[
         package: "ttf-cascadia-code-nerd",
         category: FontCategory::Mono,
         ligatures: true,
+        nerd_font: true,
         description: "Microsoft's Windows Terminal font",
     },
     FontEntry {
@@ -50,6 +55,7 @@ const MONO_FONTS: &[FontEntry] = &[
         package: "ttf-hack-nerd",
         category: FontCategory::Mono,
         ligatures: false,
+        nerd_font: true,
         description: "Classic coding font, large x-height",
     },
     FontEntry {
@@ -57,6 +63,7 @@ const MONO_FONTS: &[FontEntry] = &[
         package: "ttf-iosevka-nerd",
         category: FontCategory::Mono,
         ligatures: true,
+        nerd_font: true,
         description: "Narrow, customizable, many variants",
     },
     FontEntry {
@@ -64,20 +71,15 @@ const MONO_FONTS: &[FontEntry] = &[
         package: "ttf-victor-mono-nerd",
         category: FontCategory::Mono,
         ligatures: true,
+        nerd_font: true,
         description: "Cursive italics, clean ligatures",
-    },
-    FontEntry {
-        name: "SourceCodePro Nerd Font",
-        package: "ttf-sourcecodepro-nerd",
-        category: FontCategory::Mono,
-        ligatures: false,
-        description: "Adobe's coding font, balanced design",
     },
     FontEntry {
         name: "Hasklug Nerd Font",
         package: "otf-hasklig-nerd",
         category: FontCategory::Mono,
         ligatures: true,
+        nerd_font: true,
         description: "Source Code Pro + Haskell ligatures",
     },
     FontEntry {
@@ -85,6 +87,7 @@ const MONO_FONTS: &[FontEntry] = &[
         package: "ttf-ubuntu-mono-nerd",
         category: FontCategory::Mono,
         ligatures: false,
+        nerd_font: true,
         description: "Ubuntu's distinctive monospace",
     },
     FontEntry {
@@ -92,6 +95,7 @@ const MONO_FONTS: &[FontEntry] = &[
         package: "ttf-roboto-mono-nerd",
         category: FontCategory::Mono,
         ligatures: false,
+        nerd_font: true,
         description: "Google's geometric monospace",
     },
     FontEntry {
@@ -99,6 +103,7 @@ const MONO_FONTS: &[FontEntry] = &[
         package: "ttf-mononoki-nerd",
         category: FontCategory::Mono,
         ligatures: false,
+        nerd_font: true,
         description: "Minimal, easy on the eyes",
     },
     FontEntry {
@@ -106,6 +111,7 @@ const MONO_FONTS: &[FontEntry] = &[
         package: "otf-geist-mono-nerd",
         category: FontCategory::Mono,
         ligatures: false,
+        nerd_font: true,
         description: "Vercel's modern monospace",
     },
     FontEntry {
@@ -113,20 +119,15 @@ const MONO_FONTS: &[FontEntry] = &[
         package: "otf-commit-mono-nerd",
         category: FontCategory::Mono,
         ligatures: false,
+        nerd_font: true,
         description: "Neutral, anonymous coding font",
-    },
-    FontEntry {
-        name: "Monaspace Nerd Font",
-        package: "otf-monaspace-nerd",
-        category: FontCategory::Mono,
-        ligatures: true,
-        description: "GitHub's 5 stylistic variants",
     },
     FontEntry {
         name: "ZedMono Nerd Font",
         package: "ttf-zed-mono-nerd",
         category: FontCategory::Mono,
         ligatures: false,
+        nerd_font: true,
         description: "Zed editor's custom font",
     },
 ];
@@ -138,6 +139,7 @@ const SANS_FONTS: &[FontEntry] = &[
         package: "noto-fonts",
         category: FontCategory::Sans,
         ligatures: false,
+        nerd_font: false,
         description: "Google's universal font, full Unicode",
     },
     FontEntry {
@@ -145,6 +147,7 @@ const SANS_FONTS: &[FontEntry] = &[
         package: "adwaita-fonts",
         category: FontCategory::Sans,
         ligatures: false,
+        nerd_font: false,
         description: "GNOME's default, clean and modern",
     },
     FontEntry {
@@ -152,6 +155,7 @@ const SANS_FONTS: &[FontEntry] = &[
         package: "inter-font",
         category: FontCategory::Sans,
         ligatures: false,
+        nerd_font: false,
         description: "Designed for UI, excellent legibility",
     },
     FontEntry {
@@ -159,6 +163,7 @@ const SANS_FONTS: &[FontEntry] = &[
         package: "cantarell-fonts",
         category: FontCategory::Sans,
         ligatures: false,
+        nerd_font: false,
         description: "GNOME legacy, humanist design",
     },
     FontEntry {
@@ -166,6 +171,7 @@ const SANS_FONTS: &[FontEntry] = &[
         package: "adobe-source-sans-fonts",
         category: FontCategory::Sans,
         ligatures: false,
+        nerd_font: false,
         description: "Adobe's open-source UI font",
     },
     FontEntry {
@@ -173,6 +179,7 @@ const SANS_FONTS: &[FontEntry] = &[
         package: "ttf-ubuntu-font-family",
         category: FontCategory::Sans,
         ligatures: false,
+        nerd_font: false,
         description: "Ubuntu's distinctive branding font",
     },
     FontEntry {
@@ -180,6 +187,7 @@ const SANS_FONTS: &[FontEntry] = &[
         package: "ttf-roboto",
         category: FontCategory::Sans,
         ligatures: false,
+        nerd_font: false,
         description: "Google's Material Design font",
     },
     FontEntry {
@@ -187,6 +195,7 @@ const SANS_FONTS: &[FontEntry] = &[
         package: "ttf-ibm-plex",
         category: FontCategory::Sans,
         ligatures: false,
+        nerd_font: false,
         description: "IBM's corporate typeface",
     },
 ];
@@ -218,6 +227,7 @@ pub struct FontListing {
     pub package: &'static str,
     pub installed: bool,
     pub ligatures: bool,
+    pub nerd_font: bool,
     pub description: &'static str,
 }
 
@@ -237,6 +247,7 @@ pub fn list_fonts(category: Option<FontCategory>) -> Vec<FontListing> {
                     package: font.package,
                     installed: installed.contains(font.name),
                     ligatures: font.ligatures,
+                    nerd_font: font.nerd_font,
                     description: font.description,
                 });
             }
@@ -246,6 +257,7 @@ pub fn list_fonts(category: Option<FontCategory>) -> Vec<FontListing> {
                     package: font.package,
                     installed: installed.contains(font.name),
                     ligatures: font.ligatures,
+                    nerd_font: font.nerd_font,
                     description: font.description,
                 });
             }
@@ -260,6 +272,7 @@ pub fn list_fonts(category: Option<FontCategory>) -> Vec<FontListing> {
             package: font.package,
             installed: installed.contains(font.name),
             ligatures: font.ligatures,
+            nerd_font: font.nerd_font,
             description: font.description,
         })
         .collect()
@@ -277,4 +290,96 @@ pub fn is_valid_font(name: &str, category: FontCategory) -> bool {
 /// Check if a font is installed on the system
 pub fn is_font_installed(name: &str) -> bool {
     get_installed_fonts().contains(name)
+}
+
+/// Get the font file path using fontconfig
+fn get_font_path(font_name: &str) -> Option<String> {
+    let output = Command::new("fc-match")
+        .args([font_name, "--format=%{file}"])
+        .output()
+        .ok()?;
+
+    if output.status.success() {
+        let path = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        if !path.is_empty() {
+            return Some(path);
+        }
+    }
+    None
+}
+
+/// Render a font sample image using ImageMagick
+/// Returns PNG bytes on success
+pub fn render_font_sample(font_name: &str, text: &str, size: u32) -> Result<Vec<u8>, String> {
+    // Get the actual font file path via fontconfig
+    let font_path = get_font_path(font_name)
+        .ok_or_else(|| format!("Could not find font file for: {}", font_name))?;
+
+    let output = Command::new("magick")
+        .args(["-background", "transparent"])
+        .args(["-fill", "white"])
+        .args(["-font", &font_path])
+        .args(["-pointsize", &size.to_string()])
+        .args([&format!("label:{}", text), "png:-"])
+        .output()
+        .map_err(|e| format!("Failed to run magick: {}", e))?;
+
+    if !output.status.success() {
+        return Err(format!(
+            "ImageMagick failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        ));
+    }
+
+    Ok(output.stdout)
+}
+
+/// Display an image inline using Kitty graphics protocol
+pub fn display_kitty_image(png_bytes: &[u8]) {
+    use base64::{engine::general_purpose::STANDARD, Engine};
+    let b64 = STANDARD.encode(png_bytes);
+
+    // Kitty graphics protocol: transmit and display inline
+    // f=100 means PNG format, a=T means transmit and display
+    print!("\x1b_Gf=100,a=T;{}\x1b\\", b64);
+}
+
+/// Preview current font at multiple sizes using text sizing protocol (OSC 66)
+pub fn preview_font_sizes(font_name: &str) {
+    let sample = "The quick brown fox jumps over the lazy dog 0123456789";
+
+    println!("{}", font_name);
+    println!();
+
+    // Show at scales 1-4 (1x, 2x, 3x, 4x)
+    for scale in 1..=4 {
+        print!("\x1b]66;s={};{}\x07  ({}x)", scale, sample, scale);
+        // Add newlines proportional to scale height
+        for _ in 0..scale {
+            println!();
+        }
+    }
+}
+
+/// Preview font with variants (regular, bold, italic, bold-italic)
+pub fn preview_font_variants(font_name: &str) {
+    let sample = "The quick brown fox jumps over the lazy dog";
+
+    println!("{}", font_name);
+    println!();
+
+    // Regular
+    println!("Regular:     {}", sample);
+
+    // Bold (ANSI bold)
+    println!("Bold:        \x1b[1m{}\x1b[0m", sample);
+
+    // Italic (ANSI italic)
+    println!("Italic:      \x1b[3m{}\x1b[0m", sample);
+
+    // Bold Italic
+    println!("Bold Italic: \x1b[1;3m{}\x1b[0m", sample);
+
+    // Underline
+    println!("Underline:   \x1b[4m{}\x1b[0m", sample);
 }
