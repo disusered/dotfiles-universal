@@ -158,9 +158,17 @@ bind = $mainMod, T, togglesplit,
 
 bind = ,F11, exec, hyprctl activewindow -j | jq -e '.pinned' && hyprctl dispatch pin; hyprctl dispatch fullscreen 0
 bind = $mainMod, F, fullscreen, 1
+
 bind = $mainMod, Z, exec, app2unit -- pypr-client zoom
+bind = $mainMod, Z, submap, zoom
+submap = zoom
+bind = $mainMod, mouse_down, exec, app2unit -- pypr-client zoom ++0.75
+bind = $mainMod, mouse_up, exec, app2unit -- pypr-client zoom --0.75
 bind = $mainMod, EQUAL, exec, app2unit -- pypr-client zoom ++0.25
 bind = $mainMod, MINUS, exec, app2unit -- pypr-client zoom --0.25
+bind = $mainMod, Z, submap, reset
+bind = , escape, submap, reset
+submap = reset
 
 bind = $mainMod, H, movefocus, l
 bind = $mainMod, L, movefocus, r
@@ -185,6 +193,7 @@ bindl = , XF86AudioPause, exec, playerctl play-pause
 bindl = , XF86AudioPlay, exec, playerctl play-pause
 bindl = , XF86AudioPrev, exec, playerctl previous
 
+# Removes all keymaps. Useful for RDP and VMs
 bind = $mainMod CTRL, L, submap, clean
 submap = clean
 bind = $mainMod CTRL, L, submap, reset
