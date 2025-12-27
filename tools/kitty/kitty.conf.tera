@@ -6,11 +6,11 @@ env ZDOTDIR=$HOME
 shell_integration enabled
 
 # Font Configuration
-font_family      JetBrainsMono Nerd Font
+font_family      {{ fonts.mono }}
 bold_font        auto
 italic_font      auto
 bold_italic_font auto
-font_size 9.0
+font_size {{ fonts.mono_size }}
 
 # Cursor
 cursor_shape beam

@@ -1,5 +1,6 @@
 mod color;
 mod config;
+mod fonts;
 mod palette;
 mod render;
 mod templates;
@@ -295,20 +296,110 @@ fn main() {
             let dotfiles_dir = get_dotfiles_dir();
             let config_path = format!("{}/config.toml", cfg_dir);
 
-            let config = Config::load(&config_path).unwrap_or_default();
+            let mut config = Config::load(&config_path).unwrap_or_default();
 
             if list {
-                // TODO: List available fonts (stub)
-                println!("(font listing not yet implemented)");
-                if mono {
-                    println!("  --mono filter active");
+                // Determine category filter
+                let category = if mono {
+                    Some(fonts::FontCategory::Mono)
+                } else if sans {
+                    Some(fonts::FontCategory::Sans)
+                } else {
+                    None
+                };
+
+                let listings = fonts::list_fonts(category);
+
+                // Group by category if no filter
+                let show_mono = !sans;
+                let show_sans = !mono;
+
+                if show_mono {
+                    println!("Monospace (coding):");
+                    for font in listings.iter().filter(|f| {
+                        fonts::is_valid_font(f.name, fonts::FontCategory::Mono)
+                    }) {
+                        let status = if font.installed { "✓" } else { " " };
+                        let lig = if font.ligatures { "lig" } else { "   " };
+                        let current = if font.name == config.fonts.mono { " ←" } else { "" };
+                        println!("  {} {} {:30} {}{}", status, lig, font.name, font.description, current);
+                    }
                 }
-                if sans {
-                    println!("  --sans filter active");
+
+                if show_sans {
+                    if show_mono {
+                        println!();
+                    }
+                    println!("Sans-serif (UI):");
+                    for font in listings.iter().filter(|f| {
+                        fonts::is_valid_font(f.name, fonts::FontCategory::Sans)
+                    }) {
+                        let status = if font.installed { "✓" } else { " " };
+                        let current = if font.name == config.fonts.sans { " ←" } else { "" };
+                        println!("  {}     {:30} {}{}", status, font.name, font.description, current);
+                    }
                 }
+
+                println!();
+                println!("✓ = installed, lig = has ligatures, ← = current");
             } else if let Some(key_value) = set {
-                // TODO: Set font (stub)
-                println!("(font set not yet implemented: {})", key_value);
+                // Parse key=value
+                let parts: Vec<&str> = key_value.splitn(2, '=').collect();
+                if parts.len() != 2 {
+                    eprintln!("Error: --set requires format key=value");
+                    std::process::exit(1);
+                }
+
+                let key = parts[0];
+                let value = parts[1];
+
+                // Validate font names against registry
+                match key {
+                    "mono" => {
+                        if !fonts::is_valid_font(value, fonts::FontCategory::Mono) {
+                            eprintln!("Unknown mono font: {}", value);
+                            eprintln!("Use 'cfg font --list --mono' to see available fonts");
+                            std::process::exit(1);
+                        }
+                        if !fonts::is_font_installed(value) {
+                            eprintln!("Warning: {} is not installed", value);
+                        }
+                    }
+                    "sans" => {
+                        if !fonts::is_valid_font(value, fonts::FontCategory::Sans) {
+                            eprintln!("Unknown sans font: {}", value);
+                            eprintln!("Use 'cfg font --list --sans' to see available fonts");
+                            std::process::exit(1);
+                        }
+                        if !fonts::is_font_installed(value) {
+                            eprintln!("Warning: {} is not installed", value);
+                        }
+                    }
+                    "mono_size" | "sans_size" => {
+                        // Just validate it's a number
+                        if value.parse::<u32>().is_err() {
+                            eprintln!("Error: {} must be a number", key);
+                            std::process::exit(1);
+                        }
+                    }
+                    _ => {
+                        eprintln!("Unknown key: {} (valid: mono, mono_size, sans, sans_size)", key);
+                        std::process::exit(1);
+                    }
+                }
+
+                // Use the config's set method with proper key prefix
+                let config_key = format!("fonts.{}", key);
+                if let Err(e) = config.set(&config_key, value) {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(1);
+                }
+                if let Err(e) = config.save(&config_path) {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(1);
+                }
+                println!("{}={}", key, value);
+
                 if let Some(scope) = apply {
                     update_apps(&cfg_dir, &dotfiles_dir, &scope, false);
                 }

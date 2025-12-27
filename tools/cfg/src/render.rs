@@ -192,10 +192,13 @@ pub fn build_context(config: &Config, palette: &Palette) -> Context {
     ctx.insert("icon_theme", &config.icon_theme);
     ctx.insert("gtk_theme", &config.gtk_theme);
     ctx.insert("qt_style", &config.qt_style);
+
+    // Font config - both flat (legacy) and nested (preferred)
     ctx.insert("font_mono", &config.fonts.mono);
     ctx.insert("font_mono_size", &config.fonts.mono_size);
     ctx.insert("font_sans", &config.fonts.sans);
     ctx.insert("font_sans_size", &config.fonts.sans_size);
+    ctx.insert("fonts", &config.fonts);
 
     // Add HOME for path templating
     if let Ok(home) = std::env::var("HOME") {

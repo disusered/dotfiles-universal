@@ -2,8 +2,8 @@
 /* Catppuccin {{ flavor | capitalize }} */
 
 * {
-  font-family: "Noto Sans Regular", sans-serif;
-  font-size: 13px;
+  font-family: "{{ fonts.sans }}", sans-serif;
+  font-size: {{ fonts.sans_size + 2 }}px;
   min-height: 0;
 }
 
