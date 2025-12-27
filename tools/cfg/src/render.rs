@@ -169,6 +169,7 @@ fn darken_filter(value: &Value, args: &HashMap<String, Value>) -> TeraResult<Val
 }
 
 /// Discover all .tera template files in a directory (recursively)
+#[allow(dead_code)]
 pub fn discover_templates(root: &Path) -> Vec<PathBuf> {
     let pattern = format!("{}/**/*.tera", root.display());
     glob(&pattern)

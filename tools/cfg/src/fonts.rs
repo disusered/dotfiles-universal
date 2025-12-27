@@ -9,6 +9,7 @@ pub struct FontEntry {
     /// Arch Linux package name
     pub package: &'static str,
     /// Font category
+    #[allow(dead_code)]
     pub category: FontCategory,
     /// Has programming ligatures
     pub ligatures: bool,
@@ -224,6 +225,7 @@ fn get_installed_fonts() -> HashSet<String> {
 /// Font listing result
 pub struct FontListing {
     pub name: &'static str,
+    #[allow(dead_code)]
     pub package: &'static str,
     pub installed: bool,
     pub ligatures: bool,

@@ -27,9 +27,10 @@ enum Command {
     /// Render templates + symlink + reload apps
     Update {
         /// Names to update. If empty, updates all.
+        #[arg(conflicts_with = "list")]
         names: Vec<String>,
         /// List available templates
-        #[arg(long)]
+        #[arg(long, conflicts_with = "dry_run")]
         list: bool,
         /// Preview without writing
         #[arg(long)]
@@ -38,13 +39,13 @@ enum Command {
     /// Theme configuration (colors)
     Theme {
         /// Get a specific value
-        #[arg(long)]
+        #[arg(long, group = "mode")]
         get: Option<String>,
         /// Set a value (format: key=value)
-        #[arg(long)]
+        #[arg(long, group = "mode")]
         set: Option<String>,
         /// List available colors (palette)
-        #[arg(long)]
+        #[arg(long, group = "mode")]
         list: bool,
         /// After --set, update (render + reload). Optionally scope to specific names.
         #[arg(long, requires = "set", num_args = 0..)]
@@ -59,13 +60,13 @@ enum Command {
     /// Font configuration
     Font {
         /// Get a specific value (mono, sans)
-        #[arg(long)]
+        #[arg(long, group = "mode")]
         get: Option<String>,
         /// Set a value (format: key=value)
-        #[arg(long)]
+        #[arg(long, group = "mode")]
         set: Option<String>,
         /// List available fonts (with inline graphics samples)
-        #[arg(long)]
+        #[arg(long, group = "mode")]
         list: bool,
         /// After --set, update (render + reload). Optionally scope to specific names.
         #[arg(long, requires = "set", num_args = 0..)]
@@ -76,8 +77,11 @@ enum Command {
         /// Filter --list to sans-serif fonts
         #[arg(long, requires = "list")]
         sans: bool,
+        /// Output as JSON (for --list)
+        #[arg(long, requires = "list")]
+        json: bool,
         /// Preview current font at multiple sizes and variants
-        #[arg(long, conflicts_with = "list")]
+        #[arg(long, group = "mode")]
         preview: bool,
     },
 }
@@ -294,7 +298,7 @@ fn main() {
                 println!("secondary={}", config.secondary);
             }
         }
-        Command::Font { get, set, list, apply, mono, sans, preview } => {
+        Command::Font { get, set, list, apply, mono, sans, json, preview } => {
             let cfg_dir = get_cfg_dir();
             let dotfiles_dir = get_dotfiles_dir();
             let config_path = format!("{}/config.toml", cfg_dir);
@@ -309,6 +313,37 @@ fn main() {
                 println!("Variant preview:");
                 fonts::preview_font_variants(&config.fonts.mono);
             } else if list {
+                if json {
+                    let mono_fonts: Vec<serde_json::Value> = fonts::list_fonts(Some(fonts::FontCategory::Mono))
+                        .iter()
+                        .map(|f| serde_json::json!({
+                            "name": f.name,
+                            "description": f.description,
+                            "installed": f.installed,
+                            "ligatures": f.ligatures,
+                            "nerd_font": f.nerd_font
+                        }))
+                        .collect();
+
+                    let sans_fonts: Vec<serde_json::Value> = fonts::list_fonts(Some(fonts::FontCategory::Sans))
+                        .iter()
+                        .map(|f| serde_json::json!({
+                            "name": f.name,
+                            "description": f.description,
+                            "installed": f.installed,
+                            "ligatures": f.ligatures,
+                            "nerd_font": f.nerd_font
+                        }))
+                        .collect();
+
+                    let mut result = serde_json::Map::new();
+                    result.insert("mono".to_string(), serde_json::Value::Array(mono_fonts));
+                    result.insert("sans".to_string(), serde_json::Value::Array(sans_fonts));
+
+                    println!("{}", serde_json::to_string_pretty(&serde_json::Value::Object(result)).unwrap());
+                    return;
+                }
+
                 // Load palette for colors
                 let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
                 let palette = Palette::load(&palette_path).ok();
