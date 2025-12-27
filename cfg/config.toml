@@ -7,6 +7,6 @@ qt_style = "Darkly"
 
 [fonts]
 mono = "JetBrainsMono Nerd Font"
-mono_size = 10
+mono_size = 9
 sans = "Noto Sans"
 sans_size = 11
