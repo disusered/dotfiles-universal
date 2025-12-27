@@ -14,7 +14,7 @@ use crate::fonts::{self, FontCategory, FontListing};
 use crate::palette::Palette;
 
 use super::clipboard;
-use super::widgets::{FuzzyInput, FuzzyInputState, HelpPopup, Toast};
+use super::widgets::{FontPreviewModal, FontPreviewState, FontSamples, FuzzyInput, FuzzyInputState, HelpPopup, PreviewSection, Toast};
 use super::{init, restore};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -48,6 +48,7 @@ enum Mode {
     Search,
     Help,
     Confirm,
+    Preview,
 }
 
 struct FontEntry {
@@ -106,6 +107,9 @@ pub struct FontPicker {
     /// Original config values to detect changes
     original_mono: String,
     original_sans: String,
+    /// Preview modal state
+    preview_state: FontPreviewState,
+    preview_sections: Vec<PreviewSection>,
 }
 
 impl FontPicker {
@@ -152,6 +156,8 @@ impl FontPicker {
             should_apply: false,
             original_mono,
             original_sans,
+            preview_state: FontPreviewState::new(),
+            preview_sections: Vec::new(),
         }
     }
 
@@ -297,6 +303,10 @@ impl FontPicker {
 
         if self.mode == Mode::Confirm {
             self.render_confirm(frame, area);
+        }
+
+        if self.mode == Mode::Preview {
+            self.render_preview(frame, area);
         }
     }
 
@@ -451,6 +461,7 @@ impl FontPicker {
         let theme = &self.flavor_colors;
         let hints = vec![
             ("j/k", "navigate"),
+            ("p", "preview"),
             ("Enter", "select"),
             ("y", "copy"),
             ("Tab", "category"),
@@ -486,6 +497,7 @@ impl FontPicker {
             ("/", "Search"),
             ("Esc", "Clear search"),
             ("Tab", "Cycle category"),
+            ("p", "Preview font"),
             ("y", "Copy font name"),
             ("Enter", "Select font"),
             ("?", "Toggle help"),
@@ -536,6 +548,54 @@ impl FontPicker {
         frame.render_widget(para, inner);
     }
 
+    fn render_preview(&mut self, frame: &mut Frame, area: Rect) {
+        let theme = &self.flavor_colors;
+
+        if let Some(entry) = self.selected_font() {
+            let modal = FontPreviewModal::new(
+                entry.listing.name,
+                entry.category,
+                entry.listing.installed,
+                entry.listing.ligatures,
+                entry.listing.nerd_font,
+            )
+            .sections(self.preview_sections.clone())
+            .style(Style::default().bg(theme.surface0))
+            .border_style(Style::default().fg(theme.accent))
+            .title_style(Style::default().fg(theme.accent).add_modifier(Modifier::BOLD))
+            .label_style(Style::default().fg(theme.overlay1))
+            .text_style(Style::default().fg(theme.text))
+            .accent_style(Style::default().fg(theme.accent))
+            .dim_style(Style::default().fg(theme.overlay1));
+
+            frame.render_stateful_widget(modal, area, &mut self.preview_state);
+        }
+    }
+
+    fn open_preview(&mut self) {
+        if let Some(entry) = self.selected_font() {
+            let font_name = entry.listing.name.to_string();
+
+            // Build preview sections for this font
+            self.preview_sections = FontPreviewModal::build_sections(
+                entry.category,
+                entry.listing.ligatures,
+                entry.listing.nerd_font,
+            );
+
+            // Create fresh state and render font samples
+            self.preview_state = FontPreviewState::new();
+
+            // Pre-render images at different sizes
+            for size in [16, 24, 36, 48] {
+                self.preview_state.render_sample(&font_name, FontSamples::PANGRAM, size);
+            }
+
+            self.preview_state.loading = false;
+            self.mode = Mode::Preview;
+        }
+    }
+
     fn handle_event(&mut self, event: Event) -> io::Result<bool> {
         if let Some(ref toast) = self.toast {
             if toast.is_expired() {
@@ -565,6 +625,33 @@ impl FontPicker {
                                 self.config.fonts.sans = self.original_sans.clone();
                                 self.mode = Mode::Normal;
                             }
+                            _ => {}
+                        }
+                    }
+                    Mode::Preview => {
+                        match key.code {
+                            KeyCode::Esc | KeyCode::Char('q') => {
+                                self.mode = Mode::Normal;
+                            }
+                            KeyCode::Char('j') | KeyCode::Down => {
+                                self.preview_state.scroll_down(1);
+                            }
+                            KeyCode::Char('k') | KeyCode::Up => {
+                                self.preview_state.scroll_up(1);
+                            }
+                            KeyCode::Char('g') | KeyCode::Home => {
+                                self.preview_state.scroll_top();
+                            }
+                            KeyCode::Char('G') | KeyCode::End => {
+                                self.preview_state.scroll_bottom();
+                            }
+                            KeyCode::Char('d') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                                self.preview_state.scroll_down(10);
+                            }
+                            KeyCode::Char('u') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                                self.preview_state.scroll_up(10);
+                            }
+                            KeyCode::Char('y') => self.copy_selected(),
                             _ => {}
                         }
                     }
@@ -616,6 +703,7 @@ impl FontPicker {
                             }
                             KeyCode::Tab => self.cycle_category(),
                             KeyCode::Char('y') => self.copy_selected(),
+                            KeyCode::Char('p') => self.open_preview(),
                             KeyCode::Enter => {
                                 if let Some(entry) = self.selected_font() {
                                     if !entry.listing.installed {
