@@ -13,6 +13,12 @@ glob = "0.3"
 serde_json = "1"
 base64 = "0.22"
 
+# TUI
+ratatui = "0.29"
+crossterm = "0.28"
+catppuccin = { version = "2", features = ["ratatui"] }
+nucleo = "0.5"
+
 [dev-dependencies]
 assert_cmd = "2"
 predicates = "3"

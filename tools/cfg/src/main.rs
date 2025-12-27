@@ -4,6 +4,7 @@ mod fonts;
 mod palette;
 mod render;
 mod templates;
+mod tui;
 
 use std::path::PathBuf;
 
@@ -56,6 +57,9 @@ enum Command {
         /// Output as JSON (for --list)
         #[arg(long, requires = "list")]
         json: bool,
+        /// Interactive picker mode
+        #[arg(short, long, requires = "list")]
+        interactive: bool,
     },
     /// Font configuration
     Font {
@@ -83,6 +87,9 @@ enum Command {
         /// Preview current font at multiple sizes and variants
         #[arg(long, group = "mode")]
         preview: bool,
+        /// Interactive picker mode
+        #[arg(short, long, requires = "list")]
+        interactive: bool,
     },
 }
 
@@ -227,7 +234,7 @@ fn main() {
                 update_apps(&cfg_dir, &dotfiles_dir, &names, dry_run);
             }
         }
-        Command::Theme { get, set, list, apply, format, json } => {
+        Command::Theme { get, set, list, apply, format, json, interactive } => {
             let cfg_dir = get_cfg_dir();
             let dotfiles_dir = get_dotfiles_dir();
             let config_path = format!("{}/config.toml", cfg_dir);
@@ -244,6 +251,33 @@ fn main() {
                         std::process::exit(1);
                     }
                 };
+
+                if interactive {
+                    // Interactive TUI picker
+                    if !tui::is_tty() {
+                        eprintln!("Interactive mode requires a terminal");
+                        std::process::exit(1);
+                    }
+
+                    match tui::colors::run_picker(&config, &palette, &config_path) {
+                        Ok(Some(true)) => {
+                            // User wants to apply
+                            update_apps(&cfg_dir, &dotfiles_dir, &[], false);
+                        }
+                        Ok(Some(false)) => {
+                            // Saved but no apply
+                            println!("Config saved (run 'cfg update' to apply)");
+                        }
+                        Ok(None) => {
+                            // Quit without saving
+                        }
+                        Err(e) => {
+                            eprintln!("Error: {}", e);
+                            std::process::exit(1);
+                        }
+                    }
+                    return;
+                }
 
                 let mut names: Vec<_> = palette.colors.keys().collect();
                 names.sort();
@@ -298,7 +332,7 @@ fn main() {
                 println!("secondary={}", config.secondary);
             }
         }
-        Command::Font { get, set, list, apply, mono, sans, json, preview } => {
+        Command::Font { get, set, list, apply, mono, sans, json, preview, interactive } => {
             let cfg_dir = get_cfg_dir();
             let dotfiles_dir = get_dotfiles_dir();
             let config_path = format!("{}/config.toml", cfg_dir);
@@ -312,6 +346,36 @@ fn main() {
                 println!();
                 println!("Variant preview:");
                 fonts::preview_font_variants(&config.fonts.mono);
+            } else if list && interactive {
+                // Interactive TUI picker
+                if !tui::is_tty() {
+                    eprintln!("Interactive mode requires a terminal");
+                    std::process::exit(1);
+                }
+
+                // Load palette for theming
+                let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
+                let palette = Palette::load(&palette_path).unwrap_or_else(|_| {
+                    Palette { colors: std::collections::HashMap::new() }
+                });
+
+                match tui::fonts::run_picker(&config, &palette, &config_path) {
+                    Ok(Some(true)) => {
+                        // User wants to apply
+                        update_apps(&cfg_dir, &dotfiles_dir, &[], false);
+                    }
+                    Ok(Some(false)) => {
+                        // Saved but no apply
+                        println!("Config saved (run 'cfg update' to apply)");
+                    }
+                    Ok(None) => {
+                        // Quit without saving
+                    }
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                        std::process::exit(1);
+                    }
+                }
             } else if list {
                 if json {
                     let mono_fonts: Vec<serde_json::Value> = fonts::list_fonts(Some(fonts::FontCategory::Mono))
