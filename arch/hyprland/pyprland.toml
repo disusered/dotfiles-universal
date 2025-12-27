@@ -8,7 +8,7 @@ duration = 15
 
 [scratchpads.font]
 animation = "fromTop"
-command = "sh -c 'kitty --class cfg-font-preview -o \"font_family=$(cat /tmp/cfg-font-preview)\" cfg font-preview --scratchpad'"
+command = "sh -c 'kitty --class cfg-font-preview -o \"font_family=$(cat /tmp/cfg-font-preview)\" cfg font --scratchpad'"
 class = "cfg-font-preview"
 unfocus = "hide"
 lazy = false
