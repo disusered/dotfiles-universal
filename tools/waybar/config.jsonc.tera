@@ -82,9 +82,9 @@
     "wireplumber": {
       "format": "{volume}% {icon}",
       "format-muted": "",
-      "on-click": "pavucontrol",
-      "on-click-right": "easyeffects",
-      "on-click-middle": "helvum",
+      "on-click": "app2unit -- pypr-client toggle pavucontrol",
+      "on-click-right": "app2unit -- pypr-client toggle helvum",
+      "on-click-middle": "app2unit -- easyeffects",
       "format-icons": [
         "",
         "",
