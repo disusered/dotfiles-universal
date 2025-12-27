@@ -39,3 +39,6 @@ kdeglobals = { path = "arch/dolphin/kdeglobals.tera" }
 
 # Icons
 papirus-folders = { path = "tools/papirus/set-folders.sh.tera", reload = "~/.dotfiles/tools/papirus/set-folders.sh" }
+
+# Editors
+vscode = { path = "editors/vscode/settings.json.tera" }
