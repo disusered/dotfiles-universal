@@ -11,6 +11,9 @@ linux[whoami.distro^="Arch"]:
       systemctl --user enable --now wireplumber
     depends:
       - /lib/avahi
+  # TODO: individually link easyeffect presets
+  # presets: {{ dirs.base.config }}/easyeffects/output/
   links:
-    raop.conf: ~/.config/pipewire/pipewire.conf.d/50-raop.conf
-    presets: ~/.config/easyeffects/output/
+    raop.conf: {{ dirs.base.config }}/pipewire/pipewire.conf.d/50-raop.conf
+    pipewire.toml: {{ dirs.base.config }}/pypr/conf.d/pipewire.toml
+    pipewire.conf: {{ dirs.base.config }}/hypr/conf.d/pipewire.conf

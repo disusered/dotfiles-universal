@@ -2,5 +2,6 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: yay -S --noconfirm btop
   links:
-    catppuccin_mocha.theme: ~/.config/btop/themes/catppuccin_mocha.theme
-    btop.conf: ~/.config/hypr/conf.d/btop.conf
+    catppuccin_mocha.theme: {{ dirs.base.config }}/btop/themes/catppuccin_mocha.theme
+    btop.conf: {{ dirs.base.config }}/hypr/conf.d/btop.conf
+    btop.toml: {{ dirs.base.config }}/pypr/conf.d/btop.toml

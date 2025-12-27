@@ -1,30 +1,14 @@
 [pyprland]
 plugins = ["magnify", "scratchpads"]
+include = ["~/.config/pypr/conf.d/"]
 
 [magnify]
 factor = 2
 duration = 15
 
-[scratchpads.btop]
+[scratchpads.font]
 animation = "fromTop"
-command = "kitty --class btop-scratch btop"
-class = "btop-scratch"
-lazy = true
-
-[scratchpads.pavucontrol]
-animation = "fromRight"
-command = "pavucontrol"
-class = "org.pulseaudio.pavucontrol"
-size = "25% 60%"
-position = "74% 5%"
+command = "sh -c 'kitty --class cfg-font-preview -o \"font_family=$(cat /tmp/cfg-font-preview)\" cfg font-preview --scratchpad'"
+class = "cfg-font-preview"
 unfocus = "hide"
-lazy = true
-
-[scratchpads.helvum]
-animation = "fromRight"
-command = "helvum"
-class = "org.pipewire.Helvum"
-size = "50% 60%"
-position = "49% 5%"
-unfocus = "hide"
-lazy = true
+lazy = false

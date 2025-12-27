@@ -1,0 +1,17 @@
+[scratchpads.pavucontrol]
+animation = "fromRight"
+command = "pavucontrol"
+class = "org.pulseaudio.pavucontrol"
+size = "25% 60%"
+position = "74% 4%"
+unfocus = "hide"
+lazy = false
+
+[scratchpads.helvum]
+animation = "fromRight"
+command = "helvum"
+class = "org.pipewire.Helvum"
+size = "50% 60%"
+position = "49% 4%"
+unfocus = "hide"
+lazy = true
