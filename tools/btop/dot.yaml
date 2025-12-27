@@ -3,3 +3,4 @@ linux[whoami.distro^="Arch"]:
     cmd: yay -S --noconfirm btop
   links:
     catppuccin_mocha.theme: ~/.config/btop/themes/catppuccin_mocha.theme
+    hyprland.conf: ~/.config/hypr/conf.d/btop.conf

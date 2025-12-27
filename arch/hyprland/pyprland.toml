@@ -1,6 +1,12 @@
 [pyprland]
-plugins = ["magnify"]
+plugins = ["magnify", "scratchpads"]
 
 [magnify]
 factor = 2
 duration = 15
+
+[scratchpads.btop]
+animation = "fromTop"
+command = "kitty --class btop-scratch btop"
+class = "btop-scratch"
+lazy = true
