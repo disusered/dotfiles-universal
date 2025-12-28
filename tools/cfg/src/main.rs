@@ -244,8 +244,13 @@ fn main() {
 
             let mut config = Config::load(&config_path).unwrap_or_default();
 
-            if list {
-                // Show palette colors
+            if interactive {
+                // Interactive TUI picker
+                if !tui::is_tty() {
+                    eprintln!("Interactive mode requires a terminal");
+                    std::process::exit(1);
+                }
+
                 let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
                 let palette = match Palette::load(&palette_path) {
                     Ok(p) => p,
@@ -255,32 +260,33 @@ fn main() {
                     }
                 };
 
-                if interactive {
-                    // Interactive TUI picker
-                    if !tui::is_tty() {
-                        eprintln!("Interactive mode requires a terminal");
+                match tui::colors::run_picker(&config, &palette, &config_path) {
+                    Ok(Some(true)) => {
+                        // User wants to apply
+                        update_apps(&cfg_dir, &dotfiles_dir, &[], false);
+                    }
+                    Ok(Some(false)) => {
+                        // Saved but no apply
+                        println!("Config saved (run 'cfg update' to apply)");
+                    }
+                    Ok(None) => {
+                        // Quit without saving
+                    }
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
                         std::process::exit(1);
                     }
-
-                    match tui::colors::run_picker(&config, &palette, &config_path) {
-                        Ok(Some(true)) => {
-                            // User wants to apply
-                            update_apps(&cfg_dir, &dotfiles_dir, &[], false);
-                        }
-                        Ok(Some(false)) => {
-                            // Saved but no apply
-                            println!("Config saved (run 'cfg update' to apply)");
-                        }
-                        Ok(None) => {
-                            // Quit without saving
-                        }
-                        Err(e) => {
-                            eprintln!("Error: {}", e);
-                            std::process::exit(1);
-                        }
-                    }
-                    return;
                 }
+            } else if list {
+                // Show palette colors
+                let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
+                let palette = match Palette::load(&palette_path) {
+                    Ok(p) => p,
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                        std::process::exit(1);
+                    }
+                };
 
                 let mut names: Vec<_> = palette.colors.keys().collect();
                 names.sort();
@@ -355,9 +361,16 @@ fn main() {
                     Palette { colors: std::collections::HashMap::new() }
                 });
 
-                if let Err(e) = tui::fonts::run_scratchpad_preview(&font_name, &config, &palette) {
-                    eprintln!("Error: {}", e);
-                    std::process::exit(1);
+                match tui::fonts::run_scratchpad_preview(&font_name, &config, &palette, &config_path) {
+                    Ok(true) => {
+                        // User saved - update apps that use mono font
+                        update_apps(&cfg_dir, &dotfiles_dir, &[], false);
+                    }
+                    Ok(false) => {}
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                        std::process::exit(1);
+                    }
                 }
             } else if preview {
                 // Load palette for colors

@@ -69,6 +69,10 @@ struct FlavorTheme {
     accent: Color,
     green: Color,
     yellow: Color,
+    // Syntax highlighting colors
+    mauve: Color,  // keywords
+    peach: Color,  // functions
+    sky: Color,    // types
 }
 
 impl FlavorTheme {
@@ -90,6 +94,9 @@ impl FlavorTheme {
             accent: get_color(&config.accent),
             green: get_color("green"),
             yellow: get_color("yellow"),
+            mauve: get_color("mauve"),
+            peach: get_color("peach"),
+            sky: get_color("sky"),
         }
     }
 }
@@ -112,6 +119,8 @@ pub struct FontPicker {
     original_sans: String,
     /// Content area for mouse click detection
     content_area: Rect,
+    /// Maps visual row index to filtered data index (for mouse clicks)
+    row_to_data: Vec<Option<usize>>,
 }
 
 impl FontPicker {
@@ -159,11 +168,19 @@ impl FontPicker {
             original_mono,
             original_sans,
             content_area: Rect::default(),
+            row_to_data: Vec::new(),
         }
     }
 
     fn has_changes(&self) -> bool {
         self.config.fonts.mono != self.original_mono || self.config.fonts.sans != self.original_sans
+    }
+
+    /// Reload config from disk (to pick up changes from scratchpad)
+    fn refresh_config(&mut self) {
+        if let Ok(cfg) = Config::load(&self.config_path) {
+            self.config = cfg;
+        }
     }
 
     fn selected_font(&self) -> Option<&FontEntry> {
@@ -360,6 +377,8 @@ impl FontPicker {
 
         let mut items: Vec<ListItem> = Vec::new();
         let mut prev_category: Option<FontCategory> = None;
+        // Track which visual row maps to which data index
+        self.row_to_data.clear();
 
         for (idx, &font_idx) in self.filtered.iter().enumerate() {
             let entry = &self.fonts[font_idx];
@@ -368,6 +387,7 @@ impl FontPicker {
             if prev_category != Some(entry.category) {
                 if prev_category.is_some() {
                     items.push(ListItem::new(Line::from("")));
+                    self.row_to_data.push(None); // empty line
                 }
                 let header = match entry.category {
                     FontCategory::Mono => "Monospace",
@@ -379,6 +399,7 @@ impl FontPicker {
                         .fg(theme.overlay1)
                         .add_modifier(Modifier::BOLD),
                 ))));
+                self.row_to_data.push(None); // header line
                 prev_category = Some(entry.category);
             }
 
@@ -464,6 +485,7 @@ impl FontPicker {
             };
 
             items.push(ListItem::new(Line::from(spans)).style(style));
+            self.row_to_data.push(Some(idx)); // map this row to data index
         }
 
         let list = List::new(items);
@@ -735,8 +757,9 @@ impl FontPicker {
                     });
                     if mouse.row >= inner.y && mouse.row < inner.y + inner.height {
                         let clicked_row = (mouse.row - inner.y) as usize;
-                        if clicked_row < self.filtered.len() {
-                            self.selected = clicked_row;
+                        // Use row_to_data mapping to find actual data index
+                        if let Some(Some(data_idx)) = self.row_to_data.get(clicked_row) {
+                            self.selected = *data_idx;
                             self.list_state.select(Some(self.selected));
                         }
                     }
@@ -753,6 +776,9 @@ impl FontPicker {
         let mut terminal = init()?;
 
         loop {
+            // Refresh config to pick up changes from scratchpad preview
+            self.refresh_config();
+
             terminal.draw(|f| self.render(f))?;
 
             if event::poll(std::time::Duration::from_millis(100))? {
@@ -793,6 +819,124 @@ enum ScratchpadSection {
     },
 }
 
+/// Token types for syntax highlighting
+#[derive(Clone, Copy)]
+enum TokenType {
+    Keyword,
+    Function,
+    String,
+    Type,
+    Punctuation,
+    Text,
+}
+
+/// A syntax-highlighted code sample
+struct SyntaxSample {
+    language: &'static str,
+    tokens: &'static [(&'static str, TokenType)],
+}
+
+/// Syntax samples for different languages
+const SYNTAX_SAMPLES: &[SyntaxSample] = &[
+    SyntaxSample {
+        language: "JavaScript",
+        tokens: &[
+            ("const", TokenType::Keyword),
+            (" greet ", TokenType::Text),
+            ("=", TokenType::Punctuation),
+            (" (", TokenType::Punctuation),
+            ("name", TokenType::Text),
+            (")", TokenType::Punctuation),
+            (" ", TokenType::Text),
+            ("=>", TokenType::Punctuation),
+            (" {\n  ", TokenType::Text),
+            ("return", TokenType::Keyword),
+            (" ", TokenType::Text),
+            ("`Hello, ${", TokenType::String),
+            ("name", TokenType::Text),
+            ("}!`", TokenType::String),
+            ("\n}", TokenType::Punctuation),
+        ],
+    },
+    SyntaxSample {
+        language: "Lua",
+        tokens: &[
+            ("local", TokenType::Keyword),
+            (" ", TokenType::Text),
+            ("function", TokenType::Keyword),
+            (" ", TokenType::Text),
+            ("greet", TokenType::Function),
+            ("(", TokenType::Punctuation),
+            ("name", TokenType::Text),
+            (")\n  ", TokenType::Punctuation),
+            ("return", TokenType::Keyword),
+            (" ", TokenType::Text),
+            ("\"Hello, \"", TokenType::String),
+            (" ", TokenType::Text),
+            ("..", TokenType::Punctuation),
+            (" name\n", TokenType::Text),
+            ("end", TokenType::Keyword),
+        ],
+    },
+    SyntaxSample {
+        language: "Ruby",
+        tokens: &[
+            ("def", TokenType::Keyword),
+            (" ", TokenType::Text),
+            ("greet", TokenType::Function),
+            ("(", TokenType::Punctuation),
+            ("name", TokenType::Text),
+            (")\n  ", TokenType::Punctuation),
+            ("\"Hello, #{", TokenType::String),
+            ("name", TokenType::Text),
+            ("}!\"", TokenType::String),
+            ("\n", TokenType::Text),
+            ("end", TokenType::Keyword),
+        ],
+    },
+    SyntaxSample {
+        language: "C#",
+        tokens: &[
+            ("public", TokenType::Keyword),
+            (" ", TokenType::Text),
+            ("string", TokenType::Type),
+            (" ", TokenType::Text),
+            ("Greet", TokenType::Function),
+            ("(", TokenType::Punctuation),
+            ("string", TokenType::Type),
+            (" name", TokenType::Text),
+            (") ", TokenType::Punctuation),
+            ("=>\n  ", TokenType::Punctuation),
+            ("$\"Hello, {", TokenType::String),
+            ("name", TokenType::Text),
+            ("}!\"", TokenType::String),
+            (";", TokenType::Punctuation),
+        ],
+    },
+    SyntaxSample {
+        language: "Rust",
+        tokens: &[
+            ("fn", TokenType::Keyword),
+            (" ", TokenType::Text),
+            ("greet", TokenType::Function),
+            ("(", TokenType::Punctuation),
+            ("name", TokenType::Text),
+            (": ", TokenType::Punctuation),
+            ("&str", TokenType::Type),
+            (") ", TokenType::Punctuation),
+            ("->", TokenType::Punctuation),
+            (" ", TokenType::Text),
+            ("String", TokenType::Type),
+            (" {\n  ", TokenType::Punctuation),
+            ("format!", TokenType::Function),
+            ("(", TokenType::Punctuation),
+            ("\"Hello, {}!\"", TokenType::String),
+            (", name", TokenType::Text),
+            (")\n}", TokenType::Punctuation),
+        ],
+    },
+];
+
 /// Get the current Kitty font size using kitten @
 fn get_kitty_font_size() -> Option<f32> {
     let output = std::process::Command::new("kitten")
@@ -832,12 +976,65 @@ fn resize_kitty_window(delta_w: i32, delta_h: i32) {
         .spawn();
 }
 
+/// Helper to render a syntax sample into lines
+fn render_syntax_sample<'a>(sample: &SyntaxSample, theme: &FlavorTheme) -> Vec<Line<'a>> {
+    let mut lines: Vec<Line> = Vec::new();
+
+    // Language header
+    lines.push(Line::from(Span::styled(
+        sample.language,
+        Style::default()
+            .fg(theme.subtext0)
+            .add_modifier(Modifier::BOLD),
+    )));
+
+    // Build spans for the code, handling newlines
+    let mut current_spans: Vec<Span> = Vec::new();
+
+    for (text, token_type) in sample.tokens {
+        let color = match token_type {
+            TokenType::Keyword => theme.mauve,
+            TokenType::Function => theme.peach,
+            TokenType::String => theme.yellow,
+            TokenType::Type => theme.sky,
+            TokenType::Punctuation => theme.text,
+            TokenType::Text => theme.text,
+        };
+
+        // Handle newlines in the text
+        let parts: Vec<&str> = text.split('\n').collect();
+        for (i, part) in parts.iter().enumerate() {
+            if !part.is_empty() {
+                current_spans.push(Span::styled(
+                    part.to_string(),
+                    Style::default().fg(color),
+                ));
+            }
+            if i < parts.len() - 1 {
+                // Newline: emit current line and start a new one
+                lines.push(Line::from(current_spans.clone()));
+                current_spans.clear();
+            }
+        }
+    }
+
+    // Don't forget the last line
+    if !current_spans.is_empty() {
+        lines.push(Line::from(current_spans));
+    }
+
+    lines.push(Line::from("")); // spacing after sample
+    lines
+}
+
 /// Run the scratchpad preview TUI - displays font samples using native Kitty rendering
+/// Returns true if user saved (and apps should be updated), false otherwise
 pub fn run_scratchpad_preview(
     font_name: &str,
     config: &Config,
     palette: &Palette,
-) -> io::Result<()> {
+    config_path: &str,
+) -> io::Result<bool> {
     use super::widgets::FontSamples;
 
     let mut terminal = init()?;
@@ -849,6 +1046,9 @@ pub fn run_scratchpad_preview(
     // Set the font size immediately to ensure kitty matches our tracked state
     set_kitty_font_size(current_size);
 
+    // Track if we saved
+    let mut saved = false;
+
     // Build sections based on font capabilities (detect from name)
     let has_ligatures = font_name.contains("Fira")
         || font_name.contains("JetBrains")
@@ -857,7 +1057,6 @@ pub fn run_scratchpad_preview(
         || font_name.contains("Victor")
         || font_name.contains("Hasklug");
     let is_nerd_font = font_name.contains("Nerd");
-    let is_mono = font_name.contains("Mono") || font_name.contains("Code") || is_nerd_font; // Nerd fonts are typically mono
 
     let mut sections: Vec<ScratchpadSection> = vec![
         ScratchpadSection::Divider("Variants"),
@@ -889,14 +1088,6 @@ pub fn run_scratchpad_preview(
         });
     }
 
-    if is_mono {
-        sections.push(ScratchpadSection::Divider("Code"));
-        sections.push(ScratchpadSection::CharacterSet {
-            label: "Sample",
-            chars: FontSamples::CODE,
-        });
-    }
-
     if is_nerd_font {
         sections.push(ScratchpadSection::Divider("Nerd Font Icons"));
         sections.push(ScratchpadSection::CharacterSet {
@@ -905,9 +1096,14 @@ pub fn run_scratchpad_preview(
         });
     }
 
-    // Scroll state
-    let mut scroll_offset: u16 = 0;
-    let mut content_height: u16 = 0;
+    // Scroll state for left pane
+    let mut left_scroll: u16 = 0;
+    let mut left_height: u16 = 0;
+    // Scroll state for right pane
+    let mut right_scroll: u16 = 0;
+    let mut right_height: u16 = 0;
+    // Which pane has focus (for scrolling)
+    let mut focus_right = false;
 
     loop {
         terminal.draw(|frame| {
@@ -919,35 +1115,20 @@ pub fn run_scratchpad_preview(
                 area,
             );
 
-            // Main layout with padding
+            // Main layout: header, content, footer
             let outer = Layout::default()
                 .direction(Direction::Vertical)
                 .constraints([
-                    Constraint::Length(1),
+                    Constraint::Length(2),
                     Constraint::Min(0),
                     Constraint::Length(1),
                 ])
                 .split(area);
 
-            let inner = Layout::default()
-                .direction(Direction::Horizontal)
-                .constraints([
-                    Constraint::Length(2),
-                    Constraint::Min(0),
-                    Constraint::Length(2),
-                ])
-                .split(outer[1]);
-
-            let content_area = inner[1];
-            let visible_height = content_area.height;
-
-            // Build all lines
-            let mut lines: Vec<Line> = Vec::new();
-
-            // Title with font size
-            lines.push(Line::from(vec![
+            // Header: font name and size
+            let header = Line::from(vec![
                 Span::styled(
-                    font_name,
+                    format!(" {}", font_name),
                     Style::default()
                         .fg(theme.accent)
                         .add_modifier(Modifier::BOLD),
@@ -956,42 +1137,49 @@ pub fn run_scratchpad_preview(
                     format!(" [{:.0}pt]", current_size),
                     Style::default().fg(theme.subtext0),
                 ),
-            ]));
-            lines.push(Line::from(""));
+            ]);
+            frame.render_widget(Paragraph::new(header), outer[0]);
 
-            // Render sections
+            // Two-pane layout for content
+            let panes = Layout::default()
+                .direction(Direction::Horizontal)
+                .constraints([Constraint::Percentage(55), Constraint::Percentage(45)])
+                .split(outer[1]);
+
+            // Left pane: character samples
+            let left_block = Block::default()
+                .borders(Borders::RIGHT)
+                .border_style(Style::default().fg(theme.surface1));
+            let left_inner = left_block.inner(panes[0]);
+            frame.render_widget(left_block, panes[0]);
+
+            let mut left_lines: Vec<Line> = Vec::new();
             for section in &sections {
                 match section {
                     ScratchpadSection::Divider(label) => {
-                        lines.push(Line::from(""));
-                        lines.push(Line::from(vec![Span::styled(
+                        left_lines.push(Line::from(""));
+                        left_lines.push(Line::from(Span::styled(
                             format!("─── {} ───", label),
                             Style::default()
                                 .fg(theme.subtext0)
                                 .add_modifier(Modifier::BOLD),
-                        )]));
-                        lines.push(Line::from(""));
+                        )));
+                        left_lines.push(Line::from(""));
                     }
                     ScratchpadSection::Variants => {
                         let sample = FontSamples::PANGRAM;
-
-                        // Regular
-                        lines.push(Line::from(vec![
+                        left_lines.push(Line::from(vec![
                             Span::styled("Regular:     ", Style::default().fg(theme.subtext0)),
                             Span::styled(sample, Style::default().fg(theme.text)),
                         ]));
-
-                        // Bold
-                        lines.push(Line::from(vec![
+                        left_lines.push(Line::from(vec![
                             Span::styled("Bold:        ", Style::default().fg(theme.subtext0)),
                             Span::styled(
                                 sample,
                                 Style::default().fg(theme.text).add_modifier(Modifier::BOLD),
                             ),
                         ]));
-
-                        // Italic
-                        lines.push(Line::from(vec![
+                        left_lines.push(Line::from(vec![
                             Span::styled("Italic:      ", Style::default().fg(theme.subtext0)),
                             Span::styled(
                                 sample,
@@ -1000,9 +1188,7 @@ pub fn run_scratchpad_preview(
                                     .add_modifier(Modifier::ITALIC),
                             ),
                         ]));
-
-                        // Bold Italic
-                        lines.push(Line::from(vec![
+                        left_lines.push(Line::from(vec![
                             Span::styled("Bold Italic: ", Style::default().fg(theme.subtext0)),
                             Span::styled(
                                 sample,
@@ -1012,44 +1198,74 @@ pub fn run_scratchpad_preview(
                                     .add_modifier(Modifier::ITALIC),
                             ),
                         ]));
-
-                        lines.push(Line::from(""));
+                        left_lines.push(Line::from(""));
                     }
                     ScratchpadSection::CharacterSet { label, chars } => {
-                        lines.push(Line::from(vec![Span::styled(
+                        left_lines.push(Line::from(Span::styled(
                             format!("{}: ", label),
                             Style::default().fg(theme.subtext0),
-                        )]));
-                        lines.push(Line::from(vec![
-                            Span::styled("  ", Style::default()),
-                            Span::styled(*chars, Style::default().fg(theme.text)),
-                        ]));
-                        lines.push(Line::from(""));
+                        )));
+                        left_lines.push(Line::from(Span::styled(
+                            format!("  {}", chars),
+                            Style::default().fg(theme.text),
+                        )));
+                        left_lines.push(Line::from(""));
                     }
                 }
             }
 
-            content_height = lines.len() as u16;
+            left_height = left_lines.len() as u16;
+            let left_max_scroll = left_height.saturating_sub(left_inner.height);
+            left_scroll = left_scroll.min(left_max_scroll);
 
-            // Apply scroll
-            let max_scroll = content_height.saturating_sub(visible_height);
-            scroll_offset = scroll_offset.min(max_scroll);
-
-            let visible_lines: Vec<Line> = lines
+            let visible_left: Vec<Line> = left_lines
                 .into_iter()
-                .skip(scroll_offset as usize)
-                .take(visible_height as usize)
+                .skip(left_scroll as usize)
+                .take(left_inner.height as usize)
                 .collect();
+            frame.render_widget(Paragraph::new(visible_left), left_inner);
 
-            frame.render_widget(Paragraph::new(visible_lines), content_area);
-
-            // Scrollbar if needed
-            if content_height > visible_height {
+            // Left scrollbar
+            if left_height > left_inner.height {
                 let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
-                    .style(Style::default().fg(theme.surface1));
-                let mut scrollbar_state =
-                    ScrollbarState::new(content_height as usize).position(scroll_offset as usize);
-                frame.render_stateful_widget(scrollbar, content_area, &mut scrollbar_state);
+                    .style(Style::default().fg(if focus_right { theme.surface0 } else { theme.surface1 }));
+                let mut state = ScrollbarState::new(left_height as usize).position(left_scroll as usize);
+                frame.render_stateful_widget(scrollbar, left_inner, &mut state);
+            }
+
+            // Right pane: syntax samples
+            let right_inner = panes[1];
+            let mut right_lines: Vec<Line> = Vec::new();
+
+            right_lines.push(Line::from(Span::styled(
+                "─── Syntax Highlighting ───",
+                Style::default()
+                    .fg(theme.subtext0)
+                    .add_modifier(Modifier::BOLD),
+            )));
+            right_lines.push(Line::from(""));
+
+            for sample in SYNTAX_SAMPLES {
+                right_lines.extend(render_syntax_sample(sample, &theme));
+            }
+
+            right_height = right_lines.len() as u16;
+            let right_max_scroll = right_height.saturating_sub(right_inner.height);
+            right_scroll = right_scroll.min(right_max_scroll);
+
+            let visible_right: Vec<Line> = right_lines
+                .into_iter()
+                .skip(right_scroll as usize)
+                .take(right_inner.height as usize)
+                .collect();
+            frame.render_widget(Paragraph::new(visible_right), right_inner);
+
+            // Right scrollbar
+            if right_height > right_inner.height {
+                let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
+                    .style(Style::default().fg(if focus_right { theme.surface1 } else { theme.surface0 }));
+                let mut state = ScrollbarState::new(right_height as usize).position(right_scroll as usize);
+                frame.render_stateful_widget(scrollbar, right_inner, &mut state);
             }
 
             // Footer
@@ -1058,74 +1274,88 @@ pub fn run_scratchpad_preview(
                 Span::styled(" size  ", Style::default().fg(theme.subtext0)),
                 Span::styled("0", Style::default().fg(theme.accent)),
                 Span::styled(" reset  ", Style::default().fg(theme.subtext0)),
-                Span::styled("j/k", Style::default().fg(theme.accent)),
-                Span::styled(" scroll  ", Style::default().fg(theme.subtext0)),
+                Span::styled("Tab", Style::default().fg(theme.accent)),
+                Span::styled(" pane  ", Style::default().fg(theme.subtext0)),
+                Span::styled("Enter", Style::default().fg(theme.green)),
+                Span::styled(" save  ", Style::default().fg(theme.subtext0)),
                 Span::styled("q", Style::default().fg(theme.accent)),
                 Span::styled("/", Style::default().fg(theme.subtext0)),
                 Span::styled("Esc", Style::default().fg(theme.accent)),
                 Span::styled(" close", Style::default().fg(theme.subtext0)),
             ]);
-            frame.render_widget(
-                Paragraph::new(footer).centered(),
-                Rect::new(area.x, area.height - 1, area.width, 1),
-            );
+            frame.render_widget(Paragraph::new(footer).centered(), outer[2]);
         })?;
 
         // Handle input
         if event::poll(std::time::Duration::from_millis(100))? {
-            let visible_height = terminal.size()?.height.saturating_sub(4);
-            let max_scroll = content_height.saturating_sub(visible_height);
+            let (scroll, height) = if focus_right {
+                (&mut right_scroll, right_height)
+            } else {
+                (&mut left_scroll, left_height)
+            };
+            let visible = terminal.size()?.height.saturating_sub(4);
+            let max_scroll = height.saturating_sub(visible);
 
             match event::read()? {
                 Event::Key(key) if key.kind == KeyEventKind::Press => match key.code {
                     KeyCode::Char('q') | KeyCode::Esc => break,
+                    KeyCode::Tab => {
+                        focus_right = !focus_right;
+                    }
+                    KeyCode::Enter => {
+                        // Save font and size to config
+                        let mut cfg = config.clone();
+                        cfg.fonts.mono = font_name.to_string();
+                        cfg.fonts.mono_size = current_size as u32;
+                        if cfg.save(config_path).is_ok() {
+                            saved = true;
+                            break;
+                        }
+                    }
                     KeyCode::Char('+') | KeyCode::Char('=') => {
                         current_size += 1.0;
                         set_kitty_font_size(current_size);
-                        // Expand window proportionally (~20px per pt)
                         resize_kitty_window(20, 15);
                     }
                     KeyCode::Char('-') | KeyCode::Char('_') => {
                         if current_size > 6.0 {
                             current_size -= 1.0;
                             set_kitty_font_size(current_size);
-                            // Contract window proportionally
                             resize_kitty_window(-20, -15);
                         }
                     }
                     KeyCode::Char('0') => {
-                        // Reset font size and window size
                         let delta = (current_size - initial_size) as i32;
                         current_size = initial_size;
                         set_kitty_font_size(current_size);
                         resize_kitty_window(-delta * 20, -delta * 15);
                     }
                     KeyCode::Char('j') | KeyCode::Down => {
-                        scroll_offset = (scroll_offset + 1).min(max_scroll);
+                        *scroll = (*scroll + 1).min(max_scroll);
                     }
                     KeyCode::Char('k') | KeyCode::Up => {
-                        scroll_offset = scroll_offset.saturating_sub(1);
+                        *scroll = scroll.saturating_sub(1);
                     }
                     KeyCode::Char('g') => {
-                        scroll_offset = 0;
+                        *scroll = 0;
                     }
                     KeyCode::Char('G') => {
-                        scroll_offset = max_scroll;
+                        *scroll = max_scroll;
                     }
                     KeyCode::Char('d') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                        scroll_offset = (scroll_offset + visible_height / 2).min(max_scroll);
+                        *scroll = (*scroll + visible / 2).min(max_scroll);
                     }
                     KeyCode::Char('u') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                        scroll_offset = scroll_offset.saturating_sub(visible_height / 2);
+                        *scroll = scroll.saturating_sub(visible / 2);
                     }
                     _ => {}
                 },
                 Event::Mouse(mouse) => match mouse.kind {
                     MouseEventKind::ScrollDown => {
-                        scroll_offset = (scroll_offset + 3).min(max_scroll);
+                        *scroll = (*scroll + 3).min(max_scroll);
                     }
                     MouseEventKind::ScrollUp => {
-                        scroll_offset = scroll_offset.saturating_sub(3);
+                        *scroll = scroll.saturating_sub(3);
                     }
                     _ => {}
                 },
@@ -1136,10 +1366,23 @@ pub fn run_scratchpad_preview(
 
     restore()?;
 
+    if saved {
+        // Print confirmation before window closes
+        println!("Saved: {} @ {:.0}pt", font_name, current_size);
+
+        // Run cfg update to apply changes to apps that use the mono font
+        // Use current_exe to get the path to cfg binary
+        if let Ok(exe) = std::env::current_exe() {
+            let _ = std::process::Command::new(exe)
+                .arg("update")
+                .status(); // wait for completion
+        }
+    }
+
     // Kill the scratchpad window so pypr spawns fresh next time
     let _ = std::process::Command::new("hyprctl")
         .args(["dispatch", "killwindow", "class:fonts_scratch"])
         .spawn();
 
-    Ok(())
+    Ok(saved)
 }

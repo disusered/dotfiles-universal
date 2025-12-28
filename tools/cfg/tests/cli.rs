@@ -298,3 +298,30 @@ fn theme_get_set_list_all_conflict() {
         .failure()
         .stderr(predicate::str::contains("cannot be used with"));
 }
+
+#[test]
+fn theme_interactive_rejects_get() {
+    cfg()
+        .args(["theme", "--interactive", "--get", "accent"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn theme_interactive_rejects_set() {
+    cfg()
+        .args(["theme", "--interactive", "--set", "accent=blue"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn theme_interactive_rejects_list() {
+    cfg()
+        .args(["theme", "--interactive", "--list"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
