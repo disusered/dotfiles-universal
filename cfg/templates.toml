@@ -11,6 +11,7 @@ hyprbars = { path = "arch/hyprbars/hyprbars.conf.tera", reload = "hyprctl reload
 swappy = { path = "arch/swappy/config.tera" }
 bat = { path = "tools/bat/config.tera" }
 hyprland = { path = "arch/hyprland/hyprland.conf.tera", reload = "hyprctl reload" }
+hyprtoolkit = { path = "arch/hyprland/hyprtoolkit.conf.tera", reload = "hyprctl reload" }
 hyprlock-palette = { path = "arch/hyprlock/mocha.conf.tera" }
 kitty = { path = "tools/kitty/kitty.conf.tera", reload = "pkill -USR1 kitty" }
 waybar-style = { path = "tools/waybar/style.css.tera", reload = "systemctl --user restart waybar" }

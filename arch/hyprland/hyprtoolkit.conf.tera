@@ -1,0 +1,19 @@
+# vi: ft=hyprlang
+
+background = FF{{ base | upper }}
+base = FF{{ surface0 | upper }}
+text = FF{{ text | upper }}
+alternate_base = FF{{ surface1 | upper }}
+bright_text = FF{{ rosewater | upper }}
+accent = FF{{ accent | upper }}
+accent_secondary = FF{{ mauve | upper }}
+
+h1_size = {{ (fonts.sans_size * 1.5) | round | int }}
+h2_size = {{ (fonts.sans_size * 1.3) | round | int }}
+h3_size = {{ (fonts.sans_size * 1.1) | round | int }}
+font_size = {{ fonts.sans_size }}
+small_font_size = {{ fonts.sans_size - 1 }}
+
+icon_theme = {{ icon_theme }}
+font_family = {{ fonts.sans }}
+font_family_monospace = {{ fonts.mono }}
