@@ -16,7 +16,7 @@
         "width": 34,
         "padding": {
             "top": 4,
-           "left": 4
+            "left": 4
         }
     },
     "modules": [
@@ -117,10 +117,78 @@
             "key": "└ └󰉼 Theme",
             "keyColor": "blue"
         },
-
         {
             "type": "custom",
-            "format": "└────────────────────────────────────────────────────┘",
+            "format": "└──────────────────────────────────────────────────────┘",
+            "outputColor": "red"
+        },
+        "break",
+        {
+            "type": "custom",
+            "format": "┌─────────────────────── Network ──────────────────────┐",
+            "outputColor": "red"
+        },
+        {
+            "type": "localip",
+            "key": " 󰈀 IP",
+            "showIpv4": true,
+            "showIpv6": false,
+            "showMac": false,
+            "keyColor": "magenta"
+        },
+        {
+            "type": "wifi",
+            "key": "└ └󰖩 WiFi",
+            "format": "{4} ({6})",
+            "keyColor": "magenta"
+        },
+        {
+            "type": "custom",
+            "format": "└──────────────────────────────────────────────────────┘",
+            "outputColor": "red"
+        },
+        "break",
+        {
+            "type": "custom",
+            "format": "┌─────────────────────── Display ──────────────────────┐",
+            "outputColor": "red"
+        },
+        {
+            "type": "display",
+            "key": " 󰍹 Monitor",
+            "keyColor": "cyan"
+        },
+        {
+            "type": "brightness",
+            "key": "└ └󰃠 Brightness",
+            "keyColor": "cyan"
+        },
+        {
+            "type": "custom",
+            "format": "└──────────────────────────────────────────────────────┘",
+            "outputColor": "red"
+        },
+        "break",
+        {
+            "type": "custom",
+            "format": "┌─────────────────────── Storage ──────────────────────┐",
+            "outputColor": "red"
+        },
+        {
+            "type": "disk",
+            "key": " 󰋊 Disk",
+            "folders": "/",
+            "keyColor": "white"
+        },
+        {
+            "type": "disk",
+            "key": "└ └󰋊 Home",
+            "folders": "/home",
+            "keyColor": "white"
+        },
+        {
+            "type": "custom",
+            "format": "└──────────────────────────────────────────────────────┘",
             "outputColor": "red"
         },
         {

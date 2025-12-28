@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Fastfetch
+Comment=Show system information with fastfetch
+Exec=pypr-client toggle fastfetch
+Icon=distributor-logo-archlinux
+Terminal=false
+Categories=System;Monitor;
+Keywords=system;info;fetch;hardware;software;

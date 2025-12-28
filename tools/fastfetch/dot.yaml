@@ -3,3 +3,6 @@ linux[whoami.distro^="Arch"]:
     config.jsonc: ~/.config/fastfetch/config.jsonc
     cat.txt: ~/.config/fastfetch/cat.txt
     archpuccinn.png: ~/.config/fastfetch/archpuccinn.png
+    fastfetch.toml: {{ dirs.base.config }}/pypr/conf.d/fastfetch.toml
+    fastfetch.conf: {{ dirs.base.config }}/hypr/conf.d/fastfetch.conf
+    fastfetch.desktop: {{ dirs.base.data }}/applications/fastfetch.desktop
