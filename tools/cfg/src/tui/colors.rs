@@ -68,6 +68,8 @@ pub struct ColorPicker {
     original_secondary: String,
     /// Content area for mouse click detection
     content_area: Rect,
+    /// Maps visual row index to filtered data index (for mouse clicks)
+    row_to_data: Vec<Option<usize>>,
 }
 
 /// Theme colors from catppuccin for UI rendering
@@ -157,6 +159,7 @@ impl ColorPicker {
             original_accent,
             original_secondary,
             content_area: Rect::default(),
+            row_to_data: Vec::new(),
         }
     }
 
@@ -328,20 +331,29 @@ impl ColorPicker {
         let mut items: Vec<ListItem> = Vec::new();
         let mut prev_is_accent = true;
 
+        // Clear and rebuild row-to-data mapping for mouse clicks
+        self.row_to_data.clear();
+
         for (idx, &color_idx) in self.filtered.iter().enumerate() {
             let entry = &self.colors[color_idx];
 
             if prev_is_accent && !entry.is_accent && idx > 0 {
+                // Empty line before "Surface Colors" header
                 items.push(ListItem::new(Line::from("")));
+                self.row_to_data.push(None);
+                // "Surface Colors" header
                 items.push(ListItem::new(Line::from(Span::styled(
                     "Surface Colors",
                     Style::default().fg(theme.overlay1).add_modifier(Modifier::BOLD),
                 ))));
+                self.row_to_data.push(None);
             } else if entry.is_accent && idx == 0 {
+                // "Accent Colors" header
                 items.push(ListItem::new(Line::from(Span::styled(
                     "Accent Colors",
                     Style::default().fg(theme.overlay1).add_modifier(Modifier::BOLD),
                 ))));
+                self.row_to_data.push(None);
             }
             prev_is_accent = entry.is_accent;
 
@@ -392,6 +404,8 @@ impl ColorPicker {
             };
 
             items.push(ListItem::new(Line::from(spans)).style(style));
+            // Map this visual row to the data index
+            self.row_to_data.push(Some(idx));
         }
 
         let list = List::new(items);
@@ -665,8 +679,9 @@ impl ColorPicker {
                         });
                         if mouse.row >= inner.y && mouse.row < inner.y + inner.height {
                             let clicked_row = (mouse.row - inner.y) as usize;
-                            if clicked_row < self.filtered.len() {
-                                self.selected = clicked_row;
+                            // Use row_to_data mapping to handle section headers
+                            if let Some(Some(data_idx)) = self.row_to_data.get(clicked_row) {
+                                self.selected = *data_idx;
                                 self.list_state.select(Some(self.selected));
                             }
                         }
