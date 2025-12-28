@@ -1,9 +1,10 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      yay -S --noconfirm wlogout
+      yay -S --noconfirm wlogout hyprshutdown-git
       sudo sed -i 's/#HandlePowerKey=poweroff/HandlePowerKey=ignore/' /etc/systemd/logind.conf
   links:
     wlogout.conf: ~/.config/hypr/conf.d/wlogout.conf
     blue.css: ~/.config/wlogout/style.css
+    layout: ~/.config/wlogout/layout
     mocha/{{ eval "~/.dotfiles/tools/cfg/target/release/cfg theme --get accent | cut -d= -f2" }}: ~/.config/wlogout/icons
