@@ -3,7 +3,7 @@ use std::io;
 use crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyModifiers, MouseEventKind};
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
-    style::{Color, Modifier, Style, Stylize},
+    style::{Color, Modifier, Style},
     text::{Line, Span},
     widgets::{Block, Borders, Clear, List, ListItem, ListState, Paragraph, Scrollbar, ScrollbarOrientation, ScrollbarState},
     Frame,
@@ -18,7 +18,7 @@ use super::widgets::{FuzzyInput, FuzzyInputState, HelpPopup, Toast};
 use super::{init, restore};
 
 /// Color formats supported by the picker
-const FORMATS: &[&str] = &["hex-hash", "hex", "rgb", "rgb-css", "hyprlang"];
+const FORMATS: &[&str] = &["hex-hash", "hex", "rgb", "rgb-css", "hyprlang", "tera"];
 
 /// Accent colors (can be set as accent/secondary)
 const ACCENT_COLORS: &[&str] = &[
@@ -57,14 +57,13 @@ enum Focus {
     Preview,
 }
 
-/// Color modifier types matching tera template filters
-#[derive(Debug, Clone, Copy, PartialEq, Default)]
-enum ModifierType {
-    #[default]
-    None,
-    Lighten,
-    Darken,
-    Blend,
+/// Color modification state (layered like Photoshop)
+#[derive(Debug, Clone, Default)]
+struct ColorModifier {
+    /// Blend with another color (0 = no blend, 100 = full blend target)
+    blend_amount: u8,
+    /// Lightness adjustment (-100 = full darken, 0 = neutral, +100 = full lighten)
+    lightness: i8,
 }
 
 pub struct ColorPicker {
@@ -88,11 +87,9 @@ pub struct ColorPicker {
     content_area: Rect,
     /// Maps visual row index to filtered data index (for mouse clicks)
     row_to_data: Vec<Option<usize>>,
-    /// Current color modifier type
-    modifier_type: ModifierType,
-    /// Modifier amount (0-100)
-    modifier_amount: u8,
-    /// Input buffer for typing modifier amount directly
+    /// Color modifier state (blend + lightness)
+    modifier: ColorModifier,
+    /// Input buffer for typing values directly
     modifier_input: String,
     /// Track last selected index to detect changes
     last_selected: usize,
@@ -100,6 +97,13 @@ pub struct ColorPicker {
     focus: Focus,
     /// Secondary selection for blend target (index into filtered)
     blend_selection: usize,
+    /// Which control is active in Modify pane: 0=lightness, 1=blend
+    modify_focus: usize,
+    /// Preview pane area for mouse detection
+    preview_area: Rect,
+    /// Row positions for modifier controls (for mouse click detection)
+    lightness_row: u16,
+    blend_row: u16,
 }
 
 /// Theme colors from catppuccin for UI rendering
@@ -190,12 +194,15 @@ impl ColorPicker {
             original_secondary,
             content_area: Rect::default(),
             row_to_data: Vec::new(),
-            modifier_type: ModifierType::None,
-            modifier_amount: 15,
+            modifier: ColorModifier::default(),
             modifier_input: String::new(),
             last_selected: 0,
             focus: Focus::List,
             blend_selection: 1, // Start at second color
+            modify_focus: 0, // Start on lightness control
+            preview_area: Rect::default(),
+            lightness_row: 0,
+            blend_row: 0,
         }
     }
 
@@ -208,10 +215,6 @@ impl ColorPicker {
         FORMATS[self.format_idx]
     }
 
-    fn cycle_format(&mut self) {
-        self.format_idx = (self.format_idx + 1) % FORMATS.len();
-    }
-
     fn selected_color(&self) -> Option<&ColorEntry> {
         self.filtered.get(self.selected).and_then(|&i| self.colors.get(i))
     }
@@ -222,23 +225,64 @@ impl ColorPicker {
             .and_then(|&i| self.colors.get(i))
     }
 
+    /// Check if any modifications are applied
+    fn has_modifications(&self) -> bool {
+        self.modifier.lightness != 0 || self.modifier.blend_amount > 0
+    }
+
     /// Compute the modified color based on current modifier settings
+    /// Order: blend first, then lightness adjustment
     fn modified_color(&self) -> Option<CfgColor> {
         let entry = self.selected_color()?;
-        let base = &entry.color;
+        let mut color = entry.color;
 
-        Some(match self.modifier_type {
-            ModifierType::None => *base,
-            ModifierType::Lighten => base.lighten(self.modifier_amount),
-            ModifierType::Darken => base.darken(self.modifier_amount),
-            ModifierType::Blend => {
-                if let Some(target) = self.blend_target() {
-                    base.blend(&target.color, 100 - self.modifier_amount)
-                } else {
-                    *base
-                }
+        // Step 1: Blend with target color
+        if self.modifier.blend_amount > 0 {
+            if let Some(target) = self.blend_target() {
+                color = color.blend(&target.color, 100 - self.modifier.blend_amount);
             }
-        })
+        }
+
+        // Step 2: Apply lightness adjustment
+        if self.modifier.lightness > 0 {
+            color = color.lighten(self.modifier.lightness as u8);
+        } else if self.modifier.lightness < 0 {
+            color = color.darken((-self.modifier.lightness) as u8);
+        }
+
+        Some(color)
+    }
+
+    /// Generate tera template filter string for current modifications
+    fn tera_filter_string(&self) -> Option<String> {
+        let entry = self.selected_color()?;
+        let name = &entry.name;
+
+        if !self.has_modifications() {
+            return Some(format!("{{{{ {} }}}}", name));
+        }
+
+        let mut filters = Vec::new();
+
+        // Blend filter
+        if self.modifier.blend_amount > 0 {
+            if let Some(target) = self.blend_target() {
+                filters.push(format!("blend(base={}, amount={})", target.name, self.modifier.blend_amount));
+            }
+        }
+
+        // Lightness filter
+        if self.modifier.lightness > 0 {
+            filters.push(format!("lighten(amount={})", self.modifier.lightness));
+        } else if self.modifier.lightness < 0 {
+            filters.push(format!("darken(amount={})", -self.modifier.lightness));
+        }
+
+        if filters.is_empty() {
+            Some(format!("{{{{ {} }}}}", name))
+        } else {
+            Some(format!("{{{{ {} | {} }}}}", name, filters.join(" | ")))
+        }
     }
 
     /// Move blend selection up
@@ -257,31 +301,41 @@ impl ColorPicker {
 
     /// Reset modifier state (called when selection changes)
     fn reset_modifier(&mut self) {
-        self.modifier_type = ModifierType::None;
-        self.modifier_amount = 15;
+        self.modifier = ColorModifier::default();
         self.modifier_input.clear();
     }
 
-    /// Increase modifier amount by step
-    fn increase_amount(&mut self, step: u8) {
-        self.modifier_amount = self.modifier_amount.saturating_add(step).min(100);
+    /// Adjust lightness by step
+    fn adjust_lightness(&mut self, delta: i8) {
+        self.modifier.lightness = self.modifier.lightness.saturating_add(delta).clamp(-100, 100);
         self.modifier_input.clear();
     }
 
-    /// Decrease modifier amount by step
-    fn decrease_amount(&mut self, step: u8) {
-        self.modifier_amount = self.modifier_amount.saturating_sub(step);
+    /// Adjust blend amount by step
+    fn adjust_blend(&mut self, delta: i8) {
+        let new_val = (self.modifier.blend_amount as i16 + delta as i16).clamp(0, 100) as u8;
+        self.modifier.blend_amount = new_val;
         self.modifier_input.clear();
     }
 
-    /// Handle digit input for modifier amount
+    /// Handle digit input for direct value entry
     fn handle_amount_digit(&mut self, digit: char) {
         self.modifier_input.push(digit);
-        if let Ok(amount) = self.modifier_input.parse::<u8>() {
-            self.modifier_amount = amount.min(100);
+
+        // Parse the accumulated input
+        if let Ok(value) = self.modifier_input.parse::<i32>() {
+            if self.modify_focus == 0 {
+                // Lightness: allow negative via - prefix, clamp to -100..100
+                // For now, typed values are positive, use +/- for sign
+                self.modifier.lightness = (value.clamp(-100, 100)) as i8;
+            } else {
+                // Blend: 0-100
+                self.modifier.blend_amount = (value.clamp(0, 100)) as u8;
+            }
         }
-        // Reset input after 3 digits or if > 100
-        if self.modifier_input.len() >= 3 || self.modifier_amount >= 100 {
+
+        // Reset input after 3 digits to allow fresh entry
+        if self.modifier_input.len() >= 3 {
             self.modifier_input.clear();
         }
     }
@@ -337,7 +391,11 @@ impl ColorPicker {
 
     fn copy_selected(&mut self) {
         if let Some(color) = self.modified_color() {
-            let formatted = format_color(&color, self.current_format(), 1.0);
+            let formatted = if self.current_format() == "tera" {
+                self.tera_filter_string().unwrap_or_default()
+            } else {
+                format_color(&color, self.current_format(), 1.0)
+            };
             clipboard::copy(&formatted);
             self.toast = Some(Toast::new(format!("Copied: {}", formatted))
                 .style(Style::default().fg(self.flavor_colors.green))
@@ -473,7 +531,7 @@ impl ColorPicker {
             let swatch_color = Color::Rgb(c.r, c.g, c.b);
             let is_current = entry.name == self.config.accent || entry.name == self.config.secondary;
             let is_selected = idx == self.selected;
-            let is_blend_target = self.modifier_type == ModifierType::Blend && idx == self.blend_selection;
+            let is_blend_target = self.modifier.blend_amount > 0 && idx == self.blend_selection;
 
             // Show selection indicator: > for primary, » for blend target
             let indicator = if is_selected {
@@ -548,7 +606,10 @@ impl ColorPicker {
         }
     }
 
-    fn render_preview(&self, frame: &mut Frame, area: Rect) {
+    fn render_preview(&mut self, frame: &mut Frame, area: Rect) {
+        // Store preview area for mouse detection
+        self.preview_area = area;
+
         let theme = &self.flavor_colors;
         let border_color = if self.focus == Focus::Preview { theme.accent } else { theme.surface1 };
         let block = Block::default()
@@ -563,15 +624,21 @@ impl ColorPicker {
         let inner = block.inner(area);
         frame.render_widget(block, area);
 
-        if let Some(entry) = self.selected_color() {
-            let original = &entry.color;
-            let modified = self.modified_color().unwrap_or(*original);
+        // Copy data to avoid borrow issues with self mutation
+        let entry_data = self.selected_color().map(|e| (e.name.clone(), e.color));
+        let modified = self.modified_color();
+        let blend_target_data = self.blend_target().map(|t| (t.name.clone(), t.color));
+        let tera_string = self.tera_filter_string();
+
+        if let Some((entry_name, original)) = entry_data {
+            let modified = modified.unwrap_or(original);
             let orig_swatch = Color::Rgb(original.r, original.g, original.b);
             let mod_swatch = Color::Rgb(modified.r, modified.g, modified.b);
 
-            let has_modifier = self.modifier_type != ModifierType::None;
+            let has_modifier = self.has_modifications();
 
             let mut lines = vec![Line::from("")];
+            let mut line_count = 1u16;
 
             // Side-by-side swatches when modifier active
             if has_modifier {
@@ -592,19 +659,24 @@ impl ColorPicker {
                     Span::styled("██████", Style::default().fg(mod_swatch)),
                 ]));
                 lines.push(Line::from(""));
+                line_count += 4;
 
-                // Labels with modifier info
-                let modifier_label = match self.modifier_type {
-                    ModifierType::Lighten => format!("+{}%", self.modifier_amount),
-                    ModifierType::Darken => format!("-{}%", self.modifier_amount),
-                    ModifierType::Blend => format!("→{}%", self.modifier_amount),
-                    ModifierType::None => String::new(),
-                };
+                // Show modification summary
+                let mut mod_parts = Vec::new();
+                if self.modifier.blend_amount > 0 {
+                    if let Some((ref target_name, _)) = blend_target_data {
+                        mod_parts.push(format!("→{} {}%", target_name, self.modifier.blend_amount));
+                    }
+                }
+                if self.modifier.lightness != 0 {
+                    mod_parts.push(format!("{:+}%", self.modifier.lightness));
+                }
                 lines.push(Line::from(vec![
-                    Span::styled(&entry.name, Style::default().fg(theme.subtext0)),
+                    Span::styled(&entry_name, Style::default().fg(theme.subtext0)),
                     Span::raw("  "),
-                    Span::styled(modifier_label, Style::default().fg(theme.accent)),
+                    Span::styled(mod_parts.join(" "), Style::default().fg(theme.accent)),
                 ]));
+                line_count += 1;
             } else {
                 // Large single swatch when no modifier
                 lines.push(Line::from(Span::styled("██████████████", Style::default().fg(orig_swatch))));
@@ -612,77 +684,99 @@ impl ColorPicker {
                 lines.push(Line::from(Span::styled("██████████████", Style::default().fg(orig_swatch))));
                 lines.push(Line::from(""));
                 lines.push(Line::from(Span::styled(
-                    &entry.name,
+                    entry_name.clone(),
                     Style::default().fg(theme.text).add_modifier(Modifier::BOLD),
                 )));
+                line_count += 5;
             }
 
             lines.push(Line::from(""));
+            line_count += 1;
 
             // Show format values for the MODIFIED color
-            let display_color = if has_modifier { &modified } else { original };
+            let display_color = if has_modifier { &modified } else { &original };
             for (i, fmt) in FORMATS.iter().enumerate() {
-                let value = format_color(display_color, fmt, 1.0);
+                let value = if *fmt == "tera" {
+                    tera_string.clone().unwrap_or_default()
+                } else {
+                    format_color(display_color, fmt, 1.0)
+                };
                 let style = if i == self.format_idx {
                     Style::default().fg(theme.accent).add_modifier(Modifier::BOLD)
                 } else {
                     Style::default().fg(theme.subtext0)
                 };
                 lines.push(Line::from(Span::styled(value, style)));
+                line_count += 1;
             }
 
             lines.push(Line::from(""));
+            line_count += 1;
 
-            // Modifier controls section
+            // Modifier controls section - Photoshop-like layered controls
             lines.push(Line::from(Span::styled(
                 "─────────────────",
                 Style::default().fg(theme.surface1),
             )));
+            line_count += 1;
 
-            // Modifier type buttons
-            let btn = |label: &str, active: bool| -> Span {
-                if active {
-                    Span::styled(format!("[{}]", label), Style::default().fg(theme.accent).add_modifier(Modifier::BOLD))
-                } else {
-                    Span::styled(format!(" {} ", label), Style::default().fg(theme.overlay1))
-                }
+            // Track lightness control row (relative to inner area)
+            self.lightness_row = inner.y + line_count;
+
+            // Lightness dial (-100 to +100)
+            let lightness_focused = self.focus == Focus::Preview && self.modify_focus == 0;
+            let lightness_label = if lightness_focused {
+                Span::styled("Lightness: ", Style::default().fg(theme.accent))
+            } else {
+                Span::styled("Lightness: ", Style::default().fg(theme.overlay1))
             };
-
+            let lightness_bar = self.render_dial(self.modifier.lightness, lightness_focused, theme);
             lines.push(Line::from(vec![
-                btn("L", self.modifier_type == ModifierType::Lighten),
-                Span::raw(" "),
-                btn("D", self.modifier_type == ModifierType::Darken),
-                Span::raw(" "),
-                btn("B", self.modifier_type == ModifierType::Blend),
+                lightness_label,
+                Span::styled(
+                    format!("{:+4}", self.modifier.lightness),
+                    Style::default().fg(theme.text).add_modifier(Modifier::BOLD),
+                ),
             ]));
+            lines.push(lightness_bar);
+            line_count += 2;
 
-            // Amount control
-            if has_modifier {
+            lines.push(Line::from(""));
+            line_count += 1;
+
+            // Track blend control row
+            self.blend_row = inner.y + line_count;
+
+            // Blend control (0 to 100)
+            let blend_focused = self.focus == Focus::Preview && self.modify_focus == 1;
+            let blend_label = if blend_focused {
+                Span::styled("Blend:     ", Style::default().fg(theme.accent))
+            } else {
+                Span::styled("Blend:     ", Style::default().fg(theme.overlay1))
+            };
+            let blend_bar = self.render_slider(self.modifier.blend_amount, blend_focused, theme);
+            lines.push(Line::from(vec![
+                blend_label,
+                Span::styled(
+                    format!("{:>3}%", self.modifier.blend_amount),
+                    Style::default().fg(theme.text).add_modifier(Modifier::BOLD),
+                ),
+            ]));
+            lines.push(blend_bar);
+
+            // Show blend target if blend amount > 0
+            if self.modifier.blend_amount > 0 {
+                let (target_name, target_color) = match &blend_target_data {
+                    Some((name, color)) => (name.as_str(), Color::Rgb(color.r, color.g, color.b)),
+                    None => ("none", theme.text),
+                };
                 lines.push(Line::from(vec![
-                    Span::styled("Amount: ", Style::default().fg(theme.overlay1)),
-                    Span::styled(
-                        format!("{:>3}", self.modifier_amount),
-                        Style::default().fg(theme.text).add_modifier(Modifier::BOLD),
-                    ),
-                    Span::styled(" [+/-]", Style::default().fg(theme.overlay1)),
+                    Span::styled("  Target:  ", Style::default().fg(theme.overlay1)),
+                    Span::styled("██", Style::default().fg(target_color)),
+                    Span::raw(" "),
+                    Span::styled(target_name.to_string(), Style::default().fg(theme.text)),
+                    Span::styled(" (» in list)", Style::default().fg(theme.overlay0)),
                 ]));
-
-                // Blend target (only for blend mode)
-                if self.modifier_type == ModifierType::Blend {
-                    let target_name = self.blend_target()
-                        .map(|t| t.name.as_str())
-                        .unwrap_or("none");
-                    let target_color = self.blend_target()
-                        .map(|t| Color::Rgb(t.color.r, t.color.g, t.color.b))
-                        .unwrap_or(theme.text);
-                    lines.push(Line::from(vec![
-                        Span::styled("Target: ", Style::default().fg(theme.overlay1)),
-                        Span::styled("██", Style::default().fg(target_color)),
-                        Span::raw(" "),
-                        Span::styled(target_name, Style::default().fg(theme.text)),
-                        Span::styled(" [h/l]", Style::default().fg(theme.overlay1)),
-                    ]));
-                }
             }
 
             let para = Paragraph::new(lines);
@@ -690,16 +784,109 @@ impl ColorPicker {
         }
     }
 
+    /// Render a visual dial for lightness (-100 to +100)
+    fn render_dial(&self, value: i8, focused: bool, theme: &FlavorTheme) -> Line<'static> {
+        let bar_width = 15;
+        let center = bar_width / 2;
+        // Map -100..+100 to 0..bar_width
+        let pos = ((value as i32 + 100) * bar_width as i32 / 200).clamp(0, bar_width as i32 - 1) as usize;
+
+        let mut spans = vec![Span::raw(" ")];
+        for i in 0..bar_width {
+            let char = if i == center { "│" } else if i == pos { "●" } else { "─" };
+            let style = if i == pos {
+                if focused {
+                    Style::default().fg(theme.accent).add_modifier(Modifier::BOLD)
+                } else {
+                    Style::default().fg(theme.text)
+                }
+            } else if i == center {
+                Style::default().fg(theme.overlay1)
+            } else {
+                Style::default().fg(theme.surface1)
+            };
+            spans.push(Span::styled(char.to_string(), style));
+        }
+        Line::from(spans)
+    }
+
+    /// Render a visual slider for blend amount (0 to 100)
+    fn render_slider(&self, value: u8, focused: bool, theme: &FlavorTheme) -> Line<'static> {
+        let bar_width = 15;
+        // Map 0..100 to 0..bar_width
+        let pos = (value as usize * (bar_width - 1) / 100).min(bar_width - 1);
+
+        let mut spans = vec![Span::raw(" ")];
+        for i in 0..bar_width {
+            let char = if i == pos { "●" } else { "─" };
+            let style = if i == pos {
+                if focused {
+                    Style::default().fg(theme.accent).add_modifier(Modifier::BOLD)
+                } else {
+                    Style::default().fg(theme.text)
+                }
+            } else if i <= pos {
+                // Filled portion
+                Style::default().fg(theme.overlay1)
+            } else {
+                Style::default().fg(theme.surface1)
+            };
+            spans.push(Span::styled(char.to_string(), style));
+        }
+        Line::from(spans)
+    }
+
     fn render_footer(&self, frame: &mut Frame, area: Rect) {
         let theme = &self.flavor_colors;
-        let hints = vec![
-            ("j/k", "navigate"),
-            ("Enter", "select"),
-            ("y", "copy"),
-            ("Tab", "format"),
-            ("?", "help"),
-            ("q", "quit"),
-        ];
+
+        // Context-aware hints based on focus and state
+        let hints: Vec<(&str, &str)> = match self.focus {
+            Focus::List => {
+                vec![
+                    ("j/k", "navigate"),
+                    ("Enter", "accent"),
+                    ("y", "copy"),
+                    ("Tab", "modify"),
+                    ("?", "help"),
+                    ("q", "quit"),
+                ]
+            }
+            Focus::Preview => {
+                // Different hints based on which control is focused
+                if self.modify_focus == 0 {
+                    // Lightness control
+                    vec![
+                        ("h/l", "darken/lighten"),
+                        ("j/k", "→blend"),
+                        ("f", "format"),
+                        ("n", "reset"),
+                        ("y", "copy"),
+                        ("Tab", "colors"),
+                    ]
+                } else {
+                    // Blend control
+                    if self.modifier.blend_amount > 0 {
+                        vec![
+                            ("h/l", "blend %"),
+                            ("J/K", "target"),
+                            ("j/k", "→lightness"),
+                            ("f", "format"),
+                            ("n", "reset"),
+                            ("Tab", "colors"),
+                        ]
+                    } else {
+                        vec![
+                            ("l", "start blend"),
+                            ("j/k", "→lightness"),
+                            ("f", "format"),
+                            ("n", "reset"),
+                            ("y", "copy"),
+                            ("Tab", "colors"),
+                        ]
+                    }
+                }
+            }
+        };
 
         let spans: Vec<Span> = hints
             .iter()
@@ -738,16 +925,13 @@ impl ColorPicker {
                 ("q", "Quit"),
             ]),
             Focus::Preview => ("Modify", vec![
-                ("l", "Lighten"),
-                ("d", "Darken"),
-                ("b", "Blend (» in list)"),
-                ("n", "Reset"),
+                ("j/k", "Switch control"),
+                ("h/l", "Adjust value"),
+                ("+/-", "Fine adjust ±5"),
+                ("0-9", "Type value"),
+                ("n", "Reset all"),
                 ("", ""),
-                ("+/-", "Amount ±5%"),
-                ("0-9", "Type amount"),
-                ("j/k", "Format (or » target)"),
                 ("f", "Cycle format"),
-                ("", ""),
                 ("y", "Copy modified"),
                 ("Tab/Esc", "→ Colors"),
             ]),
@@ -888,7 +1072,7 @@ impl ColorPicker {
                                 if self.focus == Focus::Preview {
                                     // Esc in preview goes back to list
                                     self.focus = Focus::List;
-                                } else if self.modifier_type != ModifierType::None {
+                                } else if self.has_modifications() {
                                     self.reset_modifier();
                                 } else if !self.search.is_empty() {
                                     self.search.clear();
@@ -932,59 +1116,65 @@ impl ColorPicker {
                             }
                             Focus::Preview => {
                                 match key.code {
-                                    // Modifier type selection
-                                    KeyCode::Char('l') | KeyCode::Char('L') => {
-                                        self.modifier_type = if self.modifier_type == ModifierType::Lighten {
-                                            ModifierType::None
-                                        } else {
-                                            ModifierType::Lighten
-                                        };
+                                    // j/k to switch between lightness (0) and blend (1) controls
+                                    KeyCode::Char('j') | KeyCode::Down => {
+                                        self.modify_focus = (self.modify_focus + 1) % 2;
                                     }
-                                    KeyCode::Char('d') | KeyCode::Char('D') => {
-                                        self.modifier_type = if self.modifier_type == ModifierType::Darken {
-                                            ModifierType::None
-                                        } else {
-                                            ModifierType::Darken
-                                        };
+                                    KeyCode::Char('k') | KeyCode::Up => {
+                                        self.modify_focus = if self.modify_focus == 0 { 1 } else { 0 };
                                     }
-                                    KeyCode::Char('b') | KeyCode::Char('B') => {
-                                        self.modifier_type = if self.modifier_type == ModifierType::Blend {
-                                            ModifierType::None
+                                    // h/l to adjust the currently focused control
+                                    KeyCode::Char('h') | KeyCode::Left => {
+                                        if self.modify_focus == 0 {
+                                            // Lightness: decrease (more darken)
+                                            self.adjust_lightness(-10);
                                         } else {
-                                            ModifierType::Blend
-                                        };
+                                            // Blend: decrease amount
+                                            self.adjust_blend(-10);
+                                        }
                                     }
+                                    KeyCode::Char('l') | KeyCode::Right => {
+                                        if self.modify_focus == 0 {
+                                            // Lightness: increase (more lighten)
+                                            self.adjust_lightness(10);
+                                        } else {
+                                            // Blend: increase amount
+                                            self.adjust_blend(10);
+                                        }
+                                    }
+                                    // Fine adjustment with +/-
+                                    KeyCode::Char('+') | KeyCode::Char('=') => {
+                                        if self.modify_focus == 0 {
+                                            self.adjust_lightness(5);
+                                        } else {
+                                            self.adjust_blend(5);
+                                        }
+                                    }
+                                    KeyCode::Char('-') | KeyCode::Char('_') => {
+                                        if self.modify_focus == 0 {
+                                            self.adjust_lightness(-5);
+                                        } else {
+                                            self.adjust_blend(-5);
+                                        }
+                                    }
+                                    // Number input for direct value entry
+                                    KeyCode::Char(c @ '0'..='9') => {
+                                        self.handle_amount_digit(c);
+                                    }
+                                    // Reset with n
                                     KeyCode::Char('n') | KeyCode::Char('N') => {
                                         self.reset_modifier();
                                     }
-                                    // j/k navigation: blend target when in blend mode, format otherwise
-                                    KeyCode::Char('j') | KeyCode::Down => {
-                                        if self.modifier_type == ModifierType::Blend {
-                                            self.blend_select_down();
-                                        } else {
-                                            self.format_idx = (self.format_idx + 1) % FORMATS.len();
-                                        }
-                                    }
-                                    KeyCode::Char('k') | KeyCode::Up => {
-                                        if self.modifier_type == ModifierType::Blend {
-                                            self.blend_select_up();
-                                        } else {
-                                            self.format_idx = self.format_idx.checked_sub(1).unwrap_or(FORMATS.len() - 1);
-                                        }
-                                    }
-                                    // Format cycling with f (always available)
+                                    // Format cycling with f
                                     KeyCode::Char('f') => {
                                         self.format_idx = (self.format_idx + 1) % FORMATS.len();
                                     }
-                                    // Amount controls with +/-
-                                    KeyCode::Char('+') | KeyCode::Char('=') => {
-                                        self.increase_amount(5);
+                                    // Move blend target with shift+j/k when in blend control
+                                    KeyCode::Char('J') if self.modify_focus == 1 => {
+                                        self.blend_select_down();
                                     }
-                                    KeyCode::Char('-') | KeyCode::Char('_') => {
-                                        self.decrease_amount(5);
-                                    }
-                                    KeyCode::Char(c @ '0'..='9') => {
-                                        self.handle_amount_digit(c);
+                                    KeyCode::Char('K') if self.modify_focus == 1 => {
+                                        self.blend_select_up();
                                     }
                                     _ => {}
                                 }
@@ -995,20 +1185,55 @@ impl ColorPicker {
             }
             Event::Mouse(mouse) => {
                 match mouse.kind {
-                    MouseEventKind::ScrollDown => self.move_down(),
-                    MouseEventKind::ScrollUp => self.move_up(),
+                    MouseEventKind::ScrollDown => {
+                        if self.focus == Focus::Preview {
+                            // Scroll adjusts current control (±1 for fine control)
+                            if self.modify_focus == 0 {
+                                self.adjust_lightness(-1);
+                            } else {
+                                self.adjust_blend(-1);
+                            }
+                        } else {
+                            self.move_down();
+                        }
+                    }
+                    MouseEventKind::ScrollUp => {
+                        if self.focus == Focus::Preview {
+                            if self.modify_focus == 0 {
+                                self.adjust_lightness(1);
+                            } else {
+                                self.adjust_blend(1);
+                            }
+                        } else {
+                            self.move_up();
+                        }
+                    }
                     MouseEventKind::Down(crossterm::event::MouseButton::Left) => {
-                        // Check if click is within content area (accounting for border)
-                        let inner = self.content_area.inner(ratatui::layout::Margin {
-                            horizontal: 1,
-                            vertical: 1,
-                        });
-                        if mouse.row >= inner.y && mouse.row < inner.y + inner.height {
-                            let clicked_row = (mouse.row - inner.y) as usize;
-                            // Use row_to_data mapping to handle section headers
-                            if let Some(Some(data_idx)) = self.row_to_data.get(clicked_row) {
-                                self.selected = *data_idx;
-                                self.list_state.select(Some(self.selected));
+                        // Check if click is on lightness control
+                        if mouse.row == self.lightness_row || mouse.row == self.lightness_row + 1 {
+                            self.focus = Focus::Preview;
+                            self.modify_focus = 0;
+                        }
+                        // Check if click is on blend control
+                        else if mouse.row == self.blend_row {
+                            self.focus = Focus::Preview;
+                            self.modify_focus = 1;
+                        }
+                        // Check if click is within color list area
+                        else {
+                            let inner = self.content_area.inner(ratatui::layout::Margin {
+                                horizontal: 1,
+                                vertical: 1,
+                            });
+                            if mouse.row >= inner.y && mouse.row < inner.y + inner.height
+                               && mouse.column < self.preview_area.x {
+                                self.focus = Focus::List;
+                                let clicked_row = (mouse.row - inner.y) as usize;
+                                // Use row_to_data mapping to handle section headers
+                                if let Some(Some(data_idx)) = self.row_to_data.get(clicked_row) {
+                                    self.selected = *data_idx;
+                                    self.list_state.select(Some(self.selected));
+                                }
                             }
                         }
                     }
