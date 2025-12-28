@@ -346,7 +346,131 @@ pub fn display_kitty_image(png_bytes: &[u8]) {
     print!("\x1b_Gf=100,a=T;{}\x1b\\", b64);
 }
 
+/// Sample texts for font preview
+pub struct FontSamples;
+
+impl FontSamples {
+    pub const PANGRAM: &'static str = "The quick brown fox jumps over the lazy dog";
+    pub const LOWERCASE: &'static str = "abcdefghijklmnopqrstuvwxyz";
+    pub const UPPERCASE: &'static str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    pub const DIGITS: &'static str = "0123456789";
+    pub const SYMBOLS: &'static str = "!@#$%^&*()_+-=[]{}|;':\",./<>?";
+    pub const LIGATURES: &'static str = "=> -> <- <-> != !== == === <= >= |>";
+    pub const CODE: &'static str = "fn main() { let x = 42; }";
+    pub const NERD_GLYPHS: &'static str =
+        "\u{f002d} \u{e606} \u{e73c} \u{f0e7} \u{f120} \u{f121} \u{f1d3} \u{f07c} \u{f023} \u{f013}";
+}
+
+/// Preview current font with styled output matching scratchpad format
+/// Uses ANSI codes for colors and OSC 66 for variable font sizes
+pub fn preview_font_styled(
+    font_name: &str,
+    accent_rgb: Option<(u8, u8, u8)>,
+    subtext_rgb: Option<(u8, u8, u8)>,
+) {
+    // Color codes
+    let accent = accent_rgb
+        .map(|(r, g, b)| format!("\x1b[38;2;{};{};{}m", r, g, b))
+        .unwrap_or_else(|| "\x1b[1m".to_string());
+    let dim = subtext_rgb
+        .map(|(r, g, b)| format!("\x1b[38;2;{};{};{}m", r, g, b))
+        .unwrap_or_else(|| "\x1b[2m".to_string());
+    let bold = "\x1b[1m";
+    let italic = "\x1b[3m";
+    let reset = "\x1b[0m";
+
+    // Detect font features from name
+    let has_ligatures = font_name.contains("Fira")
+        || font_name.contains("JetBrains")
+        || font_name.contains("Cascadia")
+        || font_name.contains("Iosevka")
+        || font_name.contains("Victor")
+        || font_name.contains("Hasklug");
+    let is_nerd_font = font_name.contains("Nerd");
+    let is_mono =
+        font_name.contains("Mono") || font_name.contains("Code") || is_nerd_font;
+
+    // Title
+    println!("{}{}{}", accent, font_name, reset);
+    println!();
+
+    // Variable sizes section (OSC 66)
+    println!("{}{}─── Sizes ───{}", dim, bold, reset);
+    println!();
+    let sample = "The quick brown fox jumps over the lazy dog 0123456789";
+    for scale in 1..=4 {
+        print!("\x1b]66;s={};{}\x07  {}({}x){}", scale, sample, dim, scale, reset);
+        for _ in 0..scale {
+            println!();
+        }
+    }
+    println!();
+
+    // Variants section
+    println!("{}{}─── Variants ───{}", dim, bold, reset);
+    println!();
+    let variant_sample = FontSamples::PANGRAM;
+    println!("{}Regular:     {}{}", dim, reset, variant_sample);
+    println!(
+        "{}Bold:        {}{}{}{}",
+        dim, reset, bold, variant_sample, reset
+    );
+    println!(
+        "{}Italic:      {}{}{}{}",
+        dim, reset, italic, variant_sample, reset
+    );
+    println!(
+        "{}Bold Italic: {}{}{}{}{}",
+        dim, reset, bold, italic, variant_sample, reset
+    );
+    println!();
+
+    // Character sets section
+    println!("{}{}─── Character Sets ───{}", dim, bold, reset);
+    println!();
+    println!("{}Lowercase:{}", dim, reset);
+    println!("  {}", FontSamples::LOWERCASE);
+    println!();
+    println!("{}Uppercase:{}", dim, reset);
+    println!("  {}", FontSamples::UPPERCASE);
+    println!();
+    println!("{}Digits:{}", dim, reset);
+    println!("  {}", FontSamples::DIGITS);
+    println!();
+    println!("{}Symbols:{}", dim, reset);
+    println!("  {}", FontSamples::SYMBOLS);
+    println!();
+
+    // Ligatures (conditional)
+    if has_ligatures {
+        println!("{}{}─── Ligatures ───{}", dim, bold, reset);
+        println!();
+        println!("{}Common:{}", dim, reset);
+        println!("  {}", FontSamples::LIGATURES);
+        println!();
+    }
+
+    // Code sample (conditional on mono)
+    if is_mono {
+        println!("{}{}─── Code ───{}", dim, bold, reset);
+        println!();
+        println!("{}Sample:{}", dim, reset);
+        println!("  {}", FontSamples::CODE);
+        println!();
+    }
+
+    // Nerd Font glyphs (conditional)
+    if is_nerd_font {
+        println!("{}{}─── Nerd Font Icons ───{}", dim, bold, reset);
+        println!();
+        println!("{}Icons:{}", dim, reset);
+        println!("  {}", FontSamples::NERD_GLYPHS);
+        println!();
+    }
+}
+
 /// Preview current font at multiple sizes using text sizing protocol (OSC 66)
+#[allow(dead_code)]
 pub fn preview_font_sizes(font_name: &str) {
     let sample = "The quick brown fox jumps over the lazy dog 0123456789";
 
@@ -364,6 +488,7 @@ pub fn preview_font_sizes(font_name: &str) {
 }
 
 /// Preview font with variants (regular, bold, italic, bold-italic)
+#[allow(dead_code)]
 pub fn preview_font_variants(font_name: &str) {
     let sample = "The quick brown fox jumps over the lazy dog";
 

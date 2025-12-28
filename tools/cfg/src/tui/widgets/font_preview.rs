@@ -16,7 +16,7 @@ pub struct FontSamples;
 
 impl FontSamples {
     /// Short pangram for size previews
-    pub const PANGRAM: &'static str = "The quick brown fox jumps";
+    pub const PANGRAM: &'static str = "The quick brown fox jumps over the lazy dog";
 
     /// Full character set - lowercase
     pub const LOWERCASE: &'static str = "abcdefghijklmnopqrstuvwxyz";

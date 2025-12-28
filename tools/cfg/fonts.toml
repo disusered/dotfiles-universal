@@ -1,0 +1,6 @@
+[scratchpads.font]
+animation = "fromTop"
+command = "sh -c 'kitty --class fonts_scratch -o \"font_family=$(cat /tmp/cfg-font-preview)\" cfg font --scratchpad'"
+class = "fonts_scratch"
+size = "25% 60%"
+lazy = false

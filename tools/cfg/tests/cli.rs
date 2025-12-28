@@ -132,6 +132,87 @@ fn font_preview_rejects_list() {
 }
 
 #[test]
+fn font_scratchpad_rejects_get() {
+    cfg()
+        .args(["font", "--scratchpad", "--get", "mono"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn font_scratchpad_rejects_set() {
+    cfg()
+        .args(["font", "--scratchpad", "--set", "mono=JetBrainsMono Nerd Font"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn font_scratchpad_rejects_list() {
+    cfg()
+        .args(["font", "--scratchpad", "--list"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn font_scratchpad_rejects_preview() {
+    cfg()
+        .args(["font", "--scratchpad", "--preview"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn font_interactive_rejects_get() {
+    cfg()
+        .args(["font", "--interactive", "--get", "mono"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn font_interactive_rejects_set() {
+    cfg()
+        .args(["font", "--interactive", "--set", "mono=JetBrainsMono Nerd Font"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn font_interactive_rejects_list() {
+    cfg()
+        .args(["font", "--interactive", "--list"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn font_interactive_rejects_preview() {
+    cfg()
+        .args(["font", "--interactive", "--preview"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn font_interactive_rejects_scratchpad() {
+    cfg()
+        .args(["font", "--interactive", "--scratchpad"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
 fn font_list_json_outputs_valid_structure() {
     cfg()
         .args(["font", "--list", "--json"])

@@ -58,7 +58,7 @@ enum Command {
         #[arg(long, requires = "list")]
         json: bool,
         /// Interactive picker mode
-        #[arg(short, long, requires = "list")]
+        #[arg(short, long, group = "mode")]
         interactive: bool,
     },
     /// Font configuration
@@ -88,8 +88,11 @@ enum Command {
         #[arg(long, group = "mode")]
         preview: bool,
         /// Interactive picker mode
-        #[arg(short, long, requires = "list")]
+        #[arg(short, long, group = "mode")]
         interactive: bool,
+        /// Scratchpad preview mode (reads font from /tmp/cfg-font-preview)
+        #[arg(long, group = "mode", hide = true)]
+        scratchpad: bool,
     },
 }
 
@@ -332,21 +335,46 @@ fn main() {
                 println!("secondary={}", config.secondary);
             }
         }
-        Command::Font { get, set, list, apply, mono, sans, json, preview, interactive } => {
+        Command::Font { get, set, list, apply, mono, sans, json, preview, interactive, scratchpad } => {
             let cfg_dir = get_cfg_dir();
             let dotfiles_dir = get_dotfiles_dir();
             let config_path = format!("{}/config.toml", cfg_dir);
 
             let mut config = Config::load(&config_path).unwrap_or_default();
 
-            if preview {
-                // Show current font at multiple sizes and variants
-                println!("Size preview (OSC 66 text sizing):");
-                fonts::preview_font_sizes(&config.fonts.mono);
-                println!();
-                println!("Variant preview:");
-                fonts::preview_font_variants(&config.fonts.mono);
-            } else if list && interactive {
+            if scratchpad {
+                // Scratchpad preview mode - read font from temp file
+                let font_name = std::fs::read_to_string("/tmp/cfg-font-preview")
+                    .unwrap_or_else(|_| config.fonts.mono.clone())
+                    .trim()
+                    .to_string();
+
+                // Load palette for theming
+                let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
+                let palette = Palette::load(&palette_path).unwrap_or_else(|_| {
+                    Palette { colors: std::collections::HashMap::new() }
+                });
+
+                if let Err(e) = tui::fonts::run_scratchpad_preview(&font_name, &config, &palette) {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(1);
+                }
+            } else if preview {
+                // Load palette for colors
+                let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
+                let palette = Palette::load(&palette_path).ok();
+
+                let accent_rgb = palette
+                    .as_ref()
+                    .and_then(|p| p.get(&config.accent))
+                    .map(|c| (c.r, c.g, c.b));
+                let subtext_rgb = palette
+                    .as_ref()
+                    .and_then(|p| p.get("subtext0"))
+                    .map(|c| (c.r, c.g, c.b));
+
+                fonts::preview_font_styled(&config.fonts.mono, accent_rgb, subtext_rgb);
+            } else if interactive {
                 // Interactive TUI picker
                 if !tui::is_tty() {
                     eprintln!("Interactive mode requires a terminal");
@@ -443,7 +471,7 @@ fn main() {
                 let print_font = |font: &fonts::FontListing, is_current: bool| {
                     let status = if font.installed { format!("{}✓{}", green, reset) } else { " ".to_string() };
                     let lig = if font.ligatures { format!("{}lig{}", dim, reset) } else { "   ".to_string() };
-                    let nerd = if font.nerd_font { format!("{}\u{f002d}{}", dim, reset) } else { " ".to_string() };
+                    let nerd = if font.nerd_font { format!("{}nf{}", dim, reset) } else { "  ".to_string() };
 
                     // Highlight current font with accent color
                     let (name_start, name_end) = if is_current {
@@ -494,7 +522,7 @@ fn main() {
                 }
 
                 println!();
-                println!("{}✓{} installed  {}lig{} ligatures  {}\u{f002d}{} nerd font", green, reset, dim, reset, dim, reset);
+                println!("{}✓{} installed  {}lig{} ligatures  {}nf{} nerd font", green, reset, dim, reset, dim, reset);
             } else if let Some(key_value) = set {
                 // Parse key=value
                 let parts: Vec<&str> = key_value.splitn(2, '=').collect();

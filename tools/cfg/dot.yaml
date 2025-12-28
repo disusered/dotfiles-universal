@@ -3,3 +3,5 @@ linux[whoami.distro^="Arch"]:
     cmd: cargo build --release
   links:
     target/release/cfg: ~/.local/bin/cfg
+    fonts.toml: {{ dirs.base.config }}/pypr/conf.d/fonts.toml
+    fonts.conf: {{ dirs.base.config }}/hypr/conf.d/fonts.conf

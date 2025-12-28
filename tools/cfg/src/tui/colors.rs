@@ -66,6 +66,8 @@ pub struct ColorPicker {
     /// Original config values to detect changes
     original_accent: String,
     original_secondary: String,
+    /// Content area for mouse click detection
+    content_area: Rect,
 }
 
 /// Theme colors from catppuccin for UI rendering
@@ -154,6 +156,7 @@ impl ColorPicker {
             should_apply: false,
             original_accent,
             original_secondary,
+            content_area: Rect::default(),
         }
     }
 
@@ -261,6 +264,7 @@ impl ColorPicker {
             .split(area);
 
         self.render_header(frame, chunks[0]);
+        self.content_area = chunks[1];
         self.render_content(frame, chunks[1]);
         self.render_footer(frame, chunks[2]);
 
@@ -653,6 +657,20 @@ impl ColorPicker {
                 match mouse.kind {
                     MouseEventKind::ScrollDown => self.move_down(),
                     MouseEventKind::ScrollUp => self.move_up(),
+                    MouseEventKind::Down(crossterm::event::MouseButton::Left) => {
+                        // Check if click is within content area (accounting for border)
+                        let inner = self.content_area.inner(ratatui::layout::Margin {
+                            horizontal: 1,
+                            vertical: 1,
+                        });
+                        if mouse.row >= inner.y && mouse.row < inner.y + inner.height {
+                            let clicked_row = (mouse.row - inner.y) as usize;
+                            if clicked_row < self.filtered.len() {
+                                self.selected = clicked_row;
+                                self.list_state.select(Some(self.selected));
+                            }
+                        }
+                    }
                     _ => {}
                 }
             }
