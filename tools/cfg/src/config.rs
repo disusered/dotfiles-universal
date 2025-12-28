@@ -14,6 +14,8 @@ pub struct Config {
     pub gtk_theme: String,
     #[serde(default = "default_qt_style")]
     pub qt_style: String,
+    #[serde(default = "default_shader")]
+    pub shader: String,
     #[serde(default)]
     pub fonts: FontConfig,
 }
@@ -62,6 +64,10 @@ fn default_qt_style() -> String {
     "Darkly".to_string()
 }
 
+fn default_shader() -> String {
+    "off".to_string()
+}
+
 impl Config {
     /// Load config from a TOML file
     pub fn load(path: &str) -> Result<Self, String> {
@@ -94,6 +100,7 @@ impl Config {
             "icon_theme" => Some(self.icon_theme.clone()),
             "gtk_theme" => Some(self.gtk_theme.clone()),
             "qt_style" => Some(self.qt_style.clone()),
+            "shader" => Some(self.shader.clone()),
             "fonts.mono" => Some(self.fonts.mono.clone()),
             "fonts.mono_size" => Some(self.fonts.mono_size.to_string()),
             "fonts.sans" => Some(self.fonts.sans.clone()),
@@ -134,6 +141,10 @@ impl Config {
                 self.qt_style = value.to_string();
                 Ok(())
             }
+            "shader" => {
+                self.shader = value.to_string();
+                Ok(())
+            }
             "fonts.mono" => {
                 self.fonts.mono = value.to_string();
                 Ok(())
@@ -168,6 +179,7 @@ impl Default for Config {
             icon_theme: "Papirus-Dark".to_string(),
             gtk_theme: "Adwaita".to_string(),
             qt_style: "Darkly".to_string(),
+            shader: "off".to_string(),
             fonts: FontConfig::default(),
         }
     }

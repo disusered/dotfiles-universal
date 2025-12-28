@@ -20,6 +20,24 @@ use super::{init, restore};
 /// Color formats supported by the picker
 const FORMATS: &[&str] = &["hex-hash", "hex", "rgb", "rgb-css", "hyprlang", "tera"];
 
+/// Human-readable format labels
+const FORMAT_LABELS: &[(&str, &str)] = &[
+    ("hex-hash", "hex"),
+    ("hex", "hex (no #)"),
+    ("rgb", "rgb"),
+    ("rgb-css", "rgb()"),
+    ("hyprlang", "hyprlang"),
+    ("tera", "tera"),
+];
+
+fn format_label(fmt: &str) -> &'static str {
+    FORMAT_LABELS
+        .iter()
+        .find(|(k, _)| *k == fmt)
+        .map(|(_, v)| *v)
+        .unwrap_or("unknown")
+}
+
 /// Accent colors (can be set as accent/secondary)
 const ACCENT_COLORS: &[&str] = &[
     "rosewater", "flamingo", "pink", "mauve", "red", "maroon",
@@ -715,6 +733,13 @@ impl ColorPicker {
             lines.push(Line::from(""));
             line_count += 1;
 
+            // Formats section header
+            lines.push(Line::from(Span::styled(
+                "─── Formats ───",
+                Style::default().fg(theme.surface1),
+            )));
+            line_count += 1;
+
             // Show format values for the MODIFIED color
             let display_color = if has_modifier { &modified } else { &original };
             for (i, fmt) in FORMATS.iter().enumerate() {
@@ -723,21 +748,26 @@ impl ColorPicker {
                 } else {
                     format_color(display_color, fmt, 1.0)
                 };
-                let style = if i == self.format_idx {
+                let is_selected = i == self.format_idx;
+                let label_style = Style::default().fg(theme.overlay1);
+                let value_style = if is_selected {
                     Style::default().fg(theme.accent).add_modifier(Modifier::BOLD)
                 } else {
                     Style::default().fg(theme.subtext0)
                 };
-                lines.push(Line::from(Span::styled(value, style)));
+                lines.push(Line::from(vec![
+                    Span::styled(format!("{}: ", format_label(fmt)), label_style),
+                    Span::styled(value, value_style),
+                ]));
                 line_count += 1;
             }
 
             lines.push(Line::from(""));
             line_count += 1;
 
-            // Modifier controls section - Photoshop-like layered controls
+            // Modifier controls section
             lines.push(Line::from(Span::styled(
-                "─────────────────",
+                "─── Modify ───",
                 Style::default().fg(theme.surface1),
             )));
             line_count += 1;
@@ -865,6 +895,13 @@ impl ColorPicker {
             lines.push(Line::from(""));
             line_count += 1;
 
+            // Formats section header
+            lines.push(Line::from(Span::styled(
+                "─── Formats ───",
+                Style::default().fg(theme.surface1),
+            )));
+            line_count += 1;
+
             // Show format values for the MODIFIED color
             let display_color = if has_modifier { &modified } else { &original };
             for (i, fmt) in FORMATS.iter().enumerate() {
@@ -873,12 +910,17 @@ impl ColorPicker {
                 } else {
                     format_color(display_color, fmt, 1.0)
                 };
-                let style = if i == self.format_idx {
+                let is_selected = i == self.format_idx;
+                let label_style = Style::default().fg(theme.overlay1);
+                let value_style = if is_selected {
                     Style::default().fg(theme.accent).add_modifier(Modifier::BOLD)
                 } else {
                     Style::default().fg(theme.subtext0)
                 };
-                lines.push(Line::from(Span::styled(value, style)));
+                lines.push(Line::from(vec![
+                    Span::styled(format!("{}: ", format_label(fmt)), label_style),
+                    Span::styled(value, value_style),
+                ]));
                 line_count += 1;
             }
 
@@ -887,7 +929,7 @@ impl ColorPicker {
 
             // Modifier controls section
             lines.push(Line::from(Span::styled(
-                "─────────────────",
+                "─── Modify ───",
                 Style::default().fg(theme.surface1),
             )));
             line_count += 1;

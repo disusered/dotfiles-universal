@@ -94,6 +94,27 @@ enum Command {
         #[arg(long, group = "mode", hide = true)]
         scratchpad: bool,
     },
+    /// Screen shader configuration (hyprshade)
+    Shader {
+        /// Get current shader
+        #[arg(long, group = "mode")]
+        get: bool,
+        /// Set a shader (use 'off' to disable)
+        #[arg(long, group = "mode")]
+        set: Option<String>,
+        /// List available shaders
+        #[arg(long, group = "mode")]
+        list: bool,
+        /// Turn on current shader from config
+        #[arg(long, group = "mode")]
+        on: bool,
+        /// Turn off shaders
+        #[arg(long, group = "mode")]
+        off: bool,
+        /// Toggle between current shader and off
+        #[arg(long, group = "mode")]
+        toggle: bool,
+    },
 }
 
 /// Get the cfg configuration directory
@@ -200,12 +221,32 @@ fn update_apps(cfg_dir: &str, dotfiles_dir: &str, app_names: &[String], dry_run:
             if let Some(tpl_config) = templates.get(name) {
                 if let Some(cmd) = &tpl_config.reload {
                     print!("  {}... ", name);
-                    match reload_app(cmd) {
-                        Ok(()) => println!("ok"),
-                        Err(e) => println!("failed: {}", e),
-                    }
+                match reload_app(cmd) {
+                    Ok(()) => println!("ok"),
+                    Err(e) => println!("failed: {}", e),
                 }
             }
+        }
+    }
+}
+
+    // Phase 3: Shaders (if not disabled)
+    if !dry_run {
+        if config.shader != "off" {
+            println!("\nApplying shader...");
+            print!("  {}... ", config.shader);
+            let status = std::process::Command::new("hyprshade")
+                .arg("on")
+                .arg(&config.shader)
+                .status();
+            
+            match status {
+                Ok(s) if s.success() => println!("ok"),
+                _ => println!("failed"),
+            }
+        } else {
+            // Ensure off if configured off
+            let _ = std::process::Command::new("hyprshade").arg("off").status();
         }
     }
 }
@@ -615,6 +656,124 @@ fn main() {
                 println!("mono_size={}", config.fonts.mono_size);
                 println!("sans={}", config.fonts.sans);
                 println!("sans_size={}", config.fonts.sans_size);
+            }
+        }
+        Command::Shader { get, set, list, on, off, toggle } => {
+            let cfg_dir = get_cfg_dir();
+            let config_path = format!("{}/config.toml", cfg_dir);
+            let mut config = Config::load(&config_path).unwrap_or_default();
+
+            if list {
+                let output = std::process::Command::new("hyprshade")
+                    .arg("ls")
+                    .output()
+                    .expect("Failed to run hyprshade ls");
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                for line in stdout.lines() {
+                    let trimmed = line.trim();
+                    if !trimmed.is_empty() 
+                        && !trimmed.to_lowercase().contains("readme") 
+                        && !trimmed.contains(" ") 
+                        && !trimmed.contains(".") 
+                    {
+                        println!("  {}", trimmed);
+                    }
+                }
+            } else if get {
+                println!("{}", config.shader);
+            } else if let Some(mut shader_name) = set {
+                if shader_name == "off" || shader_name == "none" || shader_name == "null" {
+                    shader_name = "off".to_string();
+                }
+
+                if shader_name == "off" {
+                    std::process::Command::new("hyprshade")
+                        .arg("off")
+                        .status()
+                        .expect("Failed to run hyprshade off");
+                    config.shader = "off".to_string();
+                } else {
+                    let status = std::process::Command::new("hyprshade")
+                        .arg("on")
+                        .arg(&shader_name)
+                        .status()
+                        .expect("Failed to run hyprshade on");
+
+                    if status.success() {
+                        config.shader = shader_name.clone();
+                    } else {
+                        eprintln!("Failed to apply shader: {}", shader_name);
+                        std::process::exit(1);
+                    }
+                }
+
+                if let Err(e) = config.save(&config_path) {
+                    eprintln!("Error saving config: {}", e);
+                }
+                println!("Shader set to: {}", config.shader);
+            } else if on {
+                if config.shader == "off" {
+                    eprintln!("No shader currently set in config. Use --set <name> first.");
+                    std::process::exit(1);
+                }
+                let status = std::process::Command::new("hyprshade")
+                    .arg("on")
+                    .arg(&config.shader)
+                    .status()
+                    .expect("Failed to run hyprshade on");
+                if status.success() {
+                    println!("Shader turned on: {}", config.shader);
+                } else {
+                    eprintln!("Failed to turn on shader: {}", config.shader);
+                    std::process::exit(1);
+                }
+            } else if off {
+                std::process::Command::new("hyprshade")
+                    .arg("off")
+                    .status()
+                    .expect("Failed to run hyprshade off");
+                println!("Shaders turned off (config retained)");
+            } else if toggle {
+                let output = std::process::Command::new("hyprshade")
+                    .arg("current")
+                    .output()
+                    .expect("Failed to run hyprshade current");
+                let current = String::from_utf8_lossy(&output.stdout).trim().to_string();
+
+                if !current.is_empty() {
+                    // Turn off
+                    std::process::Command::new("hyprshade")
+                        .arg("off")
+                        .status()
+                        .expect("Failed to run hyprshade off");
+                    println!("Shader turned off (was: {})", current);
+                } else {
+                    // Turn on
+                    if config.shader == "off" {
+                        eprintln!("No shader to toggle to. Use --set <name> first.");
+                        std::process::exit(1);
+                    }
+                    let status = std::process::Command::new("hyprshade")
+                        .arg("on")
+                        .arg(&config.shader)
+                        .status()
+                        .expect("Failed to run hyprshade on");
+                    if status.success() {
+                        println!("Shader turned on: {}", config.shader);
+                    }
+                }
+            } else {
+                let output = std::process::Command::new("hyprshade")
+                    .arg("current")
+                    .output()
+                    .expect("Failed to run hyprshade current");
+                let current = String::from_utf8_lossy(&output.stdout).trim().to_string();
+                
+                let status_str = if current.is_empty() { "off" } else { &current };
+                let config_str = &config.shader;
+
+                println!("Current active: {}", status_str);
+                println!("Configured:     {}", config_str);
             }
         }
     }
