@@ -473,14 +473,36 @@ impl ColorPicker {
         frame.render_stateful_widget(search_widget, inner, &mut self.search);
     }
 
-    fn render_content(&mut self, frame: &mut Frame, area: Rect) {
-        let chunks = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints([Constraint::Percentage(65), Constraint::Percentage(35)])
-            .split(area);
+    /// Check if we should use wide (3-column) layout
+    fn is_wide_layout(&self, width: u16) -> bool {
+        width >= 120
+    }
 
-        self.render_color_list(frame, chunks[0]);
-        self.render_preview(frame, chunks[1]);
+    fn render_content(&mut self, frame: &mut Frame, area: Rect) {
+        if self.is_wide_layout(area.width) {
+            // Wide layout: Colors | Modify | Preview
+            let chunks = Layout::default()
+                .direction(Direction::Horizontal)
+                .constraints([
+                    Constraint::Percentage(40),
+                    Constraint::Percentage(30),
+                    Constraint::Percentage(30),
+                ])
+                .split(area);
+
+            self.render_color_list(frame, chunks[0]);
+            self.render_modify_pane(frame, chunks[1]);
+            self.render_swatch_column(frame, chunks[2]);
+        } else {
+            // Normal layout: Colors | Preview+Modify combined
+            let chunks = Layout::default()
+                .direction(Direction::Horizontal)
+                .constraints([Constraint::Percentage(65), Constraint::Percentage(35)])
+                .split(area);
+
+            self.render_color_list(frame, chunks[0]);
+            self.render_preview(frame, chunks[1]);
+        }
     }
 
     fn render_color_list(&mut self, frame: &mut Frame, area: Rect) {
@@ -642,22 +664,19 @@ impl ColorPicker {
 
             // Side-by-side swatches when modifier active
             if has_modifier {
-                // Larger swatches side by side
-                lines.push(Line::from(vec![
-                    Span::styled("██████", Style::default().fg(orig_swatch)),
-                    Span::raw("  "),
-                    Span::styled("██████", Style::default().fg(mod_swatch)),
-                ]));
-                lines.push(Line::from(vec![
-                    Span::styled("██████", Style::default().fg(orig_swatch)),
-                    Span::raw("  "),
-                    Span::styled("██████", Style::default().fg(mod_swatch)),
-                ]));
-                lines.push(Line::from(vec![
-                    Span::styled("██████", Style::default().fg(orig_swatch)),
-                    Span::raw("  "),
-                    Span::styled("██████", Style::default().fg(mod_swatch)),
-                ]));
+                // Calculate swatch width to fill available space
+                let available_width = inner.width.saturating_sub(2) as usize; // -2 for gap
+                let swatch_width = available_width / 2;
+                let swatch_str: String = "█".repeat(swatch_width);
+
+                // Larger swatches side by side (3 rows)
+                for _ in 0..3 {
+                    lines.push(Line::from(vec![
+                        Span::styled(swatch_str.clone(), Style::default().fg(orig_swatch)),
+                        Span::raw("  "),
+                        Span::styled(swatch_str.clone(), Style::default().fg(mod_swatch)),
+                    ]));
+                }
                 lines.push(Line::from(""));
                 line_count += 4;
 
@@ -678,10 +697,13 @@ impl ColorPicker {
                 ]));
                 line_count += 1;
             } else {
-                // Large single swatch when no modifier
-                lines.push(Line::from(Span::styled("██████████████", Style::default().fg(orig_swatch))));
-                lines.push(Line::from(Span::styled("██████████████", Style::default().fg(orig_swatch))));
-                lines.push(Line::from(Span::styled("██████████████", Style::default().fg(orig_swatch))));
+                // Large single swatch when no modifier - full width
+                let swatch_width = inner.width as usize;
+                let swatch_str: String = "█".repeat(swatch_width);
+
+                for _ in 0..3 {
+                    lines.push(Line::from(Span::styled(swatch_str.clone(), Style::default().fg(orig_swatch))));
+                }
                 lines.push(Line::from(""));
                 lines.push(Line::from(Span::styled(
                     entry_name.clone(),
@@ -782,6 +804,215 @@ impl ColorPicker {
             let para = Paragraph::new(lines);
             frame.render_widget(para, inner);
         }
+    }
+
+    /// Render modify pane (controls only, for wide layout)
+    fn render_modify_pane(&mut self, frame: &mut Frame, area: Rect) {
+        // Store preview area for mouse detection (same as regular preview)
+        self.preview_area = area;
+
+        let theme = &self.flavor_colors;
+        let border_color = if self.focus == Focus::Preview { theme.accent } else { theme.surface1 };
+        let block = Block::default()
+            .borders(Borders::ALL)
+            .border_style(Style::default().fg(border_color))
+            .title(if self.focus == Focus::Preview {
+                Span::styled(" Modify ", Style::default().fg(theme.accent))
+            } else {
+                Span::styled(" Modify ", Style::default().fg(theme.overlay1))
+            });
+
+        let inner = block.inner(area);
+        frame.render_widget(block, area);
+
+        // Copy data to avoid borrow issues
+        let entry_data = self.selected_color().map(|e| (e.name.clone(), e.color));
+        let modified = self.modified_color();
+        let blend_target_data = self.blend_target().map(|t| (t.name.clone(), t.color));
+        let tera_string = self.tera_filter_string();
+
+        if let Some((entry_name, original)) = entry_data {
+            let modified = modified.unwrap_or(original);
+            let has_modifier = self.has_modifications();
+
+            let mut lines = vec![Line::from("")];
+            let mut line_count = 1u16;
+
+            // Color name and modification summary
+            if has_modifier {
+                let mut mod_parts = Vec::new();
+                if self.modifier.blend_amount > 0 {
+                    if let Some((ref target_name, _)) = blend_target_data {
+                        mod_parts.push(format!("→{} {}%", target_name, self.modifier.blend_amount));
+                    }
+                }
+                if self.modifier.lightness != 0 {
+                    mod_parts.push(format!("{:+}%", self.modifier.lightness));
+                }
+                lines.push(Line::from(vec![
+                    Span::styled(&entry_name, Style::default().fg(theme.text).add_modifier(Modifier::BOLD)),
+                    Span::raw("  "),
+                    Span::styled(mod_parts.join(" "), Style::default().fg(theme.accent)),
+                ]));
+            } else {
+                lines.push(Line::from(Span::styled(
+                    entry_name.clone(),
+                    Style::default().fg(theme.text).add_modifier(Modifier::BOLD),
+                )));
+            }
+            line_count += 1;
+
+            lines.push(Line::from(""));
+            line_count += 1;
+
+            // Show format values for the MODIFIED color
+            let display_color = if has_modifier { &modified } else { &original };
+            for (i, fmt) in FORMATS.iter().enumerate() {
+                let value = if *fmt == "tera" {
+                    tera_string.clone().unwrap_or_default()
+                } else {
+                    format_color(display_color, fmt, 1.0)
+                };
+                let style = if i == self.format_idx {
+                    Style::default().fg(theme.accent).add_modifier(Modifier::BOLD)
+                } else {
+                    Style::default().fg(theme.subtext0)
+                };
+                lines.push(Line::from(Span::styled(value, style)));
+                line_count += 1;
+            }
+
+            lines.push(Line::from(""));
+            line_count += 1;
+
+            // Modifier controls section
+            lines.push(Line::from(Span::styled(
+                "─────────────────",
+                Style::default().fg(theme.surface1),
+            )));
+            line_count += 1;
+
+            // Track lightness control row
+            self.lightness_row = inner.y + line_count;
+
+            // Lightness dial
+            let lightness_focused = self.focus == Focus::Preview && self.modify_focus == 0;
+            let lightness_label = if lightness_focused {
+                Span::styled("Lightness: ", Style::default().fg(theme.accent))
+            } else {
+                Span::styled("Lightness: ", Style::default().fg(theme.overlay1))
+            };
+            let lightness_bar = self.render_dial(self.modifier.lightness, lightness_focused, theme);
+            lines.push(Line::from(vec![
+                lightness_label,
+                Span::styled(
+                    format!("{:+4}", self.modifier.lightness),
+                    Style::default().fg(theme.text).add_modifier(Modifier::BOLD),
+                ),
+            ]));
+            lines.push(lightness_bar);
+            line_count += 2;
+
+            lines.push(Line::from(""));
+            line_count += 1;
+
+            // Track blend control row
+            self.blend_row = inner.y + line_count;
+
+            // Blend control
+            let blend_focused = self.focus == Focus::Preview && self.modify_focus == 1;
+            let blend_label = if blend_focused {
+                Span::styled("Blend:     ", Style::default().fg(theme.accent))
+            } else {
+                Span::styled("Blend:     ", Style::default().fg(theme.overlay1))
+            };
+            let blend_bar = self.render_slider(self.modifier.blend_amount, blend_focused, theme);
+            lines.push(Line::from(vec![
+                blend_label,
+                Span::styled(
+                    format!("{:>3}%", self.modifier.blend_amount),
+                    Style::default().fg(theme.text).add_modifier(Modifier::BOLD),
+                ),
+            ]));
+            lines.push(blend_bar);
+
+            // Show blend target if blend amount > 0
+            if self.modifier.blend_amount > 0 {
+                let (target_name, target_color) = match &blend_target_data {
+                    Some((name, color)) => (name.as_str(), Color::Rgb(color.r, color.g, color.b)),
+                    None => ("none", theme.text),
+                };
+                lines.push(Line::from(vec![
+                    Span::styled("  Target:  ", Style::default().fg(theme.overlay1)),
+                    Span::styled("██", Style::default().fg(target_color)),
+                    Span::raw(" "),
+                    Span::styled(target_name.to_string(), Style::default().fg(theme.text)),
+                    Span::styled(" (» in list)", Style::default().fg(theme.overlay0)),
+                ]));
+            }
+
+            let para = Paragraph::new(lines);
+            frame.render_widget(para, inner);
+        }
+    }
+
+    /// Render swatch column (full-height color preview, for wide layout)
+    fn render_swatch_column(&self, frame: &mut Frame, area: Rect) {
+        let theme = &self.flavor_colors;
+
+        let entry_data = self.selected_color().map(|e| (e.name.clone(), e.color));
+        let modified = self.modified_color();
+
+        if let Some((entry_name, original)) = entry_data {
+            let orig_swatch = Color::Rgb(original.r, original.g, original.b);
+            let has_modifier = self.has_modifications();
+
+            if has_modifier {
+                let modified = modified.unwrap_or(original);
+                let mod_swatch = Color::Rgb(modified.r, modified.g, modified.b);
+
+                // Split vertically: original on top, modified on bottom
+                let chunks = Layout::default()
+                    .direction(Direction::Vertical)
+                    .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
+                    .split(area);
+
+                // Original swatch (top half) - title in border
+                self.render_full_swatch_block(frame, chunks[0], orig_swatch, &entry_name, theme);
+
+                // Modified swatch (bottom half) - title in border
+                self.render_full_swatch_block(frame, chunks[1], mod_swatch, "modified", theme);
+            } else {
+                // Full height single swatch with name in border
+                self.render_full_swatch_block(frame, area, orig_swatch, &entry_name, theme);
+            }
+        }
+    }
+
+    /// Helper to render a full-area color swatch with border and title
+    fn render_full_swatch_block(&self, frame: &mut Frame, area: Rect, color: Color, title: &str, theme: &FlavorTheme) {
+        let block = Block::default()
+            .borders(Borders::ALL)
+            .border_style(Style::default().fg(theme.surface1))
+            .title(Span::styled(format!(" {} ", title), Style::default().fg(theme.overlay1)));
+
+        let inner = block.inner(area);
+        frame.render_widget(block, area);
+
+        // Fill entire inner area with swatch color
+        let swatch_char = "█";
+        let width = inner.width as usize;
+        let mut lines = Vec::new();
+
+        for _ in 0..inner.height {
+            lines.push(Line::from(Span::styled(
+                swatch_char.repeat(width),
+                Style::default().fg(color),
+            )));
+        }
+
+        let para = Paragraph::new(lines);
+        frame.render_widget(para, inner);
     }
 
     /// Render a visual dial for lightness (-100 to +100)
