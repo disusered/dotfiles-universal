@@ -3,4 +3,5 @@ animation = "fromTop"
 command = "app2unit -s b -- kitty --class fastfetch_scratch sh -c 'fastfetch; tput civis; read -r _'"
 class = "fastfetch_scratch"
 size = "734px 625px"
-lazy = true
+preserve_aspect = false
+lazy = false

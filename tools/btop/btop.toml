@@ -2,5 +2,6 @@
 animation = "fromTop"
 command = "app2unit -s b -- kitty --class btop_scratch btop"
 size = "70% 70%"
+preserve_aspect = false
 class = "btop_scratch"
-lazy = true
+lazy = false

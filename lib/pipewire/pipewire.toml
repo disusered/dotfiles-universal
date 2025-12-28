@@ -5,6 +5,7 @@ class = "org.pulseaudio.pavucontrol"
 size = "25% 60%"
 position = "74% 4%"
 unfocus = "hide"
+preserve_aspect = false
 lazy = false
 
 [scratchpads.helvum]
@@ -15,3 +16,4 @@ size = "50% 60%"
 position = "49% 4%"
 unfocus = "hide"
 lazy = true
+close_on_hide = true

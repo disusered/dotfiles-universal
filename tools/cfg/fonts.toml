@@ -3,4 +3,6 @@ animation = "fromTop"
 command = "sh -c 'kitty --class fonts_scratch -o \"font_family=$(cat /tmp/cfg-font-preview)\" cfg font --scratchpad'"
 class = "fonts_scratch"
 size = "25% 60%"
-lazy = false
+lazy = true
+close_on_hide = true
+preserve_aspect = false
