@@ -1,6 +1,6 @@
 [scratchpads.pavucontrol]
 animation = "fromRight"
-command = "app2unit -s -b -- pavucontrol"
+command = "app2unit -s b -- pavucontrol"
 class = "org.pulseaudio.pavucontrol"
 size = "25% 60%"
 position = "74% 4%"
