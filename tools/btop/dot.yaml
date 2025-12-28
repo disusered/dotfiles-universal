@@ -5,3 +5,4 @@ linux[whoami.distro^="Arch"]:
     catppuccin_mocha.theme: {{ dirs.base.config }}/btop/themes/catppuccin_mocha.theme
     btop.conf: {{ dirs.base.config }}/hypr/conf.d/btop.conf
     btop.toml: {{ dirs.base.config }}/pypr/conf.d/btop.toml
+    btop.desktop: {{ dirs.base.data }}/applications/btop.desktop

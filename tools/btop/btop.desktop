@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=btop
+Comment=Resource monitor that shows usage and stats
+Exec=pypr-client toggle btop
+Icon=btop
+Terminal=false
+Categories=System;Monitor;
+Keywords=system;process;monitor;resource;cpu;memory;
