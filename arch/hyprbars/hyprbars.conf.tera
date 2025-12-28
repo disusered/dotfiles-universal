@@ -26,4 +26,4 @@ plugin {
 }
 
 # Window rule: Disable hyprbars on tiled windows (only show on floating)
-windowrule = plugin:hyprbars:nobar, floating:0
+windowrule = match:float false, hyprbars:no_bar true
