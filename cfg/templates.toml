@@ -33,6 +33,13 @@ gtk2-settings = { path = "arch/nwg-look/gtkrc-2.0.tera" }
 xsettingsd = { path = "arch/nwg-look/xsettingsd.conf.tera" }
 gtk3-css = { path = "arch/nwg-look/gtk.css.tera" }
 gtk4-css = { path = "arch/nwg-look/gtk-4.0/gtk.css.tera" }
+libadwaita = { path = "arch/nwg-look/gtk-4.0/libadwaita.css.tera" }
+libadwaita-tweaks = { path = "arch/nwg-look/gtk-4.0/libadwaita-tweaks.css.tera" }
+gtk4-dark-css = { path = "arch/nwg-look/gtk-4.0/gtk-dark.css.tera" }
+gtk4-bullet-svg = { path = "arch/nwg-look/gtk-4.0/assets/bullet-symbolic.svg.tera" }
+gtk4-check-svg = { path = "arch/nwg-look/gtk-4.0/assets/check-symbolic.svg.tera" }
+gtk4-dash-svg = { path = "arch/nwg-look/gtk-4.0/assets/dash-symbolic.svg.tera" }
+gtk4-devel-svg = { path = "arch/nwg-look/gtk-4.0/assets/devel-symbolic.svg.tera" }
 
 # KDE / Dolphin
 kdeglobals = { path = "arch/dolphin/kdeglobals.tera" }

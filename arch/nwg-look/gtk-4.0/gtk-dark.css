@@ -1,1 +1,2 @@
-/usr/share/themes/adw-gtk3-dark/gtk-4.0/gtk-dark.css
+/* Dark theme - same as gtk.css since catppuccin mocha is already dark */
+@import url('gtk.css');
