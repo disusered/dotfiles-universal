@@ -49,6 +49,24 @@ enum Mode {
     Confirm,
 }
 
+/// Which pane has focus
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+enum Focus {
+    #[default]
+    List,
+    Preview,
+}
+
+/// Color modifier types matching tera template filters
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+enum ModifierType {
+    #[default]
+    None,
+    Lighten,
+    Darken,
+    Blend,
+}
+
 pub struct ColorPicker {
     colors: Vec<ColorEntry>,
     filtered: Vec<usize>,
@@ -70,6 +88,18 @@ pub struct ColorPicker {
     content_area: Rect,
     /// Maps visual row index to filtered data index (for mouse clicks)
     row_to_data: Vec<Option<usize>>,
+    /// Current color modifier type
+    modifier_type: ModifierType,
+    /// Modifier amount (0-100)
+    modifier_amount: u8,
+    /// Input buffer for typing modifier amount directly
+    modifier_input: String,
+    /// Track last selected index to detect changes
+    last_selected: usize,
+    /// Which pane has focus
+    focus: Focus,
+    /// Secondary selection for blend target (index into filtered)
+    blend_selection: usize,
 }
 
 /// Theme colors from catppuccin for UI rendering
@@ -160,6 +190,12 @@ impl ColorPicker {
             original_secondary,
             content_area: Rect::default(),
             row_to_data: Vec::new(),
+            modifier_type: ModifierType::None,
+            modifier_amount: 15,
+            modifier_input: String::new(),
+            last_selected: 0,
+            focus: Focus::List,
+            blend_selection: 1, // Start at second color
         }
     }
 
@@ -178,6 +214,76 @@ impl ColorPicker {
 
     fn selected_color(&self) -> Option<&ColorEntry> {
         self.filtered.get(self.selected).and_then(|&i| self.colors.get(i))
+    }
+
+    /// Get the blend target color (from filtered list via blend_selection)
+    fn blend_target(&self) -> Option<&ColorEntry> {
+        self.filtered.get(self.blend_selection)
+            .and_then(|&i| self.colors.get(i))
+    }
+
+    /// Compute the modified color based on current modifier settings
+    fn modified_color(&self) -> Option<CfgColor> {
+        let entry = self.selected_color()?;
+        let base = &entry.color;
+
+        Some(match self.modifier_type {
+            ModifierType::None => *base,
+            ModifierType::Lighten => base.lighten(self.modifier_amount),
+            ModifierType::Darken => base.darken(self.modifier_amount),
+            ModifierType::Blend => {
+                if let Some(target) = self.blend_target() {
+                    base.blend(&target.color, 100 - self.modifier_amount)
+                } else {
+                    *base
+                }
+            }
+        })
+    }
+
+    /// Move blend selection up
+    fn blend_select_up(&mut self) {
+        if !self.filtered.is_empty() && self.blend_selection > 0 {
+            self.blend_selection -= 1;
+        }
+    }
+
+    /// Move blend selection down
+    fn blend_select_down(&mut self) {
+        if !self.filtered.is_empty() && self.blend_selection < self.filtered.len() - 1 {
+            self.blend_selection += 1;
+        }
+    }
+
+    /// Reset modifier state (called when selection changes)
+    fn reset_modifier(&mut self) {
+        self.modifier_type = ModifierType::None;
+        self.modifier_amount = 15;
+        self.modifier_input.clear();
+    }
+
+    /// Increase modifier amount by step
+    fn increase_amount(&mut self, step: u8) {
+        self.modifier_amount = self.modifier_amount.saturating_add(step).min(100);
+        self.modifier_input.clear();
+    }
+
+    /// Decrease modifier amount by step
+    fn decrease_amount(&mut self, step: u8) {
+        self.modifier_amount = self.modifier_amount.saturating_sub(step);
+        self.modifier_input.clear();
+    }
+
+    /// Handle digit input for modifier amount
+    fn handle_amount_digit(&mut self, digit: char) {
+        self.modifier_input.push(digit);
+        if let Ok(amount) = self.modifier_input.parse::<u8>() {
+            self.modifier_amount = amount.min(100);
+        }
+        // Reset input after 3 digits or if > 100
+        if self.modifier_input.len() >= 3 || self.modifier_amount >= 100 {
+            self.modifier_input.clear();
+        }
     }
 
     fn update_filter(&mut self) {
@@ -230,8 +336,8 @@ impl ColorPicker {
     }
 
     fn copy_selected(&mut self) {
-        if let Some(entry) = self.selected_color() {
-            let formatted = format_color(&entry.color, self.current_format(), 1.0);
+        if let Some(color) = self.modified_color() {
+            let formatted = format_color(&color, self.current_format(), 1.0);
             clipboard::copy(&formatted);
             self.toast = Some(Toast::new(format!("Copied: {}", formatted))
                 .style(Style::default().fg(self.flavor_colors.green))
@@ -321,9 +427,15 @@ impl ColorPicker {
 
     fn render_color_list(&mut self, frame: &mut Frame, area: Rect) {
         let theme = &self.flavor_colors;
+        let border_color = if self.focus == Focus::List { theme.accent } else { theme.surface1 };
         let block = Block::default()
             .borders(Borders::ALL)
-            .border_style(Style::default().fg(theme.surface1));
+            .border_style(Style::default().fg(border_color))
+            .title(if self.focus == Focus::List {
+                Span::styled(" Colors ", Style::default().fg(theme.accent))
+            } else {
+                Span::styled(" Colors ", Style::default().fg(theme.overlay1))
+            });
 
         let inner = block.inner(area);
         frame.render_widget(block, area);
@@ -361,9 +473,19 @@ impl ColorPicker {
             let swatch_color = Color::Rgb(c.r, c.g, c.b);
             let is_current = entry.name == self.config.accent || entry.name == self.config.secondary;
             let is_selected = idx == self.selected;
+            let is_blend_target = self.modifier_type == ModifierType::Blend && idx == self.blend_selection;
+
+            // Show selection indicator: > for primary, » for blend target
+            let indicator = if is_selected {
+                Span::styled("> ", Style::default().fg(theme.accent))
+            } else if is_blend_target {
+                Span::styled("» ", Style::default().fg(theme.green))
+            } else {
+                Span::raw("  ")
+            };
 
             let mut spans = vec![
-                Span::raw("  "),
+                indicator,
                 Span::styled("██", Style::default().fg(swatch_color)),
                 Span::raw(" "),
             ];
@@ -399,6 +521,8 @@ impl ColorPicker {
 
             let style = if is_selected {
                 Style::default().bg(theme.surface0)
+            } else if is_blend_target {
+                Style::default().bg(theme.surface0)
             } else {
                 Style::default()
             };
@@ -426,32 +550,79 @@ impl ColorPicker {
 
     fn render_preview(&self, frame: &mut Frame, area: Rect) {
         let theme = &self.flavor_colors;
+        let border_color = if self.focus == Focus::Preview { theme.accent } else { theme.surface1 };
         let block = Block::default()
             .borders(Borders::ALL)
-            .border_style(Style::default().fg(theme.surface1))
-            .title(Span::styled(" Preview ", Style::default().fg(theme.overlay1)));
+            .border_style(Style::default().fg(border_color))
+            .title(if self.focus == Focus::Preview {
+                Span::styled(" Modify ", Style::default().fg(theme.accent))
+            } else {
+                Span::styled(" Preview ", Style::default().fg(theme.overlay1))
+            });
 
         let inner = block.inner(area);
         frame.render_widget(block, area);
 
         if let Some(entry) = self.selected_color() {
-            let c = &entry.color;
-            let swatch_color = Color::Rgb(c.r, c.g, c.b);
+            let original = &entry.color;
+            let modified = self.modified_color().unwrap_or(*original);
+            let orig_swatch = Color::Rgb(original.r, original.g, original.b);
+            let mod_swatch = Color::Rgb(modified.r, modified.g, modified.b);
 
-            let mut lines = vec![
-                Line::from(""),
-                Line::from(Span::styled("████████", Style::default().fg(swatch_color))),
-                Line::from(Span::styled("████████", Style::default().fg(swatch_color))),
-                Line::from(""),
-                Line::from(Span::styled(
+            let has_modifier = self.modifier_type != ModifierType::None;
+
+            let mut lines = vec![Line::from("")];
+
+            // Side-by-side swatches when modifier active
+            if has_modifier {
+                // Larger swatches side by side
+                lines.push(Line::from(vec![
+                    Span::styled("██████", Style::default().fg(orig_swatch)),
+                    Span::raw("  "),
+                    Span::styled("██████", Style::default().fg(mod_swatch)),
+                ]));
+                lines.push(Line::from(vec![
+                    Span::styled("██████", Style::default().fg(orig_swatch)),
+                    Span::raw("  "),
+                    Span::styled("██████", Style::default().fg(mod_swatch)),
+                ]));
+                lines.push(Line::from(vec![
+                    Span::styled("██████", Style::default().fg(orig_swatch)),
+                    Span::raw("  "),
+                    Span::styled("██████", Style::default().fg(mod_swatch)),
+                ]));
+                lines.push(Line::from(""));
+
+                // Labels with modifier info
+                let modifier_label = match self.modifier_type {
+                    ModifierType::Lighten => format!("+{}%", self.modifier_amount),
+                    ModifierType::Darken => format!("-{}%", self.modifier_amount),
+                    ModifierType::Blend => format!("→{}%", self.modifier_amount),
+                    ModifierType::None => String::new(),
+                };
+                lines.push(Line::from(vec![
+                    Span::styled(&entry.name, Style::default().fg(theme.subtext0)),
+                    Span::raw("  "),
+                    Span::styled(modifier_label, Style::default().fg(theme.accent)),
+                ]));
+            } else {
+                // Large single swatch when no modifier
+                lines.push(Line::from(Span::styled("██████████████", Style::default().fg(orig_swatch))));
+                lines.push(Line::from(Span::styled("██████████████", Style::default().fg(orig_swatch))));
+                lines.push(Line::from(Span::styled("██████████████", Style::default().fg(orig_swatch))));
+                lines.push(Line::from(""));
+                lines.push(Line::from(Span::styled(
                     &entry.name,
                     Style::default().fg(theme.text).add_modifier(Modifier::BOLD),
-                )),
-                Line::from(""),
-            ];
+                )));
+            }
 
+            lines.push(Line::from(""));
+
+            // Show format values for the MODIFIED color
+            let display_color = if has_modifier { &modified } else { original };
             for (i, fmt) in FORMATS.iter().enumerate() {
-                let value = format_color(c, fmt, 1.0);
+                let value = format_color(display_color, fmt, 1.0);
                 let style = if i == self.format_idx {
                     Style::default().fg(theme.accent).add_modifier(Modifier::BOLD)
                 } else {
@@ -461,10 +632,58 @@ impl ColorPicker {
             }
 
             lines.push(Line::from(""));
+
+            // Modifier controls section
             lines.push(Line::from(Span::styled(
-                format!("Tab: {}", self.current_format()),
-                Style::default().fg(theme.overlay1),
+                "─────────────────",
+                Style::default().fg(theme.surface1),
             )));
+
+            // Modifier type buttons
+            let btn = |label: &str, active: bool| -> Span {
+                if active {
+                    Span::styled(format!("[{}]", label), Style::default().fg(theme.accent).add_modifier(Modifier::BOLD))
+                } else {
+                    Span::styled(format!(" {} ", label), Style::default().fg(theme.overlay1))
+                }
+            };
+
+            lines.push(Line::from(vec![
+                btn("L", self.modifier_type == ModifierType::Lighten),
+                Span::raw(" "),
+                btn("D", self.modifier_type == ModifierType::Darken),
+                Span::raw(" "),
+                btn("B", self.modifier_type == ModifierType::Blend),
+            ]));
+
+            // Amount control
+            if has_modifier {
+                lines.push(Line::from(vec![
+                    Span::styled("Amount: ", Style::default().fg(theme.overlay1)),
+                    Span::styled(
+                        format!("{:>3}", self.modifier_amount),
+                        Style::default().fg(theme.text).add_modifier(Modifier::BOLD),
+                    ),
+                    Span::styled(" [+/-]", Style::default().fg(theme.overlay1)),
+                ]));
+
+                // Blend target (only for blend mode)
+                if self.modifier_type == ModifierType::Blend {
+                    let target_name = self.blend_target()
+                        .map(|t| t.name.as_str())
+                        .unwrap_or("none");
+                    let target_color = self.blend_target()
+                        .map(|t| Color::Rgb(t.color.r, t.color.g, t.color.b))
+                        .unwrap_or(theme.text);
+                    lines.push(Line::from(vec![
+                        Span::styled("Target: ", Style::default().fg(theme.overlay1)),
+                        Span::styled("██", Style::default().fg(target_color)),
+                        Span::raw(" "),
+                        Span::styled(target_name, Style::default().fg(theme.text)),
+                        Span::styled(" [h/l]", Style::default().fg(theme.overlay1)),
+                    ]));
+                }
+            }
 
             let para = Paragraph::new(lines);
             frame.render_widget(para, inner);
@@ -503,20 +722,38 @@ impl ColorPicker {
 
     fn render_help(&self, frame: &mut Frame, area: Rect) {
         let theme = &self.flavor_colors;
-        let bindings = vec![
-            ("j/k, ↑/↓", "Navigate"),
-            ("g/G", "Top/bottom"),
-            ("Ctrl+d/u", "Page down/up"),
-            ("/", "Search"),
-            ("Esc", "Clear search"),
-            ("Tab", "Cycle format"),
-            ("y", "Copy to clipboard"),
-            ("Enter", "Select as accent"),
-            ("?", "Toggle help"),
-            ("q", "Quit"),
-        ];
 
-        let popup = HelpPopup::new("Keybindings")
+        // Context-aware help based on current focus
+        let (title, bindings): (&str, Vec<(&str, &str)>) = match self.focus {
+            Focus::List => ("Colors", vec![
+                ("j/k ↑/↓", "Navigate"),
+                ("g/G", "Top/bottom"),
+                ("Ctrl+d/u", "Page down/up"),
+                ("/", "Search"),
+                ("Enter", "Set as accent"),
+                ("y", "Copy color"),
+                ("Tab", "→ Modify pane"),
+                ("Esc", "Clear search"),
+                ("?", "Toggle help"),
+                ("q", "Quit"),
+            ]),
+            Focus::Preview => ("Modify", vec![
+                ("l", "Lighten"),
+                ("d", "Darken"),
+                ("b", "Blend (» in list)"),
+                ("n", "Reset"),
+                ("", ""),
+                ("+/-", "Amount ±5%"),
+                ("0-9", "Type amount"),
+                ("j/k", "Format (or » target)"),
+                ("f", "Cycle format"),
+                ("", ""),
+                ("y", "Copy modified"),
+                ("Tab/Esc", "→ Colors"),
+            ]),
+        };
+
+        let popup = HelpPopup::new(title)
             .bindings(bindings)
             .style(Style::default().bg(theme.surface0))
             .border_style(Style::default().fg(theme.accent))
@@ -628,41 +865,130 @@ impl ColorPicker {
                         }
                     }
                     Mode::Normal => {
+                        // Global keys (work in any focus)
                         match key.code {
                             KeyCode::Char('q') => return Ok(false),
-                            KeyCode::Char('/') => self.mode = Mode::Search,
-                            KeyCode::Char('?') | KeyCode::F(1) => self.mode = Mode::Help,
-                            KeyCode::Char('j') | KeyCode::Down => self.move_down(),
-                            KeyCode::Char('k') | KeyCode::Up => self.move_up(),
-                            KeyCode::Char('g') | KeyCode::Home => self.move_top(),
-                            KeyCode::Char('G') | KeyCode::End => self.move_bottom(),
-                            KeyCode::Char('d') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                                self.page_down(10);
+                            KeyCode::Char('?') | KeyCode::F(1) => {
+                                self.mode = Mode::Help;
+                                return Ok(true);
                             }
-                            KeyCode::Char('u') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                                self.page_up(10);
+                            KeyCode::Tab => {
+                                // Toggle focus between panes
+                                self.focus = match self.focus {
+                                    Focus::List => Focus::Preview,
+                                    Focus::Preview => Focus::List,
+                                };
+                                return Ok(true);
                             }
-                            KeyCode::Tab => self.cycle_format(),
-                            KeyCode::Char('y') => self.copy_selected(),
-                            KeyCode::Enter => {
-                                self.select_as_accent();
-                                // Only show confirm dialog if something changed
-                                if self.has_changes() {
-                                    self.mode = Mode::Confirm;
-                                }
+                            KeyCode::Char('y') => {
+                                self.copy_selected();
+                                return Ok(true);
                             }
                             KeyCode::Esc => {
-                                if !self.search.is_empty() {
+                                if self.focus == Focus::Preview {
+                                    // Esc in preview goes back to list
+                                    self.focus = Focus::List;
+                                } else if self.modifier_type != ModifierType::None {
+                                    self.reset_modifier();
+                                } else if !self.search.is_empty() {
                                     self.search.clear();
                                     self.update_filter();
                                 }
-                            }
-                            KeyCode::Char(c) if !key.modifiers.contains(KeyModifiers::CONTROL) => {
-                                self.mode = Mode::Search;
-                                self.search.insert(c);
-                                self.update_filter();
+                                return Ok(true);
                             }
                             _ => {}
+                        }
+
+                        // Focus-specific keys
+                        match self.focus {
+                            Focus::List => {
+                                match key.code {
+                                    KeyCode::Char('/') => self.mode = Mode::Search,
+                                    KeyCode::Char('j') | KeyCode::Down => self.move_down(),
+                                    KeyCode::Char('k') | KeyCode::Up => self.move_up(),
+                                    KeyCode::Char('g') | KeyCode::Home => self.move_top(),
+                                    KeyCode::Char('G') | KeyCode::End => self.move_bottom(),
+                                    KeyCode::Char('h') | KeyCode::Left => self.move_up(),
+                                    KeyCode::Char('l') | KeyCode::Right => self.move_down(),
+                                    KeyCode::Char('d') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                                        self.page_down(10);
+                                    }
+                                    KeyCode::Char('u') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                                        self.page_up(10);
+                                    }
+                                    KeyCode::Enter => {
+                                        self.select_as_accent();
+                                        if self.has_changes() {
+                                            self.mode = Mode::Confirm;
+                                        }
+                                    }
+                                    KeyCode::Char(c) if !key.modifiers.contains(KeyModifiers::CONTROL) => {
+                                        self.mode = Mode::Search;
+                                        self.search.insert(c);
+                                        self.update_filter();
+                                    }
+                                    _ => {}
+                                }
+                            }
+                            Focus::Preview => {
+                                match key.code {
+                                    // Modifier type selection
+                                    KeyCode::Char('l') | KeyCode::Char('L') => {
+                                        self.modifier_type = if self.modifier_type == ModifierType::Lighten {
+                                            ModifierType::None
+                                        } else {
+                                            ModifierType::Lighten
+                                        };
+                                    }
+                                    KeyCode::Char('d') | KeyCode::Char('D') => {
+                                        self.modifier_type = if self.modifier_type == ModifierType::Darken {
+                                            ModifierType::None
+                                        } else {
+                                            ModifierType::Darken
+                                        };
+                                    }
+                                    KeyCode::Char('b') | KeyCode::Char('B') => {
+                                        self.modifier_type = if self.modifier_type == ModifierType::Blend {
+                                            ModifierType::None
+                                        } else {
+                                            ModifierType::Blend
+                                        };
+                                    }
+                                    KeyCode::Char('n') | KeyCode::Char('N') => {
+                                        self.reset_modifier();
+                                    }
+                                    // j/k navigation: blend target when in blend mode, format otherwise
+                                    KeyCode::Char('j') | KeyCode::Down => {
+                                        if self.modifier_type == ModifierType::Blend {
+                                            self.blend_select_down();
+                                        } else {
+                                            self.format_idx = (self.format_idx + 1) % FORMATS.len();
+                                        }
+                                    }
+                                    KeyCode::Char('k') | KeyCode::Up => {
+                                        if self.modifier_type == ModifierType::Blend {
+                                            self.blend_select_up();
+                                        } else {
+                                            self.format_idx = self.format_idx.checked_sub(1).unwrap_or(FORMATS.len() - 1);
+                                        }
+                                    }
+                                    // Format cycling with f (always available)
+                                    KeyCode::Char('f') => {
+                                        self.format_idx = (self.format_idx + 1) % FORMATS.len();
+                                    }
+                                    // Amount controls with +/-
+                                    KeyCode::Char('+') | KeyCode::Char('=') => {
+                                        self.increase_amount(5);
+                                    }
+                                    KeyCode::Char('-') | KeyCode::Char('_') => {
+                                        self.decrease_amount(5);
+                                    }
+                                    KeyCode::Char(c @ '0'..='9') => {
+                                        self.handle_amount_digit(c);
+                                    }
+                                    _ => {}
+                                }
+                            }
                         }
                     }
                 }
@@ -690,6 +1016,12 @@ impl ColorPicker {
                 }
             }
             _ => {}
+        }
+
+        // Reset modifier when selection changes
+        if self.selected != self.last_selected {
+            self.reset_modifier();
+            self.last_selected = self.selected;
         }
 
         Ok(true)
