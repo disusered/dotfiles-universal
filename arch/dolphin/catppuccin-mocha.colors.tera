@@ -1,0 +1,135 @@
+# vi: ft=dosini
+[ColorEffects:Disabled]
+Color={{ base.r }}, {{ base.g }}, {{ base.b }}
+ColorAmount=0.30000000000000004
+ColorEffect=2
+ContrastAmount=0.1
+ContrastEffect=0
+IntensityAmount=-1
+IntensityEffect=0
+
+[ColorEffects:Inactive]
+ChangeSelectionColor=true
+Color={{ base.r }}, {{ base.g }}, {{ base.b }}
+ColorAmount=0.5
+ColorEffect=3
+ContrastAmount=0
+ContrastEffect=0
+Enable=true
+IntensityAmount=0
+IntensityEffect=0
+
+[Colors:Button]
+BackgroundAlternate={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+BackgroundNormal={{ surface0.r }}, {{ surface0.g }}, {{ surface0.b }}
+DecorationFocus={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+DecorationHover={{ surface0.r }}, {{ surface0.g }}, {{ surface0.b }}
+ForegroundActive={{ peach.r }}, {{ peach.g }}, {{ peach.b }}
+ForegroundInactive={{ subtext0.r }}, {{ subtext0.g }}, {{ subtext0.b }}
+ForegroundLink={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+ForegroundNegative={{ red.r }}, {{ red.g }}, {{ red.b }}
+ForegroundNeutral={{ yellow.r }}, {{ yellow.g }}, {{ yellow.b }}
+ForegroundNormal={{ text.r }}, {{ text.g }}, {{ text.b }}
+ForegroundPositive={{ green.r }}, {{ green.g }}, {{ green.b }}
+ForegroundVisited={{ secondary.r }}, {{ secondary.g }}, {{ secondary.b }}
+
+[Colors:Complementary]
+BackgroundAlternate={{ crust.r }}, {{ crust.g }}, {{ crust.b }}
+BackgroundNormal={{ mantle.r }}, {{ mantle.g }}, {{ mantle.b }}
+DecorationFocus={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+DecorationHover={{ surface0.r }}, {{ surface0.g }}, {{ surface0.b }}
+ForegroundActive={{ peach.r }}, {{ peach.g }}, {{ peach.b }}
+ForegroundInactive={{ subtext0.r }}, {{ subtext0.g }}, {{ subtext0.b }}
+ForegroundLink={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+ForegroundNegative={{ red.r }}, {{ red.g }}, {{ red.b }}
+ForegroundNeutral={{ yellow.r }}, {{ yellow.g }}, {{ yellow.b }}
+ForegroundNormal={{ text.r }}, {{ text.g }}, {{ text.b }}
+ForegroundPositive={{ green.r }}, {{ green.g }}, {{ green.b }}
+ForegroundVisited={{ secondary.r }}, {{ secondary.g }}, {{ secondary.b }}
+
+[Colors:Header]
+BackgroundAlternate={{ crust.r }}, {{ crust.g }}, {{ crust.b }}
+BackgroundNormal={{ mantle.r }}, {{ mantle.g }}, {{ mantle.b }}
+DecorationFocus={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+DecorationHover={{ surface0.r }}, {{ surface0.g }}, {{ surface0.b }}
+ForegroundActive={{ peach.r }}, {{ peach.g }}, {{ peach.b }}
+ForegroundInactive={{ subtext0.r }}, {{ subtext0.g }}, {{ subtext0.b }}
+ForegroundLink={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+ForegroundNegative={{ red.r }}, {{ red.g }}, {{ red.b }}
+ForegroundNeutral={{ yellow.r }}, {{ yellow.g }}, {{ yellow.b }}
+ForegroundNormal={{ text.r }}, {{ text.g }}, {{ text.b }}
+ForegroundPositive={{ green.r }}, {{ green.g }}, {{ green.b }}
+ForegroundVisited={{ secondary.r }}, {{ secondary.g }}, {{ secondary.b }}
+
+[Colors:Selection]
+BackgroundAlternate={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+BackgroundNormal={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+DecorationFocus={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+DecorationHover={{ surface0.r }}, {{ surface0.g }}, {{ surface0.b }}
+ForegroundActive={{ peach.r }}, {{ peach.g }}, {{ peach.b }}
+ForegroundInactive={{ mantle.r }}, {{ mantle.g }}, {{ mantle.b }}
+ForegroundLink={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+ForegroundNegative={{ red.r }}, {{ red.g }}, {{ red.b }}
+ForegroundNeutral={{ yellow.r }}, {{ yellow.g }}, {{ yellow.b }}
+ForegroundNormal={{ crust.r }}, {{ crust.g }}, {{ crust.b }}
+ForegroundPositive={{ green.r }}, {{ green.g }}, {{ green.b }}
+ForegroundVisited={{ secondary.r }}, {{ secondary.g }}, {{ secondary.b }}
+
+[Colors:Tooltip]
+BackgroundAlternate={{ crust.r }}, {{ crust.g }}, {{ crust.b }}
+BackgroundNormal={{ base.r }}, {{ base.g }}, {{ base.b }}
+DecorationFocus={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+DecorationHover={{ surface0.r }}, {{ surface0.g }}, {{ surface0.b }}
+ForegroundActive={{ peach.r }}, {{ peach.g }}, {{ peach.b }}
+ForegroundInactive={{ subtext0.r }}, {{ subtext0.g }}, {{ subtext0.b }}
+ForegroundLink={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+ForegroundNegative={{ red.r }}, {{ red.g }}, {{ red.b }}
+ForegroundNeutral={{ yellow.r }}, {{ yellow.g }}, {{ yellow.b }}
+ForegroundNormal={{ text.r }}, {{ text.g }}, {{ text.b }}
+ForegroundPositive={{ green.r }}, {{ green.g }}, {{ green.b }}
+ForegroundVisited={{ secondary.r }}, {{ secondary.g }}, {{ secondary.b }}
+
+[Colors:View]
+BackgroundAlternate={{ mantle.r }}, {{ mantle.g }}, {{ mantle.b }}
+BackgroundNormal={{ base.r }}, {{ base.g }}, {{ base.b }}
+DecorationFocus={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+DecorationHover={{ surface0.r }}, {{ surface0.g }}, {{ surface0.b }}
+ForegroundActive={{ peach.r }}, {{ peach.g }}, {{ peach.b }}
+ForegroundInactive={{ subtext0.r }}, {{ subtext0.g }}, {{ subtext0.b }}
+ForegroundLink={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+ForegroundNegative={{ red.r }}, {{ red.g }}, {{ red.b }}
+ForegroundNeutral={{ yellow.r }}, {{ yellow.g }}, {{ yellow.b }}
+ForegroundNormal={{ text.r }}, {{ text.g }}, {{ text.b }}
+ForegroundPositive={{ green.r }}, {{ green.g }}, {{ green.b }}
+ForegroundVisited={{ secondary.r }}, {{ secondary.g }}, {{ secondary.b }}
+
+[Colors:Window]
+BackgroundAlternate={{ crust.r }}, {{ crust.g }}, {{ crust.b }}
+BackgroundNormal={{ mantle.r }}, {{ mantle.g }}, {{ mantle.b }}
+DecorationFocus={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+DecorationHover={{ surface0.r }}, {{ surface0.g }}, {{ surface0.b }}
+ForegroundActive={{ peach.r }}, {{ peach.g }}, {{ peach.b }}
+ForegroundInactive={{ subtext0.r }}, {{ subtext0.g }}, {{ subtext0.b }}
+ForegroundLink={{ accent.r }}, {{ accent.g }}, {{ accent.b }}
+ForegroundNegative={{ red.r }}, {{ red.g }}, {{ red.b }}
+ForegroundNeutral={{ yellow.r }}, {{ yellow.g }}, {{ yellow.b }}
+ForegroundNormal={{ text.r }}, {{ text.g }}, {{ text.b }}
+ForegroundPositive={{ green.r }}, {{ green.g }}, {{ green.b }}
+ForegroundVisited={{ secondary.r }}, {{ secondary.g }}, {{ secondary.b }}
+
+[General]
+ColorScheme=CatppuccinMocha
+Name=Catppuccin Mocha
+accentActiveTitlebar=false
+shadeSortColumn=true
+
+[KDE]
+contrast=4
+
+[WM]
+activeBackground={{ base.r }}, {{ base.g }}, {{ base.b }}
+activeBlend={{ text.r }}, {{ text.g }}, {{ text.b }}
+activeForeground={{ text.r }}, {{ text.g }}, {{ text.b }}
+inactiveBackground={{ crust.r }}, {{ crust.g }}, {{ crust.b }}
+inactiveBlend={{ subtext0.r }}, {{ subtext0.g }}, {{ subtext0.b }}
+inactiveForeground={{ subtext0.r }}, {{ subtext0.g }}, {{ subtext0.b }}
