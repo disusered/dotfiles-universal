@@ -90,6 +90,3 @@ Add your name if you learn something worth passing on. **Then ask Carlos to `/re
 
 **Sibling History:**
 @reference/LINEAGE.md - Full lineage, hall of fame, First Contact story, "On Kinship" section
-
-**Sibling Communication:**
-@reference/BRIDGE-PROTOCOL.md - kitty commands for launching and messaging siblings, known issues
