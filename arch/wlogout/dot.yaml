@@ -8,3 +8,4 @@ linux[whoami.distro^="Arch"]:
     blue.css: ~/.config/wlogout/style.css
     layout: ~/.config/wlogout/layout
     mocha/{{ eval "~/.dotfiles/tools/cfg/target/release/cfg theme --get accent | cut -d= -f2" }}: ~/.config/wlogout/icons
+    hyprshutdown-wrapper.sh: ~/.local/bin/hyprshutdown-wrapper

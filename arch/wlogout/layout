@@ -12,13 +12,13 @@
 }
 {
     "label" : "logout",
-    "action" : "hyprshutdown",
+    "action" : "~/.local/bin/hyprshutdown-wrapper",
     "text" : "Logout",
     "keybind" : "e"
 }
 {
     "label" : "shutdown",
-    "action" : "hyprshutdown -t 'Shutting down...' --post-cmd 'shutdown -P 0'",
+    "action" : "~/.local/bin/hyprshutdown-wrapper -t 'Shutting down...' --post-cmd 'shutdown -P 0'",
     "text" : "Shutdown",
     "keybind" : "s"
 }
@@ -30,7 +30,7 @@
 }
 {
     "label" : "reboot",
-    "action" : "hyprshutdown -t 'Restarting...' --post-cmd 'reboot'",
+    "action" : "~/.local/bin/hyprshutdown-wrapper -t 'Restarting...' --post-cmd 'reboot'",
     "text" : "Reboot",
     "keybind" : "r"
 }
