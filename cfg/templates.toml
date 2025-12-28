@@ -43,6 +43,10 @@ gtk4-devel-svg = { path = "arch/nwg-look/gtk-4.0/assets/devel-symbolic.svg.tera"
 
 # KDE / Dolphin
 kdeglobals = { path = "arch/dolphin/kdeglobals.tera" }
+kde-colorscheme = { path = "arch/dolphin/catppuccin-mocha.colors.tera", link = "/arch/dolphin" }
+
+# SDDM
+sddm-theme = { path = "tools/sddm/theme.conf.tera" }
 
 # Icons
 papirus-folders = { path = "tools/papirus/set-folders.sh.tera", reload = "~/.dotfiles/tools/papirus/set-folders.sh" }

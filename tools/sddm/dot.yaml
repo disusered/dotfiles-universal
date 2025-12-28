@@ -1,12 +1,25 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm sddm
-      sudo systemctl enable --now sddm
+      # Install sddm if not present
+      if ! pacman -Qi sddm &>/dev/null; then
+        sudo pacman -S --noconfirm sddm
+        sudo systemctl enable --now sddm
+      fi
+      # Download themes directly to system directory if not present
+      if [ ! -d /usr/share/sddm/themes/catppuccin-mocha-green ]; then
+        echo "Downloading catppuccin mocha themes..."
+        TMPDIR=$(mktemp -d)
+        gh release download --repo catppuccin/sddm --pattern 'catppuccin-mocha-*-sddm.zip' --dir "$TMPDIR"
+        for zip in "$TMPDIR"/catppuccin-mocha-*.zip; do
+          sudo unzip -o "$zip" -d /usr/share/sddm/themes/
+        done
+        rm -rf "$TMPDIR"
+      fi
+      # Symlink configs
+      sudo mkdir -p /etc/sddm.conf.d
+      sudo ln -sf ~/.dotfiles/tools/sddm/wayland.conf /etc/sddm.conf.d/10-wayland.conf
+      sudo ln -sf ~/.dotfiles/tools/sddm/theme.conf /etc/sddm.conf.d/15-theme.conf
     depends:
       - /lib/qt
-  links:
-    # FIXME: Sudo? Install script? Permissions?
-    # wayland.conf: /etc/sddm.conf.d/10-wayland.conf
-    # theme.conf: /etc/sddm.conf.d/15-theme.conf
-    # catppuccin-mocha-blue: /usr/share/sddm/themes/catppuccin-mocha-blue
+      - /tools/gh
