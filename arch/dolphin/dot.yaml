@@ -7,3 +7,6 @@ linux[whoami.distro^="Arch"]:
   links:
     dolphin.conf: ~/.config/hypr/conf.d/dolphin.conf
     kdeglobals: ~/.config/kdeglobals
+    kdedefaults-kdeglobals: ~/.config/kdedefaults/kdeglobals
+    catppuccin-mocha.colors: ~/.local/share/color-schemes/CatppuccinMocha.colors
+    dolphinrc: ~/.config/dolphinrc
