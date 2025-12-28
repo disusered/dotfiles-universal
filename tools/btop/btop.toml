@@ -1,5 +1,5 @@
 [scratchpads.btop]
 animation = "fromTop"
-command = "kitty --class btop_scratch btop"
+command = "app2unit -s b -- kitty --class btop_scratch btop"
 class = "btop_scratch"
 lazy = true

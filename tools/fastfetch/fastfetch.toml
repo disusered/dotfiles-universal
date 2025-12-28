@@ -1,6 +1,6 @@
 [scratchpads.fastfetch]
 animation = "fromTop"
-command = "kitty --class fastfetch_scratch sh -c 'fastfetch; tput civis; read -r _'"
+command = "app2unit -s b -- kitty --class fastfetch_scratch sh -c 'fastfetch; tput civis; read -r _'"
 class = "fastfetch_scratch"
 size = "734px 625px"
 lazy = true

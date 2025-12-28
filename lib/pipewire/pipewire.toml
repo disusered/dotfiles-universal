@@ -1,6 +1,6 @@
 [scratchpads.pavucontrol]
 animation = "fromRight"
-command = "pavucontrol"
+command = "app2unit -s -b -- pavucontrol"
 class = "org.pulseaudio.pavucontrol"
 size = "25% 60%"
 position = "74% 4%"
@@ -9,7 +9,7 @@ lazy = false
 
 [scratchpads.helvum]
 animation = "fromRight"
-command = "helvum"
+command = "app2unit -- helvum"
 class = "org.pipewire.Helvum"
 size = "50% 60%"
 position = "49% 4%"
