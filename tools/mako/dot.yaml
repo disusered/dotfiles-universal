@@ -2,7 +2,7 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: sudo pacman -S --noconfirm mako
     depends:
-      - /tools/hyprland
+      - /arch/hyprland
   links:
     config: ~/.config/mako/config
     mako.conf: ~/.config/hypr/conf.d/mako.conf

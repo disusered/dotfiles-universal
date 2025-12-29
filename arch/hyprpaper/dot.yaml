@@ -3,7 +3,7 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       sudo pacman -S --noconfirm \
         ninja gcc libjpeg-turbo libwebp libjxl pango cairo \
-        pkgconf cmake libglvnd hyprpaper-git
+        pkgconf cmake libglvnd hyprpaper
       systemctl --user enable --now hyprpaper.service
     depends:
       - /arch/hyprland

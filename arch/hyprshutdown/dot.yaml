@@ -1,7 +1,7 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      yay -S --noconfirm hyprshutdown-git
+      yay -S --noconfirm hyprshutdown
       sudo sed -i 's/#HandlePowerKey=poweroff/HandlePowerKey=ignore/' /etc/systemd/logind.conf
   links:
     hyprshutdown-wrapper.sh: ~/.local/bin/hyprshutdown-wrapper

@@ -1,6 +1,0 @@
-global:
-  installs:
-    cmd: uv pip install postgres-mcp --system
-    depends:
-      - /languages/python/uv
-      - /languages/python/latest

@@ -4,9 +4,8 @@ linux[whoami.distro^="Arch"]:
       if cd ~/.yay; then git pull; else git clone \
       --depth 1 https://aur.archlinux.org/yay.git ~/.yay; fi && \
       cd ~/.yay; yes | makepkg -si
-      yay --devel --save
     depends:
       - /lib/arch
-      # - /tools/git
+      - /tools/git
   links:
     yay.zsh: ~/.config/zsh/1400_yay.zsh

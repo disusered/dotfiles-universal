@@ -1,7 +1,12 @@
 linux:
   installs:
-    # TODO: Non-interactive installer
-    cmd: curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
+    cmd: |
+      if command -v ghc &> /dev/null; then
+          echo "Haskell is installed"
+      else
+          # TODO: Non-interactive installer
+          curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh
+      fi
     depends:
       - /tools/curl
       - /lib/arch

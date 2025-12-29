@@ -1,11 +1,11 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm hyprland-meta-git xdg-desktop-portal \
-      xdg-desktop-portal-kde qt5-wayland \
-      qt6-wayland wayland wayland-protocols hyprutils-git hyprlang-git \
-      hyprwayland-scanner-git cpio && \
-      PATH="/usr/bin:$PATH" yay -S --noconfirm pyprland
+      sudo pacman -S --noconfirm hyprland hyprpolkitagent hyprutils hyprlang \
+      hyprutils hyprwayland-scanner qt5-wayland qt6-wayland \
+      xdg-desktop-portal-hyprland xdg-desktop-portal xdg-desktop-portal-kde \
+      wayland wayland-protocols cpio aquamarine && \
+      PATH="/usr/bin:$PATH" yay -S --noconfirm pyprland hyprqt6engine
       systemctl --user enable --now hyprpolkitagent.service
     depends:
       - /tools/jq

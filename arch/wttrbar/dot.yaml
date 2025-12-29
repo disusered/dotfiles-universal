@@ -3,5 +3,5 @@ linux[whoami.distro^="Arch"]:
     cmd: yay -S --noconfirm wttrbar
   depends:
     - /languages/rust
-    - /tools/waybar
+    - /arch/waybar
     - /tools/yay

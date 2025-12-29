@@ -4,7 +4,7 @@ linux[whoami.distro^="Arch"]:
     depends:
       - /lib/slurp
       - /lib/uwsm
-      - /tools/hyprland
+      - /arch/hyprland
       - /tools/ffmpeg
       - /tools/rofi
       - /tools/jq

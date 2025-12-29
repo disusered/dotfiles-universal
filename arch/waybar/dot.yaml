@@ -2,9 +2,10 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       sudo pacman -S --noconfirm waybar
-      sudo systemctl enable --now waybar.service
+      # FIXME: Service??
+      # sudo systemctl enable --now waybar.service
     depends:
-      - /tools/hyprland
+      - /arch/hyprland
       - /lib/pipewire
   links:
     config.jsonc: ~/.config/waybar/config.jsonc

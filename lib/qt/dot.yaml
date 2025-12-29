@@ -1,5 +1,3 @@
-# TODO: Accent colors
-# TODO: ~/.config/qt5|6ct/
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
