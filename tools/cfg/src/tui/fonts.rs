@@ -937,27 +937,6 @@ const SYNTAX_SAMPLES: &[SyntaxSample] = &[
     },
 ];
 
-/// Get the current Kitty font size using kitten @
-fn get_kitty_font_size() -> Option<f32> {
-    let output = std::process::Command::new("kitten")
-        .args(["@", "get-colors"])
-        .output()
-        .ok()?;
-
-    if output.status.success() {
-        let text = String::from_utf8_lossy(&output.stdout);
-        for line in text.lines() {
-            if line.starts_with("font_size") {
-                let parts: Vec<&str> = line.split_whitespace().collect();
-                if parts.len() >= 2 {
-                    return parts[1].parse().ok();
-                }
-            }
-        }
-    }
-    None
-}
-
 /// Set Kitty font size using kitten @
 fn set_kitty_font_size(size: f32) {
     let _ = std::process::Command::new("kitten")

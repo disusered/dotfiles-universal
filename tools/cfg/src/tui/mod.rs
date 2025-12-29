@@ -37,26 +37,3 @@ pub fn is_tty() -> bool {
             .unwrap_or(false)
 }
 
-/// Result type for TUI operations
-pub type TuiResult<T> = Result<T, TuiError>;
-
-#[derive(Debug)]
-pub enum TuiError {
-    Io(io::Error),
-    NotATty,
-}
-
-impl From<io::Error> for TuiError {
-    fn from(e: io::Error) -> Self {
-        TuiError::Io(e)
-    }
-}
-
-impl std::fmt::Display for TuiError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            TuiError::Io(e) => write!(f, "IO error: {}", e),
-            TuiError::NotATty => write!(f, "Interactive mode requires a terminal"),
-        }
-    }
-}

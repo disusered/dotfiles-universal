@@ -5,9 +5,9 @@ use nucleo::{
 use ratatui::{
     buffer::Buffer,
     layout::Rect,
-    style::{Color, Modifier, Style},
+    style::{Modifier, Style},
     text::{Line, Span},
-    widgets::{Block, Borders, Paragraph, StatefulWidget, Widget},
+    widgets::{Paragraph, StatefulWidget, Widget},
 };
 
 pub struct FuzzyInput {
@@ -57,10 +57,6 @@ impl FuzzyInputState {
             cursor: 0,
             matcher: Matcher::new(nucleo::Config::DEFAULT),
         }
-    }
-
-    pub fn query(&self) -> &str {
-        &self.query
     }
 
     pub fn is_empty(&self) -> bool {

@@ -28,11 +28,6 @@ impl Toast {
         }
     }
 
-    pub fn duration(mut self, duration: Duration) -> Self {
-        self.duration = duration;
-        self
-    }
-
     pub fn style(mut self, style: Style) -> Self {
         self.style = style;
         self
@@ -45,10 +40,6 @@ impl Toast {
 
     pub fn is_expired(&self) -> bool {
         self.created_at.elapsed() >= self.duration
-    }
-
-    pub fn message(&self) -> &str {
-        &self.message
     }
 }
 
@@ -78,9 +69,3 @@ impl Widget for Toast {
     }
 }
 
-/// Convenience function to create a "Copied!" toast with success styling
-pub fn copied_toast(style: Style, border_style: Style) -> Toast {
-    Toast::new("Copied!")
-        .style(style)
-        .border_style(border_style)
-}

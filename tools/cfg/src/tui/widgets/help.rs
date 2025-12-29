@@ -1,6 +1,6 @@
 use ratatui::{
     buffer::Buffer,
-    layout::{Constraint, Rect},
+    layout::Rect,
     style::Style,
     text::{Line, Span},
     widgets::{Block, Borders, Clear, Paragraph, Widget},
@@ -112,18 +112,3 @@ impl Widget for HelpPopup<'_> {
     }
 }
 
-/// Standard keybindings for pickers
-pub fn picker_bindings() -> Vec<(&'static str, &'static str)> {
-    vec![
-        ("j/k, ↑/↓", "Navigate"),
-        ("g/G", "Top/bottom"),
-        ("Ctrl+d/u", "Page down/up"),
-        ("/", "Search"),
-        ("Esc", "Clear search"),
-        ("Tab", "Cycle format"),
-        ("y", "Copy to clipboard"),
-        ("Enter", "Select"),
-        ("?", "Help"),
-        ("q", "Quit"),
-    ]
-}
