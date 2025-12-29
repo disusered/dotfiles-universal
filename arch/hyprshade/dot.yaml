@@ -2,5 +2,9 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       yay -S --noconfirm hyprshade-git
+      hyprshade install
+      systemctl --user enable --now hyprshade.timer
   links:
+    hyprshade.conf: {{ dirs.base.config }}/hypr/conf.d/hyprshade.conf
+    config.toml: {{ dirs.base.config }}/hypr/hyprshade.toml
     shaders: ~/.config/hypr/shaders
