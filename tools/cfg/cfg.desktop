@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=cfg
+Comment=Dotfiles configuration
+Exec=pypr toggle cfg
+Icon=cfg
+Type=Application
+Categories=Settings;

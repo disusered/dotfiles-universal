@@ -1254,7 +1254,8 @@ impl ColorPicker {
         frame.render_widget(para, inner);
     }
 
-    fn handle_event(&mut self, event: Event) -> io::Result<bool> {
+    /// Handle an event, returns false when picker should quit
+    pub fn handle_event(&mut self, event: Event) -> io::Result<bool> {
         if let Some(ref toast) = self.toast {
             if toast.is_expired() {
                 self.toast = None;
@@ -1523,6 +1524,61 @@ impl ColorPicker {
         }
 
         Ok(true)
+    }
+
+    /// Check if picker is in search mode (for tab switching logic)
+    pub fn is_in_search(&self) -> bool {
+        self.mode == Mode::Search
+    }
+
+    /// Check if picker wants to apply changes
+    pub fn wants_apply(&self) -> bool {
+        self.should_apply
+    }
+
+    /// Check if picker saved without applying
+    pub fn was_saved(&self) -> bool {
+        self.mode == Mode::Confirm && !self.should_apply
+    }
+
+    /// Render picker in a specific area (for embedding in tabbed app)
+    pub fn render_in_area(&mut self, frame: &mut Frame, area: Rect) {
+        let theme = &self.flavor_colors;
+
+        frame.render_widget(
+            Block::default().style(Style::default().bg(theme.base)),
+            area,
+        );
+
+        let chunks = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Length(3),
+                Constraint::Min(10),
+                Constraint::Length(1),
+            ])
+            .split(area);
+
+        self.render_header(frame, chunks[0]);
+        self.content_area = chunks[1];
+        self.render_content(frame, chunks[1]);
+        self.render_footer(frame, chunks[2]);
+
+        if let Some(ref toast) = self.toast {
+            if !toast.is_expired() {
+                frame.render_widget(toast.clone(), area);
+            } else {
+                self.toast = None;
+            }
+        }
+
+        if self.mode == Mode::Help {
+            self.render_help(frame, area);
+        }
+
+        if self.mode == Mode::Confirm {
+            self.render_confirm(frame, area);
+        }
     }
 
     pub fn run(mut self) -> io::Result<Option<bool>> {

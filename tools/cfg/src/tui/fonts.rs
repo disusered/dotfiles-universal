@@ -70,9 +70,9 @@ struct FlavorTheme {
     green: Color,
     yellow: Color,
     // Syntax highlighting colors
-    mauve: Color,  // keywords
-    peach: Color,  // functions
-    sky: Color,    // types
+    mauve: Color, // keywords
+    peach: Color, // functions
+    sky: Color,   // types
 }
 
 impl FlavorTheme {
@@ -177,7 +177,7 @@ impl FontPicker {
     }
 
     /// Reload config from disk (to pick up changes from scratchpad)
-    fn refresh_config(&mut self) {
+    pub fn refresh_config(&mut self) {
         if let Ok(cfg) = Config::load(&self.config_path) {
             self.config = cfg;
         }
@@ -617,24 +617,50 @@ impl FontPicker {
         if let Some(entry) = self.selected_font() {
             let font_name = entry.listing.name.to_string();
 
-            // Kill any existing font scratchpad first (SIGKILL to avoid kitty confirmation)
+            // Kill any existing font preview first
             let _ = std::process::Command::new("hyprctl")
                 .args(["dispatch", "killwindow", "class:fonts_scratch"])
-                .output(); // wait for it
+                .output();
 
-            // Write font name to temp file for scratchpad to read
-            if std::fs::write("/tmp/cfg-font-preview", &font_name).is_err() {
-                return;
-            }
-
-            // Spawn pypr scratchpad - it will launch kitty with the font override
-            let _ = std::process::Command::new("pypr")
-                .args(["toggle", "font"])
+            // Spawn kitty directly as child process (dies when cfg dies)
+            let child = std::process::Command::new("kitty")
+                .args([
+                    "--class",
+                    "fonts_scratch",
+                    "-o",
+                    &format!("font_family={}", font_name),
+                    "cfg",
+                    "font",
+                    "--scratchpad",
+                ])
                 .spawn();
+
+            if let Ok(mut child) = child {
+                // Hide cfg via pypr
+                let _ = std::process::Command::new("pypr")
+                    .args(["toggle", "cfg"])
+                    .output();
+
+                // Wait for window to appear, then resize and position
+                std::thread::spawn(move || {
+                    std::thread::sleep(std::time::Duration::from_millis(150));
+                    // Resize and move down 5% from top (matching cfg scratchpad position)
+                    let _ = std::process::Command::new("hyprctl")
+                        .args(["--batch", "dispatch focuswindow class:fonts_scratch; dispatch resizeactive exact 1080 720; dispatch centerwindow 1"])
+                        .output();
+
+                    // Wait for preview to close, then restore cfg
+                    let _ = child.wait();
+                    let _ = std::process::Command::new("pypr")
+                        .args(["toggle", "cfg"])
+                        .output();
+                });
+            }
         }
     }
 
-    fn handle_event(&mut self, event: Event) -> io::Result<bool> {
+    /// Handle an event, returns false when picker should quit
+    pub fn handle_event(&mut self, event: Event) -> io::Result<bool> {
         if let Some(ref toast) = self.toast {
             if toast.is_expired() {
                 self.toast = None;
@@ -770,6 +796,61 @@ impl FontPicker {
         }
 
         Ok(true)
+    }
+
+    /// Check if picker is in search mode (for tab switching logic)
+    pub fn is_in_search(&self) -> bool {
+        self.mode == Mode::Search
+    }
+
+    /// Check if picker wants to apply changes
+    pub fn wants_apply(&self) -> bool {
+        self.should_apply
+    }
+
+    /// Check if picker saved without applying
+    pub fn was_saved(&self) -> bool {
+        self.mode == Mode::Confirm && !self.should_apply
+    }
+
+    /// Render picker in a specific area (for embedding in tabbed app)
+    pub fn render_in_area(&mut self, frame: &mut Frame, area: Rect) {
+        let theme = &self.flavor_colors;
+
+        frame.render_widget(
+            Block::default().style(Style::default().bg(theme.base)),
+            area,
+        );
+
+        let chunks = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([
+                Constraint::Length(3),
+                Constraint::Min(10),
+                Constraint::Length(1),
+            ])
+            .split(area);
+
+        self.render_header(frame, chunks[0]);
+        self.content_area = chunks[1];
+        self.render_content(frame, chunks[1]);
+        self.render_footer(frame, chunks[2]);
+
+        if let Some(ref toast) = self.toast {
+            if !toast.is_expired() {
+                frame.render_widget(toast.clone(), area);
+            } else {
+                self.toast = None;
+            }
+        }
+
+        if self.mode == Mode::Help {
+            self.render_help(frame, area);
+        }
+
+        if self.mode == Mode::Confirm {
+            self.render_confirm(frame, area);
+        }
     }
 
     pub fn run(mut self) -> io::Result<Option<bool>> {
@@ -946,11 +1027,14 @@ fn set_kitty_font_size(size: f32) {
 
 /// Resize Kitty window using hyprctl (since we're in a floating scratchpad)
 fn resize_kitty_window(delta_w: i32, delta_h: i32) {
+    // Resize and recenter horizontally to grow from center
     let _ = std::process::Command::new("hyprctl")
         .args([
-            "dispatch",
-            "resizeactive",
-            &format!("{} {}", delta_w, delta_h),
+            "--batch",
+            &format!(
+                "dispatch resizeactive {} {}; dispatch centerwindow 1",
+                delta_w, delta_h
+            ),
         ])
         .spawn();
 }
@@ -984,10 +1068,7 @@ fn render_syntax_sample<'a>(sample: &SyntaxSample, theme: &FlavorTheme) -> Vec<L
         let parts: Vec<&str> = text.split('\n').collect();
         for (i, part) in parts.iter().enumerate() {
             if !part.is_empty() {
-                current_spans.push(Span::styled(
-                    part.to_string(),
-                    Style::default().fg(color),
-                ));
+                current_spans.push(Span::styled(part.to_string(), Style::default().fg(color)));
             }
             if i < parts.len() - 1 {
                 // Newline: emit current line and start a new one
@@ -1206,9 +1287,15 @@ pub fn run_scratchpad_preview(
 
             // Left scrollbar
             if left_height > left_inner.height {
-                let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
-                    .style(Style::default().fg(if focus_right { theme.surface0 } else { theme.surface1 }));
-                let mut state = ScrollbarState::new(left_height as usize).position(left_scroll as usize);
+                let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight).style(
+                    Style::default().fg(if focus_right {
+                        theme.surface0
+                    } else {
+                        theme.surface1
+                    }),
+                );
+                let mut state =
+                    ScrollbarState::new(left_height as usize).position(left_scroll as usize);
                 frame.render_stateful_widget(scrollbar, left_inner, &mut state);
             }
 
@@ -1241,9 +1328,15 @@ pub fn run_scratchpad_preview(
 
             // Right scrollbar
             if right_height > right_inner.height {
-                let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
-                    .style(Style::default().fg(if focus_right { theme.surface1 } else { theme.surface0 }));
-                let mut state = ScrollbarState::new(right_height as usize).position(right_scroll as usize);
+                let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight).style(
+                    Style::default().fg(if focus_right {
+                        theme.surface1
+                    } else {
+                        theme.surface0
+                    }),
+                );
+                let mut state =
+                    ScrollbarState::new(right_height as usize).position(right_scroll as usize);
                 frame.render_stateful_widget(scrollbar, right_inner, &mut state);
             }
 
@@ -1294,20 +1387,20 @@ pub fn run_scratchpad_preview(
                     KeyCode::Char('+') | KeyCode::Char('=') => {
                         current_size += 1.0;
                         set_kitty_font_size(current_size);
-                        resize_kitty_window(20, 15);
+                        resize_kitty_window(40, 45);
                     }
                     KeyCode::Char('-') | KeyCode::Char('_') => {
                         if current_size > 6.0 {
                             current_size -= 1.0;
                             set_kitty_font_size(current_size);
-                            resize_kitty_window(-20, -15);
+                            resize_kitty_window(-40, -45);
                         }
                     }
                     KeyCode::Char('0') => {
                         let delta = (current_size - initial_size) as i32;
                         current_size = initial_size;
                         set_kitty_font_size(current_size);
-                        resize_kitty_window(-delta * 20, -delta * 15);
+                        resize_kitty_window(-delta * 40, -delta * 45);
                     }
                     KeyCode::Char('j') | KeyCode::Down => {
                         *scroll = (*scroll + 1).min(max_scroll);
@@ -1352,9 +1445,7 @@ pub fn run_scratchpad_preview(
         // Run cfg update to apply changes to apps that use the mono font
         // Use current_exe to get the path to cfg binary
         if let Ok(exe) = std::env::current_exe() {
-            let _ = std::process::Command::new(exe)
-                .arg("update")
-                .status(); // wait for completion
+            let _ = std::process::Command::new(exe).arg("update").status(); // wait for completion
         }
     }
 

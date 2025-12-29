@@ -1,3 +1,4 @@
+pub mod app;
 pub mod clipboard;
 pub mod colors;
 pub mod fonts;

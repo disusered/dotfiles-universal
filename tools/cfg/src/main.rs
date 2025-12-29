@@ -19,8 +19,12 @@ use templates::{reload_app, rotz_link, TemplatesFile};
 #[command(name = "cfg")]
 #[command(about = "Linux Configuration Manager")]
 struct Cli {
+    /// Interactive settings TUI (colors + fonts)
+    #[arg(short, long, global = true)]
+    interactive: bool,
+
     #[command(subcommand)]
-    command: Command,
+    command: Option<Command>,
 }
 
 #[derive(Subcommand)]
@@ -213,7 +217,58 @@ fn update_apps(cfg_dir: &str, dotfiles_dir: &str, app_names: &[String], dry_run:
 fn main() {
     let cli = Cli::parse();
 
-    match cli.command {
+    // Handle global -i flag (no subcommand needed)
+    if cli.interactive && cli.command.is_none() {
+        let cfg_dir = get_cfg_dir();
+        let dotfiles_dir = get_dotfiles_dir();
+        let config_path = format!("{}/config.toml", cfg_dir);
+
+        if !tui::is_tty() {
+            eprintln!("Interactive mode requires a terminal");
+            std::process::exit(1);
+        }
+
+        let config = Config::load(&config_path).unwrap_or_default();
+        let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
+        let palette = match Palette::load(&palette_path) {
+            Ok(p) => p,
+            Err(e) => {
+                eprintln!("Error: {}", e);
+                std::process::exit(1);
+            }
+        };
+
+        match tui::app::run(&config, &palette, &config_path) {
+            Ok(Some(true)) => {
+                // User wants to apply
+                update_apps(&cfg_dir, &dotfiles_dir, &[], false);
+            }
+            Ok(Some(false)) => {
+                // Saved but no apply
+                println!("Config saved (run 'cfg update' to apply)");
+            }
+            Ok(None) => {
+                // Quit without saving
+            }
+            Err(e) => {
+                eprintln!("Error: {}", e);
+                std::process::exit(1);
+            }
+        }
+        return;
+    }
+
+    // Require a subcommand if -i not used at root
+    let command = match cli.command {
+        Some(cmd) => cmd,
+        None => {
+            eprintln!("Usage: cfg <COMMAND> or cfg -i");
+            eprintln!("Try 'cfg --help' for more information.");
+            std::process::exit(1);
+        }
+    };
+
+    match command {
         Command::Update { names, list, dry_run } => {
             let cfg_dir = get_cfg_dir();
             let dotfiles_dir = get_dotfiles_dir();

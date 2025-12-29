@@ -4,4 +4,7 @@ linux[whoami.distro^="Arch"]:
   links:
     target/release/cfg: ~/.local/bin/cfg
     fonts.toml: {{ dirs.base.config }}/pypr/conf.d/fonts.toml
-    fonts.conf: {{ dirs.base.config }}/hypr/conf.d/fonts.conf
+    cfg.conf: {{ dirs.base.config }}/hypr/conf.d/cfg.conf
+    scratchpad.toml: {{ dirs.base.config }}/pypr/conf.d/cfg.toml
+    cfg.desktop: ~/.local/share/applications/cfg.desktop
+    cfg.svg: ~/.local/share/icons/hicolor/scalable/apps/cfg.svg

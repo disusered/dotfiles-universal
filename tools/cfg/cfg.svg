@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Background - terminal style rounded box -->
+  <rect x="8" y="8" width="112" height="112" rx="16" ry="16" fill="#1e1e2e"/>
+
+  <!-- Inner border glow -->
+  <rect x="12" y="12" width="104" height="104" rx="12" ry="12" fill="none" stroke="#45475a" stroke-width="2"/>
+
+  <!-- Terminal dots (like macOS window buttons) -->
+  <circle cx="28" cy="28" r="5" fill="#f38ba8"/>
+  <circle cx="44" cy="28" r="5" fill="#f9e2af"/>
+  <circle cx="60" cy="28" r="5" fill="#a6e3a1"/>
+
+  <!-- CFG text - bold monospace style -->
+  <text x="64" y="82" text-anchor="middle" font-family="monospace" font-weight="bold" font-size="36" fill="#cdd6f4">CFG</text>
+
+  <!-- Subtle accent line under text -->
+  <rect x="32" y="92" width="64" height="3" rx="1.5" fill="#89b4fa"/>
+</svg>
