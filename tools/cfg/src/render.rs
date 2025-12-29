@@ -63,6 +63,13 @@ fn upper_filter(value: &Value, _args: &HashMap<String, Value>) -> TeraResult<Val
     Ok(Value::String(color.to_hex_upper()))
 }
 
+/// Custom Tera filter: lowercase hex
+/// Usage: {{ blue | lower }}
+fn lower_filter(value: &Value, _args: &HashMap<String, Value>) -> TeraResult<Value> {
+    let color = value_to_color(value)?;
+    Ok(Value::String(color.to_hex_lower()))
+}
+
 /// Custom Tera filter: space-separated RGB
 /// Usage: {{ blue | rgb }}
 fn rgb_filter(value: &Value, _args: &HashMap<String, Value>) -> TeraResult<Value> {
@@ -150,10 +157,10 @@ fn blend_filter(value: &Value, args: &HashMap<String, Value>) -> TeraResult<Valu
 /// Usage: {{ blue | lighten(amount=15) }}
 fn lighten_filter(value: &Value, args: &HashMap<String, Value>) -> TeraResult<Value> {
     let color = value_to_color(value)?;
-    let amount = args
-        .get("amount")
-        .and_then(|v| v.as_u64())
-        .ok_or_else(|| tera::Error::msg("lighten: missing 'amount' argument"))? as u8;
+    let amount =
+        args.get("amount")
+            .and_then(|v| v.as_u64())
+            .ok_or_else(|| tera::Error::msg("lighten: missing 'amount' argument"))? as u8;
     Ok(tera::to_value(color.lighten(amount))?)
 }
 
@@ -161,8 +168,8 @@ fn lighten_filter(value: &Value, args: &HashMap<String, Value>) -> TeraResult<Va
 /// Usage: {{ blue | darken(amount=15) }}
 fn darken_filter(value: &Value, args: &HashMap<String, Value>) -> TeraResult<Value> {
     let color = value_to_color(value)?;
-    let amount = args
-        .get("amount")
+    let amount =
+        args.get("amount")
             .and_then(|v| v.as_u64())
             .ok_or_else(|| tera::Error::msg("darken: missing 'amount' argument"))? as u8;
     Ok(tera::to_value(color.darken(amount))?)
@@ -241,6 +248,7 @@ pub fn render_template(template_path: &Path, context: &Context) -> Result<String
     let mut tera = Tera::default();
     tera.register_filter("hex", hex_filter);
     tera.register_filter("upper", upper_filter);
+    tera.register_filter("lower", lower_filter);
     tera.register_filter("rgb", rgb_filter);
     tera.register_filter("rgb_css", rgb_css_filter);
     tera.register_filter("rgba_css", rgba_css_filter);

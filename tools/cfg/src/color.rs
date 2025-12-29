@@ -38,6 +38,11 @@ impl Color {
         format!("{:02X}{:02X}{:02X}", self.r, self.g, self.b)
     }
 
+    /// Output as hex without # in lowercase (e.g., "89b4fa")
+    pub fn to_hex_lower(&self) -> String {
+        format!("{:02x}{:02x}{:02x}", self.r, self.g, self.b)
+    }
+
     /// Output as hex with # (e.g., "#89b4fa")
     pub fn to_hex_hash(&self) -> String {
         format!("#{:02x}{:02x}{:02x}", self.r, self.g, self.b)
@@ -66,13 +71,19 @@ impl Color {
     /// Output as Hyprlang RGBA (e.g., "rgba(89b4fae6)" where e6 = 0.9 * 255)
     pub fn to_hyprlang_rgba(&self, alpha: f32) -> String {
         let alpha_byte = (alpha * 255.0).round() as u8;
-        format!("rgba({:02x}{:02x}{:02x}{:02x})", self.r, self.g, self.b, alpha_byte)
+        format!(
+            "rgba({:02x}{:02x}{:02x}{:02x})",
+            self.r, self.g, self.b, alpha_byte
+        )
     }
 
     /// Output as Qt ARGB format (e.g., "#ff89b4fa")
     pub fn to_hex_argb(&self, alpha: f32) -> String {
         let alpha_byte = (alpha * 255.0).round() as u8;
-        format!("#{:02x}{:02x}{:02x}{:02x}", alpha_byte, self.r, self.g, self.b)
+        format!(
+            "#{:02x}{:02x}{:02x}{:02x}",
+            alpha_byte, self.r, self.g, self.b
+        )
     }
 
     /// Blend this color with another (amount = percentage of this color, 0-100)
@@ -88,7 +99,11 @@ impl Color {
     /// Lighten this color by a percentage (0-100)
     /// amount = 0: no change, amount = 100: pure white
     pub fn lighten(&self, amount: u8) -> Color {
-        let white = Color { r: 255, g: 255, b: 255 };
+        let white = Color {
+            r: 255,
+            g: 255,
+            b: 255,
+        };
         self.blend(&white, 100 - amount)
     }
 
