@@ -21,8 +21,7 @@
       "privacy",
       "mpris",
       "tray",
-      "wireplumber",
-      "custom/powermenu"
+      "wireplumber"
     ],
     "hyprland/workspaces": {
       "format": "{icon}",
@@ -60,11 +59,6 @@
     "tray": {
       "icon-size": 18,
       "spacing": 10
-    },
-    "custom/powermenu": {
-      "format": "⏻",
-      "tooltip": false,
-      "on-click": "app2unit -- wlogout"
     },
     "mpris": {
       "format": "{player_icon}  {dynamic}",

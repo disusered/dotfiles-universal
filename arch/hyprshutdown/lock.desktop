@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Lock Screen
+Comment=Lock the current session
+Exec=loginctl lock-session
+Icon=system-lock-screen
+Terminal=false
+Categories=System;
+Keywords=lock;screen;session;
