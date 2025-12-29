@@ -1,8 +1,8 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm hyprland-git hyprpolkitagent xdg-desktop-portal \
-      xdg-desktop-portal-kde xdg-desktop-portal-hyprland qt5-wayland \
+      sudo pacman -S --noconfirm hyprland-meta-git xdg-desktop-portal \
+      xdg-desktop-portal-kde qt5-wayland \
       qt6-wayland wayland wayland-protocols hyprutils-git hyprlang-git \
       hyprwayland-scanner-git cpio && \
       PATH="/usr/bin:$PATH" yay -S --noconfirm pyprland

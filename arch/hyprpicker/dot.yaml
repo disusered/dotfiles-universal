@@ -1,6 +1,6 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S --noconfirm hyprpicker
+    cmd: yay -S --noconfirm hyprpicker-git
   depends:
     - /lib/wl-clipboard
   links:

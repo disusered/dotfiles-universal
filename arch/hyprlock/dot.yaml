@@ -1,6 +1,6 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo yay -S --noconfirm hyprlock
+    cmd: yay -S --noconfirm hyprlock-git
   links:
     hyprlock.conf: ~/.config/hypr/hyprlock.conf
     mocha.conf: ~/.config/hypr/mocha.conf
