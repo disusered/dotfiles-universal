@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Shutdown
-Comment=Power off the system
-Exec=sh -c '~/.local/bin/hyprshutdown-wrapper -t "Shutting down..." --post-cmd "shutdown -P 0"'
-Icon=system-shutdown
-Terminal=false
-Categories=System;
-Keywords=shutdown;poweroff;halt;

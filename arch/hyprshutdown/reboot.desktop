@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Reboot
-Comment=Restart the system
-Exec=sh -c '~/.local/bin/hyprshutdown-wrapper -t "Restarting..." --post-cmd "reboot"'
-Icon=system-reboot
-Terminal=false
-Categories=System;
-Keywords=reboot;restart;
