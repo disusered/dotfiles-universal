@@ -7,4 +7,3 @@ linux[whoami.distro^="Arch"]:
     clipse.conf: {{ dirs.base.config }}/hypr/conf.d/clipse.conf
     config.json: {{ dirs.base.config }}/clipse/config.json
     custom_theme.json: {{ dirs.base.config }}/clipse/custom_theme.json
-    clipse.toml: {{ dirs.base.config }}/pypr/conf.d/clipse.toml
