@@ -1,5 +1,0 @@
-linux[whoami.distro^="Arch"]:
-  installs:
-    cmd: sudo pacman -S --noconfirm cliphist
-    depends:
-      - /arch/hyprland

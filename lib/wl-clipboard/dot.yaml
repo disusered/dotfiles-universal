@@ -1,5 +1,3 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: sudo pacman -S --noconfirm wl-clipboard
-  links:
-    clipboard.conf: ~/.config/hypr/conf.d/clipboard.conf

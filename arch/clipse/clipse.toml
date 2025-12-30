@@ -1,0 +1,6 @@
+[scratchpads.clipboard]
+animation = "fromTop"
+command = "app2unit -s b -- kitty --class clipse_scratch clipse"
+size = "734px 625px"
+class = "clipse_scratch"
+lazy = true
