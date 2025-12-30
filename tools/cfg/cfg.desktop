@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=cfg
 Comment=Dotfiles configuration
-Exec=app2unit -- pypr-client toggle cfg
+Exec=sh -c 'hyprctl clients -j | jq -e ".[] | select(.class == \"cfg_scratch\")" > /dev/null || app2unit -- kitty --class cfg_scratch cfg -i'
 Icon=cfg
 Type=Application
 Categories=Settings;

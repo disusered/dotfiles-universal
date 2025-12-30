@@ -639,23 +639,17 @@ impl FontPicker {
                 .spawn();
 
             if let Ok(mut child) = child {
-                // Hide cfg via pypr
-                let _ = std::process::Command::new("pypr")
-                    .args(["toggle", "cfg"])
-                    .output();
-
-                // Wait for window to appear, then resize and position
                 std::thread::spawn(move || {
+                    // Wait for window to appear, then resize and position
                     std::thread::sleep(std::time::Duration::from_millis(150));
-                    // Resize and move down 5% from top (matching cfg scratchpad position)
                     let _ = std::process::Command::new("hyprctl")
                         .args(["--batch", "dispatch focuswindow class:fonts_scratch; dispatch resizeactive exact 1080 720; dispatch centerwindow 1"])
                         .output();
 
-                    // Wait for preview to close, then restore cfg
+                    // Wait for preview to close, then restore focus to cfg
                     let _ = child.wait();
-                    let _ = std::process::Command::new("pypr")
-                        .args(["toggle", "cfg"])
+                    let _ = std::process::Command::new("hyprctl")
+                        .args(["dispatch", "focuswindow", "class:cfg_scratch"])
                         .output();
                 });
             }
