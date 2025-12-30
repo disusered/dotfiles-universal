@@ -13,8 +13,8 @@ hyprland = { path = "arch/hyprland/hyprland.conf.tera", reload = "hyprctl reload
 hyprtoolkit = { path = "arch/hyprland/hyprtoolkit.conf.tera", reload = "hyprctl reload" }
 hyprlock-palette = { path = "arch/hyprlock/mocha.conf.tera" }
 kitty = { path = "tools/kitty/kitty.conf.tera", reload = "pkill -USR1 kitty" }
-waybar-style = { path = "tools/waybar/style.css.tera", reload = "systemctl --user restart waybar" }
-waybar-config = { path = "tools/waybar/config.jsonc.tera", reload = "systemctl --user restart waybar" }
+waybar-style = { path = "arch/waybar/style.css.tera", reload = "systemctl --user restart waybar" }
+waybar-config = { path = "arch/waybar/config.jsonc.tera", reload = "systemctl --user restart waybar" }
 rofi = { path = "tools/rofi/catppuccin-mocha.rasi.tera" }
 lazygit = { path = "tools/lazygit/config.yaml.tera" }
 gitconfig = { path = "tools/git/gitconfig.tera" }
