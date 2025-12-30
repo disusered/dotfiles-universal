@@ -3,4 +3,4 @@ animation = "fromTop"
 command = "app2unit -s b -- kitty --class cfg_scratch cfg -i"
 size = "1080px 720px"
 class = "cfg_scratch"
-lazy = true
+lazy = false
