@@ -179,6 +179,9 @@ impl FontPicker {
     /// Reload config from disk (to pick up changes from scratchpad)
     pub fn refresh_config(&mut self) {
         if let Ok(cfg) = Config::load(&self.config_path) {
+            // Update originals so has_changes() reflects the new baseline
+            self.original_mono = cfg.fonts.mono.clone();
+            self.original_sans = cfg.fonts.sans.clone();
             self.config = cfg;
         }
     }
