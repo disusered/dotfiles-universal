@@ -640,12 +640,6 @@ impl FontPicker {
 
             if let Ok(mut child) = child {
                 std::thread::spawn(move || {
-                    // Wait for window to appear, then resize and position
-                    std::thread::sleep(std::time::Duration::from_millis(150));
-                    let _ = std::process::Command::new("hyprctl")
-                        .args(["--batch", "dispatch focuswindow class:fonts_scratch; dispatch resizeactive exact 1080 720; dispatch centerwindow 1"])
-                        .output();
-
                     // Wait for preview to close, then restore focus to cfg
                     let _ = child.wait();
                     let _ = std::process::Command::new("hyprctl")
