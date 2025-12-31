@@ -67,6 +67,7 @@ $base = {{ base | hyprlang }}
 $mantle = {{ mantle | hyprlang }}
 $crust = {{ crust | hyprlang }}
 $accent = {{ accent | hyprlang }}
+$secondary = {{ secondary | hyprlang }}
 
 general {
     gaps_in = 3
