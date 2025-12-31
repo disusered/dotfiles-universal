@@ -79,6 +79,17 @@ general {
     layout = dwindle
 }
 
+group {
+    col.border_active = $accent
+    col.border_inactive = $surface0
+    groupbar {
+        col.active = $secondary
+        col.inactive = $surface0
+        render_titles = false
+        height = 3
+    }
+}
+
 decoration {
     rounding = 10
     active_opacity = 1.0
@@ -151,10 +162,25 @@ bind = $mainMod, Return, exec, app2unit -- $terminal
 bind = $mainMod, E, exec, app2unit -- $fileManager
 bind = $mainMod, B, exec, app2unit -- $browser
 bind = $mainMod, W, killactive,
+bind = $mainMod SHIFT, T, togglegroup,
 bind = $mainMod, M, exit,
 bind = $mainMod SHIFT, F, togglefloating,
 bind = $mainMod SHIFT, P, pin,
 bind = $mainMod, T, togglesplit,
+
+# Tabbed Windows (Group)
+bind = $mainMod, bracketleft, changegroupactive, b
+bind = $mainMod, bracketright, changegroupactive, f
+bind = $mainMod SHIFT, bracketleft, movegroupwindow, b
+bind = $mainMod SHIFT, bracketright, movegroupwindow, f
+bind = $mainMod SHIFT CONTROL, H, moveintogroup, l
+bind = $mainMod SHIFT CONTROL, L, moveintogroup, r
+bind = $mainMod SHIFT CONTROL, K, moveintogroup, u
+bind = $mainMod SHIFT CONTROL, J, moveintogroup, d
+bind = $mainMod SHIFT ALT, H, moveoutofgroup, l
+bind = $mainMod SHIFT ALT, L, moveoutofgroup, r
+bind = $mainMod SHIFT ALT, K, moveoutofgroup, u
+bind = $mainMod SHIFT ALT, J, moveoutofgroup, d
 
 bind = ,F11, exec, hyprctl activewindow -j | jq -e '.pinned' && hyprctl dispatch pin; hyprctl dispatch fullscreen 0
 bind = $mainMod, F, fullscreen, 1
