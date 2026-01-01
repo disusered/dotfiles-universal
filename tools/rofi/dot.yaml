@@ -1,6 +1,8 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm rofi-wayland
+    cmd: |
+      sudo pacman -S --noconfirm rofi-wayland
+      yay -S --noconfirm rofi-calc
   links:
     config.rasi: ~/.config/rofi/config.rasi
     rofi.conf: ~/.config/hypr/conf.d/rofi.conf
