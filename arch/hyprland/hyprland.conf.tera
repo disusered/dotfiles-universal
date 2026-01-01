@@ -197,6 +197,10 @@ bind = $mainMod, L, movefocus, r
 bind = $mainMod, K, movefocus, u
 bind = $mainMod, J, movefocus, d
 
+# Alt-Tab window cycling (current workspace)
+bind = ALT, TAB, cyclenext, visible
+bind = ALT SHIFT, TAB, cyclenext, visible prev
+
 bind = $mainMod SHIFT, H, movewindow, l
 bind = $mainMod SHIFT, L, movewindow, r
 bind = $mainMod SHIFT, K, movewindow, u
