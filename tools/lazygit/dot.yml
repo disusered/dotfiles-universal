@@ -24,3 +24,5 @@ linux[whoami.distro^="Arch"]:
       - /tools/delta
   links:
     config.yaml: ~/.config/lazygit/config.yml
+    hyprgit.sh: ~/.local/bin/hyprgit
+    lazygit.conf: {{ dirs.base.config }}/hypr/conf.d/lazygit.conf
