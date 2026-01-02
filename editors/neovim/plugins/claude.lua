@@ -15,149 +15,118 @@ end
 -- Create Kitty terminal provider with multi-window safety
 local function create_kitty_provider()
   local provider = {}
+  local modal_socket = nil
 
   provider.setup = function(config)
     -- Initialize state tracking
     vim.g.claudecode_kitty_window_id = nil
+    
+    -- Determine the expected socket for the modal associated with this Kitty instance
+    -- We assume the current Kitty instance is the parent
+    -- Try to find our own PID or the parent kitty PID
+    local kitty_pid = vim.fn.getpid() -- Start with nvim pid
+    -- Traverse up to find kitty? simpler: query kitty @ ls and find self
+    local ls_cmd = "kitty @ ls"
+    local ls_result = vim.fn.system(ls_cmd)
+    local ok, data = pcall(vim.fn.json_decode, ls_result)
+    
+    if ok and data then
+      -- The ls output is a list of OS Windows. 
+      -- We need the PID of the Kitty *process* that owns these windows.
+      -- Actually, Hyprclaude uses the PID of the focused window from Hyprland.
+      -- Which is usually the OS Window PID or the Kitty Process PID?
+      -- Hyprland 'pid' is the process ID of the window owner.
+      -- Kitty runs as a single process for all windows (usually) or separate?
+      -- If single process, we just need that PID.
+      -- 'kitty @ ls' doesn't explicitly give the main process PID easily at top level?
+      -- Wait, hyprclaude uses `hyprctl activewindow`.
+      -- We can assume the socket name will be `unix:@claude-<KITTY_PID>`.
+      -- We can guess KITTY_PID from the `KITTY_PID` env var if set, or query it.
+    end
+    
+    -- Use filesystem socket (matches hyprclaude per-Neovim pattern)
+    -- Kitty appends its own PID, so we glob for it
+    local nvim_pid = vim.fn.getpid()
+    local socket_pattern = "/tmp/claude-nvim-" .. nvim_pid .. ".sock-*"
+    local sockets = vim.fn.glob(socket_pattern, false, true)
+    if #sockets > 0 then
+      modal_socket = "unix:" .. sockets[1]
+    else
+      -- Fallback: try without the Kitty PID suffix (in case behavior changes)
+      modal_socket = "unix:/tmp/claude-nvim-" .. nvim_pid .. ".sock"
+    end
   end
 
-  -- Find the current OS window (the one containing Neovim)
-  local function find_current_os_window(data)
-    for _, os_window in ipairs(data) do
-      for _, tab in ipairs(os_window.tabs or {}) do
-        for _, window in ipairs(tab.windows or {}) do
-          if window.is_self then
-            return os_window
-          end
-        end
-      end
+  -- Helper to execute commands against the modal's socket
+  local function exec_modal(cmd)
+    if not modal_socket then return nil end
+    return vim.fn.system("kitty @ --to " .. modal_socket .. " " .. cmd)
+  end
+
+  -- Check if the modal exists and is reachable
+  local function find_modal_id()
+    if not modal_socket then return nil end
+    local ls_cmd = "ls" -- kitty @ ls
+    local result = exec_modal(ls_cmd)
+    
+    -- If the socket doesn't exist, result will be an error
+    if not result or result:match("Connection refused") or result:match("Failed to connect") then
+        return nil
+    end
+
+    -- If connected, we just need ANY window ID from it (it should only have one tab/window)
+    local ok, data = pcall(vim.fn.json_decode, result)
+    if ok and data and #data > 0 then
+        -- Return the id of the first window in the first tab
+        return data[1].tabs[1].windows[1].id
     end
     return nil
   end
 
   provider.open = function(cmd_string, env_table, effective_config, focus)
-    if focus == nil then
-      focus = true
-    end
+    -- Delegate launch/toggle to the script
+    vim.fn.system("bash ~/.local/bin/hyprclaude")
 
-    -- Get all Kitty windows and tabs
-    local ls_cmd = "kitty @ ls"
-    local ls_result = vim.fn.system(ls_cmd)
-    local ok, data = pcall(vim.fn.json_decode, ls_result)
-
-    if ok and data then
-      -- Find the current OS window to scope our search
-      local current_os_window = find_current_os_window(data)
-
-      if current_os_window then
-        -- Search only within the current OS window's tabs
-        for _, tab in ipairs(current_os_window.tabs or {}) do
-          for _, window in ipairs(tab.windows or {}) do
-            if window.user_vars and window.user_vars.claude_tab == "true" then
-              -- Found existing Claude tab in current OS window
-              vim.g.claudecode_kitty_window_id = window.id
-
-              if focus then
-                local focus_cmd = string.format("kitty @ focus-tab --match id:%d", tab.id)
-                vim.fn.system(focus_cmd)
-              end
-
-              return
-            end
-          end
-        end
-      end
-    end
-
-    -- No Claude tab found in current OS window, spawn new one
-    local cwd = vim.fn.getcwd()
-
-    -- The cmd_string already contains environment variables and full command
-    -- Just like Wezterm provider, pass it directly to the shell
-    local spawn_cmd = string.format(
-      "kitty @ launch --type=tab --var claude_tab=true --cwd %s -- zsh -lic %s",
-      vim.fn.shellescape(cwd),
-      vim.fn.shellescape(cmd_string)
-    )
-
-    local result = vim.fn.system(spawn_cmd)
-    local window_id = tonumber(result:match("%d+"))
-
+    -- Wait for socket to become available
+    vim.wait(2000, function() 
+        return find_modal_id() ~= nil
+    end, 100)
+    
+    local window_id = find_modal_id()
     if window_id then
       vim.g.claudecode_kitty_window_id = window_id
-
-      -- Focus the new tab if requested
-      if focus then
-        -- Get the tab ID for this window
-        local ls_result2 = vim.fn.system("kitty @ ls")
-        local ok2, data2 = pcall(vim.fn.json_decode, ls_result2)
-        if ok2 and data2 then
-          for _, os_window in ipairs(data2) do
-            for _, tab in ipairs(os_window.tabs or {}) do
-              for _, window in ipairs(tab.windows or {}) do
-                if window.id == window_id then
-                  local focus_cmd = string.format("kitty @ focus-tab --match id:%d", tab.id)
-                  vim.fn.system(focus_cmd)
-                  return
-                end
-              end
-            end
-          end
-        end
-      end
     end
   end
 
   provider.close = function()
+    -- We can close the window via the socket
     local window_id = vim.g.claudecode_kitty_window_id
-    if window_id then
-      local close_cmd = string.format("kitty @ close-window --match id:%d", window_id)
-      vim.fn.system(close_cmd)
+    if window_id and modal_socket then
+      exec_modal("close-window --match id:" .. window_id)
       vim.g.claudecode_kitty_window_id = nil
     end
   end
 
   provider.simple_toggle = function(cmd_string, env_table, effective_config)
-    -- Check if Claude tab exists in current OS window
-    local ls_cmd = "kitty @ ls"
-    local ls_result = vim.fn.system(ls_cmd)
-    local ok, data = pcall(vim.fn.json_decode, ls_result)
-
-    if ok and data then
-      local current_os_window = find_current_os_window(data)
-
-      if current_os_window then
-        for _, tab in ipairs(current_os_window.tabs or {}) do
-          for _, window in ipairs(tab.windows or {}) do
-            if window.user_vars and window.user_vars.claude_tab == "true" then
-              -- Focus existing tab
-              local focus_cmd = string.format("kitty @ focus-tab --match id:%d", tab.id)
-              vim.fn.system(focus_cmd)
-              vim.g.claudecode_kitty_window_id = window.id
-              return
-            end
-          end
-        end
-      end
+    vim.fn.system("bash ~/.local/bin/hyprclaude")
+    -- Update ID tracking
+    local window_id = find_modal_id()
+    if window_id then
+        vim.g.claudecode_kitty_window_id = window_id
     end
-
-    -- No Claude tab found, spawn new one
-    provider.open(cmd_string, env_table, effective_config, true)
   end
 
   provider.focus_toggle = function(cmd_string, env_table, effective_config)
-    -- Same as simple_toggle for Kitty
     provider.simple_toggle(cmd_string, env_table, effective_config)
   end
 
   provider.get_active_bufnr = function()
-    -- External terminal, no buffer
     return nil
   end
 
   provider.is_available = function()
-    -- Check if we're in Kitty
-    return vim.env.KITTY_LISTEN_ON ~= nil
+    -- We need to ensure we can identify the target socket
+    return vim.env.KITTY_LISTEN_ON ~= nil and vim.env.KITTY_PID ~= nil
   end
 
   return provider
@@ -312,7 +281,7 @@ return {
       port_range = { min = 10000, max = 65535 },
       auto_start = true,
       log_level = "info", -- "trace", "debug", "info", "warn", "error"
-      terminal_cmd = "/home/carlos/.local/share/mise/installs/node/24.10.0/bin/claude",
+      terminal_cmd = "/home/carlos/.local/share/mise/shims/claude",
       -- For local installations: "~/.claude/local/claude"
       -- For native binary: use output from 'which claude'
 

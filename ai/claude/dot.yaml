@@ -14,6 +14,7 @@ global:
 linux|darwin:
   links:
     settings.json: ~/.claude/settings.json
+    claude.conf: {{ dirs.base.config }}/hypr/conf.d/claude.conf
 windows:
   links:
     settings_win.json: ~/.claude/settings.json
