@@ -17,12 +17,7 @@
     "modules-center": [
       "hyprland/window"
     ],
-    "modules-right": [
-      "privacy",
-      "mpris",
-      "tray",
-      "wireplumber"
-    ],
+    "modules-right": [],
     "hyprland/workspaces": {
       "format": "{icon}",
       "format-icons": {
@@ -55,35 +50,6 @@
           "today": "<span color='#{{ accent | hex }}'><b><u>{}</u></b></span>"
         }
       }
-    },
-    "tray": {
-      "icon-size": 18,
-      "spacing": 10
-    },
-    "mpris": {
-      "format": "{player_icon}  {dynamic}",
-      "format-paused": "{status_icon}  <i>{dynamic}</i>",
-      "player-icons": {
-        "default": "▶",
-        "mpv": "🎵"
-      },
-      "status-icons": {
-        "paused": "⏸"
-      },
-      "interval": 15,
-      "dynamic-len": 60
-    },
-    "wireplumber": {
-      "format": "{volume}% {icon}",
-      "format-muted": "",
-      "on-click": "app2unit -- pavucontrol",
-      "on-click-right": "app2unit -- helvum",
-      "on-click-middle": "app2unit -- easyeffects",
-      "format-icons": [
-        "",
-        "",
-        ""
-      ]
     },
     "privacy": {
       "icon-spacing": 4,
@@ -124,7 +90,12 @@
     "modules-center": [
       "hyprland/window"
     ],
-    "modules-right": [],
+    "modules-right": [
+      "privacy",
+      "mpris",
+      "tray",
+      "wireplumber"
+    ],
     "hyprland/workspaces": {
       "format": "{icon}",
       "format-icons": {
@@ -140,23 +111,53 @@
       "format": "{}",
       "separate-outputs": true
     },
-    "clock": {
-      "format": "{:%H:%M}",
-      "format-alt": "{:%Y-%m-%d}",
-      "tooltip-format": "<tt><small>{calendar}</small></tt>",
-      "calendar": {
-        "mode": "year",
-        "mode-mon-col": 3,
-        "weeks-pos": "right",
-        "on-scroll": 1,
-        "format": {
-          "months": "<span color='#{{ mauve | hex }}'><b>{}</b></span>",
-          "days": "<span color='#{{ text | hex }}'><b>{}</b></span>",
-          "weeks": "<span color='#{{ accent | hex }}'><b>W{}</b></span>",
-          "weekdays": "<span color='#{{ lavender | hex }}'><b>{}</b></span>",
-          "today": "<span color='#{{ accent | hex }}'><b><u>{}</u></b></span>"
+    "privacy": {
+      "icon-spacing": 4,
+      "icon-size": 18,
+      "transition-duration": 250,
+      "modules": [
+        {
+          "type": "screenshare",
+          "tooltip": true,
+          "tooltip-icon-size": 24
+        },
+        {
+          "type": "audio-in",
+          "tooltip": true,
+          "tooltip-icon-size": 24
         }
-      }
+      ],
+      "ignore-monitor": true,
+      "ignore": []
+    },
+    "mpris": {
+      "format": "{player_icon}  {dynamic}",
+      "format-paused": "{status_icon}  <i>{dynamic}</i>",
+      "player-icons": {
+        "default": "▶",
+        "mpv": "🎵"
+      },
+      "status-icons": {
+        "paused": "⏸"
+      },
+      "interval": 15,
+      "dynamic-len": 60
+    },
+    "tray": {
+      "icon-size": 18,
+      "spacing": 10
+    },
+    "wireplumber": {
+      "format": "{volume}% {icon}",
+      "format-muted": "",
+      "on-click": "app2unit -- pavucontrol",
+      "on-click-right": "app2unit -- helvum",
+      "on-click-middle": "app2unit -- easyeffects",
+      "format-icons": [
+        "",
+        "",
+        ""
+      ]
     }
   }
 ]
