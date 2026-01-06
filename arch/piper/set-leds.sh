@@ -3,5 +3,5 @@
 DEVICE="warbling-mara"
 
 # Profile 0 only (active profile)
-ratbagctl $DEVICE profile 0 led 0 set color 749f71
-ratbagctl $DEVICE profile 0 led 1 set color fab387
+ratbagctl $DEVICE profile 0 led 0 set color aa6176
+ratbagctl $DEVICE profile 0 led 1 set color b4befe

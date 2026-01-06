@@ -34,18 +34,18 @@ gui:
   # Theme (Catppuccin Mocha)
   theme:
     activeBorderColor:
-      - "#a6e3a1"
+      - "#f38ba8"
       - bold
     inactiveBorderColor:
       - "#a6adc8"
     optionsTextColor:
-      - "#a6e3a1"
+      - "#f38ba8"
     selectedLineBgColor:
       - "#313244"
     cherryPickedCommitBgColor:
       - "#45475a"
     cherryPickedCommitFgColor:
-      - "#a6e3a1"
+      - "#f38ba8"
     unstagedChangesColor:
       - "#f38ba8"
     defaultFgColor:

@@ -6,7 +6,7 @@ TerminalApplication=app2unit -- kitty
 Theme=Papirus-Dark
 
 [KDE]
-LookAndFeelPackage=Catppuccin-Mocha-Green
+LookAndFeelPackage=Catppuccin-Mocha-Red
 ShowDeleteCommand=false
 widgetStyle=Breeze
 

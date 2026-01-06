@@ -1,2 +1,2 @@
 #!/bin/bash
-papirus-folders -C cat-mocha-green --theme Papirus-Dark
+papirus-folders -C cat-mocha-red --theme Papirus-Dark

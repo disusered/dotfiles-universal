@@ -1,5 +1,5 @@
 /* Catppuccin mocha accent overrides */
-@define-color accent_bg_color #a6e3a1;
+@define-color accent_bg_color #f38ba8;
 @define-color accent_fg_color #11111b;
 :root {
   --accent-blue: #89b4fa;
@@ -11,7 +11,7 @@
   --accent-pink: #f5c2e7;
   --accent-purple: #cba6f7;
   --accent-slate: #7f849c;
-  --accent-bg-color: #a6e3a1;
+  --accent-bg-color: #f38ba8;
   --accent-fg-color: @accent_fg_color;
   --window-bg-color: @window_bg_color;
   --headerbar-bg-color: @headerbar_bg_color;
