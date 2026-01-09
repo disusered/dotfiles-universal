@@ -1,0 +1,4 @@
+linux[whoami.distro^="Arch"]:
+  links:
+    hyprspace-lib.sh: ~/.local/share/hyprspace/hyprspace-lib.sh
+    README.md: ~/.local/share/hyprspace/README.md

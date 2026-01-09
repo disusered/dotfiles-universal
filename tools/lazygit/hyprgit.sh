@@ -1,67 +1,64 @@
 #!/usr/bin/env bash
-# Hyprland lazygit modal launcher
-# Queries focused kitty window cwd, finds git root, spawns lazygit
+# Hyprland lazygit modal launcher - uses shared library
 
-# Check if lazygit modal already exists (toggle off)
-lazygit_pid=$(hyprctl clients -j | jq -r '.[] | select(.class == "lazygit_modal") | .pid')
-if [[ -n "$lazygit_pid" ]]; then
-  kill "$lazygit_pid" 2>/dev/null
-  exit 0
+# Source library
+if [[ -f "$HOME/.local/share/hyprspace/hyprspace-lib.sh" ]]; then
+  source "$HOME/.local/share/hyprspace/hyprspace-lib.sh"
+else
+  notify-send -u critical "hyprgit" "Library not found: hyprspace-lib.sh"
+  exit 1
 fi
 
-# Verify focused window is kitty
-active_info=$(hyprctl activewindow -j)
+# Configuration
+LAZYGIT_BIN="lazygit"
+WORKSPACE_NAME="lazygit"
+WINDOW_CLASS="lazygit_modal"
+
+# Validate dependencies
+hyprspace_check_deps || exit 1
+
+# Get active window and context
+active_info=$(hyprspace_get_active_window) || exit 1
 active_class=$(echo "$active_info" | jq -r '.class')
 active_pid=$(echo "$active_info" | jq -r '.pid')
+cwd=$(hyprspace_get_kitty_context "$active_class" "$active_pid")
 
-if [[ "$active_class" != "kitty" ]]; then
-  notify-send -u normal "Lazygit" "No Kitty window focused (got: $active_class)"
-  exit 1
-fi
-
-# Query kitty for focused window's cwd and check for neovim
-# Kitty appends the PID to the socket name when multiple instances are running
-kitty_state=$(kitty @ --to "unix:@mykitty-$active_pid" ls 2>/dev/null)
-
-# Fallback to generic socket if PID-specific fails
-if [[ -z "$kitty_state" ]]; then
-    kitty_state=$(kitty @ --to unix:@mykitty ls 2>/dev/null)
-fi
-
-cwd=$(echo "$kitty_state" | jq -r '
-  .[] | .tabs[] | .windows[] | select(.is_focused) | .cwd
-' | head -1)
-
-
-# Check if focused window is running neovim and get its PID
-nvim_pid=$(echo "$kitty_state" | jq -r '
-  .[] | .tabs[] | .windows[] | select(.is_focused) |
-  .foreground_processes[] | select(.cmdline[0] == "nvim") | .pid
-' | head -1)
-
-# Fallback: warn if no kitty context
-if [[ -z "$cwd" || "$cwd" == "null" ]]; then
-  notify-send -u normal "Lazygit" "No Kitty window focused"
-  exit 1
-fi
-
-# Find git root from cwd
+# GIT-SPECIFIC: Find git root (REQUIRED)
 git_root=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null)
-
 if [[ -z "$git_root" ]]; then
   notify-send -u normal "Lazygit" "Not a git repository: $cwd"
   exit 1
 fi
 
-# Spawn lazygit in floating kitty window
-#
-# Build NVIM env if neovim is running in the focused window
-nvim_env=""
-if [[ -n "$nvim_pid" && "$nvim_pid" != "null" ]]; then
-  nvim_socket="/run/user/$(id -u)/nvim.${nvim_pid}.0"
-  if [[ -S "$nvim_socket" ]]; then
-    nvim_env="--env NVIM=$nvim_socket"
-  fi
+# Build context identifier
+context_title="lazygit: $git_root"
+
+# Toggle off if workspace already visible
+if hyprspace_is_workspace_visible "$WORKSPACE_NAME"; then
+  hyprspace_toggle_off "$WORKSPACE_NAME"
+  exit 0
 fi
 
-kitty --class lazygit_modal --directory "$git_root" $nvim_env lazygit
+# Find or spawn window
+existing_window=$(hyprspace_find_window "$WINDOW_CLASS" "$context_title")
+
+if [[ -n "$existing_window" ]]; then
+  # Focus existing window
+  hyprspace_focus_window "$WORKSPACE_NAME" "$existing_window"
+else
+  # Spawn new window (SIMPLIFIED - no NVIM env var)
+  kitty --class "$WINDOW_CLASS" \
+        --title "$context_title" \
+        --directory "$git_root" \
+        "$LAZYGIT_BIN" &
+
+  # Wait for spawn and show workspace
+  if hyprspace_wait_for_window "$WINDOW_CLASS" "$context_title" "$git_root"; then
+    new_window=$(hyprspace_find_window "$WINDOW_CLASS" "$context_title")
+    if [[ -n "$new_window" ]]; then
+      hyprspace_focus_window "$WORKSPACE_NAME" "$new_window"
+    else
+      hyprspace_show_workspace "$WORKSPACE_NAME"
+    fi
+  fi
+fi

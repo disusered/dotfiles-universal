@@ -22,6 +22,7 @@ linux[whoami.distro^="Arch"]:
     cmd: yes | sudo pacman -S lazygit
     depends:
       - /tools/delta
+      - /lib/hyprspace
   links:
     config.yaml: ~/.config/lazygit/config.yml
     hyprgit.sh: ~/.local/bin/hyprgit
