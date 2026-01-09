@@ -3,7 +3,9 @@ global:
     cmd: npm install -g @anthropic-ai/claude-code tsx
     depends:
       - /languages/node/latest
+      - /lib/hyprspace
   links:
+    hyprclaude.sh: ~/.local/bin/hyprclaude
     skills: ~/.claude/skills/
     hooks: ~/.claude/hooks
     commands: ~/.claude/commands

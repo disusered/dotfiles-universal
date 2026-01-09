@@ -21,7 +21,8 @@ hyprspace_check_deps || exit 1
 active_info=$(hyprspace_get_active_window) || exit 1
 active_class=$(echo "$active_info" | jq -r '.class')
 active_pid=$(echo "$active_info" | jq -r '.pid')
-cwd=$(hyprspace_get_kitty_context "$active_class" "$active_pid")
+active_title=$(echo "$active_info" | jq -r '.initialTitle')
+cwd=$(hyprspace_get_kitty_context "$active_class" "$active_pid" "$active_title")
 
 # GIT-SPECIFIC: Find git root (REQUIRED)
 git_root=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null)
