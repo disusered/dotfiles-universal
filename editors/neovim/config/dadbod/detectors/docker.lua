@@ -23,21 +23,87 @@ local function get_env_value(env_data, key)
   return nil
 end
 
+-- Find all docker-compose files in a directory (base + environment-specific)
+local function find_compose_files(dir)
+  local files = {}
+
+  -- Check for base docker-compose.yml/yaml
+  for _, basename in ipairs({ "docker-compose.yml", "docker-compose.yaml" }) do
+    local path = dir .. "/" .. basename
+    if vim.fn.filereadable(path) == 1 then
+      table.insert(files, path)
+      break
+    end
+  end
+
+  -- Find docker-compose.*.yml/yaml files (e.g., docker-compose.development.yml)
+  local glob_patterns = { dir .. "/docker-compose.*.yml", dir .. "/docker-compose.*.yaml" }
+  for _, pattern in ipairs(glob_patterns) do
+    local matches = vim.fn.glob(pattern, false, true)
+    for _, match in ipairs(matches) do
+      -- Avoid duplicates
+      local already_added = false
+      for _, f in ipairs(files) do
+        if f == match then
+          already_added = true
+          break
+        end
+      end
+      if not already_added then
+        table.insert(files, match)
+      end
+    end
+  end
+
+  return files
+end
+
+-- Merge services from multiple compose files (later files override earlier ones)
+local function merge_services(files)
+  local merged = {}
+  for _, file in ipairs(files) do
+    local ok, data = pcall(vim.fn["rails#yaml_parse_file"], file)
+    if ok and type(data) == "table" then
+      local services = data.services or data
+      if type(services) == "table" then
+        for name, config in pairs(services) do
+          merged[name] = config
+        end
+      end
+    end
+  end
+  return merged
+end
+
 function M.find()
-  local compose_path = vim.fn.findfile("docker-compose.yml", ".;") or vim.fn.findfile("docker-compose.yaml", ".;")
+  -- Find project root by looking for docker-compose files
+  local compose_path = vim.fn.findfile("docker-compose.yml", ".;")
   if not compose_path or compose_path == "" then
-    print("  No docker-compose.yml found in current or parent directories.")
+    compose_path = vim.fn.findfile("docker-compose.yaml", ".;")
+  end
+  -- Also try finding environment-specific compose files
+  if not compose_path or compose_path == "" then
+    local glob_result = vim.fn.glob("**/docker-compose.*.yml", false, true)
+    if #glob_result > 0 then
+      compose_path = glob_result[1]
+    end
+  end
+
+  if not compose_path or compose_path == "" then
+    print("  No docker-compose files found in current or parent directories.")
     return nil
   end
 
-  local ok, compose_data = pcall(vim.fn["rails#yaml_parse_file"], compose_path)
-  if not ok or type(compose_data) ~= "table" then
-    print("  Failed to parse docker-compose.yml. Check file format.")
+  local compose_dir = vim.fn.fnamemodify(compose_path, ":h")
+  local compose_files = find_compose_files(compose_dir)
+
+  if #compose_files == 0 then
+    print("  No docker-compose files found.")
     return nil
   end
 
-  local services = compose_data.services or compose_data
-  if type(services) ~= "table" then
+  local services = merge_services(compose_files)
+  if type(services) ~= "table" or vim.tbl_isempty(services) then
     return nil
   end
 
@@ -115,9 +181,11 @@ function M.find()
     table.sort(connections, function(a, b)
       return a.name < b.name
     end)
-    local noun = #connections == 1 and "connection" or "connections"
+    local file_count = #compose_files
+    local file_noun = file_count == 1 and "file" or "files"
+    local conn_noun = #connections == 1 and "connection" or "connections"
     vim.notify(
-      "  Found " .. #connections .. " " .. noun .. " in docker-compose.yml.",
+      "  Found " .. #connections .. " " .. conn_noun .. " in " .. file_count .. " docker-compose " .. file_noun .. ".",
       vim.log.levels.INFO,
       { title = "Database UI" }
     )
