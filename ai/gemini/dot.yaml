@@ -3,3 +3,5 @@ global:
     cmd: npm install -g @google/gemini-cli
     depends:
       - /languages/node/latest
+  links:
+    gemini.conf: {{ dirs.base.config }}/hypr/conf.d/gemini.conf
