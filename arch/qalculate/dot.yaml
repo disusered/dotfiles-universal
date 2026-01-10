@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S --noconfirm qalculate-gtk
+  links:
+    qalculate.conf: {{ dirs.base.config }}/hypr/conf.d/qalculate.conf
