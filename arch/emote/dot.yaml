@@ -1,5 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S --noconfirm emote
+    cmd: yay -S --noconfirm --answerclean All aur/emote
   links:
     emote.conf: ~/.config/hypr/conf.d/emote.conf
