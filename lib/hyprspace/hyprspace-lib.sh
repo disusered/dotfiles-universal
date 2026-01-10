@@ -28,12 +28,13 @@ hyprspace_get_active_window() {
 
 # Extract context from Kitty window (including modal windows which are Kitty terminals)
 # Args: $1=active_class, $2=active_pid, $3=active_initial_title (optional)
-# Returns: cwd path (or $HOME on failure)
+# Returns: cwd path on stdout, exit code 0 on success, 1 if no context found
+# NOTE: Does NOT fall back to $HOME - caller must handle failure
 hyprspace_get_kitty_context() {
   local active_class="$1"
   local active_pid="$2"
   local active_title="$3"
-  local cwd="$HOME"
+  local cwd=""
 
   # For regular Kitty windows, query the socket
   if [[ "$active_class" == "kitty" ]]; then
@@ -44,9 +45,7 @@ hyprspace_get_kitty_context() {
 
     if [[ -n "$kitty_state" ]]; then
       cwd=$(echo "$kitty_state" | jq -r '.[] | .tabs[] | .windows[] | select(.is_focused) | .cwd' | head -1)
-      [[ -z "$cwd" || "$cwd" == "null" ]] && cwd="$HOME"
-    else
-      notify-send -u low "hyprspace" "Could not get Kitty context, using $HOME"
+      [[ "$cwd" == "null" ]] && cwd=""
     fi
   # For modal windows, parse the initialTitle (format: "app: /path/to/dir")
   elif [[ "$active_class" == *_modal && -n "$active_title" ]]; then
@@ -55,9 +54,22 @@ hyprspace_get_kitty_context() {
     if [[ -d "$parsed_path" ]]; then
       cwd="$parsed_path"
     fi
+  # For Dolphin file manager, check for org.kde.dolphin class
+  elif [[ "$active_class" == "org.kde.dolphin" ]]; then
+    # Dolphin's title often contains the current path
+    # Format varies: "path — Dolphin" or just "path"
+    local parsed_path="${active_title%% —*}"
+    if [[ -d "$parsed_path" ]]; then
+      cwd="$parsed_path"
+    fi
   fi
 
-  echo "$cwd"
+  if [[ -n "$cwd" ]]; then
+    echo "$cwd"
+    return 0
+  else
+    return 1
+  fi
 }
 
 # Check if workspace visible on focused monitor
@@ -67,6 +79,19 @@ hyprspace_is_workspace_visible() {
   local focused_special
   focused_special=$(hyprctl monitors -j | jq -r '.[] | select(.focused) | .specialWorkspace.name')
   [[ "$focused_special" == "special:$workspace_name" ]]
+}
+
+# Check if ANY special workspace is visible on focused monitor
+# Returns: 0 if a special workspace is visible, 1 otherwise
+# Outputs: the special workspace name (without "special:" prefix) if visible
+hyprspace_any_special_visible() {
+  local focused_special
+  focused_special=$(hyprctl monitors -j | jq -r '.[] | select(.focused) | .specialWorkspace.name')
+  if [[ "$focused_special" == special:* ]]; then
+    echo "${focused_special#special:}"
+    return 0
+  fi
+  return 1
 }
 
 # Toggle workspace off
