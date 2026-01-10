@@ -1,0 +1,3 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S --noconfirm webapp-manager
