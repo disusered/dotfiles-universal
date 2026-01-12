@@ -43,6 +43,14 @@ linux[whoami.distro^="Arch"]:
       # Copy Mini-Launcher executable as POP.EXE (x64 version works with Proton)
       cp "$TEMP_DIR/launcher/x64/Launcher.exe" "$GAME_DIR/POP.EXE"
 
+      # Skip intro videos (rename for reversibility)
+      echo "Skipping intro videos..."
+      for video in Bink.int Intro.int nvidia.int poplogo.int ubisoft.int; do
+        if [ -f "$GAME_DIR/Video/$video" ] && [ ! -f "$GAME_DIR/Video/$video.bak" ]; then
+          mv "$GAME_DIR/Video/$video" "$GAME_DIR/Video/$video.bak"
+        fi
+      done
+
       echo "Done! Config files and DLLs will be symlinked by Rotz."
     depends:
       - /arch/wine
@@ -55,3 +63,7 @@ linux[whoami.distro^="Arch"]:
     # Binary mods (preserved in dotfiles)
     d3d9.dll: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/d3d9.dll
     pop1w.dll: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/pop1w.dll
+    # DSOAL for 3D audio with HRTF
+    dsound.dll: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/dsound.dll
+    dsoal-aldrv.dll: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/dsoal-aldrv.dll
+    alsoft.ini: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/alsoft.ini

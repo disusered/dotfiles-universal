@@ -5,10 +5,12 @@
   },
   "prefix": {
     "overrides": {
-      "dinput8": "native,builtin"
+      "dinput8": "native,builtin",
+      "dsound": "native,builtin"
     }
   },
   "env": {
-    "PROTON_DISABLE_LSTEAMCLIENT": "1"
+    "PROTON_DISABLE_LSTEAMCLIENT": "1",
+    "WINEDLLOVERRIDES": "dinput8,dsound=n,b"
   }
 }
