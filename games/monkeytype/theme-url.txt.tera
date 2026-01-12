@@ -1,0 +1,33 @@
+{# Monkeytype custom theme URLs for Catppuccin Mocha #}
+{% if accent_name == "rosewater" %}
+https://monkeytype.com?customTheme=eyJjIjpbIiMzMTMyNDQiLCIjZjVlMGRjIiwiI2Y1ZTBkYyIsIiM2YzcwODYiLCIjMWUxZTJlIiwiI2NkZDZmNCIsIiNmMzhiYTgiLCIjZWJhMGFjIiwiI2YzOGJhOCIsIiNlYmEwYWMiXX0=
+{% elif accent_name == "flamingo" %}
+https://monkeytype.com?customTheme=eyJjIjpbIiMzMTMyNDQiLCIjZjJjZGNkIiwiI2YyY2RjZCIsIiM2YzcwODYiLCIjMWUxZTJlIiwiI2NkZDZmNCIsIiNmMzhiYTgiLCIjZWJhMGFjIiwiI2YzOGJhOCIsIiNlYmEwYWMiXX0=
+{% elif accent_name == "pink" %}
+https://monkeytype.com?customTheme=eyJjIjpbIiMzMTMyNDQiLCIjZjVjMmU3IiwiI2Y1YzJlNyIsIiM2YzcwODYiLCIjMWUxZTJlIiwiI2NkZDZmNCIsIiNmMzhiYTgiLCIjZWJhMGFjIiwiI2YzOGJhOCIsIiNlYmEwYWMiXX0=
+{% elif accent_name == "mauve" %}
+https://monkeytype.com?customTheme=eyJjIjpbIiMzMTMyNDQiLCIjY2JhNmY3IiwiI2NiYTZmNyIsIiM2YzcwODYiLCIjMWUxZTJlIiwiI2NkZDZmNCIsIiNmMzhiYTgiLCIjZWJhMGFjIiwiI2YzOGJhOCIsIiNlYmEwYWMiXX0=
+{% elif accent_name == "red" %}
+https://monkeytype.com?customTheme=eyJjIjpbIiMzMTMyNDQiLCIjZjM4YmE4IiwiI2YzOGJhOCIsIiM2YzcwODYiLCIjMWUxZTJlIiwiI2NkZDZmNCIsIiNmMzhiYTgiLCIjZWJhMGFjIiwiI2YzOGJhOCIsIiNlYmEwYWMiXX0=
+{% elif accent_name == "maroon" %}
+https://monkeytype.com?customTheme=eyJjIjpbIiMzMTMyNDQiLCIjZWJhMGFjIiwiI2ViYTBhYyIsIiM2YzcwODYiLCIjMWUxZTJlIiwiI2NkZDZmNCIsIiNmMzhiYTgiLCIjZWJhMGFjIiwiI2YzOGJhOCIsIiNlYmEwYWMiXX0=
+{% elif accent_name == "peach" %}
+https://monkeytype.com?customTheme=eyJjIjpbIiMzMTMyNDQiLCIjZmFiMzg3IiwiI2ZhYjM4NyIsIiM2YzcwODYiLCIjMWUxZTJlIiwiI2NkZDZmNCIsIiNmMzhiYTgiLCIjZWJhMGFjIiwiI2YzOGJhOCIsIiNlYmEwYWMiXX0=
+{% elif accent_name == "yellow" %}
+https://monkeytype.com?customTheme=eyJjIjpbIiMzMTMyNDQiLCIjZjllMmFmIiwiI2Y5ZTJhZiIsIiM2YzcwODYiLCIjMWUxZTJlIiwiI2NkZDZmNCIsIiNmMzhiYTgiLCIjZWJhMGFjIiwiI2YzOGJhOCIsIiNlYmEwYWMiXX0=
+{% elif accent_name == "green" %}
+https://monkeytype.com?customTheme=eyJjIjpbIiMzMTMyNDQiLCIjYTZlM2ExIiwiI2E2ZTNhMSIsIiM2YzcwODYiLCIjMWUxZTJlIiwiI2NkZDZmNCIsIiNmMzhiYTgiLCIjZWJhMGFjIiwiI2YzOGJhOCIsIiNlYmEwYWMiXX0=
+{% elif accent_name == "teal" %}
+https://monkeytype.com?customTheme=eyJjIjpbIiMzMTMyNDQiLCIjOTRlMmQ1IiwiIzk0ZTJkNSIsIiM2YzcwODYiLCIjMWUxZTJlIiwiI2NkZDZmNCIsIiNmMzhiYTgiLCIjZWJhMGFjIiwiI2YzOGJhOCIsIiNlYmEwYWMiXX0=
+{% elif accent_name == "sky" %}
+https://monkeytype.com?customTheme=eyJjIjpbIiMzMTMyNDQiLCIjODlkY2ViIiwiIzg5ZGNlYiIsIiM2YzcwODYiLCIjMWUxZTJlIiwiI2NkZDZmNCIsIiNmMzhiYTgiLCIjZWJhMGFjIiwiI2YzOGJhOCIsIiNlYmEwYWMiXX0=
+{% elif accent_name == "sapphire" %}
+https://monkeytype.com?customTheme=eyJjIjpbIiMzMTMyNDQiLCIjNzRjN2VjIiwiIzc0YzdlYyIsIiM2YzcwODYiLCIjMWUxZTJlIiwiI2NkZDZmNCIsIiNmMzhiYTgiLCIjZWJhMGFjIiwiI2YzOGJhOCIsIiNlYmEwYWMiXX0=
+{% elif accent_name == "blue" %}
+https://monkeytype.com?customTheme=eyJjIjpbIiMzMTMyNDQiLCIjODliNGZhIiwiIzg5YjRmYSIsIiM2YzcwODYiLCIjMWUxZTJlIiwiI2NkZDZmNCIsIiNmMzhiYTgiLCIjZWJhMGFjIiwiI2YzOGJhOCIsIiNlYmEwYWMiXX0=
+{% elif accent_name == "lavender" %}
+https://monkeytype.com?customTheme=eyJjIjpbIiMzMTMyNDQiLCIjYjRiZWZlIiwiI2I0YmVmZSIsIiM2YzcwODYiLCIjMWUxZTJlIiwiI2NkZDZmNCIsIiNmMzhiYTgiLCIjZWJhMGFjIiwiI2YzOGJhOCIsIiNlYmEwYWMiXX0=
+{% else %}
+{# Fallback to red #}
+https://monkeytype.com?customTheme=eyJjIjpbIiMzMTMyNDQiLCIjZjM4YmE4IiwiI2YzOGJhOCIsIiM2YzcwODYiLCIjMWUxZTJlIiwiI2NkZDZmNCIsIiNmMzhiYTgiLCIjZWJhMGFjIiwiI2YzOGJhOCIsIiNlYmEwYWMiXX0=
+{% endif %}

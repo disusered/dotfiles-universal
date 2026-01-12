@@ -55,3 +55,6 @@ papirus-folders = { path = "tools/papirus/set-folders.sh.tera", reload = "~/.dot
 
 # Editors
 vscode = { path = "editors/vscode/settings.json.tera" }
+
+# Games
+monkeytype = { path = "games/monkeytype/theme-url.txt.tera", reload = "firefox \"$(cat ~/.dotfiles/games/monkeytype/theme-url.txt)\"" }
