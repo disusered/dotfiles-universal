@@ -1,0 +1,14 @@
+{
+  "bin": "POP_Steam.EXE",
+  "patch": {
+    "LAA": true
+  },
+  "prefix": {
+    "overrides": {
+      "dinput8": "native,builtin"
+    }
+  },
+  "env": {
+    "PROTON_DISABLE_LSTEAMCLIENT": "1"
+  }
+}

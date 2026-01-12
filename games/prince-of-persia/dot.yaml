@@ -1,0 +1,57 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -e
+
+      GAME_DIR="$HOME/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time"
+      TEMP_DIR=$(mktemp -d)
+      trap 'rm -rf "$TEMP_DIR"' EXIT
+
+      if [ ! -d "$GAME_DIR" ]; then
+        echo "Error: Game not found at $GAME_DIR"
+        echo "Please install Prince of Persia: The Sands of Time from Steam first."
+        exit 1
+      fi
+
+      echo "Installing Prince of Persia mods..."
+
+      # Backup original executable if not already done
+      if [ ! -f "$GAME_DIR/POP_Steam.EXE" ]; then
+        echo "Backing up original POP.EXE..."
+        cp "$GAME_DIR/POP.EXE" "$GAME_DIR/POP_Steam.EXE"
+      fi
+
+      # Download DXWrapper
+      echo "Downloading DXWrapper..."
+      DXWRAPPER_URL="https://github.com/elishacloud/dxwrapper/releases/latest/download/dxwrapper.zip"
+      curl -L -o "$TEMP_DIR/dxwrapper.zip" "$DXWRAPPER_URL"
+      unzip -o "$TEMP_DIR/dxwrapper.zip" -d "$TEMP_DIR/dxwrapper"
+
+      # Copy DXWrapper files (main dll + dinput8 stub)
+      # Note: d3d9.dll should be a tiny stub that loads dxwrapper, not the full DXWrapper stub
+      cp "$TEMP_DIR/dxwrapper/dxwrapper.dll" "$GAME_DIR/"
+      cp "$TEMP_DIR/dxwrapper/Stub/dinput8.dll" "$GAME_DIR/"
+
+      # d3d9.dll and pop1w.dll are included in the dotfiles and symlinked
+
+      # Download Mini-Launcher
+      echo "Downloading Mini-Launcher..."
+      LAUNCHER_URL="https://github.com/xan105/Mini-Launcher/releases/latest/download/Mini-Launcher.7z"
+      curl -L -o "$TEMP_DIR/mini-launcher.7z" "$LAUNCHER_URL"
+      7z x "$TEMP_DIR/mini-launcher.7z" -o"$TEMP_DIR/launcher" -y
+
+      # Copy Mini-Launcher executable as POP.EXE (x64 version works with Proton)
+      cp "$TEMP_DIR/launcher/x64/Launcher.exe" "$GAME_DIR/POP.EXE"
+
+      echo "Done! Config files and DLLs will be symlinked by Rotz."
+    depends:
+      - /arch/wine
+  links:
+    # Config files
+    dxwrapper.ini: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/dxwrapper.ini
+    Hardware.ini: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/Hardware.ini
+    pop.ini: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/pop.ini
+    launcher.json: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/launcher.json
+    # Binary mods (preserved in dotfiles)
+    d3d9.dll: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/d3d9.dll
+    pop1w.dll: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/pop1w.dll
