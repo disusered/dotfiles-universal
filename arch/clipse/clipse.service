@@ -1,0 +1,12 @@
+[Unit]
+Description=Clipse Clipboard Listener
+BindsTo=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=uwsm app -- clipse -listen
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

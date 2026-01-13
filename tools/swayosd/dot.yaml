@@ -8,3 +8,4 @@ linux[whoami.distro^="Arch"]:
   links:
     style.css: ~/.config/swayosd/style.css
     sway.conf: ~/.config/hypr/conf.d/sway.conf
+    swayosd-server.service: ~/.config/systemd/user/swayosd-server.service

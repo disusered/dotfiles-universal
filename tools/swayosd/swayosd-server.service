@@ -1,0 +1,12 @@
+[Unit]
+Description=SwayOSD Server
+BindsTo=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=uwsm app -- swayosd-server
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

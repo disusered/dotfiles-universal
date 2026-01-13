@@ -1,0 +1,12 @@
+[Unit]
+Description=Pyprland - Hyprland Community Utilities
+BindsTo=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=uwsm app -- /usr/bin/pypr
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

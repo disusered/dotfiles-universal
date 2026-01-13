@@ -7,6 +7,7 @@ linux[whoami.distro^="Arch"]:
   links:
     1password.conf: ~/.config/hypr/conf.d/1password.conf
     1password.desktop: ~/.local/share/applications/1password-silent.desktop
+    1password.service: ~/.config/systemd/user/1password.service
     agent.toml: ~/.config/1Password/ssh/agent.toml
     config: ~/.ssh/config
     1password.zsh: ~/.config/zsh/0017_1password.zsh

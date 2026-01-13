@@ -5,5 +5,6 @@ linux[whoami.distro^="Arch"]:
       - /lib/wl-clipboard
   links:
     clipse.conf: {{ dirs.base.config }}/hypr/conf.d/clipse.conf
+    clipse.service: {{ dirs.base.config }}/systemd/user/clipse.service
     config.json: {{ dirs.base.config }}/clipse/config.json
     custom_theme.json: {{ dirs.base.config }}/clipse/custom_theme.json

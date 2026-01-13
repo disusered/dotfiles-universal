@@ -21,9 +21,6 @@ $browser = firefox
 # Network Manager
 exec-once = app2unit -- nm-applet --indicator
 
-# Community utilities
-exec-once = app2unit -- /usr/bin/pypr
-
 # Plugins
 exec-once = hyprpm reload -n
 
