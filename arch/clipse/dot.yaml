@@ -8,3 +8,4 @@ linux[whoami.distro^="Arch"]:
     clipse.service: {{ dirs.base.config }}/systemd/user/clipse.service
     config.json: {{ dirs.base.config }}/clipse/config.json
     custom_theme.json: {{ dirs.base.config }}/clipse/custom_theme.json
+    hyprclipse.sh: ~/.local/bin/hyprclipse
