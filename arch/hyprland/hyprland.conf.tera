@@ -227,5 +227,4 @@ submap = reset
 ### WINDOWS ###
 ##############################
 
-windowrulev2 = suppressevent maximize, class:.*
 windowrule = match:class r:^pinentry-.*, stay_focused true
