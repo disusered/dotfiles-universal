@@ -1,3 +1,9 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S --noconfirm aur/bruno
+    cmd: |
+      yay -S --noconfirm aur/bruno
+      npm i -g @usebruno/cli
+    depends:
+      - /languages/node/latest
+  links:
+    bruno.sh: ~/.local/bin/bruno-partial-import
