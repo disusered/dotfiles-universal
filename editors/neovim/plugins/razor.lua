@@ -9,15 +9,20 @@ return {
   },
   {
     "mason-org/mason.nvim",
-    opts = {
-      registries = {
+    opts = function(_, opts)
+      opts.registries = {
         "github:mason-org/mason-registry",
         "github:Crashdummyy/mason-registry",
-      },
-      ensure_installed = {
-        "roslyn",
-      },
-    },
+      }
+
+      opts.ensure_installed = opts.ensure_installed or {}
+      table.insert(opts.ensure_installed, "roslyn")
+
+      local exclude = { "csharpier" }
+      opts.ensure_installed = vim.tbl_filter(function(item)
+        return not vim.tbl_contains(exclude, item)
+      end, opts.ensure_installed)
+    end,
   },
   {
     "seblyng/roslyn.nvim",

@@ -11,7 +11,6 @@ return {
       "bash-language-server",
       "shfmt", -- Formatter
       -- C#
-      "csharpier", -- Formatter
       "xmlformatter", -- Formatter
       -- CSS / HTML
       "css-lsp",
