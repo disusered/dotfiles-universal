@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sdk install kotlin
+    depends:
+      - /tools/sdkman
