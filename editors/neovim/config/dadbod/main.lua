@@ -5,15 +5,20 @@ local docker_detector = require("config.dadbod.detectors.docker")
 -- Session-level cache to store connections for each project root.
 local project_connections_cache = {}
 
+-- Helper to convert empty string to nil (for proper `or` chaining)
+local function non_empty(s)
+  return s ~= "" and s or nil
+end
+
 ---
 -- Main orchestrator function to detect and set up DB connections.
 local function setup_project_connections()
-  local project_root_marker = vim.fn.finddir(".git", ".;")
-    or vim.fn.findfile("config/database.yml", ".;")
-    or vim.fn.findfile("docker-compose.yml", ".;")
-    or vim.fn.findfile("docker-compose.yaml", ".;")
+  local project_root_marker = non_empty(vim.fn.finddir(".git", ".;"))
+    or non_empty(vim.fn.findfile("config/database.yml", ".;"))
+    or non_empty(vim.fn.findfile("docker-compose.yml", ".;"))
+    or non_empty(vim.fn.findfile("docker-compose.yaml", ".;"))
 
-  if not project_root_marker or project_root_marker == "" then
+  if not project_root_marker then
     return
   end
   local project_root = vim.fn.fnamemodify(project_root_marker, ":h")
