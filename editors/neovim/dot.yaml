@@ -29,7 +29,7 @@ linux[whoami.distro^="Arch"]:
       - /languages/python/latest
       - /languages/lua/5.1
       - /languages/lua/hererocks
-      - /languages/node/latest
+      - /languages/javascript/node/latest
       - /languages/latex/tectonic
       - /tools/fonts
       - /tools/grpcurl
@@ -63,7 +63,7 @@ linux[whoami.distro^="Fedora"]:
       - /languages/lua/hererocks
       - /languages/latex/tectonic
       - /languages/python/latest
-      - /languages/node/latest
+      - /languages/javascript/node/latest
 windows:
   installs:
     cmd: scoop install neovim
@@ -90,7 +90,7 @@ windows:
       - /languages/lua/hererocks
       - /languages/latex/tectonic
       - /languages/python/latest
-      - /languages/node/latest
+      - /languages/javascript/node/latest
   links:
     neovim.ps1: ~/.config/powershell/profile.d/neovim.ps1
     init.lua: >-

@@ -4,6 +4,6 @@ linux[whoami.distro^="Arch"]:
       yay -S --noconfirm aur/bruno
       npm i -g @usebruno/cli
     depends:
-      - /languages/node/latest
+      - /languages/javascript/node/latest
   links:
     bruno.sh: ~/.local/bin/bruno-partial-import

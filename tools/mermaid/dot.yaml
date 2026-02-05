@@ -2,4 +2,4 @@ global:
   installs:
     cmd: npm install -g @mermaid-js/mermaid-cli
     depends:
-      - /languages/node/latest
+      - /languages/javascript/node/latest
