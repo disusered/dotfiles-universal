@@ -1,2 +1,3 @@
-export PATH="$HOME/Android/Sdk/platform-tools:$HOME/Android/Sdk/emulator:$PATH"
+export ANDROID_HOME="$HOME/Android/Sdk"
 export ANDROID_AVD_HOME="$HOME/.config/.android/avd"
+export PATH="$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH"

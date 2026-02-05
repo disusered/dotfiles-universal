@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sdk install java 17.0.18-tem
+    depends:
+      - /tools/sdkman
