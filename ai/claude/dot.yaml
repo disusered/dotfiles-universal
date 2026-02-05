@@ -1,8 +1,7 @@
 global:
   installs:
-    cmd: npm install -g @anthropic-ai/claude-code tsx
+    cmd: curl -fsSL https://claude.ai/install.sh | bash
     depends:
-      - /languages/node/latest
       - /lib/hyprspace
   links:
     hyprclaude.sh: ~/.local/bin/hyprclaude
