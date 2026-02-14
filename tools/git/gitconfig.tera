@@ -46,6 +46,7 @@
   f = fetch
   fm = pull
   co = checkout
+  branches = for-each-ref --sort=-committerdate --format='%(color:{{ secondary_name | ansi }})%(committerdate:relative)%(color:reset) %(color:{{ accent_name | ansi }} bold)%(align:left,20)%(authorname)%(end)%(color:reset) %(color:{{ secondary_name | ansi }} bold)%(align:left,40)%(refname:short)%(end)%(color:reset) %(subject)' refs/heads
 [grep]
   lineNumber = true
 [branch]
