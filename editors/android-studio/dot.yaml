@@ -1,6 +1,8 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm android-studio
+    cmd: |
+      sudo pacman -S --noconfirm android-studio
+      yay -S --noconfirm watchman-bin
   links:
     android.zsh: {{ dirs.base.config }}/zsh/0800_android.zsh
     android-studio.desktop: {{ dirs.base.data }}/applications/android-studio.desktop
