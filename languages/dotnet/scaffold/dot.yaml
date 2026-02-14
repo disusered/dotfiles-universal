@@ -1,0 +1,5 @@
+global:
+  installs:
+    cmd: dotnet tool install --global Microsoft.dotnet-scaffold
+    depends:
+      - /languages/dotnet/latest
