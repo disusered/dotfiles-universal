@@ -14,12 +14,11 @@
   "hooks": {
     "PreCompact": [
       {
-        "hooks": [
-          {
-            "command": "/usr/bin/bin/bd prime",
-            "type": "command"
-          }
-        ],
+        "hooks": [],
+        "matcher": ""
+      },
+      {
+        "hooks": [],
         "matcher": ""
       },
       {
@@ -34,12 +33,11 @@
     ],
     "SessionStart": [
       {
-        "hooks": [
-          {
-            "command": "/usr/bin/bd prime",
-            "type": "command"
-          }
-        ],
+        "hooks": [],
+        "matcher": ""
+      },
+      {
+        "hooks": [],
         "matcher": ""
       },
       {
