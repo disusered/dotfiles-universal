@@ -5,6 +5,7 @@ mod palette;
 mod render;
 mod templates;
 mod tui;
+mod wallpaper;
 
 use std::path::PathBuf;
 

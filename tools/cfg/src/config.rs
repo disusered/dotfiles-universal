@@ -16,6 +16,8 @@ pub struct Config {
     pub qt_style: String,
     #[serde(default)]
     pub fonts: FontConfig,
+    #[serde(default)]
+    pub wallpaper: WallpaperConfig,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
@@ -28,6 +30,39 @@ pub struct FontConfig {
     pub sans: String,
     #[serde(default = "default_sans_size")]
     pub sans_size: u32,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct WallpaperConfig {
+    #[serde(default = "default_wallpaper_path")]
+    pub path: String,
+    #[serde(default = "default_wallpaper_gravity")]
+    pub gravity: String,
+    #[serde(default = "default_wallpaper_cache_dir")]
+    pub cache_dir: String,
+}
+
+fn default_wallpaper_path() -> String {
+    String::new()
+}
+
+fn default_wallpaper_gravity() -> String {
+    "Center".to_string()
+}
+
+fn default_wallpaper_cache_dir() -> String {
+    let home = std::env::var("HOME").unwrap_or_default();
+    format!("{}/.cache/wallpapers", home)
+}
+
+impl Default for WallpaperConfig {
+    fn default() -> Self {
+        WallpaperConfig {
+            path: default_wallpaper_path(),
+            gravity: default_wallpaper_gravity(),
+            cache_dir: default_wallpaper_cache_dir(),
+        }
+    }
 }
 
 fn default_secondary() -> String {
@@ -98,6 +133,9 @@ impl Config {
             "fonts.mono_size" => Some(self.fonts.mono_size.to_string()),
             "fonts.sans" => Some(self.fonts.sans.clone()),
             "fonts.sans_size" => Some(self.fonts.sans_size.to_string()),
+            "wallpaper.path" => Some(self.wallpaper.path.clone()),
+            "wallpaper.gravity" => Some(self.wallpaper.gravity.clone()),
+            "wallpaper.cache_dir" => Some(self.wallpaper.cache_dir.clone()),
             _ => None,
         }
     }
@@ -154,6 +192,27 @@ impl Config {
                     .map_err(|_| format!("Invalid number: {}", value))?;
                 Ok(())
             }
+            "wallpaper.path" => {
+                self.wallpaper.path = value.to_string();
+                Ok(())
+            }
+            "wallpaper.gravity" => {
+                const VALID_GRAVITY: &[&str] = &[
+                    "NorthWest", "North", "NorthEast",
+                    "West", "Center", "East",
+                    "SouthWest", "South", "SouthEast",
+                ];
+                if VALID_GRAVITY.contains(&value) {
+                    self.wallpaper.gravity = value.to_string();
+                    Ok(())
+                } else {
+                    Err(format!("Invalid gravity '{}'. Valid: {:?}", value, VALID_GRAVITY))
+                }
+            }
+            "wallpaper.cache_dir" => {
+                self.wallpaper.cache_dir = value.to_string();
+                Ok(())
+            }
             _ => Err(format!("Unknown config key: {}", key)),
         }
     }
@@ -169,6 +228,41 @@ impl Default for Config {
             gtk_theme: "Adwaita".to_string(),
             qt_style: "Darkly".to_string(),
             fonts: FontConfig::default(),
+            wallpaper: WallpaperConfig::default(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_wallpaper_gravity_valid() {
+        let mut config = Config::default();
+        assert!(config.set("wallpaper.gravity", "Center").is_ok());
+        assert!(config.set("wallpaper.gravity", "NorthWest").is_ok());
+        assert!(config.set("wallpaper.gravity", "SouthEast").is_ok());
+    }
+
+    #[test]
+    fn test_wallpaper_gravity_invalid() {
+        let mut config = Config::default();
+        assert!(config.set("wallpaper.gravity", "middle").is_err());
+        assert!(config.set("wallpaper.gravity", "center").is_err()); // case-sensitive
+    }
+
+    #[test]
+    fn test_wallpaper_path_roundtrip() {
+        let mut config = Config::default();
+        config.set("wallpaper.path", "~/Pictures/Wallpaper").unwrap();
+        assert_eq!(config.get("wallpaper.path").unwrap(), "~/Pictures/Wallpaper");
+    }
+
+    #[test]
+    fn test_wallpaper_cache_dir_default() {
+        let config = Config::default();
+        let cache = config.get("wallpaper.cache_dir").unwrap();
+        assert!(cache.ends_with("/.cache/wallpapers"));
     }
 }
