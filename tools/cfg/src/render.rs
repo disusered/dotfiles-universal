@@ -208,6 +208,12 @@ pub fn build_context(config: &Config, palette: &Palette) -> Context {
     ctx.insert("font_sans_size", &config.fonts.sans_size);
     ctx.insert("fonts", &config.fonts);
 
+    // Wallpaper config
+    ctx.insert("wallpaper_path", &config.wallpaper.path);
+    ctx.insert("wallpaper_gravity", &config.wallpaper.gravity);
+    ctx.insert("wallpaper_cache_dir", &config.wallpaper.cache_dir);
+    ctx.insert("wallpaper", &config.wallpaper);
+
     // Add HOME for path templating
     if let Ok(home) = std::env::var("HOME") {
         ctx.insert("home", &home);

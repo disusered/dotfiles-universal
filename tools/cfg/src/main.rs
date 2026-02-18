@@ -99,6 +99,18 @@ enum Command {
         #[arg(long, group = "mode", hide = true)]
         scratchpad: bool,
     },
+    /// Wallpaper configuration
+    Wallpaper {
+        /// Get a specific value (path, gravity, cache_dir)
+        #[arg(long, group = "mode")]
+        get: Option<String>,
+        /// Set a value (format: key=value)
+        #[arg(long, group = "mode")]
+        set: Option<String>,
+        /// After --set, apply wallpaper. Standalone: re-apply current wallpaper.
+        #[arg(long)]
+        apply: bool,
+    },
 }
 
 /// Get the cfg configuration directory
@@ -671,6 +683,71 @@ fn main() {
                 println!("mono_size={}", config.fonts.mono_size);
                 println!("sans={}", config.fonts.sans);
                 println!("sans_size={}", config.fonts.sans_size);
+            }
+        }
+        Command::Wallpaper { get, set, apply } => {
+            let cfg_dir = get_cfg_dir();
+            let config_path = format!("{}/config.toml", cfg_dir);
+
+            let mut config = Config::load(&config_path).unwrap_or_default();
+
+            if let Some(key_value) = set {
+                // Parse key=value
+                let parts: Vec<&str> = key_value.splitn(2, '=').collect();
+                if parts.len() != 2 {
+                    eprintln!("Error: --set requires format key=value");
+                    std::process::exit(1);
+                }
+
+                let key = parts[0];
+                let value = parts[1];
+
+                match key {
+                    "path" | "cache_dir" => {
+                        let config_key = format!("wallpaper.{}", key);
+                        if let Err(e) = config.set(&config_key, value) {
+                            eprintln!("Error: {}", e);
+                            std::process::exit(1);
+                        }
+                    }
+                    "gravity" => {
+                        if let Err(e) = config.set("wallpaper.gravity", value) {
+                            eprintln!("Error: {}", e);
+                            std::process::exit(1);
+                        }
+                    }
+                    _ => {
+                        eprintln!("Unknown key: {} (valid: path, gravity, cache_dir)", key);
+                        std::process::exit(1);
+                    }
+                }
+
+                if let Err(e) = config.save(&config_path) {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(1);
+                }
+                println!("{}={}", key, parts[1]);
+
+                if apply {
+                    println!("wallpaper apply not yet implemented");
+                }
+            } else if let Some(key) = get {
+                match key.as_str() {
+                    "path" => println!("{}", config.wallpaper.path),
+                    "gravity" => println!("{}", config.wallpaper.gravity),
+                    "cache_dir" => println!("{}", config.wallpaper.cache_dir),
+                    _ => {
+                        eprintln!("Unknown key: {} (valid: path, gravity, cache_dir)", key);
+                        std::process::exit(1);
+                    }
+                }
+            } else if apply {
+                println!("wallpaper apply not yet implemented");
+            } else {
+                // Show current wallpaper config
+                println!("path={}", config.wallpaper.path);
+                println!("gravity={}", config.wallpaper.gravity);
+                println!("cache_dir={}", config.wallpaper.cache_dir);
             }
         }
     }

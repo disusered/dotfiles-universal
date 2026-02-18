@@ -325,3 +325,52 @@ fn theme_interactive_rejects_list() {
         .failure()
         .stderr(predicate::str::contains("cannot be used with"));
 }
+
+// =============================================================================
+// WALLPAPER command tests
+// =============================================================================
+
+// Invalid combinations
+#[test]
+fn wallpaper_get_rejects_set() {
+    cfg()
+        .args(["wallpaper", "--get", "path", "--set", "path=/tmp/wall.png"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+// Valid combinations
+#[test]
+fn wallpaper_shows_current() {
+    cfg().arg("wallpaper").assert().success();
+}
+
+#[test]
+fn wallpaper_get_path() {
+    cfg()
+        .args(["wallpaper", "--get", "path"])
+        .assert()
+        .success();
+}
+
+#[test]
+fn wallpaper_apply_standalone_accepted() {
+    // --apply alone must NOT produce "cannot be used with" from clap
+    let output = cfg()
+        .args(["wallpaper", "--apply"])
+        .output()
+        .unwrap();
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(!stderr.contains("cannot be used with"));
+}
+
+#[test]
+fn wallpaper_set_with_apply_accepted() {
+    let output = cfg()
+        .args(["wallpaper", "--set", "gravity=North", "--apply"])
+        .output()
+        .unwrap();
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(!stderr.contains("cannot be used with"));
+}
