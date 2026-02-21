@@ -1,6 +1,7 @@
 -- Orchestrates the different database detection strategies.
 local rails_detector = require("config.dadbod.detectors.rails")
 local docker_detector = require("config.dadbod.detectors.docker")
+local sqlite_detector = require("config.dadbod.detectors.sqlite")
 
 -- Session-level cache to store connections for each project root.
 local project_connections_cache = {}
@@ -42,6 +43,9 @@ local function setup_project_connections()
   connections = rails_detector.find()
   if not connections then
     connections, command_overrides = docker_detector.find()
+  end
+  if not connections then
+    connections = sqlite_detector.find()
   end
 
   -- If connections are found, apply them and cache the result
