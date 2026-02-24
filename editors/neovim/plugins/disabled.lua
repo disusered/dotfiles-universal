@@ -9,8 +9,6 @@ return {
   { "MagicDuck/grug-far.nvim",     enabled = false },
   -- disable tokyonight
   { "folke/tokyonight.nvim",       enabled = false },
-  -- disable UI extras
-  { "folke/edgy.nvim",             enabled = false },
   -- no file explorer
   { "nvim-neo-tree/neo-tree.nvim", enabled = false },
   -- disable visual aids on fFtT and /
