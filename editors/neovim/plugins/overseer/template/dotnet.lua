@@ -170,10 +170,34 @@ return {
       })
     end
 
-    -- Format fix tasks
+    -- Format tasks: fix (actual run) and check (dry run with diagnostics)
+    local format_check_components = {
+      {
+        "on_output_parse",
+        parser = function(line)
+          local fname, lnum, col, severity, msg =
+            line:match("^(.+)%((%d+),(%d+)%): (%w+) (.+)$")
+          if fname then
+            local type_map = { error = "E", warning = "W", info = "I" }
+            return {
+              filename = fname,
+              lnum = tonumber(lnum),
+              col = tonumber(col),
+              type = type_map[severity] or "E",
+              text = msg:gsub("%s*%[.-%]$", ""),
+            }
+          end
+        end,
+      },
+      { "on_result_diagnostics_quickfix", open = true },
+      "default",
+    }
+
     for _, sub in ipairs({ "", " whitespace", " style", " analyzers" }) do
+      local label = "dotnet format" .. sub
+
       table.insert(tasks, {
-        name = "dotnet format" .. sub,
+        name = label,
         builder = function()
           local cmd = { "dotnet", "format" }
           if sub ~= "" then table.insert(cmd, vim.trim(sub)) end
@@ -181,39 +205,20 @@ return {
           return { cmd = cmd, cwd = cwd }
         end,
       })
-    end
 
-    -- Format check task with diagnostic parsing
-    table.insert(tasks, {
-      name = "dotnet format --verify-no-changes",
-      builder = function()
-        return {
-          cmd = { "dotnet", "format", marker, "--verify-no-changes", "--verbosity", "normal" },
-          cwd = cwd,
-          components = {
-            {
-              "on_output_parse",
-              parser = function(line)
-                local fname, lnum, col, severity, msg =
-                  line:match("^(.+)%((%d+),(%d+)%): (%w+) (.+)$")
-                if fname then
-                  local type_map = { error = "E", warning = "W", info = "I" }
-                  return {
-                    filename = fname,
-                    lnum = tonumber(lnum),
-                    col = tonumber(col),
-                    type = type_map[severity] or "E",
-                    text = msg:gsub("%s*%[.-%]$", ""),
-                  }
-                end
-              end,
-            },
-            { "on_result_diagnostics_quickfix", open = true },
-            "default",
-          },
-        }
-      end,
-    })
+      table.insert(tasks, {
+        name = label .. " --verify-no-changes",
+        builder = function()
+          local cmd = { "dotnet", "format" }
+          if sub ~= "" then table.insert(cmd, vim.trim(sub)) end
+          table.insert(cmd, marker)
+          table.insert(cmd, "--verify-no-changes")
+          table.insert(cmd, "--verbosity")
+          table.insert(cmd, "normal")
+          return { cmd = cmd, cwd = cwd, components = format_check_components }
+        end,
+      })
+    end
 
     return tasks
   end,
