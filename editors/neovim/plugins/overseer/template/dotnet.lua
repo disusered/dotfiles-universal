@@ -170,6 +170,51 @@ return {
       })
     end
 
+    -- Format fix tasks
+    for _, sub in ipairs({ "", " whitespace", " style", " analyzers" }) do
+      table.insert(tasks, {
+        name = "dotnet format" .. sub,
+        builder = function()
+          local cmd = { "dotnet", "format" }
+          if sub ~= "" then table.insert(cmd, vim.trim(sub)) end
+          table.insert(cmd, marker)
+          return { cmd = cmd, cwd = cwd }
+        end,
+      })
+    end
+
+    -- Format check task with diagnostic parsing
+    table.insert(tasks, {
+      name = "dotnet format --verify-no-changes",
+      builder = function()
+        return {
+          cmd = { "dotnet", "format", marker, "--verify-no-changes", "--verbosity", "normal" },
+          cwd = cwd,
+          components = {
+            {
+              "on_output_parse",
+              parser = function(line)
+                local fname, lnum, col, severity, msg =
+                  line:match("^(.+)%((%d+),(%d+)%): (%w+) (.+)$")
+                if fname then
+                  local type_map = { error = "E", warning = "W", info = "I" }
+                  return {
+                    filename = fname,
+                    lnum = tonumber(lnum),
+                    col = tonumber(col),
+                    type = type_map[severity] or "E",
+                    text = msg:gsub("%s*%[.-%]$", ""),
+                  }
+                end
+              end,
+            },
+            { "on_result_diagnostics_quickfix", open = true },
+            "default",
+          },
+        }
+      end,
+    })
+
     return tasks
   end,
 }
