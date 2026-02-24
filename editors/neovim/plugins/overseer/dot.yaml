@@ -1,0 +1,5 @@
+global:
+  links:
+    overseer.lua: ~/.config/nvim/lua/plugins/overseer.lua
+    template: ~/.config/nvim/lua/overseer/template
+    component: ~/.config/nvim/lua/overseer/component
