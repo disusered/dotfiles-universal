@@ -5,16 +5,9 @@ return {
       "OverseerOpen",
       "OverseerClose",
       "OverseerToggle",
-      "OverseerSaveBundle",
-      "OverseerLoadBundle",
-      "OverseerDeleteBundle",
-      "OverseerRunCmd",
       "OverseerRun",
-      "OverseerInfo",
-      "OverseerBuild",
-      "OverseerQuickAction",
+      "OverseerShell",
       "OverseerTaskAction",
-      "OverseerClearCache",
     },
     opts = {
       dap = false,
@@ -45,11 +38,26 @@ return {
     keys = {
       { "<leader>rw", "<cmd>OverseerToggle<cr>", desc = "Task list" },
       { "<leader>ro", "<cmd>OverseerRun<cr>", desc = "Run task" },
-      { "<leader>rq", "<cmd>OverseerQuickAction<cr>", desc = "Action recent task" },
-      { "<leader>ri", "<cmd>OverseerInfo<cr>", desc = "Overseer Info" },
-      { "<leader>rb", "<cmd>OverseerBuild<cr>", desc = "Task builder" },
       { "<leader>rt", "<cmd>OverseerTaskAction<cr>", desc = "Task action" },
-      { "<leader>rc", "<cmd>OverseerClearCache<cr>", desc = "Clear cache" },
+      {
+        "<leader>rq",
+        function()
+          local overseer = require("overseer")
+          local tasks = overseer.list_tasks({ recent_first = true })
+          if tasks[1] then
+            overseer.run_action(tasks[1])
+          end
+        end,
+        desc = "Action recent task",
+      },
+      {
+        "<leader>rc",
+        function()
+          require("overseer").clear_task_cache()
+          vim.notify("Overseer cache cleared", vim.log.levels.INFO)
+        end,
+        desc = "Clear cache",
+      },
     },
   },
   {
