@@ -36,6 +36,7 @@ return {
       },
     },
     keys = {
+      { "<leader>W", "<cmd>OverseerToggle<cr>", desc = "Task list" },
       { "<leader>rw", "<cmd>OverseerToggle<cr>", desc = "Task list" },
       { "<leader>ro", "<cmd>OverseerRun<cr>", desc = "Run task" },
       { "<leader>rt", "<cmd>OverseerTaskAction<cr>", desc = "Task action" },
