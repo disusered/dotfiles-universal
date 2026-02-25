@@ -1,3 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: yay -S --noconfirm icu74 beads-bin
+  links:
+    jira-import.py: ~/.local/bin/jira-import
