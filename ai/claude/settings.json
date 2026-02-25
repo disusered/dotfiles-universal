@@ -1,60 +1,11 @@
 {
-  "enabledPlugins": {
-    "beads@beads-marketplace": true,
-    "claude-code-setup@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true
+  "fileSuggestion": {
+    "type": "command",
+    "command": "~/.claude/file-suggestion.sh"
   },
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "fileSuggestion": {
-    "command": "~/.claude/file-suggestion.sh",
-    "type": "command"
-  },
-  "hooks": {
-    "PreCompact": [
-      {
-        "hooks": [],
-        "matcher": ""
-      },
-      {
-        "hooks": [],
-        "matcher": ""
-      },
-      {
-        "hooks": [
-          {
-            "command": "bd prime",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [],
-        "matcher": ""
-      },
-      {
-        "hooks": [],
-        "matcher": ""
-      },
-      {
-        "hooks": [
-          {
-            "command": "bd prime",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ]
-  },
-  "model": "opus",
   "permissions": {
     "allow": [
       "Bash(git show-branch:*)",
@@ -67,9 +18,59 @@
       "Bash(sqlite3:*)"
     ]
   },
-  "skipDangerousModePermissionPrompt": true,
+  "model": "opus",
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": []
+      },
+      {
+        "matcher": "",
+        "hooks": []
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bd prime"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": []
+      },
+      {
+        "matcher": "",
+        "hooks": []
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bd prime"
+          }
+        ]
+      }
+    ]
+  },
   "statusLine": {
-    "command": "input=$(cat); model_name=$(echo \"$input\" | jq -r '.model.display_name'); current_dir=$(echo \"$input\" | jq -r '.workspace.current_dir'); project_dir=$(echo \"$input\" | jq -r '.workspace.project_dir'); output_style=$(echo \"$input\" | jq -r '.output_style.name'); version=$(echo \"$input\" | jq -r '.version'); git_branch=$(cd \"$current_dir\" 2\u003e/dev/null \u0026\u0026 git branch --show-current 2\u003e/dev/null); git_status=$(cd \"$current_dir\" 2\u003e/dev/null \u0026\u0026 git status --porcelain 2\u003e/dev/null | wc -l); pwd_display=$(echo \"$current_dir\" | sed \"s|^$HOME|~|\"); printf \"\\033[2m\\033[38;2;116;199;236m\\033[0m \\033[2m\\033[1m\\033[38;2;203;166;247m%s\\033[0m\" \"$model_name\"; printf \" \\033[2m\\033[38;2;180;190;254m%s\\033[0m\" \"$pwd_display\"; if [ -n \"$git_branch\" ]; then printf \" \\033[2m\\033[38;2;203;166;247m\\033[0m \\033[2m\\033[1m\\033[38;2;203;166;247m%s\\033[0m\" \"$git_branch\"; if [ \"$git_status\" -gt 0 ]; then printf \" \\033[2m\\033[38;2;249;226;175m+%s\\033[0m\" \"$git_status\"; fi; fi; if [ \"$output_style\" != \"default\" ]; then printf \" \\033[2m\\033[38;2;148;226;213m%s\\033[0m\" \"$output_style\"; fi; printf \" \\033[2m\\033[38;2;166;173;200mv%s\\033[0m\" \"$version\"",
-    "type": "command"
-  }
+    "type": "command",
+    "command": "input=$(cat); model_name=$(echo \"$input\" | jq -r '.model.display_name'); current_dir=$(echo \"$input\" | jq -r '.workspace.current_dir'); project_dir=$(echo \"$input\" | jq -r '.workspace.project_dir'); output_style=$(echo \"$input\" | jq -r '.output_style.name'); version=$(echo \"$input\" | jq -r '.version'); git_branch=$(cd \"$current_dir\" 2>/dev/null && git branch --show-current 2>/dev/null); git_status=$(cd \"$current_dir\" 2>/dev/null && git status --porcelain 2>/dev/null | wc -l); pwd_display=$(echo \"$current_dir\" | sed \"s|^$HOME|~|\"); printf \"\\033[2m\\033[38;2;116;199;236m\\033[0m \\033[2m\\033[1m\\033[38;2;203;166;247m%s\\033[0m\" \"$model_name\"; printf \" \\033[2m\\033[38;2;180;190;254m%s\\033[0m\" \"$pwd_display\"; if [ -n \"$git_branch\" ]; then printf \" \\033[2m\\033[38;2;203;166;247m\\033[0m \\033[2m\\033[1m\\033[38;2;203;166;247m%s\\033[0m\" \"$git_branch\"; if [ \"$git_status\" -gt 0 ]; then printf \" \\033[2m\\033[38;2;249;226;175m+%s\\033[0m\" \"$git_status\"; fi; fi; if [ \"$output_style\" != \"default\" ]; then printf \" \\033[2m\\033[38;2;148;226;213m%s\\033[0m\" \"$output_style\"; fi; printf \" \\033[2m\\033[38;2;166;173;200mv%s\\033[0m\" \"$version\""
+  },
+  "enabledPlugins": {
+    "beads@beads-marketplace": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true
+  },
+  "skipDangerousModePermissionPrompt": true
 }
