@@ -5,6 +5,7 @@
 """Convert Jira XML (RSS) export to Beads JSONL for import via `bd import`."""
 
 import argparse
+import hashlib
 import json
 import sys
 import xml.etree.ElementTree as ET
@@ -144,10 +145,23 @@ def convert_item(item):
     return record, key
 
 
+def generate_id(prefix, jira_key):
+    """Generate a deterministic beads ID from the Jira key."""
+    h = hashlib.sha256(jira_key.encode()).hexdigest()
+    short = int(h[:6], 16)
+    # base36 encode
+    chars = "0123456789abcdefghijklmnopqrstuvwxyz"
+    result = ""
+    while short:
+        short, remainder = divmod(short, 36)
+        result = chars[remainder] + result
+    return f"{prefix}-{result or '0'}"
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Convert Jira XML (RSS) export to Beads JSONL.",
-        epilog="example: jira-import export.xml | bd import",
+        epilog="example: jira-import --prefix se export.xml | bd import",
     )
     parser.add_argument(
         "file",
@@ -155,6 +169,12 @@ def main():
         type=argparse.FileType("r"),
         default=None,
         help="Jira XML file (default: stdin)",
+    )
+    parser.add_argument(
+        "-p",
+        "--prefix",
+        required=True,
+        help="beads project prefix for generated IDs (e.g., 'se')",
     )
     parser.add_argument(
         "--no-links",
@@ -187,6 +207,7 @@ def main():
 
     for item in items:
         record, key = convert_item(item)
+        record["id"] = generate_id(args.prefix, key)
         print(json.dumps(record))
 
         links = extract_links(item)
