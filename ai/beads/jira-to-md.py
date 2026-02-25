@@ -2,12 +2,13 @@
 # /// script
 # dependencies = ["markdownify"]
 # ///
-"""Convert Jira XML (RSS) export to Beads JSONL for import via `bd import`."""
+"""Convert Jira XML (RSS) export to Markdown for `bd create --file` or standalone use."""
 
 import argparse
-import hashlib
 import json
+import subprocess
 import sys
+import tempfile
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 
@@ -40,7 +41,6 @@ STATUS_CATEGORY_MAP = {
 
 def parse_jira_date(date_str):
     """Parse Jira date string to ISO 8601 UTC."""
-    # Jira uses: "Mon, 1 Jan 2024 12:00:00 +0000" or similar RFC 2822
     for fmt in (
         "%a, %d %b %Y %H:%M:%S %z",
         "%Y-%m-%dT%H:%M:%S.%f%z",
@@ -58,7 +58,6 @@ def extract_links(item):
     """Extract issue link descriptions from an item."""
     links = []
     for link in item.findall("issuelinks/issuelinktype"):
-        link_name = link.findtext("name", "")
         for direction in ("inwardlinks", "outwardlinks"):
             dir_el = link.find(direction)
             if dir_el is None:
@@ -83,85 +82,82 @@ def extract_sprint_labels(item):
 
 
 def convert_item(item):
-    """Convert a single Jira XML item to a beads JSONL dict."""
+    """Convert a single Jira XML item to markdown and extract its key."""
     key = item.findtext("key", "")
     summary = item.findtext("summary", "")
 
-    # Description: HTML -> Markdown
-    desc_html = item.findtext("description", "")
-    description = md(desc_html).strip() if desc_html else ""
+    desc_el = item.find("description")
+    if desc_el is not None:
+        # findtext() misses HTML parsed as XML child elements; serialize inner content
+        inner = (desc_el.text or "") + "".join(
+            ET.tostring(child, encoding="unicode") for child in desc_el
+        )
+        description = md(inner).strip() if inner.strip() else ""
+    else:
+        description = ""
 
-    # Type mapping
     raw_type = item.findtext("type", "Task")
     issue_type = TYPE_MAP.get(raw_type, "task")
 
-    # Priority mapping
     raw_priority = item.findtext("priority", "Medium")
     priority = PRIORITY_MAP.get(raw_priority, 2)
 
-    # Status mapping via statusCategory attribute
-    status_el = item.find("status")
-    if status_el is not None:
-        status_cat = status_el.get("statusCategory", "undefined")
+    # statusCategory can be an attribute on <status> or a sibling element
+    status_cat_el = item.find("statusCategory")
+    if status_cat_el is not None:
+        status_cat = status_cat_el.get("key", "undefined")
     else:
-        status_cat = "undefined"
+        status_el = item.find("status")
+        status_cat = status_el.get("statusCategory", "undefined") if status_el is not None else "undefined"
     status = STATUS_CATEGORY_MAP.get(status_cat, "open")
 
-    # People
     assignee_el = item.find("assignee")
-    owner = assignee_el.text if assignee_el is not None and assignee_el.text else None
+    assignee = assignee_el.text if assignee_el is not None and assignee_el.text else None
 
     reporter_el = item.find("reporter")
     created_by = (
         reporter_el.text if reporter_el is not None and reporter_el.text else None
     )
 
-    # Dates
     created_at = parse_jira_date(item.findtext("created", ""))
     updated_at = parse_jira_date(item.findtext("updated", ""))
 
-    # Labels
-    labels = [l.text for l in item.findall("labels/label") if l.text]
-    labels.extend(extract_sprint_labels(item))
+    labels = [l.text.replace(" ", "-") for l in item.findall("labels/label") if l.text]
+    labels.extend(s.replace(" ", "-") for s in extract_sprint_labels(item))
 
-    record = {
-        "external_ref": key,
-        "title": summary,
-        "description": description,
-        "issue_type": issue_type,
-        "priority": priority,
-        "status": status,
-        "created_at": created_at,
-        "updated_at": updated_at,
-    }
+    # Build markdown sections
+    sections = []
+    sections.append(f"## {summary}")
 
-    if owner:
-        record["owner"] = owner
-    if created_by:
-        record["created_by"] = created_by
-    if labels:
-        record["labels"] = labels
+    # Use ### Description so bd preserves multi-paragraph content
+    if description:
+        sections.append(f"### Description\n{description}")
 
-    return record, key
+    fields = [
+        ("Priority", str(priority)),
+        ("Type", issue_type),
+        ("Assignee", assignee),
+        ("Labels", ", ".join(labels) if labels else None),
+        ("Status", status),
+        ("External Ref", key),
+        ("Created By", created_by),
+        ("Created At", created_at if created_at else None),
+        ("Updated At", updated_at if updated_at else None),
+    ]
 
+    for name, value in fields:
+        if value:
+            sections.append(f"### {name}\n{value}")
 
-def generate_id(prefix, jira_key):
-    """Generate a deterministic beads ID from the Jira key."""
-    h = hashlib.sha256(jira_key.encode()).hexdigest()
-    short = int(h[:6], 16)
-    # base36 encode
-    chars = "0123456789abcdefghijklmnopqrstuvwxyz"
-    result = ""
-    while short:
-        short, remainder = divmod(short, 36)
-        result = chars[remainder] + result
-    return f"{prefix}-{result or '0'}"
+    return "\n\n".join(sections), key
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Convert Jira XML (RSS) export to Beads JSONL.",
-        epilog="example: jira-import --prefix se export.xml | bd import",
+        description="Convert Jira XML (RSS) export to Markdown.",
+        epilog="example: jira-to-md export.xml | bd create --file -\n"
+        "         pbpaste | jira-to-md --bd",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
         "file",
@@ -171,10 +167,9 @@ def main():
         help="Jira XML file (default: stdin)",
     )
     parser.add_argument(
-        "-p",
-        "--prefix",
-        required=True,
-        help="beads project prefix for generated IDs (e.g., 'se')",
+        "--bd",
+        action="store_true",
+        help="create issues in beads via bd create --file",
     )
     parser.add_argument(
         "--no-links",
@@ -204,15 +199,47 @@ def main():
     items = channel.findall("item") if channel is not None else root.findall(".//item")
 
     all_links = []
+    markdown_parts = []
+    external_refs = []
 
     for item in items:
-        record, key = convert_item(item)
-        record["id"] = generate_id(args.prefix, key)
-        print(json.dumps(record))
+        item_md, key = convert_item(item)
+        markdown_parts.append(item_md)
+        external_refs.append(key)
 
         links = extract_links(item)
         for link_desc in links:
             all_links.append(f"{key} {link_desc}")
+
+    output = "\n\n".join(markdown_parts) + "\n"
+
+    if args.bd:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".md", delete=True
+        ) as tmp:
+            tmp.write(output)
+            tmp.flush()
+            result = subprocess.run(
+                ["bd", "create", "--file", tmp.name, "--json"],
+                capture_output=True, text=True,
+            )
+            if result.returncode != 0:
+                sys.stderr.write(result.stderr)
+                raise SystemExit(result.returncode)
+
+            created = json.loads(result.stdout)
+            for issue, ref in zip(created, external_refs):
+                if not ref:
+                    continue
+                subprocess.run(
+                    ["bd", "update", issue["id"], "--external-ref", ref],
+                    check=True,
+                )
+            # Print the normal (non-json) summary
+            for issue in created:
+                print(f"  {issue['id']}: {issue['title']}")
+    else:
+        sys.stdout.write(output)
 
     if all_links and not args.no_links:
         print("\n--- Issue Links (informational) ---", file=sys.stderr)
