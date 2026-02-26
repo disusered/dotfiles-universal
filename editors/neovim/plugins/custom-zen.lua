@@ -181,6 +181,11 @@ return {
             zen_state.toggles.inlay_hints = Snacks.toggle.inlay_hints():get()
             Snacks.toggle.inlay_hints():set(false)
 
+            zen_state.snacks_animate = vim.g.snacks_animate
+            zen_state.toggles.scroll = Snacks.toggle.scroll():get()
+            vim.g.snacks_animate = true
+            Snacks.toggle.scroll():set(true)
+
             local gitsigns_ok, gitsigns = pcall(require, "gitsigns")
             if gitsigns_ok and gitsigns.toggle_signs then
               zen_state.toggles.git_signs = true
@@ -208,6 +213,8 @@ return {
             Snacks.toggle.dim():set(zen_state.toggles.dim)
             Snacks.toggle.diagnostics():set(zen_state.toggles.diagnostics)
             Snacks.toggle.inlay_hints():set(zen_state.toggles.inlay_hints)
+            Snacks.toggle.scroll():set(zen_state.toggles.inlay_hints)
+            vim.g.snacks_animate = zen_state.snacks_animate
 
             local gitsigns_ok, gitsigns = pcall(require, "gitsigns")
             if gitsigns_ok and gitsigns.toggle_signs then
