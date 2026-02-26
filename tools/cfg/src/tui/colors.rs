@@ -67,6 +67,14 @@ enum Mode {
     Confirm,
 }
 
+/// Which color target Enter will set
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+enum SelectTarget {
+    #[default]
+    Accent,
+    Secondary,
+}
+
 /// Which pane has focus
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 enum Focus {
@@ -117,6 +125,8 @@ pub struct ColorPicker {
     blend_selection: usize,
     /// Which control is active in Modify pane: 0=lightness, 1=blend
     modify_focus: usize,
+    /// Which target Enter sets (accent or secondary)
+    select_target: SelectTarget,
     /// Preview pane area for mouse detection
     preview_area: Rect,
     /// Row positions for modifier controls (for mouse click detection)
@@ -216,6 +226,7 @@ impl ColorPicker {
             modifier_input: String::new(),
             last_selected: 0,
             focus: Focus::List,
+            select_target: SelectTarget::default(),
             blend_selection: 1, // Start at second color
             modify_focus: 0, // Start on lightness control
             preview_area: Rect::default(),
@@ -425,6 +436,14 @@ impl ColorPicker {
         if let Some(entry) = self.selected_color() {
             if entry.is_accent {
                 self.config.accent = entry.name.clone();
+            }
+        }
+    }
+
+    fn select_as_secondary(&mut self) {
+        if let Some(entry) = self.selected_color() {
+            if entry.is_accent {
+                self.config.secondary = entry.name.clone();
             }
         }
     }
@@ -1115,9 +1134,14 @@ impl ColorPicker {
         // Context-aware hints based on focus and state
         let hints: Vec<(&str, &str)> = match self.focus {
             Focus::List => {
+                let target = match self.select_target {
+                    SelectTarget::Accent => "accent",
+                    SelectTarget::Secondary => "secondary",
+                };
                 vec![
                     ("j/k", "navigate"),
-                    ("Enter", "accent"),
+                    ("Enter", target),
+                    ("s", "switch"),
                     ("y", "copy"),
                     ("Tab", "modify"),
                     ("?", "help"),
@@ -1190,7 +1214,8 @@ impl ColorPicker {
                 ("g/G", "Top/bottom"),
                 ("Ctrl+d/u", "Page down/up"),
                 ("/", "Search"),
-                ("Enter", "Set as accent"),
+                ("Enter", "Set as accent/secondary"),
+                ("s", "Switch target"),
                 ("y", "Copy color"),
                 ("Tab", "→ Modify pane"),
                 ("Esc", "Clear search"),
@@ -1375,10 +1400,19 @@ impl ColorPicker {
                                         self.page_up(10);
                                     }
                                     KeyCode::Enter => {
-                                        self.select_as_accent();
+                                        match self.select_target {
+                                            SelectTarget::Accent => self.select_as_accent(),
+                                            SelectTarget::Secondary => self.select_as_secondary(),
+                                        }
                                         if self.has_changes() {
                                             self.mode = Mode::Confirm;
                                         }
+                                    }
+                                    KeyCode::Char('s') => {
+                                        self.select_target = match self.select_target {
+                                            SelectTarget::Accent => SelectTarget::Secondary,
+                                            SelectTarget::Secondary => SelectTarget::Accent,
+                                        };
                                     }
                                     KeyCode::Char(c) if !key.modifiers.contains(KeyModifiers::CONTROL) => {
                                         self.mode = Mode::Search;
