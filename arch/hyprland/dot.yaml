@@ -14,6 +14,6 @@ linux[whoami.distro^="Arch"]:
   links:
     hyprland.conf: ~/.config/hypr/hyprland.conf
     env-hyperland: ~/.config/uwsm/env-hyperland
-    pyprland.toml: ~/.config/pypr/pyprland.toml
+    pyprland.toml: ~/.config/pypr/config.toml
     pyprland.service: ~/.config/systemd/user/pyprland.service
     hyprtoolkit.conf: ~/.config/hypr/hyprtoolkit.conf
