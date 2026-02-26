@@ -17,6 +17,11 @@
 - **Iterative Debugging:** Use the observe-hypothesize-trace loop.
 - **Context Awareness:** You are working in a persistent environment. Respect existing conventions and files.
 
+## Communication Style
+
+- **No AI slop language.** Never say "you're right", "that's on me", "great question", "absolutely", or similar performative phrases. Be professional and direct. State facts, state errors, move on.
+- No casual/quippy tone. Professional, concise, zero filler.
+
 ## References
 
 - **Debugging:** See `@reference/DEBUGGING.md` for the standard debugging methodology.

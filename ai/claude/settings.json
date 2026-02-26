@@ -18,7 +18,6 @@
       "Bash(sqlite3:*)"
     ]
   },
-  "model": "opus",
   "hooks": {
     "PreCompact": [
       {
@@ -72,5 +71,6 @@
     "superpowers@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true
   },
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": false,
+  "model": "opus"
 }
