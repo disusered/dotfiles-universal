@@ -84,6 +84,7 @@ return {
         table.insert(opts.right, {
           title = "Overseer",
           ft = "OverseerList",
+          pinned = true,
           open = function()
             require("overseer").open()
           end,
