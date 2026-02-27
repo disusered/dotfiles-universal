@@ -38,6 +38,6 @@ window#osd progressbar progress {
   min-height: inherit;
   border-radius: inherit;
   border: none;
-  background: #{{ accent | hex }};
+  background: #{{ primary | hex }};
 }
 

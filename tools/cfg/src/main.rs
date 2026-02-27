@@ -405,7 +405,7 @@ fn main() {
             } else {
                 // Show current theme config
                 println!("flavor={}", config.flavor);
-                println!("accent={}", config.accent);
+                println!("primary={}", config.primary);
                 println!("secondary={}", config.secondary);
             }
         }
@@ -445,16 +445,16 @@ fn main() {
                 let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
                 let palette = Palette::load(&palette_path).ok();
 
-                let accent_rgb = palette
+                let primary_rgb = palette
                     .as_ref()
-                    .and_then(|p| p.get(&config.accent))
+                    .and_then(|p| p.get(&config.primary))
                     .map(|c| (c.r, c.g, c.b));
                 let subtext_rgb = palette
                     .as_ref()
                     .and_then(|p| p.get("subtext0"))
                     .map(|c| (c.r, c.g, c.b));
 
-                fonts::preview_font_styled(&config.fonts.mono, accent_rgb, subtext_rgb);
+                fonts::preview_font_styled(&config.fonts.mono, primary_rgb, subtext_rgb);
             } else if interactive {
                 // Interactive TUI picker
                 if !tui::is_tty() {
@@ -521,9 +521,9 @@ fn main() {
                 let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
                 let palette = Palette::load(&palette_path).ok();
 
-                // Get accent color for highlighting current font
-                let accent = palette.as_ref()
-                    .and_then(|p| p.get(&config.accent))
+                // Get primary color for highlighting current font
+                let primary = palette.as_ref()
+                    .and_then(|p| p.get(&config.primary))
                     .map(|c| format!("\x1b[38;2;{};{};{}m", c.r, c.g, c.b))
                     .unwrap_or_default();
                 let green = palette.as_ref()
@@ -554,9 +554,9 @@ fn main() {
                     let lig = if font.ligatures { format!("{}lig{}", dim, reset) } else { "   ".to_string() };
                     let nerd = if font.nerd_font { format!("{}nf{}", dim, reset) } else { "  ".to_string() };
 
-                    // Highlight current font with accent color
+                    // Highlight current font with primary color
                     let (name_start, name_end) = if is_current {
-                        (accent.as_str(), reset)
+                        (primary.as_str(), reset)
                     } else if !font.installed {
                         (dim, reset)
                     } else {
@@ -580,7 +580,7 @@ fn main() {
                 };
 
                 if show_mono {
-                    println!("{}Monospace:{}", accent, reset);
+                    println!("{}Monospace:{}", primary, reset);
                     for font in listings.iter().filter(|f| {
                         fonts::is_valid_font(f.name, fonts::FontCategory::Mono)
                     }) {
@@ -593,7 +593,7 @@ fn main() {
                     if show_mono {
                         println!();
                     }
-                    println!("{}Sans-serif:{}", accent, reset);
+                    println!("{}Sans-serif:{}", primary, reset);
                     for font in listings.iter().filter(|f| {
                         fonts::is_valid_font(f.name, fonts::FontCategory::Sans)
                     }) {

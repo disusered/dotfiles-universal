@@ -38,7 +38,7 @@ fn format_label(fmt: &str) -> &'static str {
         .unwrap_or("unknown")
 }
 
-/// Accent colors (can be set as accent/secondary)
+/// Accent colors (can be set as primary/secondary)
 const ACCENT_COLORS: &[&str] = &[
     "rosewater", "flamingo", "pink", "mauve", "red", "maroon",
     "peach", "yellow", "green", "teal", "sky", "sapphire", "blue", "lavender",
@@ -56,7 +56,7 @@ const SURFACE_COLORS: &[&str] = &[
 struct ColorEntry {
     name: String,
     color: CfgColor,
-    is_accent: bool,
+    is_primary: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -71,7 +71,7 @@ enum Mode {
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 enum SelectTarget {
     #[default]
-    Accent,
+    Primary,
     Secondary,
 }
 
@@ -107,7 +107,7 @@ pub struct ColorPicker {
     flavor_colors: FlavorTheme,
     should_apply: bool,
     /// Original config values to detect changes
-    original_accent: String,
+    original_primary: String,
     original_secondary: String,
     /// Content area for mouse click detection
     content_area: Rect,
@@ -125,7 +125,7 @@ pub struct ColorPicker {
     blend_selection: usize,
     /// Which control is active in Modify pane: 0=lightness, 1=blend
     modify_focus: usize,
-    /// Which target Enter sets (accent or secondary)
+    /// Which target Enter sets (primary or secondary)
     select_target: SelectTarget,
     /// Preview pane area for mouse detection
     preview_area: Rect,
@@ -164,7 +164,7 @@ impl FlavorTheme {
             text: get_color("text"),
             subtext0: get_color("subtext0"),
             green: get_color("green"),
-            accent: get_color(&config.accent),
+            accent: get_color(&config.primary),
         }
     }
 }
@@ -182,7 +182,7 @@ impl ColorPicker {
                 colors.push(ColorEntry {
                     name: name.to_string(),
                     color: *c,
-                    is_accent: true,
+                    is_primary: true,
                 });
             }
         }
@@ -193,7 +193,7 @@ impl ColorPicker {
                 colors.push(ColorEntry {
                     name: name.to_string(),
                     color: *c,
-                    is_accent: false,
+                    is_primary: false,
                 });
             }
         }
@@ -202,7 +202,7 @@ impl ColorPicker {
         let mut list_state = ListState::default();
         list_state.select(Some(0));
 
-        let original_accent = config.accent.clone();
+        let original_primary = config.primary.clone();
         let original_secondary = config.secondary.clone();
 
         Self {
@@ -218,7 +218,7 @@ impl ColorPicker {
             config_path,
             flavor_colors,
             should_apply: false,
-            original_accent,
+            original_primary,
             original_secondary,
             content_area: Rect::default(),
             row_to_data: Vec::new(),
@@ -236,7 +236,7 @@ impl ColorPicker {
     }
 
     fn has_changes(&self) -> bool {
-        self.config.accent != self.original_accent
+        self.config.primary != self.original_primary
             || self.config.secondary != self.original_secondary
     }
 
@@ -432,17 +432,17 @@ impl ColorPicker {
         }
     }
 
-    fn select_as_accent(&mut self) {
+    fn select_as_primary(&mut self) {
         if let Some(entry) = self.selected_color() {
-            if entry.is_accent {
-                self.config.accent = entry.name.clone();
+            if entry.is_primary {
+                self.config.primary = entry.name.clone();
             }
         }
     }
 
     fn select_as_secondary(&mut self) {
         if let Some(entry) = self.selected_color() {
-            if entry.is_accent {
+            if entry.is_primary {
                 self.config.secondary = entry.name.clone();
             }
         }
@@ -558,7 +558,7 @@ impl ColorPicker {
         frame.render_widget(block, area);
 
         let mut items: Vec<ListItem> = Vec::new();
-        let mut prev_is_accent = true;
+        let mut prev_is_primary = true;
 
         // Clear and rebuild row-to-data mapping for mouse clicks
         self.row_to_data.clear();
@@ -566,7 +566,7 @@ impl ColorPicker {
         for (idx, &color_idx) in self.filtered.iter().enumerate() {
             let entry = &self.colors[color_idx];
 
-            if prev_is_accent && !entry.is_accent && idx > 0 {
+            if prev_is_primary && !entry.is_primary && idx > 0 {
                 // Empty line before "Surface Colors" header
                 items.push(ListItem::new(Line::from("")));
                 self.row_to_data.push(None);
@@ -576,7 +576,7 @@ impl ColorPicker {
                     Style::default().fg(theme.overlay1).add_modifier(Modifier::BOLD),
                 ))));
                 self.row_to_data.push(None);
-            } else if entry.is_accent && idx == 0 {
+            } else if entry.is_primary && idx == 0 {
                 // "Accent Colors" header
                 items.push(ListItem::new(Line::from(Span::styled(
                     "Accent Colors",
@@ -584,11 +584,11 @@ impl ColorPicker {
                 ))));
                 self.row_to_data.push(None);
             }
-            prev_is_accent = entry.is_accent;
+            prev_is_primary = entry.is_primary;
 
             let c = &entry.color;
             let swatch_color = Color::Rgb(c.r, c.g, c.b);
-            let is_current = entry.name == self.config.accent || entry.name == self.config.secondary;
+            let is_current = entry.name == self.config.primary || entry.name == self.config.secondary;
             let is_selected = idx == self.selected;
             let is_blend_target = self.modifier.blend_amount > 0 && idx == self.blend_selection;
 
@@ -630,8 +630,8 @@ impl ColorPicker {
                 Style::default().fg(theme.subtext0),
             ));
 
-            if entry.name == self.config.accent {
-                spans.push(Span::styled(" ← accent", Style::default().fg(theme.overlay1)));
+            if entry.name == self.config.primary {
+                spans.push(Span::styled(" ← primary", Style::default().fg(theme.overlay1)));
             } else if entry.name == self.config.secondary {
                 spans.push(Span::styled(" ← secondary", Style::default().fg(theme.overlay1)));
             }
@@ -1135,7 +1135,7 @@ impl ColorPicker {
         let hints: Vec<(&str, &str)> = match self.focus {
             Focus::List => {
                 let target = match self.select_target {
-                    SelectTarget::Accent => "accent",
+                    SelectTarget::Primary => "primary",
                     SelectTarget::Secondary => "secondary",
                 };
                 vec![
@@ -1214,7 +1214,7 @@ impl ColorPicker {
                 ("g/G", "Top/bottom"),
                 ("Ctrl+d/u", "Page down/up"),
                 ("/", "Search"),
-                ("Enter", "Set as accent/secondary"),
+                ("Enter", "Set as primary/secondary"),
                 ("s", "Switch target"),
                 ("y", "Copy color"),
                 ("Tab", "→ Modify pane"),
@@ -1305,7 +1305,7 @@ impl ColorPicker {
                             }
                             KeyCode::Char('n') | KeyCode::Char('N') | KeyCode::Esc => {
                                 // Revert changes
-                                self.config.accent = self.original_accent.clone();
+                                self.config.primary = self.original_primary.clone();
                                 self.config.secondary = self.original_secondary.clone();
                                 self.mode = Mode::Normal;
                             }
@@ -1401,7 +1401,7 @@ impl ColorPicker {
                                     }
                                     KeyCode::Enter => {
                                         match self.select_target {
-                                            SelectTarget::Accent => self.select_as_accent(),
+                                            SelectTarget::Primary => self.select_as_primary(),
                                             SelectTarget::Secondary => self.select_as_secondary(),
                                         }
                                         if self.has_changes() {
@@ -1410,8 +1410,8 @@ impl ColorPicker {
                                     }
                                     KeyCode::Char('s') => {
                                         self.select_target = match self.select_target {
-                                            SelectTarget::Accent => SelectTarget::Secondary,
-                                            SelectTarget::Secondary => SelectTarget::Accent,
+                                            SelectTarget::Primary => SelectTarget::Secondary,
+                                            SelectTarget::Secondary => SelectTarget::Primary,
                                         };
                                     }
                                     KeyCode::Char(c) if !key.modifiers.contains(KeyModifiers::CONTROL) => {

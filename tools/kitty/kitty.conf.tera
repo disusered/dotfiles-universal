@@ -27,7 +27,7 @@ underline_hyperlinks hover
 # thick|thin, dense|sparse
 undercurl_style thick-sparse
 open_url_with default
-url_color #{{ accent | hex }}
+url_color #{{ primary | hex }}
 url_style curly
 
 # Performance
@@ -42,7 +42,7 @@ remember_window_size yes
 initial_window_width 1200
 initial_window_height 800
 confirm_os_window_close 0
-active_border_color #{{ accent | hex }}
+active_border_color #{{ primary | hex }}
 inactive_border_color #{{ surface0 | hex }}
 window_border_width 1pt
 enabled_layouts splits
@@ -93,7 +93,7 @@ color7  #{{ subtext1 | hex }}
 color15 #{{ subtext0 | hex }}
 
 # Tab colors
-active_tab_background #{{ accent | hex }}
+active_tab_background #{{ primary | hex }}
 active_tab_foreground #{{ base | hex }}
 inactive_tab_background #{{ surface0 | hex }}
 inactive_tab_foreground #{{ text | hex }}

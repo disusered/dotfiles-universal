@@ -1,6 +1,6 @@
 /* vi: ft=css */
 /* Catppuccin {{ flavor }} accent overrides */
-@define-color accent_bg_color #{{ accent | hex }};
+@define-color accent_bg_color #{{ primary | hex }};
 @define-color accent_fg_color #{{ crust | hex }};
 :root {
   --accent-blue: #{{ blue | hex }};
@@ -12,7 +12,7 @@
   --accent-pink: #{{ pink | hex }};
   --accent-purple: #{{ mauve | hex }};
   --accent-slate: #{{ overlay1 | hex }};
-  --accent-bg-color: #{{ accent | hex }};
+  --accent-bg-color: #{{ primary | hex }};
   --accent-fg-color: @accent_fg_color;
   --window-bg-color: @window_bg_color;
   --headerbar-bg-color: @headerbar_bg_color;

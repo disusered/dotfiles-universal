@@ -5,7 +5,7 @@ use std::path::Path;
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Config {
     pub flavor: String,
-    pub accent: String,
+    pub primary: String,
     #[serde(default = "default_secondary")]
     pub secondary: String,
     #[serde(default = "default_icon_theme")]
@@ -124,7 +124,7 @@ impl Config {
     pub fn get(&self, key: &str) -> Option<String> {
         match key {
             "flavor" => Some(self.flavor.clone()),
-            "accent" => Some(self.accent.clone()),
+            "primary" => Some(self.primary.clone()),
             "secondary" => Some(self.secondary.clone()),
             "icon_theme" => Some(self.icon_theme.clone()),
             "gtk_theme" => Some(self.gtk_theme.clone()),
@@ -152,8 +152,8 @@ impl Config {
                     Err(format!("Invalid flavor '{}'. Valid: {:?}", value, valid))
                 }
             }
-            "accent" => {
-                self.accent = value.to_string();
+            "primary" => {
+                self.primary = value.to_string();
                 Ok(())
             }
             "secondary" => {
@@ -222,7 +222,7 @@ impl Default for Config {
     fn default() -> Self {
         Config {
             flavor: "mocha".to_string(),
-            accent: "blue".to_string(),
+            primary: "blue".to_string(),
             secondary: "mauve".to_string(),
             icon_theme: "Papirus-Dark".to_string(),
             gtk_theme: "Adwaita".to_string(),

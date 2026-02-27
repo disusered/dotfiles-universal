@@ -365,11 +365,11 @@ impl FontSamples {
 /// Uses ANSI codes for colors and OSC 66 for variable font sizes
 pub fn preview_font_styled(
     font_name: &str,
-    accent_rgb: Option<(u8, u8, u8)>,
+    primary_rgb: Option<(u8, u8, u8)>,
     subtext_rgb: Option<(u8, u8, u8)>,
 ) {
     // Color codes
-    let accent = accent_rgb
+    let primary = primary_rgb
         .map(|(r, g, b)| format!("\x1b[38;2;{};{};{}m", r, g, b))
         .unwrap_or_else(|| "\x1b[1m".to_string());
     let dim = subtext_rgb
@@ -391,7 +391,7 @@ pub fn preview_font_styled(
         font_name.contains("Mono") || font_name.contains("Code") || is_nerd_font;
 
     // Title
-    println!("{}{}{}", accent, font_name, reset);
+    println!("{}{}{}", primary, font_name, reset);
     println!();
 
     // Variable sizes section (OSC 66)

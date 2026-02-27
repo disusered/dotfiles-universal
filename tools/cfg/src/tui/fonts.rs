@@ -91,7 +91,7 @@ impl FlavorTheme {
             text: get_color("text"),
             subtext0: get_color("subtext0"),
             overlay1: get_color("overlay1"),
-            accent: get_color(&config.accent),
+            accent: get_color(&config.primary),
             green: get_color("green"),
             yellow: get_color("yellow"),
             mauve: get_color("mauve"),

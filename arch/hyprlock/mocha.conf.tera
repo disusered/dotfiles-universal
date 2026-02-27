@@ -78,5 +78,5 @@ $mantleAlpha = {{ mantle | hex }}
 $crust = {{ crust | hyprlang }}
 $crustAlpha = {{ crust | hex }}
 
-$accent = {{ accent | hyprlang }}
-$accentAlpha = {{ accent | hex }}
+$accent = {{ primary | hyprlang }}
+$accentAlpha = {{ primary | hex }}

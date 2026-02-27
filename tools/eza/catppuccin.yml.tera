@@ -3,7 +3,7 @@ colourful: true
 
 filekinds:
   normal: { foreground: "#{{ subtext1 | upper }}" }
-  directory: { foreground: "#{{ accent | upper }}" }
+  directory: { foreground: "#{{ primary | upper }}" }
   symlink: { foreground: "#{{ sky | upper }}" }
   pipe: { foreground: "#{{ overlay1 | upper }}" }
   block_device: { foreground: "#{{ maroon | upper }}" }

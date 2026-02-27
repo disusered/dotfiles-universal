@@ -25,6 +25,6 @@
   base: #{{ base | hex }};
   mantle: #{{ mantle | hex }};
   crust: #{{ crust | hex }};
-  accent: #{{ accent | hex }};
+  accent: #{{ primary | hex }};
 }
 

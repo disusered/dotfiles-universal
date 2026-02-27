@@ -9,13 +9,13 @@ theme[main_fg]="#{{ text | hex }}"
 theme[title]="#{{ text | hex }}"
 
 # Highlight color for keyboard shortcuts
-theme[hi_fg]="#{{ accent | hex }}"
+theme[hi_fg]="#{{ primary | hex }}"
 
 # Background color of selected item in processes box
 theme[selected_bg]="#{{ surface1 | hex }}"
 
 # Foreground color of selected item in processes box
-theme[selected_fg]="#{{ accent | hex }}"
+theme[selected_fg]="#{{ primary | hex }}"
 
 # Color of inactive/disabled text
 theme[inactive_fg]="#{{ overlay1 | hex }}"
@@ -33,7 +33,7 @@ theme[proc_misc]="#{{ rosewater | hex }}"
 theme[cpu_box]="#{{ mauve | hex }}" #Mauve
 theme[mem_box]="#{{ green | hex }}" #Green
 theme[net_box]="#{{ maroon | hex }}" #Maroon
-theme[proc_box]="#{{ accent | hex }}" #Accent
+theme[proc_box]="#{{ primary | hex }}" #Accent
 
 # Box divider line and small boxes line color
 theme[div_line]="#{{ overlay0 | hex }}"

@@ -7,7 +7,7 @@ TerminalApplication=app2unit -- kitty
 Theme={{ icon_theme }}
 
 [KDE]
-LookAndFeelPackage=Catppuccin-{{ flavor | capitalize }}-{{ accent_name | capitalize }}
+LookAndFeelPackage=Catppuccin-{{ flavor | capitalize }}-{{ primary_name | capitalize }}
 ShowDeleteCommand=false
 widgetStyle=Breeze
 

@@ -27,7 +27,7 @@ window#waybar {
 
 #workspaces button.active {
   color: #{{ base | hex }};
-  background-color: #{{ accent | hex }};
+  background-color: #{{ primary | hex }};
 }
 
 #workspaces button:hover {

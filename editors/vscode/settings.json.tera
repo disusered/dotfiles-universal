@@ -35,7 +35,7 @@
     "nvim",
     "lazygit"
   ],
-  "catppuccin.accentColor": "{{ accent_name }}",
+  "catppuccin.accentColor": "{{ primary_name }}",
   "github.gitProtocol": "ssh",
   "github.copilot.chat.anthropic.thinking.enabled": true,
   "editor.fontLigatures": true,

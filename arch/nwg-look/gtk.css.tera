@@ -2,7 +2,7 @@
 /* Catppuccin {{ flavor }} theme for GTK3 */
 
 /* Catppuccin colors */
-@define-color accent #{{ accent | hex }};
+@define-color accent #{{ primary | hex }};
 @define-color red #{{ red | hex }};
 @define-color green #{{ green | hex }};
 @define-color yellow #{{ yellow | hex }};

@@ -63,7 +63,7 @@ $surface0 = {{ surface0 | hyprlang }}
 $base = {{ base | hyprlang }}
 $mantle = {{ mantle | hyprlang }}
 $crust = {{ crust | hyprlang }}
-$accent = {{ accent | hyprlang }}
+$accent = {{ primary | hyprlang }}
 $secondary = {{ secondary | hyprlang }}
 
 general {

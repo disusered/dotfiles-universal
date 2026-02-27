@@ -34,18 +34,18 @@ gui:
   # Theme (Catppuccin {{ flavor | capitalize }})
   theme:
     activeBorderColor:
-      - "#{{ accent | hex }}"
+      - "#{{ primary | hex }}"
       - bold
     inactiveBorderColor:
       - "#{{ subtext0 | hex }}"
     optionsTextColor:
-      - "#{{ accent | hex }}"
+      - "#{{ primary | hex }}"
     selectedLineBgColor:
       - "#{{ surface0 | hex }}"
     cherryPickedCommitBgColor:
       - "#{{ surface1 | hex }}"
     cherryPickedCommitFgColor:
-      - "#{{ accent | hex }}"
+      - "#{{ primary | hex }}"
     unstagedChangesColor:
       - "#{{ red | hex }}"
     defaultFgColor:

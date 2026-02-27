@@ -123,7 +123,7 @@ fn hex_argb_filter(value: &Value, args: &HashMap<String, Value>) -> TeraResult<V
 }
 
 /// Custom Tera filter: ANSI color name
-/// Usage: {{ blue_name | ansi }} or {{ accent_name | ansi }}
+/// Usage: {{ blue_name | ansi }} or {{ primary_name | ansi }}
 /// Input: Catppuccin color name string (e.g., "blue", "text", "mauve")
 /// Output: ANSI color name (e.g., "blue", "white", "magenta")
 fn ansi_filter(value: &Value, _args: &HashMap<String, Value>) -> TeraResult<Value> {
@@ -227,10 +227,10 @@ pub fn build_context(config: &Config, palette: &Palette) -> Context {
         ctx.insert(&format!("{}_name", name), name);
     }
 
-    // Add accent and secondary color objects
-    if let Some(accent_color) = palette.get(&config.accent) {
-        ctx.insert("accent", accent_color);
-        ctx.insert("accent_name", &config.accent);
+    // Add primary and secondary color objects
+    if let Some(primary_color) = palette.get(&config.primary) {
+        ctx.insert("primary", primary_color);
+        ctx.insert("primary_name", &config.primary);
     }
     if let Some(secondary_color) = palette.get(&config.secondary) {
         ctx.insert("secondary", secondary_color);

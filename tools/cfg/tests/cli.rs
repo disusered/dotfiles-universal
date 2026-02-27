@@ -242,7 +242,7 @@ fn theme_shows_current() {
 #[test]
 fn theme_get_accent() {
     cfg()
-        .args(["theme", "--get", "accent"])
+        .args(["theme", "--get", "primary"])
         .assert()
         .success();
 }
@@ -266,7 +266,7 @@ fn theme_list_json() {
 #[test]
 fn theme_get_rejects_set() {
     cfg()
-        .args(["theme", "--get", "accent", "--set", "accent=blue"])
+        .args(["theme", "--get", "primary", "--set", "accent=blue"])
         .assert()
         .failure()
         .stderr(predicate::str::contains("cannot be used with"));
@@ -275,7 +275,7 @@ fn theme_get_rejects_set() {
 #[test]
 fn theme_get_rejects_list() {
     cfg()
-        .args(["theme", "--get", "accent", "--list"])
+        .args(["theme", "--get", "primary", "--list"])
         .assert()
         .failure()
         .stderr(predicate::str::contains("cannot be used with"));
@@ -293,7 +293,7 @@ fn theme_set_rejects_list() {
 #[test]
 fn theme_get_set_list_all_conflict() {
     cfg()
-        .args(["theme", "--get", "accent", "--set", "accent=blue", "--list"])
+        .args(["theme", "--get", "primary", "--set", "accent=blue", "--list"])
         .assert()
         .failure()
         .stderr(predicate::str::contains("cannot be used with"));
@@ -302,7 +302,7 @@ fn theme_get_set_list_all_conflict() {
 #[test]
 fn theme_interactive_rejects_get() {
     cfg()
-        .args(["theme", "--interactive", "--get", "accent"])
+        .args(["theme", "--interactive", "--get", "primary"])
         .assert()
         .failure()
         .stderr(predicate::str::contains("cannot be used with"));

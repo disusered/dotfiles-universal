@@ -24,8 +24,8 @@
   attributesFile = ~/.config/git/attributes
 [pretty]
   basic = %C({{ secondary_name | ansi }} bold)%h%C(reset) %C(auto)%d%C(reset) %s
-  extended = %C({{ secondary_name | ansi }} bold)%h%C(reset) %C({{ accent_name | ansi }} bold)%aN%C(reset) %C(auto)%d%C(reset) %s %C(8)(%cr)%C(reset)
-  reflog = %C({{ secondary_name | ansi }} bold)%h%C(reset)  %C({{ accent_name | ansi }} bold)%gd%C(reset) %gs %C(8)(%cr)%C(reset)
+  extended = %C({{ secondary_name | ansi }} bold)%h%C(reset) %C({{ primary_name | ansi }} bold)%aN%C(reset) %C(auto)%d%C(reset) %s %C(8)(%cr)%C(reset)
+  reflog = %C({{ secondary_name | ansi }} bold)%h%C(reset)  %C({{ primary_name | ansi }} bold)%gd%C(reset) %gs %C(8)(%cr)%C(reset)
 [alias]
   l = log --color --pretty=extended --graph --date=relative
   la = log --color --pretty=extended --graph --date=relative --branches --tags --remotes
@@ -46,7 +46,7 @@
   f = fetch
   fm = pull
   co = checkout
-  branches = for-each-ref --sort=-committerdate --format='%(color:{{ secondary_name | ansi }})%(committerdate:relative)%(color:reset) %(color:{{ accent_name | ansi }} bold)%(align:left,20)%(authorname)%(end)%(color:reset) %(color:{{ secondary_name | ansi }} bold)%(align:left,40)%(refname:short)%(end)%(color:reset) %(subject)' refs/heads
+  branches = for-each-ref --sort=-committerdate --format='%(color:{{ secondary_name | ansi }})%(committerdate:relative)%(color:reset) %(color:{{ primary_name | ansi }} bold)%(align:left,20)%(authorname)%(end)%(color:reset) %(color:{{ secondary_name | ansi }} bold)%(align:left,40)%(refname:short)%(end)%(color:reset) %(subject)' refs/heads
 [grep]
   lineNumber = true
 [branch]

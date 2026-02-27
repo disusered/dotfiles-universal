@@ -1,2 +1,2 @@
 [Theme]
-Current=catppuccin-mocha-{{ accent_name }}
+Current=catppuccin-mocha-{{ primary_name }}

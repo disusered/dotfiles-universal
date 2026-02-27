@@ -49,9 +49,9 @@
         "format": {
           "months": "<span color='#{{ mauve | hex }}'><b>{}</b></span>",
           "days": "<span color='#{{ text | hex }}'><b>{}</b></span>",
-          "weeks": "<span color='#{{ accent | hex }}'><b>W{}</b></span>",
+          "weeks": "<span color='#{{ primary | hex }}'><b>W{}</b></span>",
           "weekdays": "<span color='#{{ lavender | hex }}'><b>{}</b></span>",
-          "today": "<span color='#{{ accent | hex }}'><b><u>{}</u></b></span>"
+          "today": "<span color='#{{ primary | hex }}'><b><u>{}</u></b></span>"
         }
       }
     },
@@ -155,9 +155,9 @@
         "format": {
           "months": "<span color='#{{ mauve | hex }}'><b>{}</b></span>",
           "days": "<span color='#{{ text | hex }}'><b>{}</b></span>",
-          "weeks": "<span color='#{{ accent | hex }}'><b>W{}</b></span>",
+          "weeks": "<span color='#{{ primary | hex }}'><b>W{}</b></span>",
           "weekdays": "<span color='#{{ lavender | hex }}'><b>{}</b></span>",
-          "today": "<span color='#{{ accent | hex }}'><b><u>{}</u></b></span>"
+          "today": "<span color='#{{ primary | hex }}'><b><u>{}</u></b></span>"
         }
       }
     },

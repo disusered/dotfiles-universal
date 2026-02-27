@@ -58,7 +58,7 @@ impl TabTheme {
         Self {
             base: get_color("base"),
             subtext0: get_color("subtext0"),
-            accent: get_color(&config.accent),
+            accent: get_color(&config.primary),
         }
     }
 }

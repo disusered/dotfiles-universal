@@ -1,7 +1,7 @@
 # vi: ft=dosini
 background-color=#{{ base | hex }}
 text-color=#{{ text | hex }}
-border-color=#{{ accent | hex }}
+border-color=#{{ primary | hex }}
 progress-color=over #{{ surface0 | hex }}
 
 [urgency=high]
