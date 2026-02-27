@@ -1,4 +1,3 @@
-# vi: ft=conf
 # Environment
 env ZDOTDIR=$HOME
 

@@ -1,4 +1,3 @@
-# vi: ft=toml
 # Get editor completions based on the config schema
 "$schema" = 'https://starship.rs/config-schema.json'
 

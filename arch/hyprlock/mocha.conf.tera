@@ -1,5 +1,3 @@
-# vi: ft=hyprlang
-
 $rosewater = {{ rosewater | hyprlang }}
 $rosewaterAlpha = {{ rosewater | hex }}
 

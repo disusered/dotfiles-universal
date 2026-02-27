@@ -1,3 +1,2 @@
 #!/bin/bash
-# vi: ft=bash
 papirus-folders -C cat-{{ flavor }}-{{ primary_name }} --theme {{ icon_theme }}

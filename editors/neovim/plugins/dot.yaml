@@ -44,3 +44,4 @@ global:
     custom-zen.lua: ~/.config/nvim/lua/plugins/zen.lua
     table-mode.lua: ~/.config/nvim/lua/plugins/table-mode.lua
     edgy.lua: ~/.config/nvim/lua/plugins/edgy.lua
+    tera.lua: ~/.config/nvim/lua/plugins/tera.lua

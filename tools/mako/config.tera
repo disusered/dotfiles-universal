@@ -1,4 +1,3 @@
-# vi: ft=dosini
 background-color=#{{ base | hex }}
 text-color=#{{ text | hex }}
 border-color=#{{ primary | hex }}

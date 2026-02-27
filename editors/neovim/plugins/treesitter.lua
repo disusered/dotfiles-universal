@@ -39,6 +39,7 @@ return {
       "svelte",
       "vim",
       "vimdoc",
+      "tera",
     })
   end,
 }

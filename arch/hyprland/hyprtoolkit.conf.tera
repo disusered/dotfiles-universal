@@ -1,4 +1,3 @@
-# vi: ft=hyprlang
 # https://wiki.hypr.land/Hypr-Ecosystem/hyprtoolkit/
 # https://github.com/SchweGELBin/catppuccin-hyprtoolkit
 background=0xff{{ crust | lower }}

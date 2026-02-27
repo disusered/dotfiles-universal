@@ -1,4 +1,3 @@
-# vi: ft=dosini
 [General]
 ColorScheme=CatppuccinMocha
 TerminalApplication=app2unit -- kitty

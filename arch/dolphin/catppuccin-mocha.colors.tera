@@ -1,4 +1,3 @@
-# vi: ft=dosini
 [ColorEffects:Disabled]
 Color={{ base.r }}, {{ base.g }}, {{ base.b }}
 ColorAmount=0.30000000000000004
