@@ -1,5 +1,9 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S --noconfirm icu74 beads-bin
+    cmd: |
+      yay -S --noconfirm icu74 dolt
+      go install github.com/steveyegge/beads/cmd/bd@latest
   links:
     jira-to-md.py: ~/.local/bin/jira-to-md
+  depends:
+    - /languages/go/latest
