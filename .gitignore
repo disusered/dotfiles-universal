@@ -30,3 +30,7 @@ ai/claude/.cache/
 /tools/rofi/catppuccin-mocha.rasi
 /tools/sddm/theme.conf
 /tools/swayosd/style.css
+
+# Dolt database files (added by bd init)
+.dolt/
+*.db
