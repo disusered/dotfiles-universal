@@ -68,7 +68,7 @@ if cwd=$(hyprspace_get_kitty_context "$active_class" "$active_pid" "$active_titl
   kitty --class "$CLAUDE_CLASS" \
     --title "$context_title" \
     --directory "$context_dir" \
-    --hold "$CLAUDE_BIN" &
+    --hold zsh -ic "$CLAUDE_BIN" &
 
   if hyprspace_wait_for_window "$CLAUDE_CLASS" "$context_title" "$context_dir"; then
     new_window=$(hyprspace_find_window "$CLAUDE_CLASS" "$context_title")
