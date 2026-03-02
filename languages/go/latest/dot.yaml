@@ -1,5 +1,5 @@
 global:
   installs:
-    cmd: mise use --global go@latest
-    depends:
-      - /tools/mise
+    cmd: sudo pacman -S --noconfirm go
+  links:
+    go.zsh: ~/.config/zsh/0300_go.zsh

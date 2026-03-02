@@ -1,7 +1,7 @@
 [settings]
 idiomatic_version_file_enable_tools = ["ruby"]
 
-# CRITICAL: Disable python management globally.
+# CRITICAL: Disable python and go management globally.
 # This ensures that when you type 'python' in your home directory,
 # mise ignores it, and the shell falls back to /usr/bin/python.
 disable_tools = ["python"]
@@ -14,7 +14,6 @@ activate_aggressive = false
 jobs = 4
 
 [tools]
-go = "1.25.2"
 node = "24.10.0"
 python = "latest"
 ruby = "latest"
