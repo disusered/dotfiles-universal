@@ -21,3 +21,9 @@ dev/artifacts/
 mise.toml
 bv
 .op/
+
+AGENTS.md
+
+# Dolt database files (added by bd init)
+.dolt/
+*.db
