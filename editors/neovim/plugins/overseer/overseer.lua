@@ -18,8 +18,9 @@ return {
           ["<C-j>"] = false,
           ["<C-k>"] = false,
           ["<C-l>"] = false,
-          ["<C-n>"] = "NextTask",
-          ["<C-p>"] = "PrevTask",
+          ["<C-q>"] = false,
+          ["<C-n>"] = "keymap.next_task",
+          ["<C-p>"] = "keymap.prev_task",
         },
       },
       form = {
