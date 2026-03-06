@@ -56,6 +56,56 @@ return {
         },
         view = "mini",
       },
+      -- Send DBUI "Executing query..." to mini, suppress result notifications
+      {
+        filter = {
+          event = "notify",
+          find = "Executing query",
+        },
+        view = "mini",
+      },
+      {
+        filter = {
+          event = "notify",
+          find = "Done after",
+        },
+        view = "mini",
+      },
+      {
+        filter = {
+          event = "notify",
+          find = "Connecting to db",
+        },
+        view = "mini",
+      },
+      {
+        filter = {
+          event = "notify",
+          find = "Connected to db",
+        },
+        view = "mini",
+      },
+      {
+        filter = {
+          event = "notify",
+          find = "Refreshing",
+        },
+        view = "mini",
+      },
+      {
+        filter = {
+          event = "notify",
+          find = "Refreshed",
+        },
+        opts = { skip = true },
+      },
+      {
+        filter = {
+          event = "msg_show",
+          find = "DB: Query",
+        },
+        opts = { skip = true },
+      },
       -- Send long print messages to popup view
       {
         filter = {
