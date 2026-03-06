@@ -12,11 +12,14 @@ return {
     opts = {
       dap = false,
       task_list = {
-        bindings = {
+        direction = "right",
+        keymaps = {
           ["<C-h>"] = false,
           ["<C-j>"] = false,
           ["<C-k>"] = false,
           ["<C-l>"] = false,
+          ["<C-n>"] = "NextTask",
+          ["<C-p>"] = "PrevTask",
         },
       },
       form = {
@@ -67,45 +70,45 @@ return {
     opts = {
       integrations = { overseer = true },
     },
-    {
-      "folke/which-key.nvim",
-      optional = true,
-      opts = {
-        spec = {
-          { "<leader>r", group = "overseer" },
-        },
+  },
+  {
+    "folke/which-key.nvim",
+    optional = true,
+    opts = {
+      spec = {
+        { "<leader>r", group = "overseer" },
       },
     },
-    {
-      "folke/edgy.nvim",
-      optional = true,
-      opts = function(_, opts)
-        opts.right = opts.right or {}
-        table.insert(opts.right, {
-          title = "Overseer",
-          ft = "OverseerList",
-          pinned = true,
-          open = function()
-            require("overseer").open()
-          end,
-        })
-      end,
-    },
-    {
-      "nvim-neotest/neotest",
-      optional = true,
-      opts = function(_, opts)
-        opts = opts or {}
-        opts.consumers = opts.consumers or {}
-        opts.consumers.overseer = require("neotest.consumers.overseer")
-      end,
-    },
-    {
-      "mfussenegger/nvim-dap",
-      optional = true,
-      opts = function()
-        require("overseer").enable_dap()
-      end,
-    },
+  },
+  {
+    "folke/edgy.nvim",
+    optional = true,
+    opts = function(_, opts)
+      opts.right = opts.right or {}
+      table.insert(opts.right, {
+        title = "Overseer",
+        ft = "OverseerList",
+        pinned = true,
+        open = function()
+          require("overseer").open()
+        end,
+      })
+    end,
+  },
+  {
+    "nvim-neotest/neotest",
+    optional = true,
+    opts = function(_, opts)
+      opts = opts or {}
+      opts.consumers = opts.consumers or {}
+      opts.consumers.overseer = require("neotest.consumers.overseer")
+    end,
+  },
+  {
+    "mfussenegger/nvim-dap",
+    optional = true,
+    opts = function()
+      require("overseer").enable_dap()
+    end,
   },
 }
