@@ -68,6 +68,7 @@ require("lazy").setup({
     autocmds = true, -- lazyvim.config.autocmds
     keymaps = true, -- lazyvim.config.keymaps
   },
+  ui = { border = "rounded" },
   install = { colorscheme = { "catppuccin" } },
   checker = {
     enabled = true, -- check for plugin updates periodically
