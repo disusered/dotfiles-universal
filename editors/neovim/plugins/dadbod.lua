@@ -12,6 +12,7 @@ return {
       "DBUIFindBuffer",
     },
     init = function()
+      vim.g.db_ui_use_nvim_notify = 1
       require("config.dadbod.main").setup()
 
       vim.api.nvim_create_autocmd("FileType", {
