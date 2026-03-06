@@ -11,9 +11,18 @@ return {
       "DBUIAddConnection",
       "DBUIFindBuffer",
     },
-    -- The init function now just calls the setup from our main module
     init = function()
       require("config.dadbod.main").setup()
+
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "dbui",
+        callback = function()
+          local del = vim.keymap.del
+          for _, key in ipairs({ "<C-j>", "<C-k>" }) do
+            pcall(del, "n", key, { buffer = 0 })
+          end
+        end,
+      })
     end,
   },
   {
