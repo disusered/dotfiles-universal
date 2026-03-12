@@ -168,6 +168,17 @@ return {
           }
         end,
       })
+
+      table.insert(tasks, {
+        name = "dotnet watch: " .. profile.name,
+        builder = function()
+          return {
+            cmd = { "dotnet", "watch", "--launch-profile", profile.name, "--project", main },
+            cwd = cwd,
+            env = vim.tbl_extend("force", { DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER = "1" }, profile.env),
+          }
+        end,
+      })
     end
 
     -- Format tasks: fix (actual run) and check (dry run with diagnostics)
