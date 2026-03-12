@@ -60,9 +60,8 @@ Iterate through the **Open Beads** for this sprint. For each bead (Issue), pract
     - Generate a stand-alone CSV file `Estimates/{SprintName}_{IssueKey}_{Date}_estimate.csv`:
 
       ```csv
-      Sprint,Date,Parent id,Summary,Assignee,Issue Type,Original Estimate
-      {SprintName},{Date},XBOL-XXX,BackEnd-{task},carlos.rosquillas@odasoft.com.mx,Sub-task,{seconds}
-      {SprintName},{Date},XBOL-XXX,FrontEnd-{task},carlos.rosquillas@odasoft.com.mx,Sub-task,{seconds}
+      Summary,Assignee,Issue Type,Original Estimate,Parent id
+      {task description},carlos.rosquillas@odasoft.com.mx,Sub-task,{seconds},XBOL-XXX
       ```
 
     - Mark bead as `done`: `bd close {BeadID} --reason "Estimation complete"`.
