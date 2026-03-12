@@ -117,10 +117,12 @@ hyprspace_focus_window() {
   local workspace_name="$1"
   local window_addr="$2"
 
-  # Show workspace first
-  if ! hyprctl dispatch togglespecialworkspace "$workspace_name" >/dev/null 2>&1; then
-    notify-send -u normal "hyprspace" "Failed to show workspace: $workspace_name"
-    return 1
+  # Show workspace only if not already visible (idempotent)
+  if ! hyprspace_is_workspace_visible "$workspace_name"; then
+    if ! hyprctl dispatch togglespecialworkspace "$workspace_name" >/dev/null 2>&1; then
+      notify-send -u normal "hyprspace" "Failed to show workspace: $workspace_name"
+      return 1
+    fi
   fi
 
   # Then focus specific window
@@ -164,6 +166,9 @@ hyprspace_wait_for_window() {
 # Args: $1=workspace_name
 hyprspace_show_workspace() {
   local workspace_name="$1"
+  if hyprspace_is_workspace_visible "$workspace_name"; then
+    return 0
+  fi
   if ! hyprctl dispatch togglespecialworkspace "$workspace_name" >/dev/null 2>&1; then
     notify-send -u normal "hyprspace" "Failed to show workspace: $workspace_name"
     return 1

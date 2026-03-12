@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Hyprland AI workspace launcher - shared workspace for Claude and Gemini
-# Priority: toggle off > Gemini-only > Claude matching CWD > spawn new Claude
+# Hyprland AI workspace launcher for Claude
+# Priority: toggle off > Claude matching CWD > spawn new Claude
 
 # Source library
 if [[ -f "$HOME/.local/share/hyprspace/hyprspace-lib.sh" ]]; then
@@ -14,7 +14,6 @@ fi
 CLAUDE_BIN="$HOME/.local/bin/claude"
 WORKSPACE_NAME="ai"
 CLAUDE_CLASS="claude_modal"
-GEMINI_CLASS="chrome-gemini.google.com__-Default"
 
 # Validate dependencies
 hyprspace_check_deps || exit 1
@@ -30,19 +29,8 @@ if hyprspace_any_special_visible >/dev/null; then
   exit 0
 fi
 
-# Count windows in AI workspace
+# Find existing Claude windows
 claude_windows=$(hyprctl clients -j | jq -r '.[] | select(.class == "'"$CLAUDE_CLASS"'") | .address')
-gemini_windows=$(hyprctl clients -j | jq -r '.[] | select(.class == "'"$GEMINI_CLASS"'") | .address')
-
-claude_count=$(echo "$claude_windows" | grep -c . || echo 0)
-gemini_count=$(echo "$gemini_windows" | grep -c . || echo 0)
-
-# If Gemini is the only window in workspace → show and focus it
-if [[ "$gemini_count" -gt 0 && "$claude_count" -eq 0 ]]; then
-  gemini_addr=$(echo "$gemini_windows" | head -1)
-  hyprspace_focus_window "$WORKSPACE_NAME" "$gemini_addr"
-  exit 0
-fi
 
 # Get active window and context
 active_info=$(hyprspace_get_active_window) || exit 1
@@ -79,14 +67,11 @@ if cwd=$(hyprspace_get_kitty_context "$active_class" "$active_pid" "$active_titl
     fi
   fi
 else
-  # No context available - show most recent Claude or Gemini
+  # No context available - show most recent Claude window
   any_claude=$(echo "$claude_windows" | head -1)
-  any_gemini=$(echo "$gemini_windows" | head -1)
 
   if [[ -n "$any_claude" ]]; then
     hyprspace_focus_window "$WORKSPACE_NAME" "$any_claude"
-  elif [[ -n "$any_gemini" ]]; then
-    hyprspace_focus_window "$WORKSPACE_NAME" "$any_gemini"
   fi
-  # If neither exists, do nothing (no context to spawn)
+  # If no Claude exists, do nothing (no context to spawn)
 fi
