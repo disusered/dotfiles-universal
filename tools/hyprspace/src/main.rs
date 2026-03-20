@@ -1,0 +1,49 @@
+mod config;
+mod context;
+mod hyprctl;
+mod lock;
+mod notify;
+mod scratchpads;
+mod workspace;
+
+use clap::{Parser, Subcommand};
+
+#[derive(Parser)]
+#[command(name = "hyprspace")]
+#[command(about = "Hyprland special workspace manager")]
+struct Cli {
+    #[command(subcommand)]
+    command: Command,
+}
+
+#[derive(Subcommand)]
+enum Command {
+    /// Context-aware show/hide of a special workspace
+    Toggle {
+        /// Name of the workspace to toggle
+        workspace: String,
+    },
+    /// Explicitly spawn a new instance in a special workspace
+    Spawn {
+        /// Name of the workspace to spawn into
+        workspace: String,
+    },
+    /// Bare togglespecialworkspace (no context logic)
+    Raw {
+        /// Name of the workspace to toggle
+        workspace: String,
+    },
+    /// Dismiss all pyprland scratchpads
+    DismissScratchpads,
+}
+
+fn main() {
+    let cli = Cli::parse();
+
+    match cli.command {
+        Command::Toggle { .. } => unimplemented!(),
+        Command::Spawn { .. } => unimplemented!(),
+        Command::Raw { .. } => unimplemented!(),
+        Command::DismissScratchpads => unimplemented!(),
+    }
+}

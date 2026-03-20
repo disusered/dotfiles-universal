@@ -31,6 +31,10 @@ ai/claude/.cache/
 /tools/sddm/theme.conf
 /tools/swayosd/style.css
 
+# Rust build artifacts
+**/target/
+
 # Dolt database files (added by bd init)
 .dolt/
+.beads/.beads-credential-key
 *.db
