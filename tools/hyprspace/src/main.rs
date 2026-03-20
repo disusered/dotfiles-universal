@@ -41,7 +41,16 @@ fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Command::Toggle { .. } => unimplemented!(),
+        Command::Toggle { workspace } => {
+            let config = config::Config::load().unwrap_or_else(|e| {
+                eprintln!("hyprspace: {}", e);
+                std::process::exit(1);
+            });
+            if let Err(e) = workspace::toggle(&workspace, &config) {
+                notify::notify(notify::Urgency::Critical, "hyprspace", &e);
+                std::process::exit(1);
+            }
+        }
         Command::Spawn { .. } => unimplemented!(),
         Command::Raw { .. } => unimplemented!(),
         Command::DismissScratchpads => {
