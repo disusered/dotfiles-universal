@@ -44,6 +44,12 @@ fn main() {
         Command::Toggle { .. } => unimplemented!(),
         Command::Spawn { .. } => unimplemented!(),
         Command::Raw { .. } => unimplemented!(),
-        Command::DismissScratchpads => unimplemented!(),
+        Command::DismissScratchpads => {
+            let config = config::Config::load().unwrap_or_else(|e| {
+                eprintln!("hyprspace: {}", e);
+                std::process::exit(1);
+            });
+            scratchpads::dismiss_all(&config.scratchpads.names);
+        }
     }
 }

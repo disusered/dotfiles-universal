@@ -27,12 +27,11 @@ fn raw_requires_workspace() {
 
 #[test]
 fn dismiss_scratchpads_takes_no_args() {
-    // clap parsing succeeds; the handler will panic with unimplemented
+    // clap parsing succeeds; the handler loads config (fails in test env)
     hyprspace()
         .arg("dismiss-scratchpads")
         .assert()
-        .failure()
-        .stderr(predicate::str::contains("not implemented"));
+        .failure();
 }
 
 #[test]
