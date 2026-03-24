@@ -112,6 +112,24 @@ local function get_launch_profiles(project_dir)
   return profiles
 end
 
+--- Collect launch profiles from all projects in the solution
+---@param projects {name: string, path: string, dir: string}[]
+---@return {name: string, env: table<string, string>, project_name: string, project_path: string}[]
+local function get_all_launch_profiles(projects)
+  local all = {}
+  for _, p in ipairs(projects) do
+    for _, profile in ipairs(get_launch_profiles(p.dir)) do
+      table.insert(all, {
+        name = profile.name,
+        env = profile.env,
+        project_name = p.name,
+        project_path = p.path,
+      })
+    end
+  end
+  return all
+end
+
 ---@type overseer.TemplateFileProvider
 return {
   cache_key = function(opts)
@@ -126,7 +144,6 @@ return {
     local cwd = vim.fs.dirname(marker)
     local projects = kind == "sln" and get_projects(marker) or {}
     local main = find_main_project(marker, projects)
-    local main_dir = vim.fs.dirname(main)
     local tasks = {}
 
     table.insert(tasks, {
@@ -157,12 +174,14 @@ return {
       end,
     })
 
-    for _, profile in ipairs(get_launch_profiles(main_dir)) do
+    for _, profile in ipairs(get_all_launch_profiles(projects)) do
+      local label = profile.name .. " (" .. profile.project_name .. ")"
+
       table.insert(tasks, {
-        name = "dotnet run: " .. profile.name,
+        name = "dotnet run: " .. label,
         builder = function()
           return {
-            cmd = { "dotnet", "run", "--launch-profile", profile.name, "--project", main },
+            cmd = { "dotnet", "run", "--launch-profile", profile.name, "--project", profile.project_path },
             cwd = cwd,
             env = profile.env,
           }
@@ -170,10 +189,10 @@ return {
       })
 
       table.insert(tasks, {
-        name = "dotnet watch: " .. profile.name,
+        name = "dotnet watch: " .. label,
         builder = function()
           return {
-            cmd = { "dotnet", "watch", "--launch-profile", profile.name, "--project", main },
+            cmd = { "dotnet", "watch", "--launch-profile", profile.name, "--project", profile.project_path },
             cwd = cwd,
             env = vim.tbl_extend("force", { DOTNET_WATCH_SUPPRESS_LAUNCH_BROWSER = "1" }, profile.env),
           }
