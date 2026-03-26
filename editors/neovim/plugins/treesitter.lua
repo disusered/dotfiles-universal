@@ -13,6 +13,7 @@ return {
       "query",
       "lua",
       "latex",
+      "liquid",
       "make",
       "scss",
       "toml",

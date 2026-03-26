@@ -29,6 +29,14 @@ return {
     opts.formatters_by_ft["ps1"] = { "ps_formatter" }
     opts.formatters_by_ft["xml"] = { "xmlformat" }
 
+    -- Liquid formatting via prettier + plugin
+    local npm_root = vim.fn.system("npm root -g"):gsub("%s+$", "")
+    opts.formatters["prettier_liquid"] = {
+      inherit = "prettier",
+      prepend_args = { "--plugin", npm_root .. "/@shopify/prettier-plugin-liquid/dist/index.js" },
+    }
+    opts.formatters_by_ft["liquid"] = { "prettier_liquid" }
+
     -- Use LSP formatting for .NET
     opts.formatters_by_ft["cs"] = {}
     opts.formatters_by_ft["fsharp"] = {}

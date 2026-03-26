@@ -47,6 +47,8 @@ return {
       -- Rust
       "rust-analyzer",
       -- "rustfmt", -- Formatter, installed via rustup now
+      -- Liquid
+      "shopify-cli",
       -- SQL
       "sqlfluff", -- Linter and formatter
       -- TOML

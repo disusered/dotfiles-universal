@@ -32,6 +32,7 @@ linux[whoami.distro^="Arch"]:
       - /languages/javascript/node/latest
       - /languages/latex/tectonic
       - /tools/fonts
+      - /tools/prettier-plugins
       - /tools/grpcurl
       - /tools/websocat
       - /tools/xmllint
@@ -64,6 +65,7 @@ linux[whoami.distro^="Fedora"]:
       - /languages/latex/tectonic
       - /languages/python/latest
       - /languages/javascript/node/latest
+      - /tools/prettier-plugins
 windows:
   installs:
     cmd: scoop install neovim
@@ -91,6 +93,7 @@ windows:
       - /languages/latex/tectonic
       - /languages/python/latest
       - /languages/javascript/node/latest
+      - /tools/prettier-plugins
   links:
     neovim.ps1: ~/.config/powershell/profile.d/neovim.ps1
     init.lua: >-

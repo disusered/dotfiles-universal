@@ -1,0 +1,5 @@
+global:
+  installs:
+    cmd: npm install -g @shopify/prettier-plugin-liquid
+    depends:
+      - /languages/javascript/node/latest
