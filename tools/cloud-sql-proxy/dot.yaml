@@ -1,0 +1,25 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S --noconfirm cloud-sql-proxy-bin
+    depends:
+      - /tools/yay
+linux[whoami.distro^="Fedora"]:
+  installs:
+    cmd: |
+      curl -o /tmp/cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.21.1/cloud-sql-proxy.linux.amd64
+      chmod +x /tmp/cloud-sql-proxy
+      sudo mv /tmp/cloud-sql-proxy /usr/local/bin/
+    depends:
+      - /tools/curl
+darwin:
+  installs:
+    cmd: |
+      curl -o /tmp/cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.21.1/cloud-sql-proxy.darwin.amd64
+      chmod +x /tmp/cloud-sql-proxy
+      sudo mv /tmp/cloud-sql-proxy /usr/local/bin/
+    depends:
+      - /tools/curl
+windows:
+  installs:
+    cmd: |
+      Invoke-WebRequest -Uri "https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.21.1/cloud-sql-proxy.x64.exe" -OutFile "$env:LOCALAPPDATA\cloud-sql-proxy\cloud-sql-proxy.exe"
