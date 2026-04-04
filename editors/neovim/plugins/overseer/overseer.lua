@@ -10,7 +10,7 @@ return {
       "OverseerTaskAction",
     },
     opts = {
-      dap = false,
+      dap = true,
       task_list = {
         direction = "right",
         keymaps = {
