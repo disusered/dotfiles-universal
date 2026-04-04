@@ -1,0 +1,4 @@
+[general]
+drivers = pulse
+periods = 4
+period_size = 1024

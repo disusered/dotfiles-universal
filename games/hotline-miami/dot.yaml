@@ -1,0 +1,44 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -e
+
+      APP_ID="219150"
+      LAUNCH_OPTS='~/.local/bin/hotline-autoscale %command%'
+
+      # Find Steam localconfig.vdf
+      LOCALCONFIG=$(find "$HOME/.local/share/Steam/userdata" -name "localconfig.vdf" -print -quit 2>/dev/null)
+
+      if [ -z "$LOCALCONFIG" ]; then
+        echo "Warning: Steam localconfig.vdf not found. Set launch options manually:"
+        echo "  $LAUNCH_OPTS"
+        exit 0
+      fi
+
+      if pgrep -x steam >/dev/null 2>&1; then
+        echo "Warning: Steam is running. Close Steam before installing to set launch options."
+        echo "  Launch options to set manually: $LAUNCH_OPTS"
+        exit 0
+      fi
+
+      # Patch LaunchOptions for the app using awk
+      # Finds the app ID block and replaces/inserts the LaunchOptions line
+      awk -v app="\"$APP_ID\"" -v opts="$LAUNCH_OPTS" '
+        $0 ~ app { in_app=1 }
+        in_app && /^\t*\{/ { depth++ }
+        in_app && /^\t*\}/ { depth--; if (depth==0) in_app=0 }
+        in_app && /\"LaunchOptions\"/ {
+          sub(/"LaunchOptions"[[:space:]]*"[^"]*"/, "\"LaunchOptions\"\t\t\"" opts "\"")
+        }
+        { print }
+      ' "$LOCALCONFIG" > "${LOCALCONFIG}.tmp" && mv "${LOCALCONFIG}.tmp" "$LOCALCONFIG"
+
+      echo "Steam launch options set for Hotline Miami ($APP_ID): $LAUNCH_OPTS"
+      echo "Also disable Steam Overlay for this game to prevent the lag bomb."
+    depends:
+      - /arch/steam
+  links:
+    hotline-autoscale.sh: ~/.local/bin/hotline-autoscale
+    hotline-miami.conf: ~/.config/hypr/conf.d/hotline-miami.conf
+    hotline.cfg: ~/.local/share/Steam/steamapps/compatdata/219150/pfx/drive_c/users/steamuser/Documents/My Games/HotlineMiami/hotline.cfg
+    alsoftrc: ~/.alsoftrc
