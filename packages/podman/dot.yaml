@@ -7,3 +7,4 @@ linux[whoami.distro^="Arch"]:
     registries.conf: ~/.config/containers/registries.conf
     podman.zsh: ~/.config/zsh/0700_podman.zsh
     docker.sh: ~/.local/bin/docker
+    storage.conf: ~/.config/containers/storage.conf
