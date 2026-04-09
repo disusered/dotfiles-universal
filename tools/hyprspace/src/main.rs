@@ -33,6 +33,8 @@ enum Command {
         /// Name of the workspace to toggle
         workspace: String,
     },
+    /// List configured workspaces
+    List,
     /// Dismiss all pyprland scratchpads
     DismissScratchpads,
 }
@@ -65,6 +67,17 @@ fn main() {
             if let Err(e) = workspace::raw(&workspace) {
                 notify::notify(notify::Urgency::Critical, "hyprspace", &e);
                 std::process::exit(1);
+            }
+        }
+        Command::List => {
+            let config = config::Config::load().unwrap_or_else(|e| {
+                eprintln!("hyprspace: {}", e);
+                std::process::exit(1);
+            });
+            let mut names: Vec<&String> = config.workspaces.keys().collect();
+            names.sort();
+            for name in names {
+                println!("{}", name);
             }
         }
         Command::DismissScratchpads => {

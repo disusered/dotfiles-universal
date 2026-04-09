@@ -136,16 +136,15 @@ fn toggle_with_cwd(
             return focus_and_show(workspace_name, &client.address);
         }
 
-        if ws.multi_instance {
-            return spawn_and_wait(ws, workspace_name, Some(&cwd_str));
+        // Single instance: reuse any existing window of this class
+        if !ws.multi_instance {
+            if let Some(client) = find_any_window(clients, ws) {
+                return focus_and_show(workspace_name, &client.address);
+            }
         }
 
-        // Single instance: show any existing window of that class
-        if let Some(client) = find_any_window(clients, ws) {
-            return focus_and_show(workspace_name, &client.address);
-        }
-
-        Ok(())
+        // No existing window — spawn one
+        spawn_and_wait(ws, workspace_name, Some(&cwd_str))
     } else {
         // No CWD context: show any existing window, never spawn
         if let Some(client) = find_any_window(clients, ws) {
@@ -183,15 +182,15 @@ fn toggle_with_git_root(
         return focus_and_show(workspace_name, &client.address);
     }
 
-    if ws.multi_instance {
-        return spawn_and_wait(ws, workspace_name, Some(&root_str));
+    // Single instance: reuse any existing window of this class
+    if !ws.multi_instance {
+        if let Some(client) = find_any_window(clients, ws) {
+            return focus_and_show(workspace_name, &client.address);
+        }
     }
 
-    if let Some(client) = find_any_window(clients, ws) {
-        return focus_and_show(workspace_name, &client.address);
-    }
-
-    Ok(())
+    // No existing window — spawn one
+    spawn_and_wait(ws, workspace_name, Some(&root_str))
 }
 
 fn detect_context(ws: &WorkspaceConfig, active_window: &ActiveWindow) -> Option<String> {

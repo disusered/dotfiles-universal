@@ -6,7 +6,7 @@ window_class = "claude_modal"
 title_prefix = "claude: "
 context_type = "cwd"
 multi_instance = true
-dismiss_scratchpads = true
+dismiss_scratchpads = false
 extra_classes = ["chrome-gemini.google.com__-Default"]
 spawn_command = ["kitty", "--class", "claude_modal", "--title", "{title}", "--directory", "{context}", "--hold", "claude"]
 
@@ -15,6 +15,7 @@ window_class = "clipse_scratch"
 window_title = "clipse"
 context_type = "none"
 multi_instance = false
+dismiss_scratchpads = false
 spawn_command = ["kitty", "--class", "clipse_scratch", "--title", "clipse", "clipse"]
 
 [workspaces.lazygit]
@@ -22,6 +23,7 @@ window_class = "lazygit_modal"
 title_prefix = "lazygit: "
 context_type = "git_root"
 multi_instance = false
+dismiss_scratchpads = false
 spawn_command = ["kitty", "--class", "lazygit_modal", "--title", "{title}", "--directory", "{context}", "lazygit"]
 
 [workspaces.calculator]
