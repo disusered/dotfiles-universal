@@ -51,8 +51,22 @@ fn main() {
                 std::process::exit(1);
             }
         }
-        Command::Spawn { .. } => unimplemented!(),
-        Command::Raw { .. } => unimplemented!(),
+        Command::Spawn { workspace } => {
+            let config = config::Config::load().unwrap_or_else(|e| {
+                eprintln!("hyprspace: {}", e);
+                std::process::exit(1);
+            });
+            if let Err(e) = workspace::spawn(&workspace, &config) {
+                notify::notify(notify::Urgency::Critical, "hyprspace", &e);
+                std::process::exit(1);
+            }
+        }
+        Command::Raw { workspace } => {
+            if let Err(e) = workspace::raw(&workspace) {
+                notify::notify(notify::Urgency::Critical, "hyprspace", &e);
+                std::process::exit(1);
+            }
+        }
         Command::DismissScratchpads => {
             let config = config::Config::load().unwrap_or_else(|e| {
                 eprintln!("hyprspace: {}", e);

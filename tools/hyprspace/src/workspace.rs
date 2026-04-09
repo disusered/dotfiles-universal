@@ -13,6 +13,50 @@ use crate::lock::SpawnLock;
 use crate::notify;
 use crate::scratchpads;
 
+pub fn raw(workspace_name: &str) -> Result<(), String> {
+    dispatch_toggle_special(workspace_name)
+}
+
+pub fn spawn(workspace_name: &str, config: &Config) -> Result<(), String> {
+    let ws = match config.get_workspace(workspace_name) {
+        Some(ws) => ws,
+        None => {
+            notify::notify(
+                notify::Urgency::Critical,
+                "hyprspace",
+                &format!("Unknown workspace: {}", workspace_name),
+            );
+            return Err(format!("Unknown workspace: {}", workspace_name));
+        }
+    };
+
+    if !ws.multi_instance {
+        notify::notify(
+            notify::Urgency::Normal,
+            "hyprspace",
+            &format!("{} is single-instance", workspace_name),
+        );
+        return Ok(());
+    }
+
+    if ws.dismiss_scratchpads {
+        scratchpads::dismiss_all(&config.scratchpads.names);
+    }
+
+    let active_window = get_active_window()?;
+    match detect_context(ws, &active_window) {
+        Some(ctx) => spawn_and_wait(ws, workspace_name, Some(&ctx)),
+        None => {
+            notify::notify(
+                notify::Urgency::Normal,
+                "hyprspace",
+                &format!("No context for spawn in {}", workspace_name),
+            );
+            Ok(())
+        }
+    }
+}
+
 pub fn toggle(workspace_name: &str, config: &Config) -> Result<(), String> {
     let ws = match config.get_workspace(workspace_name) {
         Some(ws) => ws,
@@ -148,6 +192,19 @@ fn toggle_with_git_root(
     }
 
     Ok(())
+}
+
+fn detect_context(ws: &WorkspaceConfig, active_window: &ActiveWindow) -> Option<String> {
+    match ws.context_type {
+        ContextType::None => Some(String::new()),
+        ContextType::Cwd => {
+            context::detect_cwd(active_window).map(|p| p.to_string_lossy().into_owned())
+        }
+        ContextType::GitRoot => {
+            let cwd = context::detect_cwd(active_window)?;
+            context::find_git_root(&cwd).map(|p| p.to_string_lossy().into_owned())
+        }
+    }
 }
 
 fn focus_and_show(workspace_name: &str, address: &str) -> Result<(), String> {
