@@ -19,7 +19,7 @@
     "more": "?",
     "nextPage": "right",
     "prevPage": "left",
-    "preview": " ",
+    "preview": "space",
     "quit": "esc",
     "remove": "backspace",
     "selectDown": "shift+down",
