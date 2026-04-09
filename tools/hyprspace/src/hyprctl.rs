@@ -15,10 +15,12 @@ pub struct Client {
     pub class: String,
     #[serde(rename = "initialTitle")]
     pub initial_title: String,
+    #[allow(dead_code)]
     pub workspace: WorkspaceRef,
 }
 
 #[derive(Deserialize, Debug)]
+#[allow(dead_code)]
 pub struct WorkspaceRef {
     pub name: String,
 }

@@ -17,6 +17,7 @@ pub struct ScratchpadConfig {
 #[derive(Deserialize, Debug)]
 pub struct WorkspaceConfig {
     pub window_class: String,
+    #[allow(dead_code)]
     pub window_title: Option<String>,
     pub title_prefix: Option<String>,
     #[serde(default)]
@@ -29,6 +30,7 @@ pub struct WorkspaceConfig {
     #[serde(default)]
     pub extra_classes: Vec<String>,
     #[serde(default)]
+    #[allow(dead_code)]
     pub spawn_via_desktop: bool,
 }
 

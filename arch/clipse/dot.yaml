@@ -3,9 +3,9 @@ linux[whoami.distro^="Arch"]:
     cmd: yay -S clipse
     depends:
       - /lib/wl-clipboard
+      - /tools/hyprspace
   links:
     clipse.conf: {{ dirs.base.config }}/hypr/conf.d/clipse.conf
     clipse.service: {{ dirs.base.config }}/systemd/user/clipse.service
     config.json: {{ dirs.base.config }}/clipse/config.json
     custom_theme.json: {{ dirs.base.config }}/clipse/custom_theme.json
-    hyprclipse.sh: ~/.local/bin/hyprclipse

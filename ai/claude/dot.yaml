@@ -2,9 +2,8 @@ global:
   installs:
     cmd: curl -fsSL https://claude.ai/install.sh | bash
     depends:
-      - /lib/hyprspace
+      - /tools/hyprspace
   links:
-    hyprclaude.sh: ~/.local/bin/hyprclaude
     skills: ~/.claude/skills/
     hooks: ~/.claude/hooks
     commands: ~/.claude/commands

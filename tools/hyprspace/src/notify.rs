@@ -1,6 +1,7 @@
 use std::process::Command;
 
 pub enum Urgency {
+    #[allow(dead_code)]
     Low,
     Normal,
     Critical,
