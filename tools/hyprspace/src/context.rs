@@ -48,21 +48,44 @@ fn query_kitty_socket(pid: i64) -> Option<PathBuf> {
         }
     };
 
-    let json: serde_json::Value =
-        serde_json::from_slice(&output.stdout).ok()?;
+    let json: serde_json::Value = serde_json::from_slice(&output.stdout).ok()?;
+    pick_focused_cwd(&json)
+}
 
-    let tabs = json.as_array()?;
-    for os_window in tabs {
+/// Walk the `kitty @ ls` JSON and return the cwd of the window inside the
+/// OS window that currently has window-manager focus. Returns `None` if no
+/// OS window is marked focused — better to bail than guess, since a wrong
+/// answer causes hyprspace to raise the wrong window.
+fn pick_focused_cwd(json: &serde_json::Value) -> Option<PathBuf> {
+    let os_windows = json.as_array()?;
+    for os_window in os_windows {
+        if !os_window
+            .get("is_focused")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false)
+        {
+            continue;
+        }
         for tab in os_window.get("tabs")?.as_array()? {
+            if !tab
+                .get("is_focused")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false)
+            {
+                continue;
+            }
             for window in tab.get("windows")?.as_array()? {
-                if window.get("is_focused")?.as_bool()? {
+                if window
+                    .get("is_focused")
+                    .and_then(|v| v.as_bool())
+                    .unwrap_or(false)
+                {
                     let cwd = window.get("cwd")?.as_str()?;
                     return Some(PathBuf::from(cwd));
                 }
             }
         }
     }
-
     None
 }
 
@@ -131,5 +154,109 @@ mod tests {
     fn parse_dolphin_title_invalid_path() {
         let result = parse_dolphin_title("/nonexistent/xyz \u{2014} Dolphin");
         assert!(result.is_none());
+    }
+
+    fn parse(json: &str) -> serde_json::Value {
+        serde_json::from_str(json).expect("valid fixture json")
+    }
+
+    #[test]
+    fn pick_focused_cwd_single_window() {
+        let json = parse(
+            r#"[
+                {
+                    "is_focused": true,
+                    "tabs": [
+                        {
+                            "is_focused": true,
+                            "windows": [
+                                {"is_focused": true, "cwd": "/home/user/repo"}
+                            ]
+                        }
+                    ]
+                }
+            ]"#,
+        );
+        assert_eq!(
+            pick_focused_cwd(&json),
+            Some(PathBuf::from("/home/user/repo"))
+        );
+    }
+
+    #[test]
+    fn pick_focused_cwd_multiple_os_windows_picks_focused() {
+        // Regression: with multiple Kitty OS windows on a shared socket, the
+        // old code returned the first OS window's inner-focused cwd. It must
+        // now return the cwd of the OS window flagged is_focused.
+        let json = parse(
+            r#"[
+                {
+                    "is_focused": false,
+                    "tabs": [
+                        {
+                            "is_focused": true,
+                            "windows": [
+                                {"is_focused": true, "cwd": "/home/user/repoA"}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "is_focused": true,
+                    "tabs": [
+                        {
+                            "is_focused": true,
+                            "windows": [
+                                {"is_focused": true, "cwd": "/home/user/repoB"}
+                            ]
+                        }
+                    ]
+                }
+            ]"#,
+        );
+        assert_eq!(
+            pick_focused_cwd(&json),
+            Some(PathBuf::from("/home/user/repoB"))
+        );
+    }
+
+    #[test]
+    fn pick_focused_cwd_no_focused_os_window_returns_none() {
+        let json = parse(
+            r#"[
+                {
+                    "is_focused": false,
+                    "tabs": [
+                        {
+                            "is_focused": true,
+                            "windows": [
+                                {"is_focused": true, "cwd": "/home/user/repoA"}
+                            ]
+                        }
+                    ]
+                }
+            ]"#,
+        );
+        assert_eq!(pick_focused_cwd(&json), None);
+    }
+
+    #[test]
+    fn pick_focused_cwd_focused_os_window_without_focused_inner_returns_none() {
+        let json = parse(
+            r#"[
+                {
+                    "is_focused": true,
+                    "tabs": [
+                        {
+                            "is_focused": true,
+                            "windows": [
+                                {"is_focused": false, "cwd": "/home/user/repoA"}
+                            ]
+                        }
+                    ]
+                }
+            ]"#,
+        );
+        assert_eq!(pick_focused_cwd(&json), None);
     }
 }
