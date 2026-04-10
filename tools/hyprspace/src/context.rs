@@ -52,28 +52,18 @@ fn query_kitty_socket(pid: i64) -> Option<PathBuf> {
     pick_focused_cwd(&json)
 }
 
-/// Walk the `kitty @ ls` JSON and return the cwd of the window inside the
-/// OS window that currently has window-manager focus. Returns `None` if no
-/// OS window is marked focused — better to bail than guess, since a wrong
-/// answer causes hyprspace to raise the wrong window.
+/// Walk the `kitty @ ls` JSON and return the cwd of the inner-focused
+/// window. Intended for use with a per-pid socket (`unix:@mykitty-{pid}`),
+/// which returns only that one Kitty instance — so the inner `is_focused`
+/// flag reliably identifies the currently active tab/window inside it.
+///
+/// Do NOT filter on OS-window-level or tab-level `is_focused`: those
+/// reflect window-manager focus at the moment of the query, which races
+/// with the subprocess that runs this check and frequently reports
+/// `false` even for the Kitty that invoked hyprspace.
 fn pick_focused_cwd(json: &serde_json::Value) -> Option<PathBuf> {
-    let os_windows = json.as_array()?;
-    for os_window in os_windows {
-        if !os_window
-            .get("is_focused")
-            .and_then(|v| v.as_bool())
-            .unwrap_or(false)
-        {
-            continue;
-        }
+    for os_window in json.as_array()? {
         for tab in os_window.get("tabs")?.as_array()? {
-            if !tab
-                .get("is_focused")
-                .and_then(|v| v.as_bool())
-                .unwrap_or(false)
-            {
-                continue;
-            }
             for window in tab.get("windows")?.as_array()? {
                 if window
                     .get("is_focused")
@@ -161,16 +151,20 @@ mod tests {
     }
 
     #[test]
-    fn pick_focused_cwd_single_window() {
+    fn pick_focused_cwd_returns_inner_focused() {
+        // Per-pid socket returns this Kitty's data, possibly with
+        // os_window.is_focused=false (race at query time). The inner
+        // window.is_focused flag is what we trust.
         let json = parse(
             r#"[
                 {
-                    "is_focused": true,
+                    "is_focused": false,
                     "tabs": [
                         {
                             "is_focused": true,
                             "windows": [
-                                {"is_focused": true, "cwd": "/home/user/repo"}
+                                {"is_focused": false, "cwd": "/wrong"},
+                                {"is_focused": true,  "cwd": "/home/user/repo"}
                             ]
                         }
                     ]
@@ -184,73 +178,14 @@ mod tests {
     }
 
     #[test]
-    fn pick_focused_cwd_multiple_os_windows_picks_focused() {
-        // Regression: with multiple Kitty OS windows on a shared socket, the
-        // old code returned the first OS window's inner-focused cwd. It must
-        // now return the cwd of the OS window flagged is_focused.
+    fn pick_focused_cwd_no_focused_window_returns_none() {
         let json = parse(
             r#"[
                 {
-                    "is_focused": false,
                     "tabs": [
                         {
-                            "is_focused": true,
                             "windows": [
-                                {"is_focused": true, "cwd": "/home/user/repoA"}
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "is_focused": true,
-                    "tabs": [
-                        {
-                            "is_focused": true,
-                            "windows": [
-                                {"is_focused": true, "cwd": "/home/user/repoB"}
-                            ]
-                        }
-                    ]
-                }
-            ]"#,
-        );
-        assert_eq!(
-            pick_focused_cwd(&json),
-            Some(PathBuf::from("/home/user/repoB"))
-        );
-    }
-
-    #[test]
-    fn pick_focused_cwd_no_focused_os_window_returns_none() {
-        let json = parse(
-            r#"[
-                {
-                    "is_focused": false,
-                    "tabs": [
-                        {
-                            "is_focused": true,
-                            "windows": [
-                                {"is_focused": true, "cwd": "/home/user/repoA"}
-                            ]
-                        }
-                    ]
-                }
-            ]"#,
-        );
-        assert_eq!(pick_focused_cwd(&json), None);
-    }
-
-    #[test]
-    fn pick_focused_cwd_focused_os_window_without_focused_inner_returns_none() {
-        let json = parse(
-            r#"[
-                {
-                    "is_focused": true,
-                    "tabs": [
-                        {
-                            "is_focused": true,
-                            "windows": [
-                                {"is_focused": false, "cwd": "/home/user/repoA"}
+                                {"is_focused": false, "cwd": "/home/user/repo"}
                             ]
                         }
                     ]

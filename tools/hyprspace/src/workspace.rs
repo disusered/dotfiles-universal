@@ -136,14 +136,9 @@ fn toggle_with_cwd(
             return focus_and_show(workspace_name, &client.address);
         }
 
-        // Single instance: reuse any existing window of this class
-        if !ws.multi_instance {
-            if let Some(client) = find_any_window(clients, ws) {
-                return focus_and_show(workspace_name, &client.address);
-            }
-        }
-
-        // No existing window — spawn one
+        // Context-aware: no exact match means a new context — always spawn.
+        // Do NOT fall back to find_any_window here: reusing an arbitrary
+        // window from a different context is the "wrong/stale window" bug.
         spawn_and_wait(ws, workspace_name, Some(&cwd_str))
     } else {
         // No CWD context: show any existing window, never spawn
@@ -182,14 +177,9 @@ fn toggle_with_git_root(
         return focus_and_show(workspace_name, &client.address);
     }
 
-    // Single instance: reuse any existing window of this class
-    if !ws.multi_instance {
-        if let Some(client) = find_any_window(clients, ws) {
-            return focus_and_show(workspace_name, &client.address);
-        }
-    }
-
-    // No existing window — spawn one
+    // Context-aware: no exact match means a new git repo — always spawn.
+    // Do NOT fall back to find_any_window: that reused a lazygit from an
+    // unrelated repo (the "wrong/stale window" bug).
     spawn_and_wait(ws, workspace_name, Some(&root_str))
 }
 
