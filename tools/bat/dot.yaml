@@ -22,7 +22,11 @@ linux[whoami.distro^="Fedora"]:
     themes/Catppuccin Latte.tmTheme: ~/.config/bat/themes/Catppuccin Latte.tmTheme
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S bat && bat cache --build
+    cmd: |
+      if ! pacman -Qi bat &>/dev/null; then
+        sudo pacman -S --noconfirm --needed bat
+        bat cache --build
+      fi
     depends:
       - /tools/zsh
   links:

@@ -1,10 +1,12 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      yay -S --noconfirm qt6ct-kde darkly-qt6-git
-      sudo pacman -S --noconfirm qt6-svg qt6-declarative qt5-quickcontrols2
-      mkdir -p ~/.config/qt6ct/colors
-      curl -sL https://raw.githubusercontent.com/catppuccin/qt5ct/main/themes/catppuccin-mocha-blue.conf -o ~/.config/qt6ct/colors/catppuccin-mocha-blue.conf
+      yay -S --noconfirm --needed qt6ct-kde darkly-qt6-git
+      sudo pacman -S --noconfirm --needed qt6-svg qt6-declarative qt5-quickcontrols2
+      if [ ! -f ~/.config/qt6ct/colors/catppuccin-mocha-blue.conf ]; then
+        mkdir -p ~/.config/qt6ct/colors
+        curl -sL https://raw.githubusercontent.com/catppuccin/qt5ct/main/themes/catppuccin-mocha-blue.conf -o ~/.config/qt6ct/colors/catppuccin-mocha-blue.conf
+      fi
     depends:
       - /tools/yay
   links:

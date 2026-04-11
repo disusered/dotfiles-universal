@@ -1,8 +1,10 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      yay -S --noconfirm hyprshutdown
-      sudo sed -i 's/#HandlePowerKey=poweroff/HandlePowerKey=ignore/' /etc/systemd/logind.conf
+      if ! command -v hyprshutdown &>/dev/null; then
+        yay -S --noconfirm --needed hyprshutdown
+        sudo sed -i 's/#HandlePowerKey=poweroff/HandlePowerKey=ignore/' /etc/systemd/logind.conf
+      fi
   links:
     hyprshutdown-wrapper.sh: ~/.local/bin/hyprshutdown-wrapper
     session.conf: ~/.config/hypr/conf.d/session.conf

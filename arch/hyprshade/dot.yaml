@@ -1,8 +1,10 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      yay -S --noconfirm hyprshade
-      hyprshade install
+      if ! command -v hyprshade &>/dev/null; then
+        yay -S --noconfirm --needed hyprshade
+        hyprshade install
+      fi
       systemctl --user enable --now hyprshade.timer
   links:
     hyprshade.conf: {{ dirs.base.config }}/hypr/conf.d/hyprshade.conf

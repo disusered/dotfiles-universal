@@ -4,8 +4,10 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm avahi nss-mdns
-      sudo systemctl disable --now systemd-resolved.service
-      sudo systemctl enable --now avahi-daemon.service
+      if ! pacman -Qi avahi &>/dev/null; then
+        sudo pacman -S --noconfirm --needed avahi nss-mdns
+        sudo systemctl disable --now systemd-resolved.service
+        sudo systemctl enable --now avahi-daemon.service
+      fi
     depends:
       - /lib/networkmanager/

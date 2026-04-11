@@ -1,9 +1,11 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      yay -S --noconfirm google-chrome
-      sudo mkdir -p /etc/opt/chrome/policies/managed
-      sudo cp ~/.dotfiles/tools/chrome/catppuccin-policy.json /etc/opt/chrome/policies/managed/
+      if ! pacman -Qi google-chrome &>/dev/null; then
+        yay -S --noconfirm --needed google-chrome
+        sudo mkdir -p /etc/opt/chrome/policies/managed
+        sudo cp ~/.dotfiles/tools/chrome/catppuccin-policy.json /etc/opt/chrome/policies/managed/
+      fi
     depends:
       - /tools/yay
   links:

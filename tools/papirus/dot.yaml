@@ -1,8 +1,10 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm papirus-icon-theme
-      yay -S --noconfirm papirus-folders-catppuccin-git
-      papirus-folders -C cat-mocha-blue --theme Papirus-Dark
+      sudo pacman -S --noconfirm --needed papirus-icon-theme
+      if ! pacman -Qi papirus-folders-catppuccin-git &>/dev/null; then
+        yay -S --noconfirm --needed papirus-folders-catppuccin-git
+        papirus-folders -C cat-mocha-blue --theme Papirus-Dark
+      fi
     depends:
       - /tools/yay

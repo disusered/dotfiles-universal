@@ -1,5 +1,7 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      yay -S --noconfirm reflector
-      sudo reflector --latest 20 --sort rate -l 20 --save /etc/pacman.d/mirrorlist
+      if ! command -v reflector &>/dev/null; then
+        yay -S --noconfirm --needed reflector
+        sudo reflector --latest 20 --sort rate -l 20 --save /etc/pacman.d/mirrorlist
+      fi

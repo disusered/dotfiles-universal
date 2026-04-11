@@ -2,9 +2,11 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo locale-gen
-      sudo pacman -S --noconfirm ttf-liberation steam gamemode lib32-gamemode gamescope
-      sudo gpasswd -a $USER gamemode
+      if ! pacman -Qi steam &>/dev/null; then
+        sudo locale-gen
+        sudo pacman -S --noconfirm --needed ttf-liberation steam gamemode lib32-gamemode gamescope
+        sudo gpasswd -a $USER gamemode
+      fi
     depends:
       - /arch/hyprland
       - /lib/networkmanager/

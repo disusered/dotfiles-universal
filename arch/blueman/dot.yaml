@@ -1,10 +1,12 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo yay -S --noconfirm blueman
+      if ! pacman -Qi blueman &>/dev/null; then
+        yay -S --noconfirm --needed blueman
 
-      # workaround for mako not having interactive notifications
-      gsettings set org.blueman.general notification-daemon false
+        # workaround for mako not having interactive notifications
+        gsettings set org.blueman.general notification-daemon false
+      fi
 
       systemctl enable --now bluetooth.service
       systemctl enable --now blueman-mechanism.service
