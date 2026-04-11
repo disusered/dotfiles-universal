@@ -1,9 +1,14 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      if cd ~/.yay; then git pull; else git clone \
-      --depth 1 https://aur.archlinux.org/yay.git ~/.yay; fi && \
-      cd ~/.yay; yes | makepkg -si
+      if ! command -v yay &>/dev/null; then
+        if [ -d ~/.yay ]; then
+          cd ~/.yay && git pull
+        else
+          git clone --depth 1 https://aur.archlinux.org/yay.git ~/.yay
+        fi
+        cd ~/.yay && makepkg -si --noconfirm
+      fi
     depends:
       - /lib/arch
       - /tools/git
