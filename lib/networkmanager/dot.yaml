@@ -1,7 +1,7 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm networkmanager
+      sudo pacman -S --noconfirm --needed networkmanager
       sudo systemctl enable --now NetworkManager
       sudo systemctl enable --now systemd-networkd.service
 

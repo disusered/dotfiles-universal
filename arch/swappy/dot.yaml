@@ -1,6 +1,6 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm swappy
+    cmd: sudo pacman -S --noconfirm --needed swappy
     depends:
       - /arch/hyprshot
   links:

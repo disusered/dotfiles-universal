@@ -19,7 +19,7 @@ linux[whoami.distro^="Fedora"]:
     config.yaml: ~/.config/lazygit/config.yml
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S lazygit
+    cmd: sudo pacman -S --noconfirm --needed lazygit
     depends:
       - /tools/delta
       - /tools/hyprspace

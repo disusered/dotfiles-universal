@@ -1,7 +1,7 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm visual-studio-code-bin
+      sudo pacman -S --noconfirm --needed visual-studio-code-bin
 
       # Visual
       code --install-extension Catppuccin.catppuccin-vsc

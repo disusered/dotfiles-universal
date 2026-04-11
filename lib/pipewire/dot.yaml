@@ -1,7 +1,7 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      yay -S --noconfirm \
+      yay -S --noconfirm --needed \
         pipewire pipewire-audio gst-plugin-pipewire wireplumber \
         pipewire-alsa pipewire-jack playerctl pipewire-zeroconf \
         pipewire-v4l2 pavucontrol pipewire-pulse lib32-pipewire \

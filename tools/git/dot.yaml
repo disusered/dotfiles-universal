@@ -19,7 +19,7 @@ linux[whoami.distro^="Fedora"]:
     sshexe.zsh: ~/.config/zsh/0016_sshexe.zsh
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S git
+    cmd: sudo pacman -S --noconfirm --needed git
     depends:
       - /tools/ssh
       - /tools/1password

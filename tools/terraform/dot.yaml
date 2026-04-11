@@ -1,6 +1,6 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm terraform
+    cmd: sudo pacman -S --noconfirm --needed terraform
 linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install terraform

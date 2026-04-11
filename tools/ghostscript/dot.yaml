@@ -8,4 +8,4 @@ linux[whoami.distro^="Fedora"]:
     cmd: sudo dnf install ghostscript -y
 linux[whoami.distro^="Arch"]:
   installs:
-      cmd: yes | sudo pacman -S ghostscript
+      cmd: sudo pacman -S --noconfirm --needed ghostscript

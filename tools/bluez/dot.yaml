@@ -1,5 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm bluez-utils
+      sudo pacman -S --noconfirm --needed bluez-utils
       systemctl --user enable --now mpris-proxy.service

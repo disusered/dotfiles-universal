@@ -1,6 +1,6 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm wf-recorder
+    cmd: sudo pacman -S --noconfirm --needed wf-recorder
     depends:
       - /lib/slurp
       - /lib/uwsm

@@ -5,5 +5,5 @@ linux[whoami.distro^="Fedora"]:
     cmd: sudo dnf install mono-devel -y
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S mono
+    cmd: sudo pacman -S --noconfirm --needed mono
 

@@ -1,7 +1,7 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm qjackctl supercollider sc3-plugins tmux
+      sudo pacman -S --noconfirm --needed qjackctl supercollider sc3-plugins tmux
     depends:
       - /tools/git
       - /lib/pipewire

@@ -1,5 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S --noconfirm lazydocker
+    cmd: yay -S --noconfirm --needed lazydocker
     depends:
       - /packages/podman

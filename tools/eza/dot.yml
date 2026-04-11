@@ -18,7 +18,7 @@ linux[whoami.distro^="Fedora"]:
     eza.zsh: ~/.config/zsh/0050_eza.zsh
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S eza
+    cmd: sudo pacman -S --noconfirm --needed eza
     depends:
       - /tools/zsh
   links:

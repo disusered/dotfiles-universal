@@ -7,5 +7,5 @@ linux[whoami.distro^="Fedora"]:
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm openssh
+      sudo pacman -S --noconfirm --needed openssh
       sudo systemctl enable --now sshd

@@ -7,7 +7,7 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       # Install Neovim
-      sudo pacman -S --noconfirm neovim
+      sudo pacman -S --noconfirm --needed neovim
     depends:
       - /lib/arch
       - /tools/ssh

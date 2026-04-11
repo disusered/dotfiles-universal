@@ -21,7 +21,7 @@ linux[whoami.distro^="Fedora"]:
     ripgreprc: ~/.config/ripgrep/ripgreprc
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S ripgrep
+    cmd: sudo pacman -S --noconfirm --needed ripgrep
     depends:
       - /tools/bat
       - /tools/delta

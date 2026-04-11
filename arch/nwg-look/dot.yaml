@@ -1,8 +1,8 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      yay -S --noconfirm nwg-look
-      sudo pacman -S --noconfirm adw-gtk-theme
+      yay -S --noconfirm --needed nwg-look
+      sudo pacman -S --noconfirm --needed adw-gtk-theme
   links:
     settings.ini: {{ dirs.base.config }}/gtk-3.0/settings.ini
     gtk.css: {{ dirs.base.config }}/gtk-3.0/gtk.css

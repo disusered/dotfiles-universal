@@ -3,7 +3,7 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       # Install sddm if not present
       if ! pacman -Qi sddm &>/dev/null; then
-        sudo pacman -S --noconfirm sddm
+        sudo pacman -S --noconfirm --needed sddm
         sudo systemctl enable --now sddm
       fi
       # Download themes directly to system directory if not present

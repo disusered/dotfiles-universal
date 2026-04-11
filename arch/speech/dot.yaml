@@ -1,5 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm speech-dispatcher
-      yay -S --noconfirm piper-tts-bin piper-voices-en-us piper-voices-es-es
+      sudo pacman -S --noconfirm --needed speech-dispatcher
+      yay -S --noconfirm --needed piper-tts-bin piper-voices-en-us piper-voices-es-es

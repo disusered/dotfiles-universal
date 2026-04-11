@@ -1,5 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
-      cmd: sudo pacman -S --noconfirm tmux
+      cmd: sudo pacman -S --noconfirm --needed tmux
   links:
     tmux.conf: {{ dirs.base.config }}/tmux/tmux.conf

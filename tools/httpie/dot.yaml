@@ -1,6 +1,6 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm httpie
+    cmd: sudo pacman -S --noconfirm --needed httpie
     depends:
       - /tools/jq
 linux[whoami.distro^="Fedora"]:

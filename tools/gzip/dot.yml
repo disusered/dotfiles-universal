@@ -8,5 +8,5 @@ linux[whoami.distro^="Fedora"]:
     cmd: command -v gzip &>/dev/null || sudo dnf install gzip -y
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S gzip
+    cmd: sudo pacman -S --noconfirm --needed gzip
 

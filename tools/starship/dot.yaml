@@ -12,7 +12,7 @@ linux[whoami.distro^="Fedora"]:
 
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S starship
+    cmd: sudo pacman -S --noconfirm --needed starship
   links:
     starship.zsh: ~/.config/zsh/0150_starship.zsh
 

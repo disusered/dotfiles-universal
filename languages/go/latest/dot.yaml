@@ -1,5 +1,5 @@
 global:
   installs:
-    cmd: sudo pacman -S --noconfirm go
+    cmd: sudo pacman -S --noconfirm --needed go
   links:
     go.zsh: ~/.config/zsh/0300_go.zsh

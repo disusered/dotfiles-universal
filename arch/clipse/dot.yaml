@@ -1,6 +1,6 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S clipse
+    cmd: yay -S --noconfirm --needed clipse
     depends:
       - /lib/wl-clipboard
       - /tools/hyprspace

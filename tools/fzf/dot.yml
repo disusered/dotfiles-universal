@@ -7,7 +7,7 @@ windows:
     fzf.ps1: ~/.config/powershell/profile.d/fzf.ps1
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S fzf
+    cmd: sudo pacman -S --noconfirm --needed fzf
   links:
     fzf.zsh: ~/.config/zsh/0170_fzf.zsh
 linux[whoami.distro^="Fedora"]:

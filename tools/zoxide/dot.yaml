@@ -16,7 +16,7 @@ linux[whoami.distro^="Fedora"]:
     zoxide.zsh: ~/.config/zsh/0160_zoxide.zsh
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S zoxide
+    cmd: sudo pacman -S --noconfirm --needed zoxide
     depends:
       - /tools/fzf
   links:

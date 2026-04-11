@@ -5,7 +5,7 @@ windows:
       - /packages/scoop
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm jq
+    cmd: sudo pacman -S --noconfirm --needed jq
 linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install jq

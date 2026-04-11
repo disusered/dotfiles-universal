@@ -2,7 +2,7 @@ windows:
   installs: false
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S xdotool
+    cmd: sudo pacman -S --noconfirm --needed xdotool
 linux[whoami.distro^="Fedora"]:
   installs:
     cmd: command -v xdotool &>/dev/null || sudo dnf install -y xdotool

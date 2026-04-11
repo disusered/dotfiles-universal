@@ -8,4 +8,4 @@ linux[whoami.distro^="Fedora"]:
     cmd: command -v fd &>/dev/null || sudo dnf install fd-find -y
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S fd
+    cmd: sudo pacman -S --noconfirm --needed fd

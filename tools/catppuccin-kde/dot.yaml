@@ -2,7 +2,7 @@ linux[whoami.distro^="Arch"]:
   installs:
     # FIXME: This is non-interactive
     cmd: |
-      sudo pacman -S --noconfirm plasma-workspace
+      sudo pacman -S --noconfirm --needed plasma-workspace
       if [ ! -d ~/.local/share/catppuccin-kde ]; then
         git clone --depth=1 https://github.com/catppuccin/kde ~/.local/share/catppuccin-kde
         cd ~/.local/share/catppuccin-kde && ./install.sh

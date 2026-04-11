@@ -5,4 +5,4 @@ windows:
       - /packages/scoop
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S 7zip
+    cmd: sudo pacman -S --noconfirm --needed 7zip

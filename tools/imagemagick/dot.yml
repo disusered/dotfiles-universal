@@ -8,4 +8,4 @@ linux[whoami.distro^="Fedora"]:
     cmd: sudo dnf install ImageMagick ImageMagick-devel -y
 linux[whoami.distro^="Arch"]:
   installs:
-      cmd: yes | sudo pacman -S imagemagick
+      cmd: sudo pacman -S --noconfirm --needed imagemagick

@@ -13,7 +13,7 @@ linux[whoami.distro^="Fedora"]:
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm \
+      sudo pacman -S --noconfirm --needed \
         dotnet-sdk-bin \
         dotnet-targeting-pack-bin \
         aspnet-runtime-bin \

@@ -1,4 +1,4 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm wine-stable winetricks
+      sudo pacman -S --noconfirm --needed wine-stable winetricks

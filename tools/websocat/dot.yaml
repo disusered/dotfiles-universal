@@ -6,7 +6,7 @@ windows:
     # cmd: scoop install main/grpcurl
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm websocat
+    cmd: sudo pacman -S --noconfirm --needed websocat
 linux[whoami.distro^="Fedora"]|darwin:
   installs:
     cmd: brew install websocat

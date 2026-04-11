@@ -1,6 +1,6 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S --noconfirm 1password
+    cmd: yay -S --noconfirm --needed 1password
     depends:
       - /lib/pipewire
       - /arch/kwallet

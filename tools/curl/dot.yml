@@ -8,4 +8,5 @@ linux[whoami.distro^="Fedora"]:
   installs:
     cmd: command -v curl &>/dev/null || sudo dnf install curl -y
 linux[whoami.distro^="Arch"]:
-  installs: yes | sudo pacman -S curl
+  installs:
+    cmd: sudo pacman -S --noconfirm --needed curl

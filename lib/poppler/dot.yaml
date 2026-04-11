@@ -5,4 +5,4 @@ windows:
       - /packages/scoop
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm poppler
+    cmd: sudo pacman -S --noconfirm --needed poppler

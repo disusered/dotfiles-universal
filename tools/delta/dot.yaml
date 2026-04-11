@@ -14,7 +14,7 @@ linux[whoami.distro^="Fedora"]:
     delta.zsh: ~/.config/zsh/0025_delta.zsh
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S git-delta
+    cmd: sudo pacman -S --noconfirm --needed git-delta
     depends:
       - /tools/bat
       - /tools/git

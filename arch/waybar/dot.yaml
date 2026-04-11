@@ -1,7 +1,7 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm waybar
+      sudo pacman -S --noconfirm --needed waybar
       # FIXME: Service??
       # sudo systemctl enable --now waybar.service
     depends:

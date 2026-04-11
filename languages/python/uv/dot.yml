@@ -12,7 +12,7 @@ linux[whoami.distro^="Fedora"]:
     uv.zsh: ~/.config/zsh/0300_uv.zsh
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yes | sudo pacman -S uv
+    cmd: sudo pacman -S --noconfirm --needed uv
   links:
     uv.zsh: ~/.config/zsh/0300_uv.zsh
 

@@ -8,7 +8,7 @@ windows:
       - /tools/postgresql
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm base-devel ruby-build
+    cmd: sudo pacman -S --noconfirm --needed base-devel ruby-build
     depends:
       - /lib/arch
       - /tools/imagemagick

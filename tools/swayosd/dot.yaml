@@ -1,7 +1,7 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm swayosd
+      sudo pacman -S --noconfirm --needed swayosd
       sudo systemctl enable --now swayosd-libinput-backend.service
     depends:
       - /lib/pipewire
