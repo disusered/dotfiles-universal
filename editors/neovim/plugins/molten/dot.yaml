@@ -22,9 +22,9 @@ linux[whoami.distro^="Arch"]:
       mkdir -p ~/.local/share/jupyter/runtime
       chmod 700 ~/.local/share/jupyter/runtime
     depends:
-      - /editor/neovim
+      - /editors/neovim
       - /lib/wl-clipboard
-      - /editor/neovim/plugins/images
+      - /editors/neovim/plugins/images
   links:
     molten.lua: ~/.config/nvim/lua/plugins/molten.lua
 # Jupyter Kernel Registration Workflow:

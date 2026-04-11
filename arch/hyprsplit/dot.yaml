@@ -1,9 +1,11 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      hyprpm update
-      hyprpm add --force https://github.com/shezdy/hyprsplit
-      hyprpm enable hyprsplit
+      if ! hyprpm list 2>/dev/null | grep -q hyprsplit; then
+        hyprpm update
+        hyprpm add https://github.com/shezdy/hyprsplit
+        hyprpm enable hyprsplit
+      fi
     depends:
       - /arch/hyprland
   links:
