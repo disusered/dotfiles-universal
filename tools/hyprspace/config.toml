@@ -8,7 +8,7 @@ context_type = "cwd"
 multi_instance = true
 dismiss_scratchpads = false
 extra_classes = ["chrome-gemini.google.com__-Default"]
-spawn_command = ["kitty", "--class", "claude_modal", "--title", "{title}", "--directory", "{context}", "--hold", "claude"]
+spawn_command = ["kitty", "--class", "claude_modal", "--title", "{title}", "--directory", "{context}", "--hold", "zsh", "-ic", "claude"]
 
 [workspaces.clipboard]
 window_class = "clipse_scratch"
