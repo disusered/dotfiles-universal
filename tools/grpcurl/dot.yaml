@@ -5,7 +5,7 @@ windows:
       - /packages/scoop
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
+    cmd: command -v grpcurl &>/dev/null || go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
     depends:
       - /languages/go/latest
 linux[whoami.distro^="Fedora"]:

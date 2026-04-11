@@ -1,5 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: dotnet tool install --global csharp-ls
+    cmd: dotnet tool list -g | grep -q '^csharp-ls ' || dotnet tool install --global csharp-ls
     depends:
       - /languages/dotnet/latest

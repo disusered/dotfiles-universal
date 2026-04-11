@@ -1,6 +1,6 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: CC=clang mise install ruby@2.7.7
+    cmd: mise ls ruby 2>/dev/null | grep -q '2\.7\.7' || CC=clang mise install ruby@2.7.7
   depends:
     - /tools/mise
     - /lib/arch

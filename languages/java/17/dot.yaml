@@ -1,5 +1,7 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sdk install java 17.0.18-tem
+    cmd: |
+      source "$HOME/.sdkman/bin/sdkman-init.sh"
+      sdk list java 2>/dev/null | grep -q 'installed.*17\.0\.18-tem' || sdk install java 17.0.18-tem
     depends:
       - /tools/sdkman

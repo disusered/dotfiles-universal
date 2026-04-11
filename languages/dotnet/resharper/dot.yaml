@@ -1,5 +1,5 @@
 global:
   installs:
-    cmd: dotnet tool install -g JetBrains.ReSharper.GlobalTools
+    cmd: dotnet tool list -g | grep -qi '^jetbrains\.resharper\.globaltools ' || dotnet tool install -g JetBrains.ReSharper.GlobalTools
     depends:
       - /languages/dotnet/latest

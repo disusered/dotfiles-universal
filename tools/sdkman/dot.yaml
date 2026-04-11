@@ -1,5 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: curl -s "https://get.sdkman.io" | bash
+    cmd: '[ -d "$HOME/.sdkman" ] || curl -s "https://get.sdkman.io" | bash'
   links:
     sdkman.zsh: {{ dirs.base.config }}/zsh/0900_sdkman.zsh

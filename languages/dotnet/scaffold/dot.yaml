@@ -1,5 +1,5 @@
 global:
   installs:
-    cmd: dotnet tool install --global Microsoft.dotnet-scaffold
+    cmd: dotnet tool list -g | grep -qi '^microsoft\.dotnet-scaffold ' || dotnet tool install --global Microsoft.dotnet-scaffold
     depends:
       - /languages/dotnet/latest

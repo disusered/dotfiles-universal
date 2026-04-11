@@ -1,5 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      yay -S --noconfirm piper libratbag usbutils
-      pip install evdev PyGObject
+      yay -S --noconfirm --needed piper libratbag usbutils
+      python -c "import evdev, gi" 2>/dev/null || pip install evdev PyGObject

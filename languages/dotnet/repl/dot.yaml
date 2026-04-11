@@ -1,5 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: dotnet tool install -g csharprepl
+    cmd: dotnet tool list -g | grep -qi '^csharprepl ' || dotnet tool install -g csharprepl
     depends:
       - /languages/dotnet/latest

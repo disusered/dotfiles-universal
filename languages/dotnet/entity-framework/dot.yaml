@@ -1,10 +1,10 @@
 windows:
   installs:
-    cmd: dotnet.exe tool install --global dotnet-ef
+    cmd: dotnet.exe tool list -g | grep -q '^dotnet-ef ' || dotnet.exe tool install --global dotnet-ef
     depends:
       - /languages/dotnet/latest
 linux:
   installs:
-    cmd: dotnet tool install --global dotnet-ef
+    cmd: dotnet tool list -g | grep -q '^dotnet-ef ' || dotnet tool install --global dotnet-ef
     depends:
       - /languages/dotnet/latest

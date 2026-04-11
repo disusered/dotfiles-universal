@@ -1,5 +1,7 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sdk install kotlin
+    cmd: |
+      source "$HOME/.sdkman/bin/sdkman-init.sh"
+      command -v kotlin &>/dev/null || sdk install kotlin
     depends:
       - /tools/sdkman

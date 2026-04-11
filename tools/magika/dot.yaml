@@ -1,5 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: uv tool install magika
+    cmd: command -v magika &>/dev/null || uv tool install magika
     depends:
       - /languages/python/latest
