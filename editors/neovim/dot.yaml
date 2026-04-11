@@ -26,7 +26,6 @@ linux[whoami.distro^="Arch"]:
       - /tools/postgresql
       - /tools/zsh
       - /tools/ssh
-      - /languages/python/latest
       - /languages/lua/5.1
       - /languages/lua/hererocks
       - /languages/javascript/node/latest
@@ -63,7 +62,6 @@ linux[whoami.distro^="Fedora"]:
       - /languages/lua/5.1
       - /languages/lua/hererocks
       - /languages/latex/tectonic
-      - /languages/python/latest
       - /languages/javascript/node/latest
       - /tools/prettier-plugins
 windows:
@@ -91,7 +89,6 @@ windows:
       - /languages/lua/luarocks
       - /languages/lua/hererocks
       - /languages/latex/tectonic
-      - /languages/python/latest
       - /languages/javascript/node/latest
       - /tools/prettier-plugins
   links:

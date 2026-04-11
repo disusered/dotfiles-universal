@@ -20,7 +20,7 @@ linux[whoami.distro^="Arch"]:
       # 5. Install the dependencies
       uv sync --active
     depends:
-      - /languages/python/latest
+      - /languages/python/uv
   links:
     pyproject.toml: ~/.config/nvim/pyproject.toml
     uv.lock: ~/.config/nvim/uv.lock

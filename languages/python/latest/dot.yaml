@@ -1,5 +1,0 @@
-global:
-  installs:
-    cmd: ~/.local/bin/mise use --global python@latest
-    depends:
-      - /tools/mise
