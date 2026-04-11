@@ -1,5 +1,5 @@
 global:
   installs:
-    cmd: npm install -g @mermaid-js/mermaid-cli
+    cmd: command -v mmdc &>/dev/null || npm install -g @mermaid-js/mermaid-cli
     depends:
       - /languages/javascript/node/latest

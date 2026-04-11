@@ -2,7 +2,7 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       yay -S --noconfirm --needed aur/bruno
-      npm i -g @usebruno/cli
+      command -v bru &>/dev/null || npm i -g @usebruno/cli
     depends:
       - /languages/javascript/node/latest
   links:

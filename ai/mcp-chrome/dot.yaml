@@ -2,7 +2,7 @@
 # Chromium: mkdir -p ~/.config/chromium/NativeMessagingHosts/ && cp ~/.config/{google-chrome,chromium}/NativeMessagingHosts/com.chromemcp.nativehost.json
 global:
   installs:
-    cmd: npm install -g mcp-chrome-bridge && mcp-chrome-bridge register
+    cmd: command -v mcp-chrome-bridge &>/dev/null || { npm install -g mcp-chrome-bridge && mcp-chrome-bridge register; }
     depends:
       - /languages/javascript/node/latest
       - /arch/chrome

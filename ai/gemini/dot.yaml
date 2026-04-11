@@ -1,6 +1,6 @@
 global:
   installs:
-    cmd: npm install -g @google/gemini-cli
+    cmd: command -v gemini &>/dev/null || npm install -g @google/gemini-cli
     depends:
       - /languages/javascript/node/latest
   links:

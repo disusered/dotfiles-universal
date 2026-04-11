@@ -1,5 +1,7 @@
 global:
   installs:
-    cmd: npm install -g @shopify/prettier-plugin-liquid
+    cmd: |
+      # Prettier plugin — no binary, check install dir directly.
+      [ -d "$(npm root -g)/@shopify/prettier-plugin-liquid" ] || npm install -g @shopify/prettier-plugin-liquid
     depends:
       - /languages/javascript/node/latest
