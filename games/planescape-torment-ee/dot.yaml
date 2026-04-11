@@ -1,0 +1,62 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -e
+
+      APP_ID="466300"
+      LAUNCH_OPTS='~/.local/bin/pst-ee-launch %command%'
+
+      # Ensure Beamdog per-user config dir exists before Rotz links baldur.lua
+      mkdir -p "$HOME/.local/share/Beamdog/Planescape Torment Enhanced Edition"
+
+      # Find Steam localconfig.vdf
+      LOCALCONFIG=$(find "$HOME/.local/share/Steam/userdata" -name localconfig.vdf -print -quit 2>/dev/null)
+
+      if [ -z "$LOCALCONFIG" ]; then
+        echo "Warning: Steam localconfig.vdf not found. Set launch options manually:"
+        echo "  $LAUNCH_OPTS"
+        exit 0
+      fi
+
+      if pgrep -x steam >/dev/null 2>&1; then
+        echo "Warning: Steam is running. Close Steam before installing to set launch options."
+        echo "  Launch options to set manually: $LAUNCH_OPTS"
+        exit 0
+      fi
+
+      # Patch LaunchOptions for the app. Unlike the hotline-miami awk
+      # (which only uses sub() and silently no-ops when no LaunchOptions
+      # key exists), this variant also INSERTS the key before the closing
+      # brace of the app block when missing — the common case for a game
+      # whose launch options have never been set manually before.
+      awk -v app="\"$APP_ID\"" -v opts="$LAUNCH_OPTS" '
+        !in_app && $0 ~ "^[[:space:]]*" app "[[:space:]]*$" {
+          in_app=1; found=0; next_is_open=1; print; next
+        }
+        in_app && next_is_open && /^[[:space:]]*\{/ {
+          depth=1; next_is_open=0; print; next
+        }
+        in_app && /\{/ { depth++ }
+        in_app && /"LaunchOptions"/ {
+          sub(/"LaunchOptions"[[:space:]]*"[^"]*"/, "\"LaunchOptions\"\t\t\"" opts "\"")
+          found=1
+        }
+        in_app && /^[[:space:]]*\}/ {
+          depth--
+          if (depth==0) {
+            if (!found) {
+              match($0, /^[[:space:]]*/)
+              indent = substr($0, 1, RLENGTH) "\t"
+              print indent "\"LaunchOptions\"\t\t\"" opts "\""
+            }
+            in_app=0
+          }
+        }
+        { print }
+      ' "$LOCALCONFIG" > "${LOCALCONFIG}.tmp" && mv "${LOCALCONFIG}.tmp" "$LOCALCONFIG"
+
+      echo "Steam launch options set for Planescape: Torment EE ($APP_ID): $LAUNCH_OPTS"
+  links:
+    pst-ee-launch.sh: ~/.local/bin/pst-ee-launch
+    planescape.conf: ~/.config/hypr/conf.d/planescape.conf
+    baldur.lua: ~/.local/share/Beamdog/Planescape Torment Enhanced Edition/baldur.lua
