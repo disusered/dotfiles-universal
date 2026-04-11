@@ -112,6 +112,20 @@ local function get_launch_profiles(project_dir)
   return profiles
 end
 
+--- Build --project / --startup-project args for EF CLI.
+---@param params table
+---@return string[]
+local function ef_project_args(params)
+  local args = {}
+  if params.project and params.project ~= "" then
+    vim.list_extend(args, { "--project", params.project })
+  end
+  if params.startup_project and params.startup_project ~= "" then
+    vim.list_extend(args, { "--startup-project", params.startup_project })
+  end
+  return args
+end
+
 --- Collect launch profiles from all projects in the solution
 ---@param projects {name: string, path: string, dir: string}[]
 ---@return {name: string, env: table<string, string>, project_name: string, project_path: string}[]
@@ -249,6 +263,116 @@ return {
         end,
       })
     end
+
+    -- EF Core CLI tasks
+    local ef_project_params = {
+      project = {
+        type = "string",
+        default = main,
+        desc = "EF --project (DbContext project path)",
+        optional = true,
+        order = 10,
+      },
+      startup_project = {
+        type = "string",
+        default = main,
+        desc = "EF --startup-project (Program.cs project path)",
+        optional = true,
+        order = 11,
+      },
+    }
+
+    table.insert(tasks, {
+      name = "dotnet ef migrations add",
+      params = vim.tbl_extend("force", {
+        name = { type = "string", desc = "Migration name", order = 1 },
+      }, ef_project_params),
+      builder = function(params)
+        local cmd = { "dotnet", "ef", "migrations", "add", params.name }
+        vim.list_extend(cmd, ef_project_args(params))
+        return { cmd = cmd, cwd = cwd }
+      end,
+    })
+
+    table.insert(tasks, {
+      name = "dotnet ef migrations list",
+      params = ef_project_params,
+      builder = function(params)
+        local cmd = { "dotnet", "ef", "migrations", "list" }
+        vim.list_extend(cmd, ef_project_args(params))
+        return { cmd = cmd, cwd = cwd }
+      end,
+    })
+
+    table.insert(tasks, {
+      name = "dotnet ef database update",
+      params = vim.tbl_extend("force", {
+        target = {
+          type = "string",
+          desc = "Target migration (empty for latest)",
+          optional = true,
+          order = 1,
+        },
+      }, ef_project_params),
+      builder = function(params)
+        local cmd = { "dotnet", "ef", "database", "update" }
+        if params.target and params.target ~= "" then
+          table.insert(cmd, params.target)
+        end
+        vim.list_extend(cmd, ef_project_args(params))
+        return { cmd = cmd, cwd = cwd }
+      end,
+    })
+
+    table.insert(tasks, {
+      name = "dotnet ef database drop",
+      params = ef_project_params,
+      builder = function(params)
+        local cmd = { "dotnet", "ef", "database", "drop", "--force" }
+        vim.list_extend(cmd, ef_project_args(params))
+        return { cmd = cmd, cwd = cwd }
+      end,
+    })
+
+    -- ReSharper CLI tasks
+    table.insert(tasks, {
+      name = "jb inspectcode",
+      params = {
+        solution = {
+          type = "string",
+          default = marker,
+          desc = "Solution or project file",
+          order = 1,
+        },
+        output = {
+          type = "string",
+          default = "inspections.xml",
+          desc = "Output file",
+          order = 2,
+        },
+      },
+      builder = function(params)
+        return {
+          cmd = { "jb", "inspectcode", params.solution, "--output=" .. params.output },
+          cwd = cwd,
+        }
+      end,
+    })
+
+    table.insert(tasks, {
+      name = "jb cleanupcode",
+      params = {
+        solution = {
+          type = "string",
+          default = marker,
+          desc = "Solution or project file",
+          order = 1,
+        },
+      },
+      builder = function(params)
+        return { cmd = { "jb", "cleanupcode", params.solution }, cwd = cwd }
+      end,
+    })
 
     return tasks
   end,
