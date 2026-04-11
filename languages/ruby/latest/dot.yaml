@@ -1,5 +1,7 @@
 global:
   installs:
-    cmd: mise use --global ruby@latest
+    cmd: |
+      # Read version from mise config.toml (pinned via [tools]); skip if installed.
+      ~/.local/bin/mise which ruby &>/dev/null || ~/.local/bin/mise install ruby
     depends:
       - /languages/ruby/toolchain
