@@ -3,3 +3,6 @@ windows:
     cmd: scoop install ffmpeg
     depends:
       - /packages/scoop
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm --needed ffmpeg
