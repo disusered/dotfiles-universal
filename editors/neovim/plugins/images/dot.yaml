@@ -1,3 +1,5 @@
 linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: "true"
   links:
     images.lua: ~/.config/nvim/lua/plugins/images.lua
