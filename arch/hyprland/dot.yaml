@@ -1,12 +1,14 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm --needed hyprland hyprpolkitagent hyprutils hyprlang \
-      hyprutils hyprwayland-scanner qt5-wayland qt6-wayland \
-      xdg-desktop-portal-hyprland xdg-desktop-portal xdg-desktop-portal-kde \
-      wayland wayland-protocols cpio aquamarine && \
-      PATH="/usr/bin:$PATH" yay -S --noconfirm --needed pyprland hyprqt6engine
-      systemctl --user enable --now hyprpolkitagent.service
+      if ! pacman -Qi hyprland &>/dev/null; then
+        sudo pacman -S --noconfirm --needed hyprland hyprpolkitagent hyprutils hyprlang \
+          hyprutils hyprwayland-scanner qt5-wayland qt6-wayland \
+          xdg-desktop-portal-hyprland xdg-desktop-portal xdg-desktop-portal-kde \
+          wayland wayland-protocols cpio aquamarine && \
+        PATH="/usr/bin:$PATH" yay -S --noconfirm --needed pyprland hyprqt6engine
+        systemctl --user enable --now hyprpolkitagent.service
+      fi
     depends:
       - /tools/jq
       - /lib/pipewire

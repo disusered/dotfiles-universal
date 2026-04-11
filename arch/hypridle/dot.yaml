@@ -1,7 +1,9 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      yay -S --noconfirm --needed hypridle
-      systemctl --user enable --now hypridle.service
+      if ! pacman -Qi hypridle &>/dev/null; then
+        yay -S --noconfirm --needed hypridle
+        systemctl --user enable --now hypridle.service
+      fi
   links:
     hypridle.conf: ~/.config/hypr/hypridle.conf

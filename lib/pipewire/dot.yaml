@@ -1,14 +1,16 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      yay -S --noconfirm --needed \
-        pipewire pipewire-audio gst-plugin-pipewire wireplumber \
-        pipewire-alsa pipewire-jack playerctl pipewire-zeroconf \
-        pipewire-v4l2 pavucontrol pipewire-pulse lib32-pipewire \
-        helvum easyeffects
-      systemctl --user enable --now pipewire.service
-      systemctl --user enable --now pipewire-pulse.service
-      systemctl --user enable --now wireplumber
+      if ! pacman -Qi pipewire &>/dev/null; then
+        yay -S --noconfirm --needed \
+          pipewire pipewire-audio gst-plugin-pipewire wireplumber \
+          pipewire-alsa pipewire-jack playerctl pipewire-zeroconf \
+          pipewire-v4l2 pavucontrol pipewire-pulse lib32-pipewire \
+          helvum easyeffects
+        systemctl --user enable --now pipewire.service
+        systemctl --user enable --now pipewire-pulse.service
+        systemctl --user enable --now wireplumber
+      fi
     depends:
       - /lib/avahi
   # TODO: individually link easyeffect presets

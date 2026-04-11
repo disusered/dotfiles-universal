@@ -1,11 +1,13 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm --needed networkmanager
-      sudo systemctl enable --now NetworkManager
-      sudo systemctl enable --now systemd-networkd.service
+      if ! pacman -Qi networkmanager &>/dev/null; then
+        sudo pacman -S --noconfirm --needed networkmanager
+        sudo systemctl enable --now NetworkManager
+        sudo systemctl enable --now systemd-networkd.service
 
-      # force  unlock wifi
-      rfkill unblock wifi
+        # force  unlock wifi
+        rfkill unblock wifi
+      fi
     depends:
       - /tools/iwd

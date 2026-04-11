@@ -3,6 +3,8 @@ windows:
 linux[whoami.distro^="Fedora"]:
   installs:
     cmd: |
-      sudo groupadd docker || true && \
-      sudo usermod -aG docker $USER && \
-      newgrp docker
+      if ! id -nG "$USER" | grep -qw docker; then
+        sudo groupadd -f docker
+        sudo usermod -aG docker "$USER"
+        newgrp docker
+      fi

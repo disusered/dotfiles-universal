@@ -6,7 +6,7 @@ linux[whoami.distro^="Arch"]:
 
         # workaround for mako not having interactive notifications
         gsettings set org.blueman.general notification-daemon false
-      fi
 
-      systemctl enable --now bluetooth.service
-      systemctl enable --now blueman-mechanism.service
+        systemctl enable --now bluetooth.service
+        systemctl enable --now blueman-mechanism.service
+      fi
