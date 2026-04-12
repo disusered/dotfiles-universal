@@ -1,0 +1,13 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      if ! pacman -Qi socat &>/dev/null; then
+        yay -S --noconfirm --needed socat
+      fi
+    depends:
+      - /arch/hyprpaper
+      - /tools/imagemagick
+      - /tools/cfg
+  links:
+    wallpaper.conf: ~/.config/hypr/conf.d/wallpaper.conf
+    wallpaper-listener.sh: ~/.local/bin/wallpaper-listener
