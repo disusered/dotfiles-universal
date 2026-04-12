@@ -620,6 +620,10 @@ impl FontPicker {
         if let Some(entry) = self.selected_font() {
             let font_name = entry.listing.name.to_string();
 
+            // Scratchpad reads the font to preview from this file; without it
+            // the scratchpad falls back to config.fonts.mono (the active font).
+            let _ = std::fs::write("/tmp/cfg-font-preview", &font_name);
+
             // Kill any existing font preview first
             let _ = std::process::Command::new("hyprctl")
                 .args(["dispatch", "killwindow", "class:fonts_scratch"])
