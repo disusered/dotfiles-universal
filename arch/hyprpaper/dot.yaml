@@ -7,7 +7,10 @@ linux[whoami.distro^="Arch"]:
           pkgconf cmake libglvnd hyprpaper
         systemctl --user enable --now hyprpaper.service
       fi
+      # hyprpaper.conf is now generated at runtime by cfg wallpaper --apply.
+      # Remove stale symlink from previous rotz deployments.
+      if [ -L ~/.config/hypr/hyprpaper.conf ]; then
+        rm ~/.config/hypr/hyprpaper.conf
+      fi
     depends:
       - /arch/hyprland
-  links:
-    hyprpaper.conf: ~/.config/hypr/hyprpaper.conf

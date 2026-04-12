@@ -71,7 +71,9 @@ pub fn apply(cfg: &WallpaperConfig) -> Result<(), String> {
     // 3. Monitors
     let layout = monitors::MonitorLayout::detect()?;
 
-    // 4. Process + assign per-monitor
+    // 4. Process + collect per-monitor entries
+    let mut entries = Vec::new();
+
     if layout.is_single() {
         let m = &layout.monitors[0];
         let img = processing::resize_and_crop(
@@ -81,7 +83,10 @@ pub fn apply(cfg: &WallpaperConfig) -> Result<(), String> {
             &cfg.gravity,
             &cache_dir,
         )?;
-        hyprpaper::set_wallpaper(&m.name, &img)?;
+        entries.push(hyprpaper::WallpaperEntry {
+            monitor: m.name.clone(),
+            path: img,
+        });
     } else {
         let spanning = processing::create_spanning_image(
             &source,
@@ -100,9 +105,15 @@ pub fn apply(cfg: &WallpaperConfig) -> Result<(), String> {
                 x_offset,
                 &cache_dir,
             )?;
-            hyprpaper::set_wallpaper(&m.name, &slice)?;
+            entries.push(hyprpaper::WallpaperEntry {
+                monitor: m.name.clone(),
+                path: slice,
+            });
         }
     }
+
+    // 5. Write config + restart hyprpaper
+    hyprpaper::apply_config(&entries)?;
 
     Ok(())
 }
