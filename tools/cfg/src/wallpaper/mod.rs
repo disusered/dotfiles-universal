@@ -1,6 +1,8 @@
+pub mod analysis;
 pub mod hyprpaper;
 pub mod monitors;
 pub mod processing;
+pub mod tags;
 
 use crate::config::WallpaperConfig;
 
