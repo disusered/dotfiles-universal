@@ -1145,7 +1145,7 @@ impl ColorPicker {
                     ("y", "copy"),
                     ("Tab", "modify"),
                     ("?", "help"),
-                    ("q", "quit"),
+                    ("q/Esc", "quit"),
                 ]
             }
             Focus::Preview => {
@@ -1376,6 +1376,8 @@ impl ColorPicker {
                                 } else if !self.search.is_empty() {
                                     self.search.clear();
                                     self.update_filter();
+                                } else {
+                                    return Ok(false);
                                 }
                                 return Ok(true);
                             }

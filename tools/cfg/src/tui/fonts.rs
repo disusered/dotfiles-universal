@@ -520,7 +520,7 @@ impl FontPicker {
             ("y", "copy"),
             ("Tab", "category"),
             ("?", "help"),
-            ("q", "quit"),
+            ("q/Esc", "quit"),
         ];
 
         let spans: Vec<Span> = hints
@@ -755,6 +755,8 @@ impl FontPicker {
                                 if !self.search.is_empty() {
                                     self.search.clear();
                                     self.update_filter();
+                                } else {
+                                    return Ok(false);
                                 }
                             }
                             KeyCode::Char(c) if !key.modifiers.contains(KeyModifiers::CONTROL) => {
