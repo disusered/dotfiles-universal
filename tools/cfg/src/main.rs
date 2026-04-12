@@ -14,7 +14,7 @@ use color::format_color;
 use config::Config;
 use palette::Palette;
 use render::{build_context, render_to_file};
-use templates::{reload_app, rotz_link, TemplatesFile};
+use templates::{coalesce_reloads, reload_app, reload_app_background, rotz_link, TemplatesFile, DEFAULT_RELOAD_TIMEOUT};
 
 #[derive(Parser)]
 #[command(name = "cfg")]
@@ -211,17 +211,20 @@ fn update_apps(cfg_dir: &str, dotfiles_dir: &str, app_names: &[String], dry_run:
     }
 
     // Phase 2: Reload (only rendered apps, skip dry-run)
+    // Commands are coalesced so duplicates (e.g., 3x hyprctl reload) run once.
     if !dry_run && !rendered.is_empty() {
         println!("\nReloading...");
-        for name in &rendered {
-            if let Some(tpl_config) = templates.get(name) {
-                if let Some(cmd) = &tpl_config.reload {
-                    print!("  {}... ", name);
-                    match reload_app(cmd) {
-                        Ok(()) => println!("ok"),
-                        Err(e) => println!("failed: {}", e),
-                    }
-                }
+        for group in coalesce_reloads(&rendered, &templates) {
+            let label = group.names.join(", ");
+            print!("  {}... ", label);
+            let result = if group.background {
+                reload_app_background(group.cmd)
+            } else {
+                reload_app(group.cmd, DEFAULT_RELOAD_TIMEOUT)
+            };
+            match result {
+                Ok(()) => println!("ok"),
+                Err(e) => println!("failed: {}", e),
             }
         }
     }

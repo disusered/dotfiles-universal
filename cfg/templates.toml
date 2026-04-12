@@ -19,7 +19,7 @@ rofi = { path = "tools/rofi/catppuccin-mocha.rasi.tera" }
 lazygit = { path = "tools/lazygit/config.yaml.tera" }
 gitconfig = { path = "tools/git/gitconfig.tera" }
 starship = { path = "tools/starship/starship.toml.tera" }
-firefox-theme = { path = "arch/firefox/theme-url.txt.tera", reload = "firefox \"$(cat ~/.dotfiles/arch/firefox/theme-url.txt)\"" }
+firefox-theme = { path = "arch/firefox/theme-url.txt.tera", reload = "firefox \"$(cat ~/.dotfiles/arch/firefox/theme-url.txt)\"", background = true }
 mouse-leds = { path = "arch/piper/set-leds.sh.tera", reload = "~/.dotfiles/arch/piper/set-leds.sh" }
 swayosd = { path = "tools/swayosd/style.css.tera", reload = "hyprctl dispatch exec \"killall swayosd-server && app2unit -s b swayosd-server\"" }
 
@@ -57,4 +57,4 @@ papirus-folders = { path = "tools/papirus/set-folders.sh.tera", reload = "~/.dot
 vscode = { path = "editors/vscode/settings.json.tera" }
 
 # Games
-monkeytype = { path = "games/monkeytype/theme-url.txt.tera", reload = "firefox \"$(cat ~/.dotfiles/games/monkeytype/theme-url.txt)\"" }
+monkeytype = { path = "games/monkeytype/theme-url.txt.tera", reload = "firefox \"$(cat ~/.dotfiles/games/monkeytype/theme-url.txt)\"", background = true }
