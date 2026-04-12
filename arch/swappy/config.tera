@@ -1,6 +1,6 @@
 # vi: ft=dosini
 [Default]
-save_dir=$HOME/Pictures/
+save_dir=$HOME/Pictures/Screenshots/
 save_filename_format=%Y-%m-%d-%H%M%S_swappy.png
 show_panel=false
 line_size=5

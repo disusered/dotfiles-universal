@@ -1,6 +1,8 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S --noconfirm --needed hyprshot
+    cmd: |-
+      yay -S --noconfirm --needed hyprshot
+      mkdir -p ~/Pictures/Screenshots
     depends:
       - /lib/slurp
       - /arch/hyprpicker
