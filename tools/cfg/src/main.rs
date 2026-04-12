@@ -729,7 +729,10 @@ fn main() {
                 println!("{}={}", key, parts[1]);
 
                 if apply {
-                    println!("wallpaper apply not yet implemented");
+                    if let Err(e) = wallpaper::apply(&config.wallpaper) {
+                        eprintln!("Error: {}", e);
+                        std::process::exit(1);
+                    }
                 }
             } else if let Some(key) = get {
                 match key.as_str() {
@@ -742,7 +745,10 @@ fn main() {
                     }
                 }
             } else if apply {
-                println!("wallpaper apply not yet implemented");
+                if let Err(e) = wallpaper::apply(&config.wallpaper) {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(1);
+                }
             } else {
                 // Show current wallpaper config
                 println!("path={}", config.wallpaper.path);

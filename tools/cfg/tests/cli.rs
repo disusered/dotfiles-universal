@@ -354,10 +354,22 @@ fn wallpaper_get_path() {
         .success();
 }
 
+/// Create a throwaway CFG_DIR so --apply tests don't mutate the user's real
+/// `cfg/config.toml`. Each caller passes a unique name so parallel tests don't
+/// stomp on each other.
+fn isolated_cfg_dir(name: &str) -> String {
+    let dir = std::env::temp_dir().join(format!("cfg-cli-test-{}", name));
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).unwrap();
+    dir.to_string_lossy().into_owned()
+}
+
 #[test]
 fn wallpaper_apply_standalone_accepted() {
-    // --apply alone must NOT produce "cannot be used with" from clap
+    // Clap-level sanity: --apply alone must not produce a "cannot be used with" error.
+    let dir = isolated_cfg_dir("apply-standalone-accepted");
     let output = cfg()
+        .env("CFG_DIR", &dir)
         .args(["wallpaper", "--apply"])
         .output()
         .unwrap();
@@ -367,10 +379,54 @@ fn wallpaper_apply_standalone_accepted() {
 
 #[test]
 fn wallpaper_set_with_apply_accepted() {
+    // Clap-level sanity: --set + --apply must not produce a "cannot be used with" error.
+    let dir = isolated_cfg_dir("set-with-apply-accepted");
     let output = cfg()
+        .env("CFG_DIR", &dir)
         .args(["wallpaper", "--set", "gravity=North", "--apply"])
         .output()
         .unwrap();
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(!stderr.contains("cannot be used with"));
+}
+
+#[test]
+fn wallpaper_apply_empty_path_errors() {
+    // Fresh config has wallpaper.path = "" → --apply must fail with a clear message.
+    let dir = isolated_cfg_dir("apply-empty-path");
+    let output = cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--apply"])
+        .output()
+        .unwrap();
+    assert!(!output.status.success(), "expected non-zero exit");
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("wallpaper path not set"),
+        "stderr was: {}",
+        stderr
+    );
+}
+
+#[test]
+fn wallpaper_apply_missing_file_errors() {
+    // Set path to a file that doesn't exist, then --apply must fail with "does not exist".
+    let dir = isolated_cfg_dir("apply-missing-file");
+    cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--set", "path=/nonexistent/definitely/nope.png"])
+        .assert()
+        .success();
+    let output = cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--apply"])
+        .output()
+        .unwrap();
+    assert!(!output.status.success(), "expected non-zero exit");
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("does not exist or is not a file"),
+        "stderr was: {}",
+        stderr
+    );
 }
