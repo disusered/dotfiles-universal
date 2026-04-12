@@ -430,3 +430,72 @@ fn wallpaper_apply_missing_file_errors() {
         stderr
     );
 }
+
+#[test]
+fn wallpaper_set_source_dir_persists() {
+    let dir = isolated_cfg_dir("set-source-dir");
+    cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--set", "source_dir=/tmp/wallpapers"])
+        .assert()
+        .success();
+
+    cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--get", "source_dir"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("/tmp/wallpapers"));
+}
+
+#[test]
+fn wallpaper_unknown_set_key_mentions_source_dir() {
+    let dir = isolated_cfg_dir("unknown-key-source-dir");
+    let output = cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--set", "bogus=x"])
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("source_dir"),
+        "error message should advertise source_dir; got: {}",
+        stderr
+    );
+}
+
+#[test]
+fn wallpaper_default_listing_shows_source_dir() {
+    let dir = isolated_cfg_dir("default-list-source-dir");
+    let output = cfg()
+        .env("CFG_DIR", &dir)
+        .arg("wallpaper")
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(
+        stdout.contains("source_dir="),
+        "default listing should include source_dir=; got: {}",
+        stdout
+    );
+}
+
+#[test]
+fn wallpaper_apply_errors_when_both_path_and_source_dir_empty() {
+    let dir = isolated_cfg_dir("apply-both-empty");
+    // Fresh config — both path and source_dir empty by default.
+    let output = cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--apply"])
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("wallpaper path not set"),
+        "stderr was: {}",
+        stderr
+    );
+}

@@ -396,6 +396,16 @@ fn main() {
 
                 if let Some(scope) = apply {
                     update_apps(&cfg_dir, &dotfiles_dir, &scope, false);
+                    // Re-pick wallpaper when the picker is active (source_dir set,
+                    // path empty). Pin mode is preserved; picker failure does not
+                    // fail the theme apply.
+                    if !config.wallpaper.source_dir.trim().is_empty()
+                        && config.wallpaper.path.trim().is_empty()
+                    {
+                        if let Err(e) = wallpaper::apply(&config, &cfg_dir) {
+                            eprintln!("warning: wallpaper re-pick failed: {}", e);
+                        }
+                    }
                 }
             } else if let Some(key) = get {
                 match config.get(&key) {
@@ -706,7 +716,7 @@ fn main() {
                 let value = parts[1];
 
                 match key {
-                    "path" | "cache_dir" => {
+                    "path" | "cache_dir" | "source_dir" => {
                         let config_key = format!("wallpaper.{}", key);
                         if let Err(e) = config.set(&config_key, value) {
                             eprintln!("Error: {}", e);
@@ -720,7 +730,10 @@ fn main() {
                         }
                     }
                     _ => {
-                        eprintln!("Unknown key: {} (valid: path, gravity, cache_dir)", key);
+                        eprintln!(
+                            "Unknown key: {} (valid: path, gravity, cache_dir, source_dir)",
+                            key
+                        );
                         std::process::exit(1);
                     }
                 }
@@ -732,7 +745,7 @@ fn main() {
                 println!("{}={}", key, parts[1]);
 
                 if apply {
-                    if let Err(e) = wallpaper::apply(&config.wallpaper) {
+                    if let Err(e) = wallpaper::apply(&config, &cfg_dir) {
                         eprintln!("Error: {}", e);
                         std::process::exit(1);
                     }
@@ -742,13 +755,17 @@ fn main() {
                     "path" => println!("{}", config.wallpaper.path),
                     "gravity" => println!("{}", config.wallpaper.gravity),
                     "cache_dir" => println!("{}", config.wallpaper.cache_dir),
+                    "source_dir" => println!("{}", config.wallpaper.source_dir),
                     _ => {
-                        eprintln!("Unknown key: {} (valid: path, gravity, cache_dir)", key);
+                        eprintln!(
+                            "Unknown key: {} (valid: path, gravity, cache_dir, source_dir)",
+                            key
+                        );
                         std::process::exit(1);
                     }
                 }
             } else if apply {
-                if let Err(e) = wallpaper::apply(&config.wallpaper) {
+                if let Err(e) = wallpaper::apply(&config, &cfg_dir) {
                     eprintln!("Error: {}", e);
                     std::process::exit(1);
                 }
@@ -757,6 +774,7 @@ fn main() {
                 println!("path={}", config.wallpaper.path);
                 println!("gravity={}", config.wallpaper.gravity);
                 println!("cache_dir={}", config.wallpaper.cache_dir);
+                println!("source_dir={}", config.wallpaper.source_dir);
             }
         }
     }

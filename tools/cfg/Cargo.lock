@@ -339,6 +339,7 @@ dependencies = [
  "image",
  "nucleo",
  "predicates",
+ "rand 0.8.5",
  "ratatui",
  "ratatui-image",
  "serde",

@@ -1,10 +1,11 @@
 pub mod analysis;
 pub mod hyprpaper;
 pub mod monitors;
+pub mod picker;
 pub mod processing;
 pub mod tags;
 
-use crate::config::WallpaperConfig;
+use crate::config::{Config, WallpaperConfig};
 
 /// Expand a leading `~` or `~/` to `$HOME` in `s`.
 /// Returns `s` unchanged if HOME is unset or the path doesn't start with `~`.
@@ -47,14 +48,22 @@ fn resolve_cache_dir(cfg: &WallpaperConfig) -> String {
 ///    hyprpaper API (>= 0.8) auto-loads images and exposes no preload/unload
 ///    commands, so we just hand off the final file and let hyprpaper manage
 ///    its own memory.
-pub fn apply(cfg: &WallpaperConfig) -> Result<(), String> {
-    // 1. Source path
-    let source = expand_tilde(&cfg.path);
-    if source.is_empty() {
+pub fn apply(config: &Config, cfg_dir: &str) -> Result<(), String> {
+    let cfg = &config.wallpaper;
+
+    // 1. Source path — pin mode (path) wins over picker mode (source_dir).
+    let source = if !cfg.path.trim().is_empty() {
+        expand_tilde(&cfg.path)
+    } else if !cfg.source_dir.trim().is_empty() {
+        picker::pick(config, cfg_dir)?
+    } else {
         return Err(
-            "wallpaper path not set — run: cfg wallpaper --set path=<file>".to_string(),
+            "wallpaper path not set — run: cfg wallpaper --set path=<file> \
+             or --set source_dir=<directory>"
+                .to_string(),
         );
-    }
+    };
+
     let meta = std::fs::metadata(&source).map_err(|_| {
         format!("wallpaper path does not exist or is not a file: {}", source)
     })?;
@@ -140,6 +149,7 @@ mod tests {
             path: String::new(),
             gravity: "Center".to_string(),
             cache_dir: String::new(),
+            source_dir: String::new(),
         };
         assert_eq!(resolve_cache_dir(&cfg), "/home/test/.cache/wallpapers");
     }
@@ -151,29 +161,39 @@ mod tests {
             path: String::new(),
             gravity: "Center".to_string(),
             cache_dir: "~/scratch".to_string(),
+            source_dir: String::new(),
         };
         assert_eq!(resolve_cache_dir(&cfg), "/home/test/scratch");
     }
 
+    fn cfg_with_wallpaper(w: WallpaperConfig) -> Config {
+        Config {
+            wallpaper: w,
+            ..Config::default()
+        }
+    }
+
     #[test]
-    fn apply_empty_path_errors() {
-        let cfg = WallpaperConfig {
+    fn apply_empty_path_and_source_dir_errors() {
+        let cfg = cfg_with_wallpaper(WallpaperConfig {
             path: String::new(),
             gravity: "Center".to_string(),
             cache_dir: "/tmp".to_string(),
-        };
-        let err = apply(&cfg).unwrap_err();
+            source_dir: String::new(),
+        });
+        let err = apply(&cfg, "/tmp").unwrap_err();
         assert!(err.contains("wallpaper path not set"), "err = {}", err);
     }
 
     #[test]
     fn apply_missing_file_errors() {
-        let cfg = WallpaperConfig {
+        let cfg = cfg_with_wallpaper(WallpaperConfig {
             path: "/nonexistent/definitely/not/here.png".to_string(),
             gravity: "Center".to_string(),
             cache_dir: "/tmp".to_string(),
-        };
-        let err = apply(&cfg).unwrap_err();
+            source_dir: String::new(),
+        });
+        let err = apply(&cfg, "/tmp").unwrap_err();
         assert!(
             err.contains("does not exist or is not a file"),
             "err = {}",

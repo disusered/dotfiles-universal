@@ -40,6 +40,8 @@ pub struct WallpaperConfig {
     pub gravity: String,
     #[serde(default = "default_wallpaper_cache_dir")]
     pub cache_dir: String,
+    #[serde(default = "default_wallpaper_source_dir")]
+    pub source_dir: String,
 }
 
 fn default_wallpaper_path() -> String {
@@ -55,12 +57,17 @@ fn default_wallpaper_cache_dir() -> String {
     format!("{}/.cache/wallpapers", home)
 }
 
+fn default_wallpaper_source_dir() -> String {
+    String::new()
+}
+
 impl Default for WallpaperConfig {
     fn default() -> Self {
         WallpaperConfig {
             path: default_wallpaper_path(),
             gravity: default_wallpaper_gravity(),
             cache_dir: default_wallpaper_cache_dir(),
+            source_dir: default_wallpaper_source_dir(),
         }
     }
 }
@@ -136,6 +143,7 @@ impl Config {
             "wallpaper.path" => Some(self.wallpaper.path.clone()),
             "wallpaper.gravity" => Some(self.wallpaper.gravity.clone()),
             "wallpaper.cache_dir" => Some(self.wallpaper.cache_dir.clone()),
+            "wallpaper.source_dir" => Some(self.wallpaper.source_dir.clone()),
             _ => None,
         }
     }
@@ -213,6 +221,10 @@ impl Config {
                 self.wallpaper.cache_dir = value.to_string();
                 Ok(())
             }
+            "wallpaper.source_dir" => {
+                self.wallpaper.source_dir = value.to_string();
+                Ok(())
+            }
             _ => Err(format!("Unknown config key: {}", key)),
         }
     }
@@ -264,5 +276,23 @@ mod tests {
         let config = Config::default();
         let cache = config.get("wallpaper.cache_dir").unwrap();
         assert!(cache.ends_with("/.cache/wallpapers"));
+    }
+
+    #[test]
+    fn wallpaper_source_dir_default_empty() {
+        let config = Config::default();
+        assert_eq!(config.get("wallpaper.source_dir").unwrap(), "");
+    }
+
+    #[test]
+    fn wallpaper_source_dir_roundtrip() {
+        let mut config = Config::default();
+        config
+            .set("wallpaper.source_dir", "~/Pictures/Wallpapers/catppuccin-mocha")
+            .unwrap();
+        assert_eq!(
+            config.get("wallpaper.source_dir").unwrap(),
+            "~/Pictures/Wallpapers/catppuccin-mocha"
+        );
     }
 }
