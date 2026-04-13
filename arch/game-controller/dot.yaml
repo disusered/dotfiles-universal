@@ -1,0 +1,33 @@
+# PS4/PS5 controller support for Steam, gamescope, and emulators.
+#
+# Per ArchWiki Gamepad (https://wiki.archlinux.org/title/Gamepad):
+#   - game-devices-udev covers Sony VIDs beyond Valve's steam-devices rules.
+#   - Bluez default UserspaceHID=true (since 2024) blocks the kernel
+#     hid_playstation driver from binding the DS4 over Bluetooth. Flipping
+#     to false routes BT HID through kernel HIDP so the driver claims it
+#     and /dev/input/event* nodes appear as a normal gamepad.
+#
+# After install, enable "PlayStation Controller Support" in Steam:
+#   Settings > Controller > PlayStation Controller Support.
+
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      if ! pacman -Qi game-devices-udev &>/dev/null; then
+        yay -S --noconfirm --needed game-devices-udev
+      fi
+
+      if ! grep -qE '^UserspaceHID=false' /etc/bluetooth/input.conf; then
+        if grep -qE '^#?UserspaceHID=' /etc/bluetooth/input.conf; then
+          sudo sed -i 's/^#\?UserspaceHID=.*/UserspaceHID=false/' /etc/bluetooth/input.conf
+        else
+          echo 'UserspaceHID=false' | sudo tee -a /etc/bluetooth/input.conf >/dev/null
+        fi
+        sudo systemctl restart bluetooth.service
+      fi
+
+      sudo udevadm control --reload
+      sudo udevadm trigger
+    depends:
+      - /tools/bluez
+      - /tools/yay

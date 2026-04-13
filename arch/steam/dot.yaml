@@ -9,6 +9,7 @@ linux[whoami.distro^="Arch"]:
       fi
     depends:
       - /arch/hyprland
+      - /arch/game-controller
       - /lib/networkmanager/
       - /lib/avahi/
       - /lib/pipewire/
