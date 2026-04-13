@@ -6,3 +6,4 @@ linux[whoami.distro^="Arch"]:
     cfg.conf: {{ dirs.base.config }}/hypr/conf.d/cfg.conf
     cfg.desktop: ~/.local/share/applications/cfg.desktop
     cfg.svg: ~/.local/share/icons/hicolor/scalable/apps/cfg.svg
+    cfg.zsh: ~/.config/zsh/0060_cfg.zsh
