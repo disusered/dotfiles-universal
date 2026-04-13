@@ -108,8 +108,14 @@ enum Command {
         #[arg(long, group = "mode")]
         set: Option<String>,
         /// After --set, apply wallpaper. Standalone: re-apply current wallpaper.
-        #[arg(long)]
+        #[arg(long, conflicts_with_all = ["interactive", "scratchpad"])]
         apply: bool,
+        /// Interactive picker mode
+        #[arg(short, long, group = "mode")]
+        interactive: bool,
+        /// Preview an image via kitten icat (no config mutation)
+        #[arg(long, group = "mode", value_name = "PATH")]
+        scratchpad: Option<String>,
     },
 }
 
@@ -698,11 +704,49 @@ fn main() {
                 println!("sans_size={}", config.fonts.sans_size);
             }
         }
-        Command::Wallpaper { get, set, apply } => {
+        Command::Wallpaper { get, set, apply, interactive, scratchpad } => {
             let cfg_dir = get_cfg_dir();
             let config_path = format!("{}/config.toml", cfg_dir);
 
             let mut config = Config::load(&config_path).unwrap_or_default();
+
+            if let Some(path) = scratchpad {
+                if let Err(e) = wallpaper::scratchpad::run(&path) {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(1);
+                }
+                return;
+            }
+
+            if interactive {
+                if !tui::is_tty() {
+                    eprintln!("Interactive mode requires a terminal");
+                    std::process::exit(1);
+                }
+                let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
+                let palette = match Palette::load(&palette_path) {
+                    Ok(p) => p,
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                        std::process::exit(1);
+                    }
+                };
+                match tui::wallpapers::run(&config, &palette, &config_path, &cfg_dir) {
+                    Ok(Some(true)) => {
+                        let config = Config::load(&config_path).unwrap_or_default();
+                        if let Err(e) = wallpaper::apply(&config, &cfg_dir) {
+                            eprintln!("Error: {}", e);
+                            std::process::exit(1);
+                        }
+                    }
+                    Ok(Some(false)) | Ok(None) => {}
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                        std::process::exit(1);
+                    }
+                }
+                return;
+            }
 
             if let Some(key_value) = set {
                 // Parse key=value

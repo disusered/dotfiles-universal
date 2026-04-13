@@ -2,6 +2,7 @@ pub mod app;
 pub mod clipboard;
 pub mod colors;
 pub mod fonts;
+pub mod wallpapers;
 mod widgets;
 
 use std::io::{self, stdout, Stdout};

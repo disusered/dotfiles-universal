@@ -499,3 +499,74 @@ fn wallpaper_apply_errors_when_both_path_and_source_dir_empty() {
         stderr
     );
 }
+
+// --- interactive + scratchpad flag tests (bd_.dotfiles-a2h) ---
+
+#[test]
+fn wallpaper_scratchpad_rejects_get() {
+    cfg()
+        .args(["wallpaper", "--scratchpad", "/tmp/x.jpg", "--get", "path"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn wallpaper_scratchpad_rejects_set() {
+    cfg()
+        .args(["wallpaper", "--scratchpad", "/tmp/x.jpg", "--set", "path=/tmp/y.jpg"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn wallpaper_scratchpad_rejects_interactive() {
+    cfg()
+        .args(["wallpaper", "--scratchpad", "/tmp/x.jpg", "-i"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn wallpaper_scratchpad_rejects_apply() {
+    cfg()
+        .args(["wallpaper", "--scratchpad", "/tmp/x.jpg", "--apply"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn wallpaper_scratchpad_missing_file_errors() {
+    let output = cfg()
+        .args(["wallpaper", "--scratchpad", "/nonexistent/definitely/nope.png"])
+        .output()
+        .unwrap();
+    assert!(!output.status.success(), "expected non-zero exit");
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("does not exist"),
+        "stderr was: {}",
+        stderr
+    );
+}
+
+#[test]
+fn wallpaper_interactive_rejects_get() {
+    cfg()
+        .args(["wallpaper", "-i", "--get", "path"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn wallpaper_interactive_rejects_set() {
+    cfg()
+        .args(["wallpaper", "-i", "--set", "path=/tmp/x.jpg"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}

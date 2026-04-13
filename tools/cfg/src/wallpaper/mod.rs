@@ -3,6 +3,7 @@ pub mod hyprpaper;
 pub mod monitors;
 pub mod picker;
 pub mod processing;
+pub mod scratchpad;
 pub mod tags;
 
 use crate::config::{Config, WallpaperConfig};

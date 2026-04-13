@@ -9,5 +9,6 @@ hyprctl dispatch killwindow class:clipse_scratch
 hyprctl dispatch killwindow class:fastfetch_scratch
 hyprctl dispatch killwindow class:cfg_scratch
 hyprctl dispatch killwindow class:fonts_scratch
+hyprctl dispatch killwindow class:cfg_wallpaper_scratch
 hyprctl dispatch killwindow class:org.pulseaudio.pavucontrol
 hyprctl dispatch killwindow class:org.pipewire.Helvum
