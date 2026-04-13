@@ -1,5 +1,13 @@
 use serde::Deserialize;
 use std::process::Command;
+use std::thread::sleep;
+use std::time::Duration;
+
+/// Retry budget for `MonitorLayout::detect` on boot. hyprctl may return an
+/// empty array or fail to exec briefly after compositor start, so poll for
+/// up to `DETECT_MAX_ATTEMPTS * DETECT_RETRY_DELAY_MS` ms total.
+pub const DETECT_MAX_ATTEMPTS: u32 = 15;
+pub const DETECT_RETRY_DELAY_MS: u64 = 200;
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Monitor {
@@ -28,24 +36,42 @@ struct HyprMonitor {
 }
 
 impl MonitorLayout {
-    /// Detect monitors by running `hyprctl monitors -j`
+    /// Detect monitors by running `hyprctl monitors -j`, retrying while the
+    /// compositor is still bringing outputs up (common when invoked from a
+    /// Hyprland `exec-once` hook immediately after session start).
     pub fn detect() -> Result<Self, String> {
-        let output = Command::new("hyprctl")
-            .args(["monitors", "-j"])
-            .output()
-            .map_err(|e| format!("Failed to run hyprctl: {}", e))?;
+        Self::detect_with(
+            hyprctl_monitors_json,
+            DETECT_MAX_ATTEMPTS,
+            DETECT_RETRY_DELAY_MS,
+        )
+    }
 
-        if !output.status.success() {
-            return Err(format!(
-                "hyprctl exited with status {}",
-                output.status
-            ));
+    /// Testable retry loop: `run` is invoked up to `max_attempts` times,
+    /// with `delay_ms` between attempts on retryable failures. Returns on
+    /// the first successful parse with at least one monitor.
+    pub fn detect_with<F>(
+        mut run: F,
+        max_attempts: u32,
+        delay_ms: u64,
+    ) -> Result<Self, String>
+    where
+        F: FnMut() -> Result<String, String>,
+    {
+        let mut last_err: Option<String> = None;
+        for attempt in 0..max_attempts {
+            match run() {
+                Ok(json) => match Self::from_json(&json) {
+                    Ok(layout) => return Ok(layout),
+                    Err(e) => last_err = Some(e),
+                },
+                Err(e) => last_err = Some(e),
+            }
+            if attempt + 1 < max_attempts {
+                sleep(Duration::from_millis(delay_ms));
+            }
         }
-
-        let json = String::from_utf8(output.stdout)
-            .map_err(|e| format!("hyprctl output is not valid UTF-8: {}", e))?;
-
-        Self::from_json(&json)
+        Err(last_err.unwrap_or_else(|| "monitor detection failed".to_string()))
     }
 
     /// Parse monitor JSON (testable without hyprctl)
@@ -98,6 +124,20 @@ impl MonitorLayout {
     pub fn min_x(&self) -> i32 {
         self.monitors.iter().map(|m| m.x).min().unwrap_or(0)
     }
+}
+
+fn hyprctl_monitors_json() -> Result<String, String> {
+    let output = Command::new("hyprctl")
+        .args(["monitors", "-j"])
+        .output()
+        .map_err(|e| format!("Failed to run hyprctl: {}", e))?;
+
+    if !output.status.success() {
+        return Err(format!("hyprctl exited with status {}", output.status));
+    }
+
+    String::from_utf8(output.stdout)
+        .map_err(|e| format!("hyprctl output is not valid UTF-8: {}", e))
 }
 
 #[cfg(test)]
@@ -156,5 +196,47 @@ mod tests {
     fn test_malformed_json_error() {
         let result = MonitorLayout::from_json("{not valid}");
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn detect_with_retries_empty_then_succeeds() {
+        use std::cell::RefCell;
+        let calls = RefCell::new(0);
+        let run = || {
+            let mut n = calls.borrow_mut();
+            *n += 1;
+            if *n < 3 {
+                Ok("[]".to_string())
+            } else {
+                Ok(dual_json().to_string())
+            }
+        };
+        let layout = MonitorLayout::detect_with(run, 10, 0).unwrap();
+        assert_eq!(layout.monitors.len(), 2);
+        assert_eq!(*calls.borrow(), 3);
+    }
+
+    #[test]
+    fn detect_with_retries_exec_errors() {
+        use std::cell::RefCell;
+        let calls = RefCell::new(0);
+        let run = || -> Result<String, String> {
+            let mut n = calls.borrow_mut();
+            *n += 1;
+            if *n < 2 {
+                Err("hyprctl not ready".to_string())
+            } else {
+                Ok(dual_json().to_string())
+            }
+        };
+        let layout = MonitorLayout::detect_with(run, 10, 0).unwrap();
+        assert_eq!(layout.monitors.len(), 2);
+    }
+
+    #[test]
+    fn detect_with_surfaces_last_error_after_exhausting_attempts() {
+        let run = || Ok("[]".to_string());
+        let err = MonitorLayout::detect_with(run, 3, 0).unwrap_err();
+        assert!(err.contains("No monitors"), "err = {}", err);
     }
 }
