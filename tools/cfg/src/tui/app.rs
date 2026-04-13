@@ -14,6 +14,7 @@ use crate::palette::Palette;
 
 use super::colors::ColorPicker;
 use super::fonts::FontPicker;
+use super::wallpapers::WallpaperPicker;
 use super::{init, restore};
 
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
@@ -21,6 +22,7 @@ pub enum Tab {
     #[default]
     Colors,
     Fonts,
+    Wallpapers,
 }
 
 impl Tab {
@@ -28,13 +30,15 @@ impl Tab {
         match self {
             Tab::Colors => 0,
             Tab::Fonts => 1,
+            Tab::Wallpapers => 2,
         }
     }
 
     fn next(self) -> Self {
         match self {
             Tab::Colors => Tab::Fonts,
-            Tab::Fonts => Tab::Colors,
+            Tab::Fonts => Tab::Wallpapers,
+            Tab::Wallpapers => Tab::Colors,
         }
     }
 }
@@ -67,6 +71,8 @@ pub struct App {
     active_tab: Tab,
     color_picker: ColorPicker,
     font_picker: FontPicker,
+    wallpaper_picker: Option<WallpaperPicker>,
+    wallpaper_init_error: Option<String>,
     theme: TabTheme,
     should_apply: bool,
     /// Tab bar area for mouse click detection
@@ -74,15 +80,32 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(config: Config, palette: &Palette, config_path: String) -> Self {
+    pub fn new(
+        config: Config,
+        palette: &Palette,
+        config_path: String,
+        cfg_dir: String,
+    ) -> Self {
         let theme = TabTheme::from_config(&config, palette);
         let color_picker = ColorPicker::new(config.clone(), palette, config_path.clone());
-        let font_picker = FontPicker::new(config.clone(), palette, config_path);
+        let font_picker = FontPicker::new(config.clone(), palette, config_path.clone());
+
+        let (wallpaper_picker, wallpaper_init_error) = match WallpaperPicker::new(
+            config.clone(),
+            palette,
+            config_path,
+            cfg_dir,
+        ) {
+            Ok(p) => (Some(p), None),
+            Err(e) => (None, Some(e)),
+        };
 
         Self {
             active_tab: Tab::default(),
             color_picker,
             font_picker,
+            wallpaper_picker,
+            wallpaper_init_error,
             theme,
             should_apply: false,
             tab_bar_area: Rect::default(),
@@ -112,11 +135,24 @@ impl App {
         match self.active_tab {
             Tab::Colors => self.color_picker.render_in_area(frame, chunks[1]),
             Tab::Fonts => self.font_picker.render_in_area(frame, chunks[1]),
+            Tab::Wallpapers => {
+                if let Some(p) = self.wallpaper_picker.as_mut() {
+                    p.render_in_area(frame, chunks[1]);
+                } else {
+                    let msg = self
+                        .wallpaper_init_error
+                        .clone()
+                        .unwrap_or_else(|| "wallpaper picker unavailable".to_string());
+                    let para = ratatui::widgets::Paragraph::new(msg)
+                        .style(Style::default().fg(self.theme.subtext0));
+                    frame.render_widget(para, chunks[1]);
+                }
+            }
         }
     }
 
     fn render_tabs(&self, frame: &mut Frame, area: Rect) {
-        // Nerd font icons:  (palette),  (font)
+        // Nerd font icons:  (palette),  (font),  (image)
         let titles: Vec<Line> = vec![
             Line::from(vec![
                 Span::styled("1", Style::default().fg(self.theme.subtext0).add_modifier(Modifier::DIM)),
@@ -125,6 +161,10 @@ impl App {
             Line::from(vec![
                 Span::styled("2", Style::default().fg(self.theme.subtext0).add_modifier(Modifier::DIM)),
                 Span::raw(" \u{f031} Fonts"),  //  font icon
+            ]),
+            Line::from(vec![
+                Span::styled("3", Style::default().fg(self.theme.subtext0).add_modifier(Modifier::DIM)),
+                Span::raw(" \u{f03e} Wallpapers"),  //  image icon
             ]),
         ];
 
@@ -147,16 +187,16 @@ impl App {
             if let MouseEventKind::Down(crossterm::event::MouseButton::Left) = mouse.kind {
                 // Check if click is in tab bar area
                 if mouse.row < self.tab_bar_area.height {
-                    // Tab layout: "1  Colors  2  Fonts"
-                    // Approximate click regions based on character positions
-                    // Colors tab: columns 0-12, Fonts tab: columns 13+
+                    // Tab layout: "1  Colors  2  Fonts  3  Wallpapers"
+                    // Approximate column regions: Colors 0-12, Fonts 13-26, Wallpapers 27+
                     if mouse.column < 13 {
                         self.active_tab = Tab::Colors;
-                        return Ok(true);
-                    } else {
+                    } else if mouse.column < 27 {
                         self.active_tab = Tab::Fonts;
-                        return Ok(true);
+                    } else {
+                        self.active_tab = Tab::Wallpapers;
                     }
+                    return Ok(true);
                 }
             }
         }
@@ -168,6 +208,11 @@ impl App {
                 let in_search = match self.active_tab {
                     Tab::Colors => self.color_picker.is_in_search(),
                     Tab::Fonts => self.font_picker.is_in_search(),
+                    Tab::Wallpapers => self
+                        .wallpaper_picker
+                        .as_ref()
+                        .map(|p| p.is_in_search())
+                        .unwrap_or(false),
                 };
 
                 if !in_search {
@@ -178,6 +223,10 @@ impl App {
                         }
                         KeyCode::Char('2') => {
                             self.active_tab = Tab::Fonts;
+                            return Ok(true);
+                        }
+                        KeyCode::Char('3') => {
+                            self.active_tab = Tab::Wallpapers;
                             return Ok(true);
                         }
                         KeyCode::BackTab => {
@@ -195,6 +244,23 @@ impl App {
         let continue_running = match self.active_tab {
             Tab::Colors => self.color_picker.handle_event(event)?,
             Tab::Fonts => self.font_picker.handle_event(event)?,
+            Tab::Wallpapers => match self.wallpaper_picker.as_mut() {
+                Some(p) => p.handle_event(event)?,
+                None => {
+                    // No picker available — only handle quit keys to avoid trapping user
+                    if let Event::Key(k) = event {
+                        if k.kind == KeyEventKind::Press
+                            && matches!(k.code, KeyCode::Char('q') | KeyCode::Esc)
+                        {
+                            false
+                        } else {
+                            true
+                        }
+                    } else {
+                        true
+                    }
+                }
+            },
         };
 
         // Check if picker wants to apply
@@ -202,6 +268,11 @@ impl App {
             self.should_apply = match self.active_tab {
                 Tab::Colors => self.color_picker.wants_apply(),
                 Tab::Fonts => self.font_picker.wants_apply(),
+                Tab::Wallpapers => self
+                    .wallpaper_picker
+                    .as_ref()
+                    .map(|p| p.wants_apply())
+                    .unwrap_or(false),
             };
         }
 
@@ -227,13 +298,29 @@ impl App {
 
         restore()?;
 
-        // Check if either picker has pending apply
+        // Revert any leftover desktop preview before returning
+        if let Some(p) = self.wallpaper_picker.as_mut() {
+            // no-op if not active
+            let _ = p;
+        }
+
+        // Check if any picker has pending apply
         let colors_apply = self.color_picker.wants_apply();
         let fonts_apply = self.font_picker.wants_apply();
+        let wallpaper_apply = self
+            .wallpaper_picker
+            .as_ref()
+            .map(|p| p.wants_apply())
+            .unwrap_or(false);
+        let wallpaper_saved = self
+            .wallpaper_picker
+            .as_ref()
+            .map(|p| p.was_saved())
+            .unwrap_or(false);
 
-        if colors_apply || fonts_apply || self.should_apply {
+        if colors_apply || fonts_apply || wallpaper_apply || self.should_apply {
             Ok(Some(true))
-        } else if self.color_picker.was_saved() || self.font_picker.was_saved() {
+        } else if self.color_picker.was_saved() || self.font_picker.was_saved() || wallpaper_saved {
             Ok(Some(false))
         } else {
             Ok(None)
@@ -242,7 +329,17 @@ impl App {
 }
 
 /// Run the unified settings TUI
-pub fn run(config: &Config, palette: &Palette, config_path: &str) -> io::Result<Option<bool>> {
-    let app = App::new(config.clone(), palette, config_path.to_string());
+pub fn run(
+    config: &Config,
+    palette: &Palette,
+    config_path: &str,
+    cfg_dir: &str,
+) -> io::Result<Option<bool>> {
+    let app = App::new(
+        config.clone(),
+        palette,
+        config_path.to_string(),
+        cfg_dir.to_string(),
+    );
     app.run()
 }

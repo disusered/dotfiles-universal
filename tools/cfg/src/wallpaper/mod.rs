@@ -27,7 +27,7 @@ fn expand_tilde(s: &str) -> String {
 
 /// Resolve `cfg.cache_dir` with tilde expansion; fall back to the default
 /// `$HOME/.cache/wallpapers` when it's empty.
-fn resolve_cache_dir(cfg: &WallpaperConfig) -> String {
+pub(crate) fn resolve_cache_dir(cfg: &WallpaperConfig) -> String {
     let raw = expand_tilde(&cfg.cache_dir);
     if !raw.is_empty() {
         return raw;

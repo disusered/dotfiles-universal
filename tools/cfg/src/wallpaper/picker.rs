@@ -14,7 +14,7 @@ use crate::wallpaper::tags::{TagCache, TagEntry};
 /// RGB Euclidean distance cutoff for a wallpaper to be considered a match for
 /// a target color. Max possible distance is ~441.67 (sqrt(3 * 255^2)); 60 is
 /// roughly 14% of that range.
-const MATCH_THRESHOLD: f32 = 60.0;
+pub const MATCH_THRESHOLD: f32 = 60.0;
 
 /// Minimum Euclidean RGB distance from any of `dominants` to `target`.
 ///

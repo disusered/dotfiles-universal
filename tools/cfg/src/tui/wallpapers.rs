@@ -14,9 +14,12 @@ use ratatui::{
 };
 use ratatui_image::{picker::Picker, protocol::StatefulProtocol, Resize, StatefulImage};
 
+use crate::color::Color as RgbColor;
 use crate::config::Config;
 use crate::palette::Palette;
 use crate::wallpaper;
+use crate::wallpaper::picker::MATCH_THRESHOLD;
+use crate::wallpaper::tags::TagCache;
 
 use super::widgets::{FuzzyInput, FuzzyInputState};
 use super::{init, restore};
@@ -25,6 +28,13 @@ use super::{init, restore};
 enum Mode {
     Normal,
     Search,
+}
+
+struct Entry {
+    path: PathBuf,
+    name: String,
+    score: Option<f32>,
+    best_dominant: Option<RgbColor>,
 }
 
 struct FlavorTheme {
@@ -54,22 +64,24 @@ impl FlavorTheme {
 }
 
 pub struct WallpaperPicker {
-    all: Vec<PathBuf>,
-    names: Vec<String>,
+    entries: Vec<Entry>,
     filtered: Vec<usize>,
     selected: usize,
     list_state: ListState,
     search: FuzzyInputState,
     mode: Mode,
+    match_only: bool,
     picker: Option<Picker>,
     protocols: HashMap<PathBuf, StatefulProtocol>,
     decode_failures: HashMap<PathBuf, String>,
     original_path: String,
     desktop_preview_active: bool,
     should_apply: bool,
+    saved: bool,
     config: Config,
     config_path: String,
     cfg_dir: String,
+    primary_color: Option<RgbColor>,
     theme: FlavorTheme,
     flash: Option<String>,
 }
@@ -89,22 +101,53 @@ impl WallpaperPicker {
             );
         }
         let expanded = expand_tilde(&source_dir);
-        let all = enumerate_wallpapers(&expanded)?;
-        if all.is_empty() {
+        let files = enumerate_wallpapers(&expanded)?;
+        if files.is_empty() {
             return Err(format!("no wallpapers in {}", expanded));
         }
 
-        let names: Vec<String> = all
-            .iter()
-            .map(|p| {
-                p.file_name()
+        let primary_color = palette.get(&config.primary).copied();
+        let cache_dir = wallpaper::resolve_cache_dir(&config.wallpaper);
+        let tags_path = format!("{}/tags.json", cache_dir);
+        let cache = TagCache::load(&tags_path).unwrap_or_default();
+
+        let mut entries: Vec<Entry> = files
+            .into_iter()
+            .map(|path| {
+                let name = path
+                    .file_name()
                     .and_then(|s| s.to_str())
                     .unwrap_or("?")
-                    .to_string()
+                    .to_string();
+                let path_str = path.to_string_lossy().into_owned();
+                let (score, best_dominant) = match (&primary_color, cache.get_fresh(&path_str)) {
+                    (Some(target), Some(entry)) => {
+                        let mut best: Option<(RgbColor, f32)> = None;
+                        for d in &entry.dominants {
+                            let dist = color_distance(&d.color, target);
+                            if best.map(|(_, b)| dist < b).unwrap_or(true) {
+                                best = Some((d.color, dist));
+                            }
+                        }
+                        match best {
+                            Some((c, d)) => (Some(d), Some(c)),
+                            None => (None, None),
+                        }
+                    }
+                    _ => (None, None),
+                };
+                Entry { path, name, score, best_dominant }
             })
             .collect();
 
-        let filtered: Vec<usize> = (0..all.len()).collect();
+        entries.sort_by(|a, b| match (a.score, b.score) {
+            (Some(x), Some(y)) => x.partial_cmp(&y).unwrap_or(std::cmp::Ordering::Equal),
+            (Some(_), None) => std::cmp::Ordering::Less,
+            (None, Some(_)) => std::cmp::Ordering::Greater,
+            (None, None) => a.name.cmp(&b.name),
+        });
+
+        let filtered: Vec<usize> = (0..entries.len()).collect();
         let mut list_state = ListState::default();
         list_state.select(Some(0));
 
@@ -113,22 +156,24 @@ impl WallpaperPicker {
         let original_path = config.wallpaper.path.clone();
 
         Ok(Self {
-            all,
-            names,
+            entries,
             filtered,
             selected: 0,
             list_state,
             search: FuzzyInputState::new(),
             mode: Mode::Normal,
+            match_only: false,
             picker,
             protocols: HashMap::new(),
             decode_failures: HashMap::new(),
             original_path,
             desktop_preview_active: false,
             should_apply: false,
+            saved: false,
             config,
             config_path,
             cfg_dir,
+            primary_color,
             theme,
             flash: None,
         })
@@ -137,8 +182,8 @@ impl WallpaperPicker {
     fn selected_path(&self) -> Option<&Path> {
         self.filtered
             .get(self.selected)
-            .and_then(|&i| self.all.get(i))
-            .map(|p| p.as_path())
+            .and_then(|&i| self.entries.get(i))
+            .map(|e| e.path.as_path())
     }
 
     fn move_selection(&mut self, delta: i32) {
@@ -152,8 +197,22 @@ impl WallpaperPicker {
     }
 
     fn update_filter(&mut self) {
-        let ranked = self.search.filter(&self.names, |n| n.as_str());
-        self.filtered = ranked.into_iter().map(|(i, _)| i).collect();
+        let ranked = self.search.filter(&self.entries, |e| e.name.as_str());
+        let indexes: Vec<usize> = if self.match_only {
+            ranked
+                .into_iter()
+                .filter_map(|(i, _)| {
+                    self.entries
+                        .get(i)
+                        .and_then(|e| e.score)
+                        .filter(|s| *s < MATCH_THRESHOLD)
+                        .map(|_| i)
+                })
+                .collect()
+        } else {
+            ranked.into_iter().map(|(i, _)| i).collect()
+        };
+        self.filtered = indexes;
         self.selected = 0;
         self.list_state
             .select(if self.filtered.is_empty() { None } else { Some(0) });
@@ -198,13 +257,22 @@ impl WallpaperPicker {
             .style(Style::default().fg(self.theme.text).bg(self.theme.base));
         let inner = outer.inner(area);
         f.render_widget(outer, area);
+        self.render_body(f, inner);
+    }
 
-        // Footer (1 line) + body
+    pub fn render_in_area(&mut self, f: &mut Frame, area: Rect) {
+        f.render_widget(
+            Block::default().style(Style::default().bg(self.theme.base)),
+            area,
+        );
+        self.render_body(f, area);
+    }
+
+    fn render_body(&mut self, f: &mut Frame, area: Rect) {
         let vchunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([Constraint::Min(1), Constraint::Length(1)])
-            .split(inner);
-
+            .split(area);
         let body = vchunks[0];
         let footer = vchunks[1];
 
@@ -213,46 +281,63 @@ impl WallpaperPicker {
             .constraints([Constraint::Percentage(40), Constraint::Percentage(60)])
             .split(body);
 
-        let list_area = hchunks[0];
-        let preview_area = hchunks[1];
-
-        self.render_list(f, list_area);
-        self.render_preview(f, preview_area);
+        self.render_list(f, hchunks[0]);
+        self.render_preview(f, hchunks[1]);
         self.render_footer(f, footer);
     }
 
     fn title(&self) -> String {
         let count = self.filtered.len();
-        let total = self.all.len();
+        let total = self.entries.len();
         let preview_tag = if self.desktop_preview_active {
             " · DESKTOP PREVIEW"
         } else {
             ""
         };
-        format!(" cfg wallpaper -i · {}/{}{} ", count, total, preview_tag)
+        let match_tag = if self.match_only { " · MATCH ONLY" } else { "" };
+        format!(
+            " cfg wallpaper -i · {}/{}{}{} ",
+            count, total, match_tag, preview_tag
+        )
     }
 
     fn render_list(&mut self, f: &mut Frame, area: Rect) {
+        let current_expanded = expand_tilde(&self.original_path);
         let items: Vec<ListItem> = self
             .filtered
             .iter()
-            .filter_map(|&i| self.all.get(i))
-            .map(|p| {
-                let name = p
-                    .file_name()
-                    .and_then(|s| s.to_str())
-                    .unwrap_or("?")
-                    .to_string();
-                let is_current = p.to_string_lossy() == expand_tilde(&self.original_path);
+            .filter_map(|&i| self.entries.get(i))
+            .map(|e| {
+                let is_current = e.path.to_string_lossy() == current_expanded;
                 let marker = if is_current { "● " } else { "  " };
-                let style = if is_current {
+
+                // Color swatch + score badge
+                let (swatch_color, badge_text) = match (e.best_dominant, e.score) {
+                    (Some(c), Some(s)) => (
+                        Color::Rgb(c.r, c.g, c.b),
+                        format!("{:>3.0}", s),
+                    ),
+                    _ => (self.theme.subtext0, " — ".to_string()),
+                };
+                let matched = e.score.map(|s| s < MATCH_THRESHOLD).unwrap_or(false);
+                let badge_style = if matched {
+                    Style::default().fg(self.theme.accent).add_modifier(Modifier::BOLD)
+                } else {
+                    Style::default().fg(self.theme.subtext0)
+                };
+
+                let name_style = if is_current {
                     Style::default().fg(self.theme.accent).add_modifier(Modifier::BOLD)
                 } else {
                     Style::default().fg(self.theme.text)
                 };
+
                 ListItem::new(Line::from(vec![
                     Span::styled(marker, Style::default().fg(self.theme.accent)),
-                    Span::styled(name, style),
+                    Span::styled("● ", Style::default().fg(swatch_color)),
+                    Span::styled(badge_text, badge_style),
+                    Span::raw(" "),
+                    Span::styled(e.name.clone(), name_style),
                 ]))
             })
             .collect();
@@ -318,7 +403,14 @@ impl WallpaperPicker {
         let text = if let Some(msg) = &self.flash {
             msg.clone()
         } else {
-            "↑/↓ navigate  p scratchpad  d desktop-preview  / search  enter apply  q quit".to_string()
+            let primary = self
+                .primary_color
+                .map(|_| self.config.primary.as_str())
+                .unwrap_or("—");
+            format!(
+                "↑/↓ nav  p scratchpad  d desktop  m match-only  / search  enter apply  q quit  · primary={}",
+                primary
+            )
         };
         let style = Style::default().fg(self.theme.subtext0).bg(self.theme.surface0);
         let p = Paragraph::new(text).style(style);
@@ -385,8 +477,93 @@ impl WallpaperPicker {
         self.config
             .save(&self.config_path)
             .map_err(|e| format!("save config: {}", e))?;
+        self.saved = true;
         self.should_apply = true;
         Ok(())
+    }
+
+    pub fn is_in_search(&self) -> bool {
+        self.mode == Mode::Search
+    }
+
+    pub fn wants_apply(&self) -> bool {
+        self.should_apply
+    }
+
+    pub fn was_saved(&self) -> bool {
+        self.saved
+    }
+
+    /// Handle one input event. Returns `Ok(false)` when the picker wants the
+    /// caller to exit (Enter → commit; q/Esc → cancel).
+    pub fn handle_event(&mut self, event: Event) -> io::Result<bool> {
+        let Event::Key(k) = event else {
+            return Ok(true);
+        };
+        if k.kind != KeyEventKind::Press {
+            return Ok(true);
+        }
+        match (self.mode, k.code) {
+            (Mode::Search, KeyCode::Esc) => {
+                self.mode = Mode::Normal;
+                self.search.clear();
+                self.update_filter();
+            }
+            (Mode::Search, KeyCode::Enter) => {
+                self.mode = Mode::Normal;
+            }
+            (Mode::Search, KeyCode::Backspace) => {
+                self.search.backspace();
+                self.update_filter();
+            }
+            (Mode::Search, KeyCode::Char(c)) => {
+                self.search.insert(c);
+                self.update_filter();
+            }
+            (Mode::Normal, KeyCode::Char('q') | KeyCode::Esc) => {
+                if self.desktop_preview_active {
+                    self.revert_desktop_preview();
+                }
+                return Ok(false);
+            }
+            (Mode::Normal, KeyCode::Char('/')) => {
+                self.mode = Mode::Search;
+                self.flash = None;
+            }
+            (Mode::Normal, KeyCode::Up | KeyCode::Char('k')) => {
+                self.flash = None;
+                self.move_selection(-1);
+            }
+            (Mode::Normal, KeyCode::Down | KeyCode::Char('j')) => {
+                self.flash = None;
+                self.move_selection(1);
+            }
+            (Mode::Normal, KeyCode::Char('m')) => {
+                self.match_only = !self.match_only;
+                self.update_filter();
+                self.flash = None;
+            }
+            (Mode::Normal, KeyCode::Char('p')) => {
+                if let Some(p) = self.selected_path().map(|p| p.to_path_buf()) {
+                    self.open_scratchpad(&p);
+                }
+            }
+            (Mode::Normal, KeyCode::Char('d')) => {
+                if let Some(p) = self.selected_path().map(|p| p.to_path_buf()) {
+                    self.toggle_desktop_preview(&p);
+                }
+            }
+            (Mode::Normal, KeyCode::Enter) => {
+                if let Some(p) = self.selected_path().map(|p| p.to_path_buf()) {
+                    match self.commit_selection(&p) {
+                        Ok(()) => return Ok(false),
+                        Err(e) => self.flash = Some(format!("save failed: {}", e)),
+                    }
+                }
+            }
+            _ => {}
+        }
+        Ok(true)
     }
 }
 
@@ -420,6 +597,8 @@ pub fn run(
         Ok(()) => {
             if picker.should_apply {
                 Ok(Some(true))
+            } else if picker.saved {
+                Ok(Some(false))
             } else {
                 Ok(None)
             }
@@ -435,58 +614,8 @@ fn event_loop(terminal: &mut super::Tui, picker: &mut WallpaperPicker) -> io::Re
             continue;
         }
         let ev = event::read()?;
-        match ev {
-            Event::Key(k) if k.kind == KeyEventKind::Press => match (picker.mode, k.code) {
-                (Mode::Search, KeyCode::Esc) => {
-                    picker.mode = Mode::Normal;
-                    picker.search.clear();
-                    picker.update_filter();
-                }
-                (Mode::Search, KeyCode::Enter) => {
-                    picker.mode = Mode::Normal;
-                }
-                (Mode::Search, KeyCode::Backspace) => {
-                    picker.search.backspace();
-                    picker.update_filter();
-                }
-                (Mode::Search, KeyCode::Char(c)) => {
-                    picker.search.insert(c);
-                    picker.update_filter();
-                }
-                (Mode::Normal, KeyCode::Char('q') | KeyCode::Esc) => return Ok(()),
-                (Mode::Normal, KeyCode::Char('/')) => {
-                    picker.mode = Mode::Search;
-                    picker.flash = None;
-                }
-                (Mode::Normal, KeyCode::Up | KeyCode::Char('k')) => {
-                    picker.flash = None;
-                    picker.move_selection(-1);
-                }
-                (Mode::Normal, KeyCode::Down | KeyCode::Char('j')) => {
-                    picker.flash = None;
-                    picker.move_selection(1);
-                }
-                (Mode::Normal, KeyCode::Char('p')) => {
-                    if let Some(p) = picker.selected_path().map(|p| p.to_path_buf()) {
-                        picker.open_scratchpad(&p);
-                    }
-                }
-                (Mode::Normal, KeyCode::Char('d')) => {
-                    if let Some(p) = picker.selected_path().map(|p| p.to_path_buf()) {
-                        picker.toggle_desktop_preview(&p);
-                    }
-                }
-                (Mode::Normal, KeyCode::Enter) => {
-                    if let Some(p) = picker.selected_path().map(|p| p.to_path_buf()) {
-                        match picker.commit_selection(&p) {
-                            Ok(()) => return Ok(()),
-                            Err(e) => picker.flash = Some(format!("save failed: {}", e)),
-                        }
-                    }
-                }
-                _ => {}
-            },
-            _ => {}
+        if !picker.handle_event(ev)? {
+            return Ok(());
         }
     }
 }
@@ -522,4 +651,11 @@ fn enumerate_wallpapers(dir: &str) -> Result<Vec<PathBuf>, String> {
     }
     out.sort();
     Ok(out)
+}
+
+fn color_distance(a: &RgbColor, b: &RgbColor) -> f32 {
+    let dr = a.r as f32 - b.r as f32;
+    let dg = a.g as f32 - b.g as f32;
+    let db = a.b as f32 - b.b as f32;
+    (dr * dr + dg * dg + db * db).sqrt()
 }

@@ -260,7 +260,7 @@ fn main() {
             }
         };
 
-        match tui::app::run(&config, &palette, &config_path) {
+        match tui::app::run(&config, &palette, &config_path, &cfg_dir) {
             Ok(Some(true)) => {
                 // User wants to apply
                 update_apps(&cfg_dir, &dotfiles_dir, &[], false);
