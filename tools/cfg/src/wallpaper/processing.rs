@@ -25,6 +25,26 @@ pub fn cache_key(source: &str, gravity: &str, width: u32, height: u32) -> u64 {
     hasher.finish()
 }
 
+/// Cache key for a per-monitor slice carved out of a spanning image.
+/// Includes x_offset so same-resolution monitors at different positions
+/// don't collide on a single cached file.
+pub fn slice_cache_key(spanning: &str, width: u32, height: u32, x_offset: i32) -> u64 {
+    let mut hasher = DefaultHasher::new();
+    spanning.hash(&mut hasher);
+    "slice".hash(&mut hasher);
+    width.hash(&mut hasher);
+    height.hash(&mut hasher);
+    x_offset.hash(&mut hasher);
+    if let Ok(meta) = std::fs::metadata(spanning) {
+        if let Ok(mtime) = meta.modified() {
+            if let Ok(dur) = mtime.duration_since(UNIX_EPOCH) {
+                dur.as_secs().hash(&mut hasher);
+            }
+        }
+    }
+    hasher.finish()
+}
+
 /// Resize and crop a single-monitor wallpaper using ImageMagick.
 /// Returns the path to the cached output file.
 pub fn resize_and_crop(
@@ -92,7 +112,7 @@ pub fn extract_slice(
     std::fs::create_dir_all(cache_dir)
         .map_err(|e| format!("Failed to create cache dir: {}", e))?;
 
-    let key = cache_key(spanning, "crop", width, height);
+    let key = slice_cache_key(spanning, width, height, x_offset);
     let ext = Path::new(spanning)
         .extension()
         .and_then(|e| e.to_str())
@@ -142,6 +162,20 @@ mod tests {
         assert_ne!(k1, k2);
         assert_ne!(k1, k3);
         assert_ne!(k2, k3);
+    }
+
+    #[test]
+    fn slice_cache_key_differs_by_x_offset() {
+        let k1 = slice_cache_key("/tmp/spanning.png", 1920, 1080, 0);
+        let k2 = slice_cache_key("/tmp/spanning.png", 1920, 1080, 1920);
+        assert_ne!(k1, k2);
+    }
+
+    #[test]
+    fn slice_cache_key_deterministic() {
+        let a = slice_cache_key("/tmp/spanning.png", 1920, 1080, 1920);
+        let b = slice_cache_key("/tmp/spanning.png", 1920, 1080, 1920);
+        assert_eq!(a, b);
     }
 
     #[test]
