@@ -2,10 +2,12 @@
 #
 # Per ArchWiki Gamepad (https://wiki.archlinux.org/title/Gamepad):
 #   - game-devices-udev covers Sony VIDs beyond Valve's steam-devices rules.
-#   - Bluez default UserspaceHID=true (since 2024) blocks the kernel
-#     hid_playstation driver from binding the DS4 over Bluetooth. Flipping
-#     to false routes BT HID through kernel HIDP so the driver claims it
-#     and /dev/input/event* nodes appear as a normal gamepad.
+#   - Bluez default ClassicBondedOnly=true rejects the DS4 HID profile
+#     connection as !bonded, because the DS4 does "Just Works" BT pairing
+#     without leaving the long-term bond bluez expects. Setting it to false
+#     lets bluez's UHID path accept the connection; the kernel
+#     hid_playstation driver then binds and creates /dev/input/event*
+#     (gamepad, motion sensors, touchpad) and /dev/input/js0.
 #
 # After install, enable "PlayStation Controller Support" in Steam:
 #   Settings > Controller > PlayStation Controller Support.
@@ -17,11 +19,11 @@ linux[whoami.distro^="Arch"]:
         yay -S --noconfirm --needed game-devices-udev
       fi
 
-      if ! grep -qE '^UserspaceHID=false' /etc/bluetooth/input.conf; then
-        if grep -qE '^#?UserspaceHID=' /etc/bluetooth/input.conf; then
-          sudo sed -i 's/^#\?UserspaceHID=.*/UserspaceHID=false/' /etc/bluetooth/input.conf
+      if ! grep -qE '^ClassicBondedOnly=false' /etc/bluetooth/input.conf; then
+        if grep -qE '^#?ClassicBondedOnly=' /etc/bluetooth/input.conf; then
+          sudo sed -i 's/^#\?ClassicBondedOnly=.*/ClassicBondedOnly=false/' /etc/bluetooth/input.conf
         else
-          echo 'UserspaceHID=false' | sudo tee -a /etc/bluetooth/input.conf >/dev/null
+          echo 'ClassicBondedOnly=false' | sudo tee -a /etc/bluetooth/input.conf >/dev/null
         fi
         sudo systemctl restart bluetooth.service
       fi
