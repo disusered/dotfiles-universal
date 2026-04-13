@@ -261,15 +261,27 @@ fn main() {
         };
 
         match tui::app::run(&config, &palette, &config_path, &cfg_dir) {
-            Ok(Some(true)) => {
-                // User wants to apply
-                update_apps(&cfg_dir, &dotfiles_dir, &[], false);
+            Ok(tui::app::Outcome::Apply(scope)) => {
+                // Dispatch only to the subsystems the user actually changed.
+                // Colors/fonts still need the full template render (no
+                // dependency graph yet); wallpaper stays off the template
+                // path — hyprpaper.conf is written directly by
+                // `wallpaper::apply`, not through templates.toml.
+                if scope.colors || scope.fonts {
+                    update_apps(&cfg_dir, &dotfiles_dir, &[], false);
+                }
+                if scope.wallpaper {
+                    let config = Config::load(&config_path).unwrap_or_default();
+                    if let Err(e) = wallpaper::apply(&config, &cfg_dir) {
+                        eprintln!("Error applying wallpaper: {}", e);
+                        std::process::exit(1);
+                    }
+                }
             }
-            Ok(Some(false)) => {
-                // Saved but no apply
+            Ok(tui::app::Outcome::SavedOnly) => {
                 println!("Config saved (run 'cfg update' to apply)");
             }
-            Ok(None) => {
+            Ok(tui::app::Outcome::Cancelled) => {
                 // Quit without saving
             }
             Err(e) => {

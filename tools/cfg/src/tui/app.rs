@@ -17,6 +17,33 @@ use super::fonts::FontPicker;
 use super::wallpapers::WallpaperPicker;
 use super::{init, restore};
 
+/// Which pickers committed an apply. Lets the caller dispatch only to the
+/// affected subsystems — e.g. a wallpaper-tab commit shouldn't re-render
+/// every template in `templates.toml`.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct ApplyScope {
+    pub colors: bool,
+    pub fonts: bool,
+    pub wallpaper: bool,
+}
+
+impl ApplyScope {
+    pub fn any(&self) -> bool {
+        self.colors || self.fonts || self.wallpaper
+    }
+}
+
+/// Result of a TUI session.
+#[derive(Debug, Clone, Copy)]
+pub enum Outcome {
+    /// At least one picker committed with apply requested.
+    Apply(ApplyScope),
+    /// At least one picker saved but none requested apply.
+    SavedOnly,
+    /// Quit without saving anything.
+    Cancelled,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum Tab {
     #[default]
@@ -279,7 +306,7 @@ impl App {
         Ok(continue_running)
     }
 
-    pub fn run(mut self) -> io::Result<Option<bool>> {
+    pub fn run(mut self) -> io::Result<Outcome> {
         let mut terminal = init()?;
 
         loop {
@@ -318,12 +345,17 @@ impl App {
             .map(|p| p.was_saved())
             .unwrap_or(false);
 
-        if colors_apply || fonts_apply || wallpaper_apply || self.should_apply {
-            Ok(Some(true))
+        let scope = ApplyScope {
+            colors: colors_apply,
+            fonts: fonts_apply,
+            wallpaper: wallpaper_apply,
+        };
+        if scope.any() {
+            Ok(Outcome::Apply(scope))
         } else if self.color_picker.was_saved() || self.font_picker.was_saved() || wallpaper_saved {
-            Ok(Some(false))
+            Ok(Outcome::SavedOnly)
         } else {
-            Ok(None)
+            Ok(Outcome::Cancelled)
         }
     }
 }
@@ -334,7 +366,7 @@ pub fn run(
     palette: &Palette,
     config_path: &str,
     cfg_dir: &str,
-) -> io::Result<Option<bool>> {
+) -> io::Result<Outcome> {
     let app = App::new(
         config.clone(),
         palette,
