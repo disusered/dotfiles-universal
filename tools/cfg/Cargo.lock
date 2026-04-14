@@ -342,6 +342,7 @@ dependencies = [
  "rand 0.8.5",
  "ratatui",
  "ratatui-image",
+ "rayon",
  "serde",
  "serde_json",
  "tera",

@@ -1,9 +1,14 @@
 use std::collections::HashMap;
 use std::fs;
+use std::io::IsTerminal;
 use std::path::Path;
+use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::mpsc;
+use std::thread;
 use std::time::UNIX_EPOCH;
 
 use rand::seq::SliceRandom;
+use rayon::prelude::*;
 
 use crate::color::Color;
 use crate::config::Config;
@@ -15,6 +20,10 @@ use crate::wallpaper::tags::{TagCache, TagEntry};
 /// a target color. Max possible distance is ~441.67 (sqrt(3 * 255^2)); 60 is
 /// roughly 14% of that range.
 pub const MATCH_THRESHOLD: f32 = 60.0;
+
+/// Persist the cache after every N new analyses so a Ctrl-C mid-run keeps
+/// most of the work.
+const SAVE_EVERY: usize = 50;
 
 /// Minimum Euclidean RGB distance from any of `dominants` to `target`.
 ///
@@ -84,30 +93,23 @@ pub fn pick(config: &Config, cfg_dir: &str) -> Result<String, String> {
 
     let cache_dir = super::resolve_cache_dir(&config.wallpaper);
     let tags_path = format!("{}/tags.json", cache_dir);
-    let mut cache = TagCache::load(&tags_path)?;
+    let cache = TagCache::load(&tags_path)?;
 
-    // Analyze (or load from cache) each file once.
+    // Partition into cache hits (fill dominants_by_path directly) and misses
+    // (analyze in parallel below).
     let mut dominants_by_path: HashMap<String, Vec<DominantColor>> = HashMap::new();
+    let mut to_analyze: Vec<String> = Vec::new();
     for path in &files {
-        let dominants = if let Some(entry) = cache.get_fresh(path) {
-            entry.dominants.clone()
+        if let Some(entry) = cache.get_fresh(path) {
+            dominants_by_path.insert(path.clone(), entry.dominants.clone());
         } else {
-            let dominants = analysis::analyze(path)?;
-            let mtime = file_mtime_secs(path).unwrap_or(0);
-            cache.insert(
-                path,
-                TagEntry {
-                    mtime,
-                    dominants: dominants.clone(),
-                },
-            );
-            dominants
-        };
-        dominants_by_path.insert(path.clone(), dominants);
+            to_analyze.push(path.clone());
+        }
     }
 
-    if let Err(e) = cache.save(&tags_path) {
-        eprintln!("warning: failed to save tag cache: {}", e);
+    if !to_analyze.is_empty() {
+        let analyzed = analyze_and_cache(to_analyze, cache, &tags_path)?;
+        dominants_by_path.extend(analyzed);
     }
 
     // Score against primary.
@@ -160,6 +162,84 @@ pub fn pick(config: &Config, cfg_dir: &str) -> Result<String, String> {
     pool.choose(&mut rng)
         .cloned()
         .ok_or_else(|| "internal error: empty pool after selection".to_string())
+}
+
+/// Analyze `to_analyze` in parallel via rayon while a merger thread owns the
+/// `TagCache`, inserts each completed entry, and saves to `tags_path` every
+/// [`SAVE_EVERY`] analyses (plus once at the end). Progress lines are printed
+/// to stderr only when stderr is a TTY so silent callers like the theme
+/// re-pick path don't spam unrelated invocations.
+///
+/// Returns the newly-analyzed dominants keyed by path. On analysis error,
+/// whatever has already been sent to the merger still gets persisted before
+/// this function returns with the error.
+fn analyze_and_cache(
+    to_analyze: Vec<String>,
+    mut cache: TagCache,
+    tags_path: &str,
+) -> Result<HashMap<String, Vec<DominantColor>>, String> {
+    let total = to_analyze.len();
+    let show_progress = std::io::stderr().is_terminal();
+    let counter = AtomicUsize::new(0);
+
+    let (tx, rx) = mpsc::channel::<(String, Vec<DominantColor>, u64)>();
+    let tags_path_owned = tags_path.to_string();
+    let merger: thread::JoinHandle<HashMap<String, Vec<DominantColor>>> =
+        thread::spawn(move || {
+            let mut analyzed: HashMap<String, Vec<DominantColor>> = HashMap::new();
+            let mut since_save = 0usize;
+            while let Ok((path, dominants, mtime)) = rx.recv() {
+                cache.insert(
+                    &path,
+                    TagEntry {
+                        mtime,
+                        dominants: dominants.clone(),
+                    },
+                );
+                analyzed.insert(path, dominants);
+                since_save += 1;
+                if since_save >= SAVE_EVERY {
+                    if let Err(e) = cache.save(&tags_path_owned) {
+                        eprintln!("warning: failed to save tag cache: {}", e);
+                    }
+                    since_save = 0;
+                }
+            }
+            if let Err(e) = cache.save(&tags_path_owned) {
+                eprintln!("warning: failed to save tag cache: {}", e);
+            }
+            analyzed
+        });
+
+    let analyze_result: Result<(), String> = to_analyze
+        .par_iter()
+        .try_for_each_with(tx.clone(), |tx, path| {
+            let n = counter.fetch_add(1, Ordering::Relaxed) + 1;
+            if show_progress {
+                eprintln!("{}", format_progress_line(n, total, path));
+            }
+            let dominants = analysis::analyze(path)?;
+            let mtime = file_mtime_secs(path).unwrap_or(0);
+            tx.send((path.clone(), dominants, mtime))
+                .map_err(|e| format!("tag cache merger channel closed: {}", e))?;
+            Ok(())
+        });
+
+    // Close the outer sender so the merger can finish draining; wait for it.
+    drop(tx);
+    let analyzed = merger
+        .join()
+        .map_err(|_| "tag cache merger thread panicked".to_string())?;
+    analyze_result?;
+    Ok(analyzed)
+}
+
+fn format_progress_line(n: usize, total: usize, path: &str) -> String {
+    let basename = Path::new(path)
+        .file_name()
+        .and_then(|s| s.to_str())
+        .unwrap_or(path);
+    format!("[{}/{}] analyzing {}", n, total, basename)
 }
 
 fn enumerate_wallpapers(dir: &str) -> Result<Vec<String>, String> {
@@ -285,6 +365,19 @@ mod tests {
         scores.insert("only.jpg".to_string(), 5.0);
         let top = tiebreak(&pool, &scores);
         assert_eq!(top, vec!["only.jpg".to_string()]);
+    }
+
+    #[test]
+    fn format_progress_line_uses_basename() {
+        let line = format_progress_line(42, 335, "/home/user/pics/catppuccin/foo.jpg");
+        assert_eq!(line, "[42/335] analyzing foo.jpg");
+    }
+
+    #[test]
+    fn format_progress_line_falls_back_when_no_basename() {
+        // Root "/" has no file_name() — fall back to the full input.
+        let line = format_progress_line(1, 1, "/");
+        assert_eq!(line, "[1/1] analyzing /");
     }
 
     #[test]
