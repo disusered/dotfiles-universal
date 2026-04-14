@@ -108,6 +108,26 @@ pub fn toggle(workspace_name: &str, config: &Config) -> Result<(), String> {
     }
 }
 
+#[derive(Debug, PartialEq, Eq)]
+enum MissAction {
+    Spawn,
+    FocusAny,
+    Noop,
+}
+
+// Decide what to do when `toggle` has no exact context match.
+// `toggle_spawns=false` opts out of spawning entirely: the binding becomes
+// a pure visibility/focus toggle, delegating creation to `spawn`.
+fn miss_action(toggle_spawns: bool, has_cwd: bool, has_any_existing: bool) -> MissAction {
+    match (toggle_spawns, has_cwd, has_any_existing) {
+        (true, true, _) => MissAction::Spawn,
+        (true, false, true) => MissAction::FocusAny,
+        (true, false, false) => MissAction::Noop,
+        (false, _, true) => MissAction::FocusAny,
+        (false, _, false) => MissAction::Noop,
+    }
+}
+
 fn toggle_global(
     ws: &WorkspaceConfig,
     workspace_name: &str,
@@ -115,8 +135,10 @@ fn toggle_global(
 ) -> Result<(), String> {
     if let Some(client) = find_any_window(clients, ws) {
         focus_and_show(workspace_name, &client.address)
-    } else {
+    } else if ws.toggle_spawns {
         spawn_and_wait(ws, workspace_name, None)
+    } else {
+        Ok(())
     }
 }
 
@@ -126,8 +148,10 @@ fn toggle_with_cwd(
     clients: &[Client],
     active_window: &ActiveWindow,
 ) -> Result<(), String> {
-    if let Some(cwd) = context::detect_cwd(active_window) {
-        let cwd_str = cwd.to_string_lossy();
+    let cwd = context::detect_cwd(active_window);
+
+    if let Some(ref cwd_path) = cwd {
+        let cwd_str = cwd_path.to_string_lossy();
         let title = build_context_title(ws.title_prefix.as_deref(), &cwd_str);
 
         if let Some(client) =
@@ -136,16 +160,24 @@ fn toggle_with_cwd(
             return focus_and_show(workspace_name, &client.address);
         }
 
-        // Context-aware: no exact match means a new context — always spawn.
-        // Do NOT fall back to find_any_window here: reusing an arbitrary
-        // window from a different context is the "wrong/stale window" bug.
-        spawn_and_wait(ws, workspace_name, Some(&cwd_str))
-    } else {
-        // No CWD context: show any existing window, never spawn
-        if let Some(client) = find_any_window(clients, ws) {
-            focus_and_show(workspace_name, &client.address)?;
+        if ws.toggle_spawns {
+            // Context-aware: no exact match means a new context — spawn.
+            return spawn_and_wait(ws, workspace_name, Some(&cwd_str));
         }
-        Ok(())
+    }
+
+    // Miss with toggle_spawns=false, or no CWD context: fall through to
+    // focusing any existing window. Never spawn here.
+    let has_any = find_any_window(clients, ws).is_some();
+    match miss_action(ws.toggle_spawns, cwd.is_some(), has_any) {
+        MissAction::FocusAny => {
+            if let Some(client) = find_any_window(clients, ws) {
+                focus_and_show(workspace_name, &client.address)?;
+            }
+            Ok(())
+        }
+        MissAction::Noop => Ok(()),
+        MissAction::Spawn => unreachable!("spawn handled above when cwd is Some"),
     }
 }
 
@@ -331,6 +363,30 @@ mod tests {
     fn build_context_title_without_prefix() {
         let title = build_context_title(None, "/home/user/project");
         assert_eq!(title, "/home/user/project");
+    }
+
+    #[test]
+    fn miss_action_spawns_when_enabled_and_has_cwd() {
+        assert_eq!(miss_action(true, true, false), MissAction::Spawn);
+        assert_eq!(miss_action(true, true, true), MissAction::Spawn);
+    }
+
+    #[test]
+    fn miss_action_focuses_any_without_cwd_when_existing() {
+        assert_eq!(miss_action(true, false, true), MissAction::FocusAny);
+    }
+
+    #[test]
+    fn miss_action_noop_without_cwd_and_no_existing() {
+        assert_eq!(miss_action(true, false, false), MissAction::Noop);
+    }
+
+    #[test]
+    fn miss_action_never_spawns_when_disabled() {
+        assert_eq!(miss_action(false, true, true), MissAction::FocusAny);
+        assert_eq!(miss_action(false, false, true), MissAction::FocusAny);
+        assert_eq!(miss_action(false, true, false), MissAction::Noop);
+        assert_eq!(miss_action(false, false, false), MissAction::Noop);
     }
 
     #[test]

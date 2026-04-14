@@ -32,6 +32,11 @@ pub struct WorkspaceConfig {
     #[serde(default)]
     #[allow(dead_code)]
     pub spawn_via_desktop: bool,
+    // Controls whether `toggle` may spawn a new instance on miss. When false,
+    // `toggle` only focuses existing windows; use `spawn` to create. Currently
+    // only consulted by Cwd and None context paths; GitRoot still spawns on miss.
+    #[serde(default = "default_true")]
+    pub toggle_spawns: bool,
 }
 
 fn default_true() -> bool {
@@ -142,6 +147,37 @@ mod tests {
             config.workspaces["editor"].spawn_command,
             vec!["code", "--new-window", "--wait"]
         );
+    }
+
+    #[test]
+    fn toggle_spawns_defaults_to_true() {
+        let config = parse_config(
+            r#"
+            [scratchpads]
+            names = []
+
+            [workspaces.test]
+            window_class = "test"
+            spawn_command = ["test"]
+            "#,
+        );
+        assert!(config.workspaces["test"].toggle_spawns);
+    }
+
+    #[test]
+    fn toggle_spawns_false_parses() {
+        let config = parse_config(
+            r#"
+            [scratchpads]
+            names = []
+
+            [workspaces.test]
+            window_class = "test"
+            spawn_command = ["test"]
+            toggle_spawns = false
+            "#,
+        );
+        assert!(!config.workspaces["test"].toggle_spawns);
     }
 
     #[test]
