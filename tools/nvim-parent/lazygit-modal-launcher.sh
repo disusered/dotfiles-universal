@@ -8,4 +8,6 @@ if sock="$("$HOME/.local/bin/resolve-nvim-parent" --git-root "$ctx" 2>/dev/null)
   export NVIM="$sock"
 fi
 
+export HYPRSPACE_MODAL=lazygit
+
 exec lazygit

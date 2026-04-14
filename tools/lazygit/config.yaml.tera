@@ -1,6 +1,6 @@
 os:
-  edit: '[ -z "$NVIM" ] && (nvim -- {% raw %}{{filename}}{% endraw %}) || (nvim --server "$NVIM" --remote-tab {% raw %}{{filename}}{% endraw %})'
-  editAtLine: '[ -z "$NVIM" ] && (nvim +{% raw %}{{line}}{% endraw %} -- {% raw %}{{filename}}{% endraw %}) || (nvim --server "$NVIM" --remote-tab {% raw %}{{filename}}{% endraw %} && nvim --server "$NVIM" --remote-send ":{% raw %}{{line}}{% endraw %}<CR>")'
+  edit: '[ -z "$NVIM" ] && nvim -- {% raw %}{{filename}}{% endraw %} || { nvim --server "$NVIM" --remote-tab {% raw %}{{filename}}{% endraw %} && { [ -n "$HYPRSPACE_MODAL" ] && "$HOME/.local/bin/hyprspace" toggle "$HYPRSPACE_MODAL" || :; }; }'
+  editAtLine: '[ -z "$NVIM" ] && nvim +{% raw %}{{line}}{% endraw %} -- {% raw %}{{filename}}{% endraw %} || { nvim --server "$NVIM" --remote-tab {% raw %}{{filename}}{% endraw %} && nvim --server "$NVIM" --remote-send ":{% raw %}{{line}}{% endraw %}<CR>" && { [ -n "$HYPRSPACE_MODAL" ] && "$HOME/.local/bin/hyprspace" toggle "$HYPRSPACE_MODAL" || :; }; }'
   # Whether lazygit suspends until an edit process returns
   editInTerminal: true
 # Use Git Delta for diffs
