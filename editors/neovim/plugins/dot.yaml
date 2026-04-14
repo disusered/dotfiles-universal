@@ -23,6 +23,7 @@ global:
     kulala.lua: ~/.config/nvim/lua/plugins/kulala.lua
     lazydev.lua: ~/.config/nvim/lua/plugins/lazydev.lua
     lazygit.lua: ~/.config/nvim/lua/plugins/lazygit.lua
+    parent-registry.lua: ~/.config/nvim/lua/plugins/parent-registry.lua
     leetcode.lua: ~/.config/nvim/lua/plugins/leetcode.lua
     lsp-signature.lua: ~/.config/nvim/lua/plugins/lsp-signature.lua
     luadev.lua: ~/.config/nvim/lua/plugins/luadev.lua

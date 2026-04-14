@@ -1,0 +1,4 @@
+global:
+  links:
+    resolve-nvim-parent.sh: ~/.local/bin/resolve-nvim-parent
+    lazygit-modal-launcher.sh: ~/.local/bin/lazygit-modal-launcher
