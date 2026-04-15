@@ -37,6 +37,21 @@ pub struct WorkspaceConfig {
     // only consulted by Cwd and None context paths; GitRoot still spawns on miss.
     #[serde(default = "default_true")]
     pub toggle_spawns: bool,
+    // Exported as HYPRSPACE_MODAL=<tag> to the spawned child. Lets the child
+    // call `hyprspace toggle <tag>` to dismiss itself without hardcoding the
+    // workspace name.
+    #[serde(default)]
+    pub modal_tag: Option<String>,
+    // When true, resolve a parent Neovim socket for the spawn context
+    // (via ~/.cache/nvim-servers/ entries) and export NVIM=<socket> to the
+    // spawned child. Silent no-op if no parent nvim is found.
+    #[serde(default)]
+    pub inject_parent_nvim: bool,
+    // Whitelist of env keys to forward from hyprspace's own env into the
+    // spawned child. Documents per-workspace env contracts (e.g. the ai
+    // workspace expects CLAUDE_CODE_SSE_PORT when launched from nvim).
+    #[serde(default)]
+    pub pass_env: Vec<String>,
 }
 
 fn default_true() -> bool {

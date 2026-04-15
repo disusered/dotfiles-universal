@@ -10,6 +10,9 @@ dismiss_scratchpads = false
 toggle_spawns = false
 extra_classes = ["chrome-gemini.google.com__-Default"]
 spawn_command = ["kitty", "--class", "claude_modal", "--title", "{title}", "--directory", "{context}", "--hold", "zsh", "-ic", "claude"]
+modal_tag = "ai"
+inject_parent_nvim = true
+pass_env = ["CLAUDE_CODE_SSE_PORT", "ENABLE_IDE_INTEGRATION"]
 
 [workspaces.clipboard]
 window_class = "clipse_scratch"

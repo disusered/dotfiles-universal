@@ -3,6 +3,7 @@ mod context;
 mod hyprctl;
 mod lock;
 mod notify;
+mod nvim_parent;
 mod scratchpads;
 mod workspace;
 
@@ -21,6 +22,12 @@ enum Command {
     /// Context-aware show/hide of a special workspace
     Toggle {
         /// Name of the workspace to toggle
+        workspace: String,
+    },
+    /// Ensure a workspace is visible and focused, spawning on miss even
+    /// when the workspace's toggle_spawns=false (for IDE/leader triggers)
+    Open {
+        /// Name of the workspace to open
         workspace: String,
     },
     /// Explicitly spawn a new instance in a special workspace
@@ -49,6 +56,16 @@ fn main() {
                 std::process::exit(1);
             });
             if let Err(e) = workspace::toggle(&workspace, &config) {
+                notify::notify(notify::Urgency::Critical, "hyprspace", &e);
+                std::process::exit(1);
+            }
+        }
+        Command::Open { workspace } => {
+            let config = config::Config::load().unwrap_or_else(|e| {
+                eprintln!("hyprspace: {}", e);
+                std::process::exit(1);
+            });
+            if let Err(e) = workspace::open(&workspace, &config) {
                 notify::notify(notify::Urgency::Critical, "hyprspace", &e);
                 std::process::exit(1);
             }

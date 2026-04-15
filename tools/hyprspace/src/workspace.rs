@@ -11,6 +11,7 @@ use crate::hyprctl::{
 };
 use crate::lock::SpawnLock;
 use crate::notify;
+use crate::nvim_parent;
 use crate::scratchpads;
 
 pub fn raw(workspace_name: &str) -> Result<(), String> {
@@ -58,6 +59,22 @@ pub fn spawn(workspace_name: &str, config: &Config) -> Result<(), String> {
 }
 
 pub fn toggle(workspace_name: &str, config: &Config) -> Result<(), String> {
+    dispatch_toggle(workspace_name, config, false)
+}
+
+/// `open` behaves like `toggle` but forces spawn-on-miss regardless of
+/// `toggle_spawns`. Use for "ensure this workspace is usable" triggers
+/// (e.g. <leader>ac from nvim) while keeping `toggle` strictly
+/// focus-only when the workspace opts out via `toggle_spawns=false`.
+pub fn open(workspace_name: &str, config: &Config) -> Result<(), String> {
+    dispatch_toggle(workspace_name, config, true)
+}
+
+fn dispatch_toggle(
+    workspace_name: &str,
+    config: &Config,
+    force_spawn_on_miss: bool,
+) -> Result<(), String> {
     let ws = match config.get_workspace(workspace_name) {
         Some(ws) => ws,
         None => {
@@ -69,6 +86,8 @@ pub fn toggle(workspace_name: &str, config: &Config) -> Result<(), String> {
             return Err(format!("Unknown workspace: {}", workspace_name));
         }
     };
+
+    let spawn_on_miss = ws.toggle_spawns || force_spawn_on_miss;
 
     let monitors = get_monitors()?;
     let focused_special = get_focused_special_workspace(&monitors);
@@ -96,10 +115,10 @@ pub fn toggle(workspace_name: &str, config: &Config) -> Result<(), String> {
     let clients = get_clients()?;
 
     match ws.context_type {
-        ContextType::None => toggle_global(ws, workspace_name, &clients),
+        ContextType::None => toggle_global(ws, workspace_name, &clients, spawn_on_miss),
         ContextType::Cwd => {
             let active_window = get_active_window()?;
-            toggle_with_cwd(ws, workspace_name, &clients, &active_window)
+            toggle_with_cwd(ws, workspace_name, &clients, &active_window, spawn_on_miss)
         }
         ContextType::GitRoot => {
             let active_window = get_active_window()?;
@@ -132,10 +151,11 @@ fn toggle_global(
     ws: &WorkspaceConfig,
     workspace_name: &str,
     clients: &[Client],
+    spawn_on_miss: bool,
 ) -> Result<(), String> {
     if let Some(client) = find_any_window(clients, ws) {
         focus_and_show(workspace_name, &client.address)
-    } else if ws.toggle_spawns {
+    } else if spawn_on_miss {
         spawn_and_wait(ws, workspace_name, None)
     } else {
         Ok(())
@@ -147,6 +167,7 @@ fn toggle_with_cwd(
     workspace_name: &str,
     clients: &[Client],
     active_window: &ActiveWindow,
+    spawn_on_miss: bool,
 ) -> Result<(), String> {
     let cwd = context::detect_cwd(active_window);
 
@@ -160,16 +181,16 @@ fn toggle_with_cwd(
             return focus_and_show(workspace_name, &client.address);
         }
 
-        if ws.toggle_spawns {
+        if spawn_on_miss {
             // Context-aware: no exact match means a new context — spawn.
             return spawn_and_wait(ws, workspace_name, Some(&cwd_str));
         }
     }
 
-    // Miss with toggle_spawns=false, or no CWD context: fall through to
+    // Miss with spawn_on_miss=false, or no CWD context: fall through to
     // focusing any existing window. Never spawn here.
     let has_any = find_any_window(clients, ws).is_some();
-    match miss_action(ws.toggle_spawns, cwd.is_some(), has_any) {
+    match miss_action(spawn_on_miss, cwd.is_some(), has_any) {
         MissAction::FocusAny => {
             if let Some(client) = find_any_window(clients, ws) {
                 focus_and_show(workspace_name, &client.address)?;
@@ -258,11 +279,14 @@ fn spawn_and_wait(
     if cmd.is_empty() {
         return Err("Empty spawn command".to_string());
     }
-    ProcessCommand::new(&cmd[0])
+    let mut process = ProcessCommand::new(&cmd[0]);
+    process
         .args(&cmd[1..])
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null());
+    apply_injected_env(&mut process, ws, context);
+    process
         .spawn()
         .map_err(|e| format!("Failed to spawn '{}': {}", cmd[0], e))?;
 
@@ -319,6 +343,31 @@ fn interpolate_command(command: &[String], title: &str, context: &str) -> Vec<St
         .iter()
         .map(|arg| arg.replace("{title}", title).replace("{context}", context))
         .collect()
+}
+
+// Inject env vars into the child process per the workspace's config:
+//   1. modal_tag       -> HYPRSPACE_MODAL=<tag>
+//   2. inject_parent_nvim + context resolvable -> NVIM=<socket>
+//   3. pass_env keys present in our env -> forwarded
+// Silent no-op when a field is unset or a value can't be resolved; the
+// caller decides (via config) which injections the workspace contract
+// requires.
+fn apply_injected_env(cmd: &mut ProcessCommand, ws: &WorkspaceConfig, context: Option<&str>) {
+    if let Some(tag) = ws.modal_tag.as_deref() {
+        cmd.env("HYPRSPACE_MODAL", tag);
+    }
+    if ws.inject_parent_nvim {
+        if let Some(ctx) = context {
+            if let Some(sock) = nvim_parent::resolve(ctx) {
+                cmd.env("NVIM", sock);
+            }
+        }
+    }
+    for key in &ws.pass_env {
+        if let Ok(val) = std::env::var(key) {
+            cmd.env(key, val);
+        }
+    }
 }
 
 #[cfg(test)]
