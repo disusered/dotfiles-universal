@@ -100,11 +100,17 @@ enum Command {
         scratchpad: bool,
     },
     /// Wallpaper configuration
+    /// Manage wallpaper. Two modes: `pinned` uses a fixed `path`, `picker`
+    /// chooses from `source_dir` by palette match. Toggle with
+    /// `--set mode=pinned|picker`. Both `path` and `source_dir` stay stored
+    /// regardless of mode so you can switch back.
+    ///
+    /// Settable/gettable keys: mode, path, gravity, cache_dir, source_dir.
     Wallpaper {
-        /// Get a specific value (path, gravity, cache_dir)
+        /// Get a specific value (mode, path, gravity, cache_dir, source_dir)
         #[arg(long, group = "mode")]
         get: Option<String>,
-        /// Set a value (format: key=value)
+        /// Set a value (format: key=value). Keys: mode (pinned|picker), path, gravity, cache_dir, source_dir.
         #[arg(long, group = "mode")]
         set: Option<String>,
         /// After --set, apply wallpaper. Standalone: re-apply current wallpaper.
@@ -772,7 +778,7 @@ fn main() {
                 let value = parts[1];
 
                 match key {
-                    "path" | "cache_dir" | "source_dir" => {
+                    "mode" | "path" | "cache_dir" | "source_dir" => {
                         let config_key = format!("wallpaper.{}", key);
                         if let Err(e) = config.set(&config_key, value) {
                             eprintln!("Error: {}", e);
@@ -787,7 +793,7 @@ fn main() {
                     }
                     _ => {
                         eprintln!(
-                            "Unknown key: {} (valid: path, gravity, cache_dir, source_dir)",
+                            "Unknown key: {} (valid: mode, path, gravity, cache_dir, source_dir)",
                             key
                         );
                         std::process::exit(1);
@@ -808,13 +814,14 @@ fn main() {
                 }
             } else if let Some(key) = get {
                 match key.as_str() {
+                    "mode" => println!("{}", config.wallpaper.mode),
                     "path" => println!("{}", config.wallpaper.path),
                     "gravity" => println!("{}", config.wallpaper.gravity),
                     "cache_dir" => println!("{}", config.wallpaper.cache_dir),
                     "source_dir" => println!("{}", config.wallpaper.source_dir),
                     _ => {
                         eprintln!(
-                            "Unknown key: {} (valid: path, gravity, cache_dir, source_dir)",
+                            "Unknown key: {} (valid: mode, path, gravity, cache_dir, source_dir)",
                             key
                         );
                         std::process::exit(1);
@@ -827,6 +834,7 @@ fn main() {
                 }
             } else {
                 // Show current wallpaper config
+                println!("mode: {}", config.wallpaper.mode);
                 println!("path={}", config.wallpaper.path);
                 println!("gravity={}", config.wallpaper.gravity);
                 println!("cache_dir={}", config.wallpaper.cache_dir);

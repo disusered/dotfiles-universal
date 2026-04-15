@@ -392,7 +392,7 @@ fn wallpaper_set_with_apply_accepted() {
 
 #[test]
 fn wallpaper_apply_empty_path_errors() {
-    // Fresh config has wallpaper.path = "" → --apply must fail with a clear message.
+    // Fresh config defaults to mode=pinned with empty path → --apply must fail with a clear message.
     let dir = isolated_cfg_dir("apply-empty-path");
     let output = cfg()
         .env("CFG_DIR", &dir)
@@ -402,7 +402,7 @@ fn wallpaper_apply_empty_path_errors() {
     assert!(!output.status.success(), "expected non-zero exit");
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(
-        stderr.contains("wallpaper path not set"),
+        stderr.contains("wallpaper.mode=pinned") && stderr.contains("wallpaper.path"),
         "stderr was: {}",
         stderr
     );
@@ -485,7 +485,7 @@ fn wallpaper_default_listing_shows_source_dir() {
 #[test]
 fn wallpaper_apply_errors_when_both_path_and_source_dir_empty() {
     let dir = isolated_cfg_dir("apply-both-empty");
-    // Fresh config — both path and source_dir empty by default.
+    // Fresh config — both path and source_dir empty, mode defaults to pinned.
     let output = cfg()
         .env("CFG_DIR", &dir)
         .args(["wallpaper", "--apply"])
@@ -494,7 +494,114 @@ fn wallpaper_apply_errors_when_both_path_and_source_dir_empty() {
     assert!(!output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(
-        stderr.contains("wallpaper path not set"),
+        stderr.contains("wallpaper.mode=pinned") && stderr.contains("wallpaper.path"),
+        "stderr was: {}",
+        stderr
+    );
+}
+
+// --- wallpaper.mode tests (bd_.dotfiles-ua7) ---
+
+#[test]
+fn wallpaper_set_mode_pinned_persists() {
+    let dir = isolated_cfg_dir("set-mode-pinned");
+    cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--set", "mode=pinned"])
+        .assert()
+        .success();
+    cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--get", "mode"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("pinned"));
+}
+
+#[test]
+fn wallpaper_set_mode_picker_persists() {
+    let dir = isolated_cfg_dir("set-mode-picker");
+    cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--set", "mode=picker"])
+        .assert()
+        .success();
+    cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--get", "mode"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("picker"));
+}
+
+#[test]
+fn wallpaper_set_mode_invalid_errors() {
+    let dir = isolated_cfg_dir("set-mode-invalid");
+    let output = cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--set", "mode=weird"])
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("pinned") && stderr.contains("picker"),
+        "error should list valid modes; got: {}",
+        stderr
+    );
+}
+
+#[test]
+fn wallpaper_default_output_includes_mode_line() {
+    let dir = isolated_cfg_dir("default-mode-line");
+    let output = cfg()
+        .env("CFG_DIR", &dir)
+        .arg("wallpaper")
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let first_line = stdout.lines().next().unwrap_or("");
+    assert!(
+        first_line.starts_with("mode: "),
+        "first line should start with 'mode: '; got: {}",
+        first_line
+    );
+    assert!(
+        first_line.contains("pinned"),
+        "default mode should be pinned; got: {}",
+        first_line
+    );
+}
+
+#[test]
+fn wallpaper_get_mode_returns_default() {
+    let dir = isolated_cfg_dir("get-mode-default");
+    cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--get", "mode"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("pinned"));
+}
+
+#[test]
+fn wallpaper_apply_mode_picker_empty_source_dir_errors() {
+    let dir = isolated_cfg_dir("apply-picker-empty");
+    cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--set", "mode=picker"])
+        .assert()
+        .success();
+    let output = cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--apply"])
+        .output()
+        .unwrap();
+    assert!(!output.status.success());
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("wallpaper.mode=picker") && stderr.contains("source_dir"),
         "stderr was: {}",
         stderr
     );

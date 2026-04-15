@@ -34,6 +34,8 @@ pub struct FontConfig {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct WallpaperConfig {
+    #[serde(default = "default_wallpaper_mode")]
+    pub mode: String,
     #[serde(default = "default_wallpaper_path")]
     pub path: String,
     #[serde(default = "default_wallpaper_gravity")]
@@ -42,6 +44,10 @@ pub struct WallpaperConfig {
     pub cache_dir: String,
     #[serde(default = "default_wallpaper_source_dir")]
     pub source_dir: String,
+}
+
+fn default_wallpaper_mode() -> String {
+    "pinned".to_string()
 }
 
 fn default_wallpaper_path() -> String {
@@ -64,6 +70,7 @@ fn default_wallpaper_source_dir() -> String {
 impl Default for WallpaperConfig {
     fn default() -> Self {
         WallpaperConfig {
+            mode: default_wallpaper_mode(),
             path: default_wallpaper_path(),
             gravity: default_wallpaper_gravity(),
             cache_dir: default_wallpaper_cache_dir(),
@@ -140,6 +147,7 @@ impl Config {
             "fonts.mono_size" => Some(self.fonts.mono_size.to_string()),
             "fonts.sans" => Some(self.fonts.sans.clone()),
             "fonts.sans_size" => Some(self.fonts.sans_size.to_string()),
+            "wallpaper.mode" => Some(self.wallpaper.mode.clone()),
             "wallpaper.path" => Some(self.wallpaper.path.clone()),
             "wallpaper.gravity" => Some(self.wallpaper.gravity.clone()),
             "wallpaper.cache_dir" => Some(self.wallpaper.cache_dir.clone()),
@@ -199,6 +207,18 @@ impl Config {
                     .parse()
                     .map_err(|_| format!("Invalid number: {}", value))?;
                 Ok(())
+            }
+            "wallpaper.mode" => {
+                const VALID_MODES: &[&str] = &["pinned", "picker"];
+                if VALID_MODES.contains(&value) {
+                    self.wallpaper.mode = value.to_string();
+                    Ok(())
+                } else {
+                    Err(format!(
+                        "Invalid wallpaper.mode '{}'. Valid: 'pinned' or 'picker'",
+                        value
+                    ))
+                }
             }
             "wallpaper.path" => {
                 self.wallpaper.path = value.to_string();

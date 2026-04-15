@@ -52,17 +52,34 @@ pub(crate) fn resolve_cache_dir(cfg: &WallpaperConfig) -> String {
 pub fn apply(config: &Config, cfg_dir: &str) -> Result<(), String> {
     let cfg = &config.wallpaper;
 
-    // 1. Source path — pin mode (path) wins over picker mode (source_dir).
-    let source = if !cfg.path.trim().is_empty() {
-        expand_tilde(&cfg.path)
-    } else if !cfg.source_dir.trim().is_empty() {
-        picker::pick(config, cfg_dir)?
-    } else {
-        return Err(
-            "wallpaper path not set — run: cfg wallpaper --set path=<file> \
-             or --set source_dir=<directory>"
-                .to_string(),
-        );
+    // 1. Source path — dispatch on wallpaper.mode.
+    let source = match cfg.mode.as_str() {
+        "pinned" => {
+            if cfg.path.trim().is_empty() {
+                return Err(
+                    "wallpaper.mode=pinned but wallpaper.path is empty — \
+                     run: cfg wallpaper --set path=<file>"
+                        .to_string(),
+                );
+            }
+            expand_tilde(&cfg.path)
+        }
+        "picker" => {
+            if cfg.source_dir.trim().is_empty() {
+                return Err(
+                    "wallpaper.mode=picker but wallpaper.source_dir is empty — \
+                     run: cfg wallpaper --set source_dir=<directory>"
+                        .to_string(),
+                );
+            }
+            picker::pick(config, cfg_dir)?
+        }
+        other => {
+            return Err(format!(
+                "invalid wallpaper.mode: '{}' (expected 'pinned' or 'picker')",
+                other
+            ));
+        }
     };
 
     let meta = std::fs::metadata(&source).map_err(|_| {
@@ -147,6 +164,7 @@ mod tests {
     fn resolve_cache_dir_empty_falls_back_to_default() {
         std::env::set_var("HOME", "/home/test");
         let cfg = WallpaperConfig {
+            mode: "pinned".to_string(),
             path: String::new(),
             gravity: "Center".to_string(),
             cache_dir: String::new(),
@@ -159,6 +177,7 @@ mod tests {
     fn resolve_cache_dir_expands_tilde() {
         std::env::set_var("HOME", "/home/test");
         let cfg = WallpaperConfig {
+            mode: "pinned".to_string(),
             path: String::new(),
             gravity: "Center".to_string(),
             cache_dir: "~/scratch".to_string(),
@@ -177,18 +196,24 @@ mod tests {
     #[test]
     fn apply_empty_path_and_source_dir_errors() {
         let cfg = cfg_with_wallpaper(WallpaperConfig {
+            mode: "pinned".to_string(),
             path: String::new(),
             gravity: "Center".to_string(),
             cache_dir: "/tmp".to_string(),
             source_dir: String::new(),
         });
         let err = apply(&cfg, "/tmp").unwrap_err();
-        assert!(err.contains("wallpaper path not set"), "err = {}", err);
+        assert!(
+            err.contains("wallpaper.mode=pinned") && err.contains("wallpaper.path"),
+            "err = {}",
+            err
+        );
     }
 
     #[test]
     fn apply_missing_file_errors() {
         let cfg = cfg_with_wallpaper(WallpaperConfig {
+            mode: "pinned".to_string(),
             path: "/nonexistent/definitely/not/here.png".to_string(),
             gravity: "Center".to_string(),
             cache_dir: "/tmp".to_string(),
@@ -197,6 +222,40 @@ mod tests {
         let err = apply(&cfg, "/tmp").unwrap_err();
         assert!(
             err.contains("does not exist or is not a file"),
+            "err = {}",
+            err
+        );
+    }
+
+    #[test]
+    fn apply_mode_picker_empty_source_dir_errors() {
+        let cfg = cfg_with_wallpaper(WallpaperConfig {
+            mode: "picker".to_string(),
+            path: String::new(),
+            gravity: "Center".to_string(),
+            cache_dir: "/tmp".to_string(),
+            source_dir: String::new(),
+        });
+        let err = apply(&cfg, "/tmp").unwrap_err();
+        assert!(
+            err.contains("wallpaper.mode=picker") && err.contains("source_dir"),
+            "err = {}",
+            err
+        );
+    }
+
+    #[test]
+    fn apply_mode_invalid_errors() {
+        let cfg = cfg_with_wallpaper(WallpaperConfig {
+            mode: "bogus".to_string(),
+            path: "/some/file.png".to_string(),
+            gravity: "Center".to_string(),
+            cache_dir: "/tmp".to_string(),
+            source_dir: String::new(),
+        });
+        let err = apply(&cfg, "/tmp").unwrap_err();
+        assert!(
+            err.contains("invalid wallpaper.mode") && err.contains("bogus"),
             "err = {}",
             err
         );
