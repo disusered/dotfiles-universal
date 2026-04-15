@@ -75,7 +75,7 @@ pub struct WallpaperPicker {
     protocols: HashMap<PathBuf, StatefulProtocol>,
     decode_failures: HashMap<PathBuf, String>,
     original_path: String,
-    desktop_preview_active: bool,
+    previewed_path: Option<PathBuf>,
     should_apply: bool,
     saved: bool,
     config: Config,
@@ -167,7 +167,7 @@ impl WallpaperPicker {
             protocols: HashMap::new(),
             decode_failures: HashMap::new(),
             original_path,
-            desktop_preview_active: false,
+            previewed_path: None,
             should_apply: false,
             saved: false,
             config,
@@ -289,7 +289,7 @@ impl WallpaperPicker {
     fn title(&self) -> String {
         let count = self.filtered.len();
         let total = self.entries.len();
-        let preview_tag = if self.desktop_preview_active {
+        let preview_tag = if self.previewed_path.is_some() {
             " · DESKTOP PREVIEW"
         } else {
             ""
@@ -408,7 +408,7 @@ impl WallpaperPicker {
                 .map(|_| self.config.primary.as_str())
                 .unwrap_or("—");
             format!(
-                "↑/↓ nav  p scratchpad  d desktop  m match-only  / search  enter apply  q quit  · primary={}",
+                "↑/↓ nav  p preview  space scratchpad  r revert  m match-only  / search  enter apply  q quit  · primary={}",
                 primary
             )
         };
@@ -439,12 +439,11 @@ impl WallpaperPicker {
         self.flash = Some(format!("scratchpad: {}", path.display()));
     }
 
-    fn toggle_desktop_preview(&mut self, path: &Path) {
-        if self.desktop_preview_active {
-            self.revert_desktop_preview();
-        } else {
-            self.apply_desktop_preview(path);
+    fn preview_wallpaper(&mut self, path: &Path) {
+        if self.previewed_path.as_deref() == Some(path) {
+            return;
         }
+        self.apply_desktop_preview(path);
     }
 
     fn apply_desktop_preview(&mut self, path: &Path) {
@@ -452,8 +451,8 @@ impl WallpaperPicker {
         tmp.wallpaper.path = path.to_string_lossy().into_owned();
         match wallpaper::apply(&tmp, &self.cfg_dir) {
             Ok(()) => {
-                self.desktop_preview_active = true;
-                self.flash = Some("desktop preview: press d to revert, enter to keep".into());
+                self.previewed_path = Some(path.to_path_buf());
+                self.flash = Some("preview: r revert, esc/q exit, enter keep".into());
             }
             Err(e) => {
                 self.flash = Some(format!("preview failed: {}", e));
@@ -462,13 +461,13 @@ impl WallpaperPicker {
     }
 
     fn revert_desktop_preview(&mut self) {
-        if !self.desktop_preview_active {
+        if self.previewed_path.is_none() {
             return;
         }
         let mut revert = self.config.clone();
         revert.wallpaper.path = self.original_path.clone();
         let _ = wallpaper::apply(&revert, &self.cfg_dir);
-        self.desktop_preview_active = false;
+        self.previewed_path = None;
         self.flash = Some("reverted".into());
     }
 
@@ -521,7 +520,7 @@ impl WallpaperPicker {
                 self.update_filter();
             }
             (Mode::Normal, KeyCode::Char('q') | KeyCode::Esc) => {
-                if self.desktop_preview_active {
+                if self.previewed_path.is_some() {
                     self.revert_desktop_preview();
                 }
                 return Ok(false);
@@ -545,13 +544,16 @@ impl WallpaperPicker {
             }
             (Mode::Normal, KeyCode::Char('p')) => {
                 if let Some(p) = self.selected_path().map(|p| p.to_path_buf()) {
+                    self.preview_wallpaper(&p);
+                }
+            }
+            (Mode::Normal, KeyCode::Char(' ')) => {
+                if let Some(p) = self.selected_path().map(|p| p.to_path_buf()) {
                     self.open_scratchpad(&p);
                 }
             }
-            (Mode::Normal, KeyCode::Char('d')) => {
-                if let Some(p) = self.selected_path().map(|p| p.to_path_buf()) {
-                    self.toggle_desktop_preview(&p);
-                }
+            (Mode::Normal, KeyCode::Char('r')) => {
+                self.revert_desktop_preview();
             }
             (Mode::Normal, KeyCode::Enter) => {
                 if let Some(p) = self.selected_path().map(|p| p.to_path_buf()) {
@@ -590,7 +592,7 @@ pub fn run(
     let outcome = event_loop(&mut terminal, &mut picker);
     let _ = restore();
 
-    if picker.desktop_preview_active {
+    if picker.previewed_path.is_some() {
         picker.revert_desktop_preview();
     }
     match outcome {
