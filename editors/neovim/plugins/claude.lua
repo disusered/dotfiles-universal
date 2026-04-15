@@ -12,108 +12,44 @@ local function detect_terminal()
   return "wezterm"
 end
 
--- Create Kitty terminal provider with multi-window safety
+-- Create Kitty terminal provider backed by hyprspace's `ai` workspace.
+--
+-- `hyprspace toggle ai` spawns the kitty modal when hidden and hides it
+-- when visible. env_table (CLAUDE_CODE_SSE_PORT, ENABLE_IDE_INTEGRATION)
+-- is passed via jobstart's env option so hyprspace inherits the values and
+-- re-exports them to the claude child per the workspace's pass_env
+-- whitelist. That's how <leader>ac claudes auto-connect to this nvim's
+-- IDE server without a manual /ide.
 local function create_kitty_provider()
   local provider = {}
-  local modal_socket = nil
 
-  provider.setup = function(config)
-    -- Initialize state tracking
+  provider.setup = function(_config)
     vim.g.claudecode_kitty_window_id = nil
-    
-    -- Determine the expected socket for the modal associated with this Kitty instance
-    -- We assume the current Kitty instance is the parent
-    -- Try to find our own PID or the parent kitty PID
-    local kitty_pid = vim.fn.getpid() -- Start with nvim pid
-    -- Traverse up to find kitty? simpler: query kitty @ ls and find self
-    local ls_cmd = "kitty @ ls"
-    local ls_result = vim.fn.system(ls_cmd)
-    local ok, data = pcall(vim.fn.json_decode, ls_result)
-    
-    if ok and data then
-      -- The ls output is a list of OS Windows. 
-      -- We need the PID of the Kitty *process* that owns these windows.
-      -- Actually, Hyprclaude uses the PID of the focused window from Hyprland.
-      -- Which is usually the OS Window PID or the Kitty Process PID?
-      -- Hyprland 'pid' is the process ID of the window owner.
-      -- Kitty runs as a single process for all windows (usually) or separate?
-      -- If single process, we just need that PID.
-      -- 'kitty @ ls' doesn't explicitly give the main process PID easily at top level?
-      -- Wait, hyprclaude uses `hyprctl activewindow`.
-      -- We can assume the socket name will be `unix:@claude-<KITTY_PID>`.
-      -- We can guess KITTY_PID from the `KITTY_PID` env var if set, or query it.
-    end
-    
-    -- Use filesystem socket (matches hyprclaude per-Neovim pattern)
-    -- Kitty appends its own PID, so we glob for it
-    local nvim_pid = vim.fn.getpid()
-    local socket_pattern = "/tmp/claude-nvim-" .. nvim_pid .. ".sock-*"
-    local sockets = vim.fn.glob(socket_pattern, false, true)
-    if #sockets > 0 then
-      modal_socket = "unix:" .. sockets[1]
-    else
-      -- Fallback: try without the Kitty PID suffix (in case behavior changes)
-      modal_socket = "unix:/tmp/claude-nvim-" .. nvim_pid .. ".sock"
-    end
   end
 
-  -- Helper to execute commands against the modal's socket
-  local function exec_modal(cmd)
-    if not modal_socket then return nil end
-    return vim.fn.system("kitty @ --to " .. modal_socket .. " " .. cmd)
+  -- `open` forces spawn-on-miss even when ai workspace has toggle_spawns=false
+  -- (which is the case here — SUPER+grave is intentionally focus-only).
+  -- `toggle` is the plain visibility toggle for dismissal.
+  local function hyprspace(subcommand, env_table)
+    vim.fn.jobstart({ "hyprspace", subcommand, "ai" }, {
+      env = env_table or {},
+      detach = true,
+    })
   end
 
-  -- Check if the modal exists and is reachable
-  local function find_modal_id()
-    if not modal_socket then return nil end
-    local ls_cmd = "ls" -- kitty @ ls
-    local result = exec_modal(ls_cmd)
-    
-    -- If the socket doesn't exist, result will be an error
-    if not result or result:match("Connection refused") or result:match("Failed to connect") then
-        return nil
-    end
-
-    -- If connected, we just need ANY window ID from it (it should only have one tab/window)
-    local ok, data = pcall(vim.fn.json_decode, result)
-    if ok and data and #data > 0 then
-        -- Return the id of the first window in the first tab
-        return data[1].tabs[1].windows[1].id
-    end
-    return nil
-  end
-
-  provider.open = function(cmd_string, env_table, effective_config, focus)
-    -- Delegate launch/toggle to the script
-    vim.fn.system("bash ~/.local/bin/hyprclaude")
-
-    -- Wait for socket to become available
-    vim.wait(2000, function() 
-        return find_modal_id() ~= nil
-    end, 100)
-    
-    local window_id = find_modal_id()
-    if window_id then
-      vim.g.claudecode_kitty_window_id = window_id
-    end
+  provider.open = function(_cmd_string, env_table, _effective_config, _focus)
+    hyprspace("open", env_table)
+    vim.g.claudecode_kitty_window_id = true
   end
 
   provider.close = function()
-    -- We can close the window via the socket
-    local window_id = vim.g.claudecode_kitty_window_id
-    if window_id and modal_socket then
-      exec_modal("close-window --match id:" .. window_id)
-      vim.g.claudecode_kitty_window_id = nil
-    end
+    hyprspace("toggle", nil)
+    vim.g.claudecode_kitty_window_id = nil
   end
 
-  provider.simple_toggle = function(cmd_string, env_table, effective_config)
-    vim.fn.system("bash ~/.local/bin/hyprclaude")
-    -- Update ID tracking
-    local window_id = find_modal_id()
-    if window_id then
-        vim.g.claudecode_kitty_window_id = window_id
-    end
+  provider.simple_toggle = function(_cmd_string, env_table, _effective_config)
+    hyprspace("open", env_table)
+    vim.g.claudecode_kitty_window_id = true
   end
 
   provider.focus_toggle = function(cmd_string, env_table, effective_config)
@@ -125,8 +61,7 @@ local function create_kitty_provider()
   end
 
   provider.is_available = function()
-    -- We need to ensure we can identify the target socket
-    return vim.env.KITTY_LISTEN_ON ~= nil and vim.env.KITTY_PID ~= nil
+    return vim.fn.executable("hyprspace") == 1
   end
 
   return provider
@@ -351,9 +286,29 @@ return {
         desc = "Add file",
         ft = { "NvimTree", "neo-tree", "oil", "minifiles" },
       },
-      -- Diff management
-      { "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
-      { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
+      -- Diff management. After accept/deny, hide the hyprspace ai modal if
+      -- this nvim spawned it: the user wants focus back on the diff here,
+      -- not on claude.
+      {
+        "<leader>aa",
+        function()
+          vim.cmd("ClaudeCodeDiffAccept")
+          if vim.g.claudecode_kitty_window_id then
+            vim.fn.jobstart({ "hyprspace", "toggle", "ai" }, { detach = true })
+          end
+        end,
+        desc = "Accept diff",
+      },
+      {
+        "<leader>ad",
+        function()
+          vim.cmd("ClaudeCodeDiffDeny")
+          if vim.g.claudecode_kitty_window_id then
+            vim.fn.jobstart({ "hyprspace", "toggle", "ai" }, { detach = true })
+          end
+        end,
+        desc = "Deny diff",
+      },
     },
   },
   {
