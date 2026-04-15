@@ -3,6 +3,15 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       sudo pacman -S --noconfirm --needed android-studio
       yay -S --noconfirm --needed watchman-bin
+
+      if ! pacman -Qi android-udev &>/dev/null; then
+        yay -S --noconfirm --needed android-udev
+        sudo gpasswd -a $USER adbusers
+        sudo udevadm control --reload
+        sudo udevadm trigger
+      fi
+    depends:
+      - /tools/yay
   links:
     android.zsh: {{ dirs.base.config }}/zsh/0800_android.zsh
     android-studio.desktop: {{ dirs.base.data }}/applications/android-studio.desktop
