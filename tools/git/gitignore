@@ -27,3 +27,7 @@ AGENTS.md
 # Dolt database files (added by bd init)
 .dolt/
 *.db
+
+# skills
+skills-lock.json
+.agents/skills
