@@ -242,6 +242,38 @@ fn format_progress_line(n: usize, total: usize, path: &str) -> String {
     format!("[{}/{}] analyzing {}", n, total, basename)
 }
 
+/// Analyze every image in `config.wallpaper.source_dir` whose tag cache entry
+/// is missing or stale. No-op when source_dir is empty, unreadable, or fully
+/// cached. Progress goes to stderr when it's a TTY (same convention as
+/// [`pick`]). Returns `Ok(n)` where `n` is the number of newly-analyzed files.
+pub fn prewarm_cache(config: &Config) -> Result<usize, String> {
+    let source_dir = config.wallpaper.source_dir.trim();
+    if source_dir.is_empty() {
+        return Ok(0);
+    }
+    let expanded = super::expand_tilde(source_dir);
+    let files = match enumerate_wallpapers(&expanded) {
+        Ok(f) => f,
+        Err(_) => return Ok(0), // dir missing/unreadable: nothing to warm
+    };
+    if files.is_empty() {
+        return Ok(0);
+    }
+    let cache_dir = super::resolve_cache_dir(&config.wallpaper);
+    let tags_path = format!("{}/tags.json", cache_dir);
+    let cache = TagCache::load(&tags_path)?;
+    let to_analyze: Vec<String> = files
+        .into_iter()
+        .filter(|p| cache.get_fresh(p).is_none())
+        .collect();
+    if to_analyze.is_empty() {
+        return Ok(0);
+    }
+    let n = to_analyze.len();
+    analyze_and_cache(to_analyze, cache, &tags_path)?;
+    Ok(n)
+}
+
 fn enumerate_wallpapers(dir: &str) -> Result<Vec<String>, String> {
     let entries = fs::read_dir(dir)
         .map_err(|e| format!("failed to read source_dir '{}': {}", dir, e))?;

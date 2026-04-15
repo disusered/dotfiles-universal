@@ -116,6 +116,10 @@ enum Command {
         /// After --set, apply wallpaper. Standalone: re-apply current wallpaper.
         #[arg(long, conflicts_with_all = ["interactive", "scratchpad"])]
         apply: bool,
+        /// Re-analyze images in source_dir to (re)build the color-tag cache.
+        /// Combines with --apply to rescan then apply.
+        #[arg(long, group = "mode")]
+        rescan: bool,
         /// Interactive picker mode
         #[arg(short, long, group = "mode")]
         interactive: bool,
@@ -722,7 +726,7 @@ fn main() {
                 println!("sans_size={}", config.fonts.sans_size);
             }
         }
-        Command::Wallpaper { get, set, apply, interactive, scratchpad } => {
+        Command::Wallpaper { get, set, apply, rescan, interactive, scratchpad } => {
             let cfg_dir = get_cfg_dir();
             let config_path = format!("{}/config.toml", cfg_dir);
 
@@ -824,6 +828,28 @@ fn main() {
                             "Unknown key: {} (valid: mode, path, gravity, cache_dir, source_dir)",
                             key
                         );
+                        std::process::exit(1);
+                    }
+                }
+            } else if rescan {
+                if config.wallpaper.source_dir.trim().is_empty() {
+                    eprintln!(
+                        "Error: wallpaper.source_dir not set; \
+                         run: cfg wallpaper --set source_dir=<dir>"
+                    );
+                    std::process::exit(1);
+                }
+                match wallpaper::picker::prewarm_cache(&config) {
+                    Ok(0) => println!("nothing to analyze (cache already current)"),
+                    Ok(n) => println!("analyzed {} wallpapers", n),
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                        std::process::exit(1);
+                    }
+                }
+                if apply {
+                    if let Err(e) = wallpaper::apply(&config, &cfg_dir) {
+                        eprintln!("Error: {}", e);
                         std::process::exit(1);
                     }
                 }

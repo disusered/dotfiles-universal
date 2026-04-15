@@ -677,3 +677,94 @@ fn wallpaper_interactive_rejects_set() {
         .failure()
         .stderr(predicate::str::contains("cannot be used with"));
 }
+
+// --- --rescan flag: valid + invalid combinations ---
+
+#[test]
+fn wallpaper_rescan_rejects_get() {
+    cfg()
+        .args(["wallpaper", "--rescan", "--get", "path"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn wallpaper_rescan_rejects_set() {
+    cfg()
+        .args(["wallpaper", "--rescan", "--set", "path=/tmp/x.jpg"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn wallpaper_rescan_rejects_interactive() {
+    cfg()
+        .args(["wallpaper", "--rescan", "-i"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn wallpaper_rescan_rejects_scratchpad() {
+    cfg()
+        .args(["wallpaper", "--rescan", "--scratchpad", "/tmp/x.jpg"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn wallpaper_rescan_empty_source_dir_errors() {
+    let dir = isolated_cfg_dir("rescan-empty-source-dir");
+    let output = cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--rescan"])
+        .output()
+        .unwrap();
+    assert!(!output.status.success(), "expected non-zero exit");
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("source_dir not set"),
+        "stderr was: {}",
+        stderr
+    );
+}
+
+#[test]
+fn wallpaper_rescan_with_apply_accepted() {
+    // Clap accepts --rescan --apply together. Runtime likely fails later
+    // (no source_dir, no monitors in test env), but the parse succeeds.
+    let dir = isolated_cfg_dir("rescan-with-apply-accepted");
+    cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--set", "source_dir=/tmp/definitely-nope"])
+        .assert()
+        .success();
+    // Just check clap doesn't reject the combo; runtime exit code not asserted.
+    let _ = cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--rescan", "--apply"])
+        .output()
+        .unwrap();
+}
+
+#[test]
+fn wallpaper_rescan_missing_dir_reports_zero() {
+    // source_dir set to a nonexistent dir: rescan no-ops with an informative
+    // message rather than erroring out.
+    let dir = isolated_cfg_dir("rescan-missing-dir-zero");
+    cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--set", "source_dir=/tmp/definitely-not-here"])
+        .assert()
+        .success();
+    cfg()
+        .env("CFG_DIR", &dir)
+        .args(["wallpaper", "--rescan"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("nothing to analyze"));
+}

@@ -10,7 +10,7 @@ use crate::config::{Config, WallpaperConfig};
 
 /// Expand a leading `~` or `~/` to `$HOME` in `s`.
 /// Returns `s` unchanged if HOME is unset or the path doesn't start with `~`.
-fn expand_tilde(s: &str) -> String {
+pub(crate) fn expand_tilde(s: &str) -> String {
     if s == "~" {
         if let Ok(home) = std::env::var("HOME") {
             return home;
