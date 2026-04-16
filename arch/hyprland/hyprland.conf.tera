@@ -198,6 +198,10 @@ bind = $mainMod SHIFT, L, movewindow, r
 bind = $mainMod SHIFT, K, movewindow, u
 bind = $mainMod SHIFT, J, movewindow, d
 
+# Eject focused window from a hyprspace special workspace onto the
+# monitor's regular active workspace. No-op on non-special workspaces.
+bind = $mainMod SHIFT, ESCAPE, exec, app2unit -- ~/.local/bin/hyprspace eject
+
 bind = $mainMod ALT, H, resizeactive, -40 0
 bind = $mainMod ALT, L, resizeactive, 40 0
 bind = $mainMod ALT, K, resizeactive, 0 -40

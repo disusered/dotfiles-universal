@@ -1,10 +1,12 @@
 mod config;
 mod context;
+mod eject;
 mod hyprctl;
 mod lock;
 mod notify;
 mod nvim_parent;
 mod scratchpads;
+mod watch;
 mod workspace;
 
 use clap::{Parser, Subcommand};
@@ -44,6 +46,12 @@ enum Command {
     List,
     /// Dismiss all pyprland scratchpads
     DismissScratchpads,
+    /// Long-running watcher: auto-eject stray windows that land on
+    /// hyprspace-managed special workspaces with a non-matching class.
+    Watch,
+    /// Eject the focused window from its special workspace to the
+    /// monitor's regular active workspace.
+    Eject,
 }
 
 fn main() {
@@ -103,6 +111,26 @@ fn main() {
                 std::process::exit(1);
             });
             scratchpads::dismiss_all(&config.scratchpads.names);
+        }
+        Command::Watch => {
+            let config = config::Config::load().unwrap_or_else(|e| {
+                eprintln!("hyprspace: {}", e);
+                std::process::exit(1);
+            });
+            if let Err(e) = watch::run(&config) {
+                eprintln!("hyprspace watch: {}", e);
+                std::process::exit(1);
+            }
+        }
+        Command::Eject => {
+            let config = config::Config::load().unwrap_or_else(|e| {
+                eprintln!("hyprspace: {}", e);
+                std::process::exit(1);
+            });
+            if let Err(e) = eject::run(&config) {
+                notify::notify(notify::Urgency::Critical, "hyprspace", &e);
+                std::process::exit(1);
+            }
         }
     }
 }
