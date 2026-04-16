@@ -73,5 +73,7 @@
     "pyright-lsp@claude-plugins-official": true,
     "csharp-lsp@claude-plugins-official": true
   },
-  "skipDangerousModePermissionPrompt": false
+  "effortLevel": "xhigh",
+  "skipDangerousModePermissionPrompt": false,
+  "skipAutoPermissionPrompt": true
 }
