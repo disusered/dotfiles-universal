@@ -21,7 +21,7 @@ require("lazy").setup({
       "LazyVim/LazyVim",
       import = "lazyvim.plugins",
       opts = {
-        colorscheme = "catppuccin", -- set colorscheme to catppuccin
+        colorscheme = "catppuccin-mocha",
       },
     },
     -- add coding/ide features
@@ -69,7 +69,7 @@ require("lazy").setup({
     keymaps = true, -- lazyvim.config.keymaps
   },
   ui = { border = "rounded" },
-  install = { colorscheme = { "catppuccin" } },
+  install = { colorscheme = { "catppuccin-mocha" } },
   checker = {
     enabled = true, -- check for plugin updates periodically
     notify = false, -- notify on update
