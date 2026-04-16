@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::process::Command as ProcessCommand;
 use std::thread;
 use std::time::{Duration, Instant};
@@ -272,6 +273,15 @@ fn spawn_and_wait(
 
     let cmd = interpolate_command(&ws.spawn_command, &title, context.unwrap_or(""));
 
+    // Snapshot existing windows for this workspace before spawning so the
+    // post-spawn poll can pick the address that's NEW. Multi-instance
+    // workspaces (ai) reuse class+title across tabs of the same context,
+    // so `find`-by-class+title would otherwise return the pre-existing
+    // window and focus would land on the wrong tab.
+    let pre_spawn_addrs: HashSet<String> = get_clients()
+        .map(|clients| snapshot_matching_addrs(&clients, ws))
+        .unwrap_or_default();
+
     // Show workspace before spawning
     dispatch_toggle_special(workspace_name)?;
 
@@ -295,15 +305,8 @@ fn spawn_and_wait(
     while Instant::now() < deadline {
         thread::sleep(Duration::from_millis(100));
         if let Ok(clients) = get_clients() {
-            let found = if !title.is_empty() {
-                find_window_by_class_and_title(&clients, &ws.window_class, &title)
-            } else {
-                hyprctl::find_windows_by_class(&clients, &ws.window_class)
-                    .into_iter()
-                    .next()
-            };
-            if let Some(client) = found {
-                let _ = dispatch_focus_window(&client.address);
+            if let Some(addr) = pick_new_window(&clients, ws, &title, &pre_spawn_addrs) {
+                let _ = dispatch_focus_window(&addr);
                 return Ok(());
             }
         }
@@ -315,6 +318,38 @@ fn spawn_and_wait(
         &format!("Spawn timeout for {}", workspace_name),
     );
     Ok(())
+}
+
+// Pick the first client matching the workspace's class set (primary +
+// extras) whose address is not in `pre_spawn`. When `title` is non-empty,
+// restrict to clients whose `initial_title` matches exactly. Used by
+// `spawn_and_wait` to identify the window we just spawned — matching on
+// address excludes pre-existing windows that share the same class+title
+// (e.g. a second Claude launched from the same cwd as an existing one).
+fn pick_new_window(
+    clients: &[Client],
+    ws: &WorkspaceConfig,
+    title: &str,
+    pre_spawn: &HashSet<String>,
+) -> Option<String> {
+    clients
+        .iter()
+        .filter(|c| {
+            c.class == ws.window_class || ws.extra_classes.iter().any(|e| e == &c.class)
+        })
+        .filter(|c| title.is_empty() || c.initial_title == title)
+        .map(|c| c.address.clone())
+        .find(|addr| !pre_spawn.contains(addr))
+}
+
+fn snapshot_matching_addrs(clients: &[Client], ws: &WorkspaceConfig) -> HashSet<String> {
+    clients
+        .iter()
+        .filter(|c| {
+            c.class == ws.window_class || ws.extra_classes.iter().any(|e| e == &c.class)
+        })
+        .map(|c| c.address.clone())
+        .collect()
 }
 
 fn find_any_window<'a>(clients: &'a [Client], ws: &WorkspaceConfig) -> Option<&'a Client> {
@@ -442,5 +477,121 @@ mod tests {
     fn build_context_title_empty_prefix() {
         let title = build_context_title(Some(""), "/home/user/project");
         assert_eq!(title, "/home/user/project");
+    }
+
+    use crate::hyprctl::WorkspaceRef;
+
+    fn make_client(address: &str, class: &str, title: &str) -> Client {
+        Client {
+            address: address.to_string(),
+            class: class.to_string(),
+            initial_title: title.to_string(),
+            workspace: WorkspaceRef {
+                name: "special:ai".to_string(),
+            },
+        }
+    }
+
+    fn ai_workspace_config() -> WorkspaceConfig {
+        WorkspaceConfig {
+            window_class: "claude_modal".to_string(),
+            window_title: None,
+            title_prefix: Some("claude: ".to_string()),
+            context_type: ContextType::Cwd,
+            multi_instance: true,
+            dismiss_scratchpads: false,
+            spawn_command: vec!["kitty".to_string()],
+            extra_classes: vec!["chrome-gemini.google.com__-Default".to_string()],
+            spawn_via_desktop: false,
+            toggle_spawns: false,
+            modal_tag: Some("ai".to_string()),
+            inject_parent_nvim: false,
+            pass_env: vec![],
+        }
+    }
+
+    #[test]
+    fn pick_new_window_returns_new_when_title_matches_multiple() {
+        let ws = ai_workspace_config();
+        let clients = vec![
+            make_client("0x1", "claude_modal", "claude: /home/user"),
+            make_client("0x2", "claude_modal", "claude: /home/user"),
+        ];
+        let pre: HashSet<String> = ["0x1".to_string()].into_iter().collect();
+        assert_eq!(
+            pick_new_window(&clients, &ws, "claude: /home/user", &pre),
+            Some("0x2".to_string()),
+        );
+    }
+
+    #[test]
+    fn pick_new_window_returns_none_when_all_pre_existing() {
+        let ws = ai_workspace_config();
+        let clients = vec![
+            make_client("0x1", "claude_modal", "claude: /home/user"),
+            make_client("0x2", "claude_modal", "claude: /home/user"),
+        ];
+        let pre: HashSet<String> =
+            ["0x1".to_string(), "0x2".to_string()].into_iter().collect();
+        assert_eq!(pick_new_window(&clients, &ws, "claude: /home/user", &pre), None);
+    }
+
+    #[test]
+    fn pick_new_window_ignores_non_matching_class() {
+        let ws = ai_workspace_config();
+        let clients = vec![make_client("0x9", "kitty", "claude: /home/user")];
+        let pre: HashSet<String> = HashSet::new();
+        assert_eq!(pick_new_window(&clients, &ws, "claude: /home/user", &pre), None);
+    }
+
+    #[test]
+    fn pick_new_window_ignores_non_matching_title() {
+        let ws = ai_workspace_config();
+        let clients = vec![make_client("0x1", "claude_modal", "claude: /other")];
+        let pre: HashSet<String> = HashSet::new();
+        assert_eq!(pick_new_window(&clients, &ws, "claude: /home/user", &pre), None);
+    }
+
+    #[test]
+    fn pick_new_window_matches_extra_classes() {
+        let ws = ai_workspace_config();
+        let clients = vec![make_client(
+            "0x3",
+            "chrome-gemini.google.com__-Default",
+            "Gemini",
+        )];
+        let pre: HashSet<String> = HashSet::new();
+        assert_eq!(
+            pick_new_window(&clients, &ws, "", &pre),
+            Some("0x3".to_string()),
+        );
+    }
+
+    #[test]
+    fn pick_new_window_empty_title_matches_any_title() {
+        let ws = ai_workspace_config();
+        let clients = vec![
+            make_client("0x1", "claude_modal", "claude: /a"),
+            make_client("0x2", "claude_modal", "claude: /b"),
+        ];
+        let pre: HashSet<String> = ["0x1".to_string()].into_iter().collect();
+        assert_eq!(
+            pick_new_window(&clients, &ws, "", &pre),
+            Some("0x2".to_string()),
+        );
+    }
+
+    #[test]
+    fn snapshot_matching_addrs_includes_primary_and_extras() {
+        let ws = ai_workspace_config();
+        let clients = vec![
+            make_client("0x1", "claude_modal", "claude: /a"),
+            make_client("0x2", "kitty", "terminal"),
+            make_client("0x3", "chrome-gemini.google.com__-Default", "Gemini"),
+        ];
+        let snap = snapshot_matching_addrs(&clients, &ws);
+        assert!(snap.contains("0x1"));
+        assert!(snap.contains("0x3"));
+        assert!(!snap.contains("0x2"));
     }
 }
