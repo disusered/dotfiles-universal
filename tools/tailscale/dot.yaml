@@ -6,6 +6,13 @@ linux[whoami.distro^="Arch"]:
       fi
       sudo systemctl enable --now tailscaled.service
       sudo tailscale set --operator="$USER"
+      sudo mkdir -p /etc/NetworkManager/conf.d
+      sudo ln -sf ~/.dotfiles/tools/tailscale/network-manager.conf /etc/NetworkManager/conf.d/99-tailscale.conf
+      sudo ln -sf ~/.dotfiles/tools/tailscale/default-tailscaled /etc/default/tailscaled
+      if systemctl is-active --quiet NetworkManager.service; then
+        sudo systemctl restart NetworkManager.service
+      fi
+      sudo systemctl restart tailscaled.service
       if [ ! -f ~/.config/systemd/user/tailscale-systray.service ]; then
         tailscale configure systray --enable-startup=systemd
       fi

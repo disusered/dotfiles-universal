@@ -1,0 +1,11 @@
+# Managed by ~/.dotfiles/tools/tailscale. Mirrors pacman defaults plus overrides.
+# Remote nodes are automatically informed about the port; set PORT only if you need
+# a specific external firewall hole.
+PORT="41641"
+
+# Extra flags passed to tailscaled.
+FLAGS=""
+
+# Opt out of uploading tailscaled logs to Tailscale's servers.
+# Forfeits official technical support. See https://tailscale.com/kb/1011/log-mesh-traffic
+TS_NO_LOGS_NO_SUPPORT=true
