@@ -1,7 +1,13 @@
 use std::collections::HashMap;
+use std::collections::HashSet;
+use std::path::PathBuf;
 use std::process::Command;
 use std::time::{Duration, Instant};
 use serde::Deserialize;
+
+use crate::config::Config;
+use crate::palette::Palette;
+use crate::render::{build_context, render_to_file};
 
 pub const DEFAULT_RELOAD_TIMEOUT: Duration = Duration::from_secs(5);
 
@@ -139,6 +145,110 @@ pub fn rotz_link(module: &str) -> Result<(), String> {
     } else {
         Err(format!("rotz link failed with exit code: {:?}", status.code()))
     }
+}
+
+/// Result of rendering a single template.
+pub struct RenderResult {
+    pub name: String,
+    pub output: Result<PathBuf, String>,
+}
+
+/// Result of running a reload group.
+pub struct ReloadResult {
+    pub names: Vec<String>,
+    pub result: Result<(), String>,
+}
+
+/// Full result of an update operation (render + link + reload).
+pub struct UpdateResult {
+    pub rendered: Vec<RenderResult>,
+    pub reloaded: Vec<ReloadResult>,
+}
+
+/// Run a full update: render templates, symlink, and reload apps.
+/// Returns structured results instead of printing to stdout.
+pub fn run_update(cfg_dir: &str, dotfiles_dir: &str, names: &[String]) -> Result<UpdateResult, String> {
+    let config = Config::load(&format!("{}/config.toml", cfg_dir)).unwrap_or_default();
+    let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
+    let palette = Palette::load(&palette_path)
+        .map_err(|e| format!("Error loading palette: {}", e))?;
+
+    let context = build_context(&config, &palette);
+
+    let templates_path = format!("{}/templates.toml", cfg_dir);
+    let templates = TemplatesFile::load(&templates_path)?;
+
+    let targets: Vec<&String> = if names.is_empty() {
+        templates.names()
+    } else {
+        for name in names {
+            if templates.get(name).is_none() {
+                return Err(format!("Unknown template: {}", name));
+            }
+        }
+        names.iter().collect()
+    };
+
+    let mut rendered_names: Vec<String> = Vec::new();
+    let mut render_results: Vec<RenderResult> = Vec::new();
+    let mut linked: HashSet<String> = HashSet::new();
+
+    for name in &targets {
+        let tpl_config = templates.get(name).unwrap();
+        let template_path = PathBuf::from(format!("{}/{}", dotfiles_dir, tpl_config.path));
+
+        if !template_path.exists() {
+            render_results.push(RenderResult {
+                name: (*name).clone(),
+                output: Err(format!("template not found: {}", template_path.display())),
+            });
+            continue;
+        }
+
+        match render_to_file(&template_path, &context, false) {
+            Ok(output) => {
+                rendered_names.push((*name).clone());
+
+                if let Some(link_module) = &tpl_config.link {
+                    if !linked.contains(link_module) {
+                        let _ = rotz_link(link_module);
+                        linked.insert(link_module.clone());
+                    }
+                }
+
+                render_results.push(RenderResult {
+                    name: (*name).clone(),
+                    output: Ok(output),
+                });
+            }
+            Err(e) => {
+                render_results.push(RenderResult {
+                    name: (*name).clone(),
+                    output: Err(e),
+                });
+            }
+        }
+    }
+
+    let mut reload_results: Vec<ReloadResult> = Vec::new();
+    if !rendered_names.is_empty() {
+        for group in coalesce_reloads(&rendered_names, &templates) {
+            let result = if group.background {
+                reload_app_background(group.cmd)
+            } else {
+                reload_app(group.cmd, DEFAULT_RELOAD_TIMEOUT)
+            };
+            reload_results.push(ReloadResult {
+                names: group.names.iter().map(|s| s.to_string()).collect(),
+                result,
+            });
+        }
+    }
+
+    Ok(UpdateResult {
+        rendered: render_results,
+        reloaded: reload_results,
+    })
 }
 
 #[cfg(test)]

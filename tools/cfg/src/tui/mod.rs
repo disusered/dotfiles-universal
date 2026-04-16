@@ -2,6 +2,7 @@ pub mod app;
 pub mod clipboard;
 pub mod colors;
 pub mod fonts;
+pub mod update;
 pub mod wallpapers;
 mod widgets;
 

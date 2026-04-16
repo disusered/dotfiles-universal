@@ -13,8 +13,7 @@ use clap::{Parser, Subcommand};
 use color::format_color;
 use config::Config;
 use palette::Palette;
-use render::{build_context, render_to_file};
-use templates::{coalesce_reloads, reload_app, reload_app_background, rotz_link, TemplatesFile, DEFAULT_RELOAD_TIMEOUT};
+use templates::{run_update, TemplatesFile};
 
 #[derive(Parser)]
 #[command(name = "cfg")]
@@ -149,99 +148,70 @@ fn get_dotfiles_dir() -> String {
 
 /// Update apps: render + symlink + reload
 fn update_apps(cfg_dir: &str, dotfiles_dir: &str, app_names: &[String], dry_run: bool) {
-    // Load config and palette
-    let config = Config::load(&format!("{}/config.toml", cfg_dir)).unwrap_or_default();
-    let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
-    let palette = match Palette::load(&palette_path) {
-        Ok(p) => p,
-        Err(e) => {
-            eprintln!("Error loading palette: {}", e);
-            std::process::exit(1);
-        }
-    };
-
-    let context = build_context(&config, &palette);
-
-    // Load templates registry
-    let templates_path = format!("{}/templates.toml", cfg_dir);
-    let templates = match TemplatesFile::load(&templates_path) {
-        Ok(t) => t,
-        Err(e) => {
-            eprintln!("Error loading templates.toml: {}", e);
-            std::process::exit(1);
-        }
-    };
-
-    // Determine which apps to update
-    let targets: Vec<&String> = if app_names.is_empty() {
-        templates.names()
-    } else {
-        // Validate all app names exist
-        for name in app_names {
-            if templates.get(name).is_none() {
-                eprintln!("Unknown: {}", name);
-                eprintln!("Available: {}", templates.names().iter().map(|s| s.as_str()).collect::<Vec<_>>().join(", "));
+    if dry_run {
+        // Dry-run still uses direct rendering for preview output
+        let config = Config::load(&format!("{}/config.toml", cfg_dir)).unwrap_or_default();
+        let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
+        let palette = match Palette::load(&palette_path) {
+            Ok(p) => p,
+            Err(e) => {
+                eprintln!("Error loading palette: {}", e);
                 std::process::exit(1);
             }
+        };
+        let context = render::build_context(&config, &palette);
+        let templates_path = format!("{}/templates.toml", cfg_dir);
+        let templates = match TemplatesFile::load(&templates_path) {
+            Ok(t) => t,
+            Err(e) => {
+                eprintln!("Error loading templates.toml: {}", e);
+                std::process::exit(1);
+            }
+        };
+        let targets: Vec<&String> = if app_names.is_empty() {
+            templates.names()
+        } else {
+            app_names.iter().collect()
+        };
+        for name in &targets {
+            let tpl_config = match templates.get(name) {
+                Some(c) => c,
+                None => {
+                    eprintln!("Unknown: {}", name);
+                    std::process::exit(1);
+                }
+            };
+            let template_path = PathBuf::from(format!("{}/{}", dotfiles_dir, tpl_config.path));
+            match render::render_to_file(&template_path, &context, true) {
+                Ok(output) => println!("[dry-run] {}  →  {}", name, output.display()),
+                Err(e) => eprintln!("  {} - error: {}", name, e),
+            }
         }
-        app_names.iter().collect()
-    };
+        return;
+    }
 
-    let mut rendered: Vec<String> = Vec::new();
-    let mut linked: std::collections::HashSet<String> = std::collections::HashSet::new();
-
-    // Phase 1: Render + symlink
-    for name in &targets {
-        let tpl_config = templates.get(name).unwrap();
-        let template_path = PathBuf::from(format!("{}/{}", dotfiles_dir, tpl_config.path));
-
-        if !template_path.exists() {
-            eprintln!("  {} - template not found: {}", name, template_path.display());
-            continue;
-        }
-
-        match render_to_file(&template_path, &context, dry_run) {
-            Ok(output) => {
-                let prefix = if dry_run { "[dry-run] " } else { "" };
-                println!("{}{}  →  {}", prefix, name, output.display());
-                rendered.push((*name).clone());
-
-                // Auto-symlink if not dry-run and link is defined
-                if !dry_run {
-                    if let Some(link_module) = &tpl_config.link {
-                        if !linked.contains(link_module) {
-                            print!("  rotz link {}... ", link_module);
-                            match rotz_link(link_module) {
-                                Ok(()) => println!("ok"),
-                                Err(e) => println!("failed: {}", e),
-                            }
-                            linked.insert(link_module.clone());
-                        }
+    match run_update(cfg_dir, dotfiles_dir, app_names) {
+        Ok(result) => {
+            for r in &result.rendered {
+                match &r.output {
+                    Ok(output) => println!("{}  →  {}", r.name, output.display()),
+                    Err(e) => eprintln!("  {} - error: {}", r.name, e),
+                }
+            }
+            if !result.reloaded.is_empty() {
+                println!("\nReloading...");
+                for r in &result.reloaded {
+                    let label = r.names.join(", ");
+                    match &r.result {
+                        Ok(()) => println!("  {}... ok", label),
+                        Err(e) => println!("  {}... failed: {}", label, e),
                     }
                 }
             }
-            Err(e) => {
-                eprintln!("  {} - error: {}", name, e);
-            }
         }
-    }
-
-    // Phase 2: Reload (only rendered apps, skip dry-run)
-    // Commands are coalesced so duplicates (e.g., 3x hyprctl reload) run once.
-    if !dry_run && !rendered.is_empty() {
-        println!("\nReloading...");
-        for group in coalesce_reloads(&rendered, &templates) {
-            let label = group.names.join(", ");
-            print!("  {}... ", label);
-            let result = if group.background {
-                reload_app_background(group.cmd)
-            } else {
-                reload_app(group.cmd, DEFAULT_RELOAD_TIMEOUT)
-            };
-            match result {
-                Ok(()) => println!("ok"),
-                Err(e) => println!("failed: {}", e),
-            }
+        Err(e) => {
+            eprintln!("Error: {}", e);
+            std::process::exit(1);
         }
     }
 }
@@ -270,7 +240,7 @@ fn main() {
             }
         };
 
-        match tui::app::run(&config, &palette, &config_path, &cfg_dir) {
+        match tui::app::run(&config, &palette, &config_path, &cfg_dir, &dotfiles_dir) {
             Ok(tui::app::Outcome::Apply(scope)) => {
                 // Dispatch only to the subsystems the user actually changed.
                 // Colors/fonts still need the full template render (no

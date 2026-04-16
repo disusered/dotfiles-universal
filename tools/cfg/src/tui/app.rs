@@ -14,6 +14,7 @@ use crate::palette::Palette;
 
 use super::colors::ColorPicker;
 use super::fonts::FontPicker;
+use super::update::UpdatePicker;
 use super::wallpapers::WallpaperPicker;
 use super::{init, restore};
 
@@ -50,6 +51,7 @@ pub enum Tab {
     Colors,
     Fonts,
     Wallpapers,
+    Update,
 }
 
 impl Tab {
@@ -58,6 +60,7 @@ impl Tab {
             Tab::Colors => 0,
             Tab::Fonts => 1,
             Tab::Wallpapers => 2,
+            Tab::Update => 3,
         }
     }
 
@@ -65,7 +68,8 @@ impl Tab {
         match self {
             Tab::Colors => Tab::Fonts,
             Tab::Fonts => Tab::Wallpapers,
-            Tab::Wallpapers => Tab::Colors,
+            Tab::Wallpapers => Tab::Update,
+            Tab::Update => Tab::Colors,
         }
     }
 }
@@ -100,6 +104,7 @@ pub struct App {
     font_picker: FontPicker,
     wallpaper_picker: Option<WallpaperPicker>,
     wallpaper_init_error: Option<String>,
+    update_picker: UpdatePicker,
     theme: TabTheme,
     should_apply: bool,
     /// Tab bar area for mouse click detection
@@ -112,10 +117,18 @@ impl App {
         palette: &Palette,
         config_path: String,
         cfg_dir: String,
+        dotfiles_dir: String,
     ) -> Self {
         let theme = TabTheme::from_config(&config, palette);
         let color_picker = ColorPicker::new(config.clone(), palette, config_path.clone());
         let font_picker = FontPicker::new(config.clone(), palette, config_path.clone());
+
+        let update_picker = UpdatePicker::new(
+            palette,
+            &config.primary,
+            cfg_dir.clone(),
+            dotfiles_dir,
+        );
 
         let (wallpaper_picker, wallpaper_init_error) = match WallpaperPicker::new(
             config.clone(),
@@ -133,6 +146,7 @@ impl App {
             font_picker,
             wallpaper_picker,
             wallpaper_init_error,
+            update_picker,
             theme,
             should_apply: false,
             tab_bar_area: Rect::default(),
@@ -175,6 +189,7 @@ impl App {
                     frame.render_widget(para, chunks[1]);
                 }
             }
+            Tab::Update => self.update_picker.render_in_area(frame, chunks[1]),
         }
     }
 
@@ -192,6 +207,10 @@ impl App {
             Line::from(vec![
                 Span::styled("3", Style::default().fg(self.theme.subtext0).add_modifier(Modifier::DIM)),
                 Span::raw(" \u{f03e} Wallpapers"),  //  image icon
+            ]),
+            Line::from(vec![
+                Span::styled("4", Style::default().fg(self.theme.subtext0).add_modifier(Modifier::DIM)),
+                Span::raw(" \u{f0e4e} Update"),  // 󰑓 reload icon
             ]),
         ];
 
@@ -214,14 +233,16 @@ impl App {
             if let MouseEventKind::Down(crossterm::event::MouseButton::Left) = mouse.kind {
                 // Check if click is in tab bar area
                 if mouse.row < self.tab_bar_area.height {
-                    // Tab layout: "1  Colors  2  Fonts  3  Wallpapers"
-                    // Approximate column regions: Colors 0-12, Fonts 13-26, Wallpapers 27+
+                    // Tab layout: "1  Colors  2  Fonts  3  Wallpapers  4  Update"
+                    // Approximate column regions
                     if mouse.column < 13 {
                         self.active_tab = Tab::Colors;
-                    } else if mouse.column < 27 {
+                    } else if mouse.column < 23 {
                         self.active_tab = Tab::Fonts;
-                    } else {
+                    } else if mouse.column < 39 {
                         self.active_tab = Tab::Wallpapers;
+                    } else {
+                        self.active_tab = Tab::Update;
                     }
                     return Ok(true);
                 }
@@ -240,6 +261,7 @@ impl App {
                         .as_ref()
                         .map(|p| p.is_in_search())
                         .unwrap_or(false),
+                    Tab::Update => self.update_picker.is_in_search(),
                 };
 
                 if !in_search {
@@ -254,6 +276,10 @@ impl App {
                         }
                         KeyCode::Char('3') => {
                             self.active_tab = Tab::Wallpapers;
+                            return Ok(true);
+                        }
+                        KeyCode::Char('4') => {
+                            self.active_tab = Tab::Update;
                             return Ok(true);
                         }
                         KeyCode::BackTab => {
@@ -288,6 +314,7 @@ impl App {
                     }
                 }
             },
+            Tab::Update => self.update_picker.handle_event(event)?,
         };
 
         // Check if picker wants to apply
@@ -300,6 +327,7 @@ impl App {
                     .as_ref()
                     .map(|p| p.wants_apply())
                     .unwrap_or(false),
+                Tab::Update => false, // Update tab handles its own updates
             };
         }
 
@@ -366,12 +394,14 @@ pub fn run(
     palette: &Palette,
     config_path: &str,
     cfg_dir: &str,
+    dotfiles_dir: &str,
 ) -> io::Result<Outcome> {
     let app = App::new(
         config.clone(),
         palette,
         config_path.to_string(),
         cfg_dir.to_string(),
+        dotfiles_dir.to_string(),
     );
     app.run()
 }
