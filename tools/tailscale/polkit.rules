@@ -1,0 +1,15 @@
+polkit.addRule(function(action, subject) {
+    if (subject.user !== "tailscaled") {
+        return;
+    }
+    if (action.id === "org.freedesktop.resolve1.set-dns-servers" ||
+        action.id === "org.freedesktop.resolve1.set-domains" ||
+        action.id === "org.freedesktop.resolve1.set-default-route" ||
+        action.id === "org.freedesktop.resolve1.set-llmnr" ||
+        action.id === "org.freedesktop.resolve1.set-mdns" ||
+        action.id === "org.freedesktop.resolve1.set-dnssec" ||
+        action.id === "org.freedesktop.resolve1.set-dnsovertls" ||
+        action.id === "org.freedesktop.resolve1.revert") {
+        return polkit.Result.YES;
+    }
+});

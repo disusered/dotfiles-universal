@@ -6,12 +6,26 @@ linux[whoami.distro^="Arch"]:
       fi
       sudo systemctl enable --now tailscaled.service
       sudo tailscale set --operator="$USER"
+      sudo ln -sf ~/.dotfiles/tools/tailscale/modules-load.conf /etc/modules-load.d/tailscale.conf
+      sudo modprobe tun
+      if ! getent passwd tailscaled >/dev/null; then
+        sudo useradd --system --home-dir /var/lib/tailscale --shell /usr/bin/nologin tailscaled
+      fi
+      sudo mkdir -p /etc/systemd/system/tailscaled.service.d
+      sudo ln -sf ~/.dotfiles/tools/tailscale/hardening.conf /etc/systemd/system/tailscaled.service.d/hardening.conf
+      sudo chown -R tailscaled:tailscaled /var/lib/tailscale /var/cache/tailscale 2>/dev/null || true
+      sudo systemctl enable --now systemd-resolved.service
+      sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+      sudo mkdir -p /etc/polkit-1/rules.d
+      sudo install -m 644 -o root -g root ~/.dotfiles/tools/tailscale/polkit.rules /etc/polkit-1/rules.d/50-tailscale-resolved.rules
       sudo mkdir -p /etc/NetworkManager/conf.d
       sudo ln -sf ~/.dotfiles/tools/tailscale/network-manager.conf /etc/NetworkManager/conf.d/99-tailscale.conf
+      sudo ln -sf ~/.dotfiles/tools/tailscale/network-manager-dns.conf /etc/NetworkManager/conf.d/10-dns-resolved.conf
       sudo ln -sf ~/.dotfiles/tools/tailscale/default-tailscaled /etc/default/tailscaled
       if systemctl is-active --quiet NetworkManager.service; then
         sudo systemctl restart NetworkManager.service
       fi
+      sudo systemctl daemon-reload
       sudo systemctl restart tailscaled.service
       if [ ! -f ~/.config/systemd/user/tailscale-systray.service ]; then
         tailscale configure systray --enable-startup=systemd
