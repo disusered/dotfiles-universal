@@ -1,0 +1,13 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      if ! pacman -Qi tailscale &>/dev/null; then
+        sudo pacman -S --noconfirm --needed tailscale
+      fi
+      sudo systemctl enable --now tailscaled.service
+      sudo tailscale set --operator="$USER"
+      if [ ! -f ~/.config/systemd/user/tailscale-systray.service ]; then
+        tailscale configure systray --enable-startup=systemd
+      fi
+      systemctl --user enable --now tailscale-systray.service
+      systemctl --user restart tailscale-systray.service
