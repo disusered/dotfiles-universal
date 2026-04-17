@@ -1,9 +1,10 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S --noconfirm --needed dolphin archlinux-xdg-menu ark unrar
+    cmd: yay -S --noconfirm --needed dolphin archlinux-xdg-menu ark unrar kdegraphics-thumbnailers ffmpegthumbs kimageformats
     depends:
       - /lib/qt
       - /arch/kwallet
+      - /arch/removable-media
   links:
     dolphin.conf: ~/.config/hypr/conf.d/dolphin.conf
     kdeglobals: ~/.config/kdeglobals

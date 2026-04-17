@@ -1,0 +1,17 @@
+program_options:
+  automount: true
+  notify: true
+  tray: auto
+  file_manager: dolphin
+  terminal: kitty
+
+notifications:
+  device_mounted: true
+  device_unmounted: true
+  device_added: false
+  device_removed: false
+  device_unlocked: true
+  device_locked: true
+  job_failed: true
+  browse: true
+  umount: true

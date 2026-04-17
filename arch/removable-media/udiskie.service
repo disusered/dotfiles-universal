@@ -1,0 +1,12 @@
+[Unit]
+Description=udiskie automount daemon
+BindsTo=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=uwsm app -- /usr/bin/udiskie
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

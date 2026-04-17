@@ -12,3 +12,7 @@ hyprctl dispatch killwindow class:fonts_scratch
 hyprctl dispatch killwindow class:cfg_wallpaper_scratch
 hyprctl dispatch killwindow class:org.pulseaudio.pavucontrol
 hyprctl dispatch killwindow class:org.pipewire.Helvum
+
+# Safely unmount and power-off removable drives (see Arch Wiki: USB storage devices).
+# --detach calls udisksctl power-off per drive so heads park / SSDs flush.
+command -v udiskie-umount >/dev/null && udiskie-umount --all --detach 2>/dev/null || true

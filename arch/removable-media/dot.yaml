@@ -1,0 +1,16 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      sudo pacman -S --noconfirm --needed \
+        udisks2 udiskie \
+        gvfs gvfs-mtp gvfs-gphoto2 gvfs-smb gvfs-nfs \
+        ntfs-3g exfatprogs dosfstools mtools udftools
+      mkdir -p ~/.config/systemd/user ~/.config/udiskie
+      systemctl --user daemon-reload
+      systemctl --user enable --now udiskie.service
+    depends:
+      - /arch/hyprland
+      - /tools/mako
+  links:
+    config.yml: ~/.config/udiskie/config.yml
+    udiskie.service: ~/.config/systemd/user/udiskie.service
