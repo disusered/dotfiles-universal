@@ -4,8 +4,6 @@ linux[whoami.distro^="Arch"]:
       cd tools/hyprspace && cargo build --release
       systemctl --user daemon-reload
       systemctl --user enable --now hyprspace-watch.service
-    depends:
-      - /tools/nvim-parent
   links:
     target/release/hyprspace: ~/.local/bin/hyprspace
     config.toml: ~/.config/hyprspace/config.toml

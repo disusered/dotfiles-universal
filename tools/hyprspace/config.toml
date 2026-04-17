@@ -28,7 +28,9 @@ title_prefix = "lazygit: "
 context_type = "git_root"
 multi_instance = false
 dismiss_scratchpads = false
-spawn_command = ["kitty", "--class", "lazygit_modal", "--title", "{title}", "--directory", "{context}", "/home/carlos/.local/bin/lazygit-modal-launcher", "{context}"]
+modal_tag = "lazygit"
+inject_parent_nvim = true
+spawn_command = ["kitty", "--class", "lazygit_modal", "--title", "{title}", "--directory", "{context}", "lazygit"]
 
 [workspaces.calculator]
 window_class = "qalculate-gtk"
