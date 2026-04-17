@@ -5,6 +5,11 @@ linux[whoami.distro^="Arch"]:
         udisks2 udiskie \
         gvfs gvfs-mtp gvfs-gphoto2 gvfs-smb gvfs-nfs \
         ntfs-3g exfatprogs dosfstools mtools udftools
+      sudo install -m 644 -o root -g root \
+        ~/.dotfiles/arch/removable-media/99-udisks2-unhide-thumb.rules \
+        /etc/udev/rules.d/99-udisks2-unhide-thumb.rules
+      sudo udevadm control --reload
+      sudo udevadm trigger --subsystem-match=block --action=change
       mkdir -p ~/.config/systemd/user ~/.config/udiskie
       systemctl --user daemon-reload
       systemctl --user enable --now udiskie.service

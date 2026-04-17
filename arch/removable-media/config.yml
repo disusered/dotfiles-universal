@@ -6,12 +6,12 @@ program_options:
   terminal: kitty
 
 notifications:
-  device_mounted: true
-  device_unmounted: true
+  device_mounted: 10
+  device_unmounted: 10
+  device_unlocked: 10
+  device_locked: 10
+  job_failed: 30
   device_added: false
   device_removed: false
-  device_unlocked: true
-  device_locked: true
-  job_failed: true
   browse: true
   umount: true

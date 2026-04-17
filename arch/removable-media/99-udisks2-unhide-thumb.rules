@@ -1,0 +1,5 @@
+# Override UDISKS_IGNORE=1 on USB thumb drives so live-boot media and
+# EFI System Partitions on removable sticks show in the desktop.
+# Scope: only devices udisks2 tagged as ID_DRIVE_THUMB=1 (USB sticks/SD).
+# Internal RAID members, LVM PVs, BIOS boot partitions etc. stay hidden.
+SUBSYSTEM=="block", ENV{ID_DRIVE_THUMB}=="1", ENV{UDISKS_IGNORE}="0"
