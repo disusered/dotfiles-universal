@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: command -v ouroboros &>/dev/null || uv tool install --with litellm ouroboros-ai
+    depends:
+      - /languages/python/uv

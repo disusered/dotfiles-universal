@@ -71,7 +71,16 @@
     "feature-dev@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
-    "csharp-lsp@claude-plugins-official": true
+    "csharp-lsp@claude-plugins-official": true,
+    "ouroboros@ouroboros": true
+  },
+  "extraKnownMarketplaces": {
+    "ouroboros": {
+      "source": {
+        "source": "github",
+        "repo": "Q00/ouroboros"
+      }
+    }
   },
   "effortLevel": "xhigh",
   "voice": {
