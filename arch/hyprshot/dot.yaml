@@ -8,3 +8,4 @@ linux[whoami.distro^="Arch"]:
       - /arch/hyprpicker
   links:
     hyprshot.conf: ~/.config/hypr/conf.d/hyprshot.conf
+    hyprshot-safe.sh: ~/.local/bin/hyprshot-safe
