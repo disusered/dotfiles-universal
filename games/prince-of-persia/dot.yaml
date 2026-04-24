@@ -55,14 +55,15 @@ linux[whoami.distro^="Arch"]:
 
       "$HOME/.dotfiles/games/lib/steam-set-launch-options.sh" \
         13600 \
-        '~/.local/bin/pop-launch %command%' \
+        'scb -- %command%' \
         'Prince of Persia: The Sands of Time'
     depends:
       - /arch/wine
       - /arch/steam
+      - /tools/scopebuddy
   links:
-    # Launcher (gamescope wrapper)
-    pop-launch.sh: ~/.local/bin/pop-launch
+    # ScopeBuddy per-game config (replaces the old pop-launch.sh wrapper)
+    scopebuddy.conf: ~/.config/scopebuddy/AppID/13600.conf
     # Config files
     dxwrapper.ini: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/dxwrapper.ini
     Hardware.ini: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/Hardware.ini

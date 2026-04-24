@@ -1,0 +1,32 @@
+# ScopeBuddy — gamescope wrapper for per-game config files.
+#
+# Replaces hand-rolled gamescope wrapper scripts under games/*/. Each game
+# sets Steam launch options to `scb -- %command%` and drops a config at
+# ~/.config/scopebuddy/AppID/<AppID>.conf. Globals (stability env vars,
+# auto-res, default gamescope flags) live in scb.conf.
+#
+# ScopeBuddy's SCB_NESTEDFIX=1 (default) works around gamescope issue #1180
+# (Steam Input / Overlay broken when gamescope runs nested via
+# --backend wayland). SCB_AUTO_RES=1 replaces the per-wrapper
+# `hyprctl monitors | jq` dance; it needs wlr-randr on wlroots compositors.
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      sudo pacman -S --noconfirm --needed wlr-randr
+      if ! command -v scb &>/dev/null; then
+        yay -S --noconfirm --needed scopebuddy-git
+      fi
+
+      # ScopeBuddy writes a default scb.conf on first invocation if one
+      # doesn't exist yet. Clear any real (non-symlink) file at the link
+      # target so Rotz can establish its symlink from this module.
+      SCB_CONF="$HOME/.config/scopebuddy/scb.conf"
+      if [ -e "$SCB_CONF" ] && [ ! -L "$SCB_CONF" ]; then
+        rm -f "$SCB_CONF"
+      fi
+    depends:
+      - /arch/steam
+      - /tools/yay
+      - /tools/jq
+  links:
+    scb.conf: ~/.config/scopebuddy/scb.conf
