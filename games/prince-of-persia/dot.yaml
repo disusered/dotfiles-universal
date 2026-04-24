@@ -52,9 +52,17 @@ linux[whoami.distro^="Arch"]:
       done
 
       echo "Done! Config files and DLLs will be symlinked by Rotz."
+
+      "$HOME/.dotfiles/games/lib/steam-set-launch-options.sh" \
+        13600 \
+        '~/.local/bin/pop-launch %command%' \
+        'Prince of Persia: The Sands of Time'
     depends:
       - /arch/wine
+      - /arch/steam
   links:
+    # Launcher (gamescope wrapper)
+    pop-launch.sh: ~/.local/bin/pop-launch
     # Config files
     dxwrapper.ini: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/dxwrapper.ini
     Hardware.ini: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/Hardware.ini
