@@ -1,0 +1,25 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -e
+
+      # Total War: THREE KINGDOMS (AppID 779340) — the Feral native port's
+      # bundled SDL2 can't find a wayland or x11 backend on current Arch
+      # (SDL_Init returns null, SIGABRT). Force Proton Experimental, which
+      # got an explicit TK regression fix in March 2024 (Proton issue #4674).
+      "$HOME/.dotfiles/games/lib/steam-set-compat-tool.sh" \
+        779340 \
+        proton_experimental \
+        'Total War: THREE KINGDOMS'
+
+      # Wrap in scopebuddy. Globals (-f --grab --backend wayland --prefer-output)
+      # cover everything TK needs; no per-AppID conf required.
+      "$HOME/.dotfiles/games/lib/steam-set-launch-options.sh" \
+        779340 \
+        'scb -- %command%' \
+        'Total War: THREE KINGDOMS'
+    depends:
+      - /arch/steam
+      - /tools/scopebuddy
+  links:
+    three-kingdoms.conf: ~/.config/hypr/conf.d/three-kingdoms.conf
