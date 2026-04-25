@@ -4,3 +4,4 @@ linux[whoami.distro^="Arch"]:
       sudo pacman -S --noconfirm --needed rtorrent
   links:
     rtorrent.rc: ~/.rtorrent.rc
+    refresh-trackers.py: ~/.local/bin/rtorrent-refresh-trackers
