@@ -53,17 +53,17 @@ linux[whoami.distro^="Arch"]:
 
       echo "Done! Config files and DLLs will be symlinked by Rotz."
 
+      # Clear any prior launch options (we tried wrapping PoP in ScopeBuddy /
+      # gamescope; Steam Input is broken under nested gamescope on Arch's
+      # gamescope build, and dropping the wrapper is cheaper than chasing it).
       "$HOME/.dotfiles/games/lib/steam-set-launch-options.sh" \
         13600 \
-        'scb -- %command%' \
+        '' \
         'Prince of Persia: The Sands of Time'
     depends:
       - /arch/wine
       - /arch/steam
-      - /tools/scopebuddy
   links:
-    # ScopeBuddy per-game config (replaces the old pop-launch.sh wrapper)
-    scopebuddy.conf: ~/.config/scopebuddy/AppID/13600.conf
     # Config files
     dxwrapper.ini: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/dxwrapper.ini
     Hardware.ini: ~/.local/share/Steam/steamapps/common/Prince of Persia The Sands of Time/Hardware.ini
