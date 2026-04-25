@@ -190,7 +190,11 @@ def main() -> int:
 
     if not args.dry_run:
         backup = sd.parent / f".session.bak-{time.strftime('%Y%m%d-%H%M%S')}"
-        shutil.copytree(sd, backup)
+
+        def skip_nonregular(src: str, names: list[str]) -> list[str]:
+            return [n for n in names if not (Path(src) / n).is_file()]
+
+        shutil.copytree(sd, backup, ignore=skip_nonregular)
         print(f"backed up {sd} -> {backup}")
 
     added_total = 0
