@@ -163,7 +163,7 @@ bind = $mainMod, W, killactive,
 bind = $mainMod SHIFT, T, togglegroup,
 bind = $mainMod SHIFT, F, togglefloating,
 bind = $mainMod SHIFT, P, pin,
-bind = $mainMod, T, togglesplit,
+bind = $mainMod, T, layoutmsg, togglesplit
 
 # Tabbed Windows (Group)
 bind = $mainMod, bracketleft, changegroupactive, b
