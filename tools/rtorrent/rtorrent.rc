@@ -41,6 +41,10 @@ trackers.use_udp.set = yes
 throttle.max_uploads.set = 100
 throttle.max_uploads.global.set = 250
 
+## Global rate caps (KiB/s) — 0 = unlimited
+throttle.global_up.max_rate.set_kb = 15000
+throttle.global_down.max_rate.set_kb = 0
+
 throttle.min_peers.normal.set = 20
 throttle.max_peers.normal.set = 60
 throttle.min_peers.seed.set = 30
