@@ -1,0 +1,9 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: command -v git-spr &>/dev/null || yay -S --noconfirm --needed spr-bin
+    depends:
+      - /tools/yay
+      - /tools/git
+      - /tools/gh
+  links:
+    spr.yml: ~/.spr.yml

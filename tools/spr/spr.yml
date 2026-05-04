@@ -1,0 +1,18 @@
+# User-level spr config — managed by dotfiles
+# Repo-level config (mergeMethod, owner, branch) lives in <repo>/.spr.yml
+# Schema: https://github.com/ejoffe/spr/blob/master/config/config.go (UserConfig)
+
+showPRLink: true
+logGitCommands: false
+logGitHubCalls: false
+statusBitsHeader: true
+statusBitsEmojis: true
+
+createDraftPRs: false
+preserveTitleAndBody: true
+noRebase: false
+noFetch: false
+deleteMergedBranches: true
+shortPRLink: false
+showCommitID: false
+branchPrefix: spr
