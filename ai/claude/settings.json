@@ -4,7 +4,10 @@
     "command": "~/.claude/file-suggestion.sh"
   },
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "ANTHROPIC_AUTH_TOKEN": "f7fe454f8060465493807e977d846620.fkj5Rnuk8J1FCxWJ",
+    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
+    "API_TIMEOUT_MS": "3000000"
   },
   "permissions": {
     "allow": [
@@ -18,7 +21,6 @@
       "Bash(sqlite3:*)"
     ]
   },
-  "model": "opus",
   "hooks": {
     "PreCompact": [
       {
