@@ -1,0 +1,7 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    # TODO
+    # cmd:
+  links:
+    opencode.json: ~/.config/opencode/opencode.json
+    opencode.zsh: ~/.config/zsh/5100_opencode.zsh
