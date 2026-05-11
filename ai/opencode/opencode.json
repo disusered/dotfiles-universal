@@ -3,11 +3,11 @@
   "plugin": [
     "opencode-beads",
     "opencode-snip@latest",
-    "opencode-websearch-cited@1.2.0",
     "opencode-antigravity-auth@latest",
     "@mohak34/opencode-notifier@latest",
     "opencode-pty",
-    "@franlol/opencode-md-table-formatter@latest"
+    "@franlol/opencode-md-table-formatter@latest",
+    "opencode-websearch-cited@1.2.0",
   ],
   "provider": {
     "google": {
@@ -246,6 +246,29 @@
             ]
           }
         }
+      }
+    }
+  },
+  "mcp": {
+    "web-reader": {
+      "type": "remote",
+      "url": "https://api.z.ai/api/mcp/web_reader/mcp",
+      "headers": {
+        "Authorization": "Bearer {file:~/.config/opencode/.zai-key}"
+      },
+    },
+    "web-search-prime": {
+      "type": "remote",
+      "url": "https://api.z.ai/api/mcp/web_search_prime/mcp",
+      "headers": {
+        "Authorization": "Bearer {file:~/.config/opencode/.zai-key}"
+      }
+    },
+    "zread": {
+      "type": "remote",
+      "url": "https://api.z.ai/api/mcp/zread/mcp",
+      "headers": {
+        "Authorization": "Bearer {file:~/.config/opencode/.zai-key}"
       }
     }
   }
