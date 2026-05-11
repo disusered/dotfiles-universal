@@ -1,3 +1,5 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: command -v snip &>/dev/null || go install github.com/edouard-claude/snip/cmd/snip@latest
+  links:
+    config.toml: ~/.config/snip/config.toml
