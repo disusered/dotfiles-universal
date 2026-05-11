@@ -7,6 +7,7 @@
     "opencode-antigravity-auth@latest",
     "@mohak34/opencode-notifier@latest",
     "opencode-pty",
+    "@franlol/opencode-md-table-formatter@latest"
   ],
   "provider": {
     "google": {
