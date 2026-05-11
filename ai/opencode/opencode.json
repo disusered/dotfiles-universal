@@ -4,7 +4,8 @@
     "opencode-beads",
     "opencode-snip@latest",
     "opencode-websearch-cited@1.2.0",
-    "opencode-antigravity-auth@latest"
+    "opencode-antigravity-auth@latest",
+    "@mohak34/opencode-notifier@latest"
   ],
   "provider": {
     "google": {
