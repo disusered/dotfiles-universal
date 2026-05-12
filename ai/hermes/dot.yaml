@@ -1,6 +1,15 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+    cmd: |
+      curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+      VENV=/home/carlos/.hermes/hermes-agent/venv
+      if ! "$VENV/bin/python" -c "import fastapi" 2>/dev/null; then
+        "$VENV/bin/pip" install -q 'hermes-agent[web,pty]'
+      fi
+      if [ ! -f /home/carlos/.hermes/hermes-agent/hermes_cli/web_dist/index.html ]; then
+        cd /home/carlos/.hermes/hermes-agent/web && npm install --silent && npm run build
+      fi
+      systemctl --user enable --now hermes-dashboard.service
     depends:
       - /tools/ffmpeg
       - /tools/ripgrep
@@ -9,3 +18,5 @@ linux[whoami.distro^="Arch"]:
     env.tpl: ~/.hermes/env.tpl
     hermes.zsh: ~/.config/zsh/5001_hermes.zsh
     catppuccin.yaml: ~/.hermes/skins/catppuccin.yaml
+    hermes-dashboard.service: ~/.config/systemd/user/hermes-dashboard.service
+    hermes-gateway.service: ~/.config/systemd/user/hermes-gateway.service
