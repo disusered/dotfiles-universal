@@ -32,3 +32,4 @@ linux[whoami.distro^="Arch"]:
       fi
       systemctl --user enable --now tailscale-systray.service
       systemctl --user restart tailscale-systray.service
+      ~/.dotfiles/tools/tailscale/apply-serve-rules.sh

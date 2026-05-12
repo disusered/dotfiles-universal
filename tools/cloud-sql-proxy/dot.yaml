@@ -1,8 +1,13 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S --noconfirm --needed cloud-sql-proxy-bin
+    cmd: |
+      yay -S --noconfirm --needed cloud-sql-proxy-bin
+      systemctl --user enable --now cloud-sql-proxy-boletera.service
     depends:
       - /tools/yay
+      - /tools/tailscale
+  links:
+    cloud-sql-proxy-boletera.service: ~/.config/systemd/user/cloud-sql-proxy-boletera.service
 linux[whoami.distro^="Fedora"]:
   installs:
     cmd: |
@@ -11,8 +16,12 @@ linux[whoami.distro^="Fedora"]:
         chmod +x /tmp/cloud-sql-proxy
         sudo mv /tmp/cloud-sql-proxy /usr/local/bin/
       fi
+      systemctl --user enable --now cloud-sql-proxy-boletera.service
     depends:
       - /tools/curl
+      - /tools/tailscale
+  links:
+    cloud-sql-proxy-boletera.service: ~/.config/systemd/user/cloud-sql-proxy-boletera.service
 darwin:
   installs:
     cmd: |

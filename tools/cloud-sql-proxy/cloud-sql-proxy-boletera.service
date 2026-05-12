@@ -1,0 +1,13 @@
+[Unit]
+Description=Cloud SQL Proxy (boletera-qa)
+BindsTo=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=uwsm app -- cloud-sql-proxy --port 3307 boletera-qa:northamerica-south1:boletera
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target

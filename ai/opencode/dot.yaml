@@ -1,8 +1,10 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    # TODO
-    # cmd:
+    cmd: systemctl --user enable --now opencode-serve.service
+    depends:
+      - /tools/tailscale
   links:
     opencode.json: ~/.config/opencode/opencode.json
     opencode.zsh: ~/.config/zsh/5100_opencode.zsh
     catppuccin.json: ~/.config/opencode/themes/catppuccin.json
+    opencode-serve.service: ~/.config/systemd/user/opencode-serve.service
