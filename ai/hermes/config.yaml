@@ -323,6 +323,7 @@ discord:
   channel_prompts: {}
   dm_role_auth_guild: ''
   server_actions: ''
+whatsapp: {}
 telegram:
   reactions: false
   channel_prompts: {}
@@ -397,6 +398,29 @@ session_reset:
   idle_minutes: 1440
   mode: both
 skin: catppuccin
+platform_toolsets:
+  discord:
+  - browser
+  - clarify
+  - code_execution
+  - computer_use
+  - cronjob
+  - delegation
+  - file
+  - image_gen
+  - kanban
+  - memory
+  - messaging
+  - session_search
+  - skills
+  - terminal
+  - todo
+  - tts
+  - vision
+  - web
+known_plugin_toolsets:
+  discord:
+  - spotify
 
 # ── Fallback Model ────────────────────────────────────────────────────
 # Automatic provider failover when primary is unavailable.

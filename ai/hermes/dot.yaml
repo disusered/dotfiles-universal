@@ -21,3 +21,4 @@ linux[whoami.distro^="Arch"]:
     dashboard-catppuccin.yaml: ~/.hermes/dashboard-themes/catppuccin.yaml
     hermes-dashboard.service: ~/.config/systemd/user/hermes-dashboard.service
     hermes-gateway.service: ~/.config/systemd/user/hermes-gateway.service
+    skills/query/SKILL.md: ~/.hermes/skills/database/query/SKILL.md
