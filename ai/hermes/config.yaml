@@ -219,7 +219,7 @@ display:
   copy_shortcut: auto
   tool_progress: all
 dashboard:
-  theme: cyberpunk
+  theme: catppuccin
 privacy:
   redact_pii: false
 tts:

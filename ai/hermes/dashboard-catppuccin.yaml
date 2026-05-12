@@ -1,0 +1,61 @@
+name: catppuccin
+label: Catppuccin Mocha
+description: "Catppuccin Mocha — pastel dark theme with warm accents, matching the CLI skin"
+
+palette:
+  background: "#11111b"
+  midground: "#cdd6f4"
+  foreground:
+    hex: "#eba0ac"
+    alpha: 1.0
+  warmGlow: "rgba(203, 166, 247, 0.12)"
+  noiseOpacity: 0.4
+
+typography:
+  fontSans: '"Noto Sans", "Inter", system-ui, sans-serif'
+  fontMono: '"JetBrainsMono Nerd Font", "JetBrains Mono", ui-monospace, monospace'
+  baseSize: "14px"
+  lineHeight: "1.6"
+  letterSpacing: "0"
+
+layout:
+  radius: "0.5rem"
+  density: comfortable
+
+colorOverrides:
+  card: "#1e1e2e"
+  cardForeground: "#cdd6f4"
+  popover: "#181825"
+  popoverForeground: "#cdd6f4"
+  primary: "#eba0ac"
+  primaryForeground: "#11111b"
+  secondary: "#45475a"
+  secondaryForeground: "#cdd6f4"
+  muted: "#313244"
+  mutedForeground: "#6c7086"
+  accent: "#89b4fa"
+  accentForeground: "#11111b"
+  destructive: "#f38ba8"
+  destructiveForeground: "#11111b"
+  success: "#a6e3a1"
+  warning: "#f9e2af"
+  border: "rgba(69, 71, 90, 0.6)"
+  input: "rgba(69, 71, 90, 0.6)"
+  ring: "#eba0ac"
+
+assets:
+  bg: "none"
+
+componentStyles:
+  card:
+    background: "linear-gradient(180deg, rgba(30, 30, 46, 0.95), rgba(24, 24, 37, 0.98))"
+    boxShadow: "inset 0 0 0 1px rgba(69, 71, 90, 0.3)"
+  header:
+    background: "linear-gradient(180deg, rgba(30, 30, 46, 0.9), rgba(17, 17, 27, 0.95))"
+  tab: {}
+  sidebar: {}
+  backdrop: {}
+  footer: {}
+  progress: {}
+  badge: {}
+  page: {}

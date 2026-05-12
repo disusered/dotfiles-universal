@@ -1,0 +1,61 @@
+name: catppuccin
+label: Catppuccin Mocha
+description: "Catppuccin Mocha — pastel dark theme with warm accents, matching the CLI skin"
+
+palette:
+  background: "#{{ crust | hex }}"
+  midground: "#{{ text | hex }}"
+  foreground:
+    hex: "#{{ primary | hex }}"
+    alpha: 1.0
+  warmGlow: "{{ mauve | rgba_css(alpha=0.12) }}"
+  noiseOpacity: 0.4
+
+typography:
+  fontSans: '"{{ fonts.sans }}", "Inter", system-ui, sans-serif'
+  fontMono: '"{{ fonts.mono }}", "JetBrains Mono", ui-monospace, monospace'
+  baseSize: "14px"
+  lineHeight: "1.6"
+  letterSpacing: "0"
+
+layout:
+  radius: "0.5rem"
+  density: comfortable
+
+colorOverrides:
+  card: "#{{ base | hex }}"
+  cardForeground: "#{{ text | hex }}"
+  popover: "#{{ mantle | hex }}"
+  popoverForeground: "#{{ text | hex }}"
+  primary: "#{{ primary | hex }}"
+  primaryForeground: "#{{ crust | hex }}"
+  secondary: "#{{ surface1 | hex }}"
+  secondaryForeground: "#{{ text | hex }}"
+  muted: "#{{ surface0 | hex }}"
+  mutedForeground: "#{{ overlay0 | hex }}"
+  accent: "#{{ blue | hex }}"
+  accentForeground: "#{{ crust | hex }}"
+  destructive: "#{{ red | hex }}"
+  destructiveForeground: "#{{ crust | hex }}"
+  success: "#{{ green | hex }}"
+  warning: "#{{ yellow | hex }}"
+  border: "{{ surface1 | rgba_css(alpha=0.6) }}"
+  input: "{{ surface1 | rgba_css(alpha=0.6) }}"
+  ring: "#{{ primary | hex }}"
+
+assets:
+  bg: "none"
+
+componentStyles:
+  card:
+    background: "linear-gradient(180deg, {{ base | rgba_css(alpha=0.95) }}, {{ mantle | rgba_css(alpha=0.98) }})"
+    boxShadow: "inset 0 0 0 1px {{ surface1 | rgba_css(alpha=0.3) }}"
+  header:
+    background: "linear-gradient(180deg, {{ base | rgba_css(alpha=0.9) }}, {{ crust | rgba_css(alpha=0.95) }})"
+  tab: {}
+  sidebar: {}
+  backdrop: {}
+  footer: {}
+  progress: {}
+  badge: {}
+  page: {}

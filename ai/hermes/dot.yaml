@@ -18,5 +18,6 @@ linux[whoami.distro^="Arch"]:
     env.tpl: ~/.hermes/env.tpl
     hermes.zsh: ~/.config/zsh/5001_hermes.zsh
     catppuccin.yaml: ~/.hermes/skins/catppuccin.yaml
+    dashboard-catppuccin.yaml: ~/.hermes/dashboard-themes/catppuccin.yaml
     hermes-dashboard.service: ~/.config/systemd/user/hermes-dashboard.service
     hermes-gateway.service: ~/.config/systemd/user/hermes-gateway.service
