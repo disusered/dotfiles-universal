@@ -3,3 +3,5 @@ linux[whoami.distro^="Arch"]:
     cmd: command -v ouroboros &>/dev/null || uv tool install --with litellm ouroboros-ai
     depends:
       - /languages/python/uv
+  links:
+    ouroboros-bridge.ts: ~/.config/opencode/plugins/ouroboros-bridge/ouroboros-bridge.ts
