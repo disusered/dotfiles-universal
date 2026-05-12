@@ -1,5 +1,11 @@
 # Agent Instructions
 
+## STOP — Read These First
+
+These rules are violated every session. They are NON-NEGOTIABLE:
+
+- **NEVER run `tofu`, `terraform`, `tofu init`, `tofu plan`, or `tofu apply` locally.** The tailscale-infra repo (`~/Development/ME/tailscale`) uses GitHub Actions CI: plan on PR, apply on merge to main. Commit and push. That's it. The README says "Never run `tofu init/plan/apply` locally." There are no credentials in the environment. It will fail. And you will have wasted everyone's time.
+
 This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
 
 ## Quick Reference
