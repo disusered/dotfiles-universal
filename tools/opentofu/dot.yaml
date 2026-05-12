@@ -1,0 +1,14 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm --needed opentofu
+  links:
+    tofu.zsh: ~/.config/zsh/0750_tofu.zsh
+    terraform.sh: ~/.local/bin/terraform
+linux[whoami.distro^="Fedora"]:
+  installs:
+    cmd: brew install opentofu
+    depends:
+      - /packages/homebrew
+  links:
+    tofu.zsh: ~/.config/zsh/0750_tofu.zsh
+    terraform.sh: ~/.local/bin/terraform
