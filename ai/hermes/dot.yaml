@@ -1,0 +1,7 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S --noconfirm --needed hermes-agent
+  links:
+    config.yaml: ~/.hermes/config.yaml
+    env.tpl: ~/.hermes/env.tpl
+    hermes.zsh: ~/.config/zsh/5001_hermes.zsh
