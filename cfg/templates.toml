@@ -58,6 +58,7 @@ vscode = { path = "editors/vscode/settings.json.tera" }
 
 # AI
 opencode-theme = { path = "ai/opencode/catppuccin.json.tera" }
+hermes-skin = { path = "ai/hermes/catppuccin.yaml.tera" }
 
 # Games
 monkeytype = { path = "games/monkeytype/theme-url.txt.tera", reload = "firefox \"$(cat ~/.dotfiles/games/monkeytype/theme-url.txt)\"", background = true }

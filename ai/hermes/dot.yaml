@@ -1,7 +1,11 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: yay -S --noconfirm --needed hermes-agent
+    cmd: curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash
+    depends:
+      - /tools/ffmpeg
+      - /tools/ripgrep
   links:
     config.yaml: ~/.hermes/config.yaml
     env.tpl: ~/.hermes/env.tpl
     hermes.zsh: ~/.config/zsh/5001_hermes.zsh
+    catppuccin.yaml: ~/.hermes/skins/catppuccin.yaml
