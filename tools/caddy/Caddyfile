@@ -1,0 +1,8 @@
+{
+	admin off
+}
+
+http://opencode.disusered.com {
+	bind {$CADDY_TAILSCALE_IP}
+	reverse_proxy localhost:3014
+}
