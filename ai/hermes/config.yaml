@@ -479,21 +479,20 @@ plugins:
     - spotify
     - teams_pipeline
 
-gateway:
-  platforms:
-    discord:
-      gateway_restart_notification: false
-      extra:
-        allow_from:
-          - "1448742332907262023"
-        allow_admin_from:
-          - "1448742332907262023"
-        user_allowed_commands:
-          - query
-        group_allow_admin_from:
-          - "1448742332907262023"
-        group_user_allowed_commands:
-          - query
+platforms:
+  discord:
+    gateway_restart_notification: false
+    extra:
+      allow_from:
+        - "1448742332907262023"
+      allow_admin_from:
+        - "1448742332907262023"
+      user_allowed_commands:
+        - query
+      group_allow_admin_from:
+        - "1448742332907262023"
+      group_user_allowed_commands:
+        - query
 
 # ── Fallback Model ────────────────────────────────────────────────────
 # Automatic provider failover when primary is unavailable.
