@@ -1,1 +1,24 @@
+# Z.ai
 GLM_API_KEY=op://Personal/GLM Coding Plan - Hermes/password
+
+# XBOT
+DISCORD_HOME_CHANNEL=1450664552638189685
+DISCORD_HOME_CHANNEL_NAME=ayuda-con-la-tarea
+
+DISCORD_BOT_TOKEN=op://Odasoft/Discord XBOT/Token
+DISCORD_ALLOWED_USERS=1448742332907262023
+DISCORD_ALLOWED_ROLES=1450664551682019514
+
+# XBOL Dev
+DEV_PGHOST=op://Odasoft/XBOL Cloud SQL Dev/host
+DEV_PGPORT=op://Odasoft/XBOL Cloud SQL Dev/port
+DEV_PGUSER=op://Odasoft/XBOL Cloud SQL Dev/user
+DEV_PGDATABASE=op://Odasoft/XBOL Cloud SQL Dev/database
+DEV_PGPASSWORD=op://Odasoft/XBOL Cloud SQL Dev/password
+
+# XBOL QA
+QA_PGHOST=op://Odasoft/XBOL Cloud SQL QA/host
+QA_PGPORT=op://Odasoft/XBOL Cloud SQL QA/port
+QA_PGUSER=op://Odasoft/XBOL Cloud SQL QA/user
+QA_PGDATABASE=op://Odasoft/XBOL Cloud SQL QA/database
+QA_PGPASSWORD=op://Odasoft/XBOL Cloud SQL QA/password
