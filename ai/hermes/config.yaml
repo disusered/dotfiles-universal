@@ -298,6 +298,55 @@ skills:
   inline_shell: false
   inline_shell_timeout: 10
   guard_agent_created: false
+  disabled:
+  - airtable
+  - ascii-art
+  - ascii-video
+  - audiocraft-audio-generation
+  - baoyu-comic
+  - baoyu-infographic
+  - codex
+  - comfyui
+  - dogfood
+  - evaluating-llms-harness
+  - excalidraw
+  - godmode
+  - heartmula
+  - huggingface-hub
+  - ideation
+  - jupyter-live-kernel
+  - linear
+  - llama-cpp
+  - llm-wiki
+  - manim-video
+  - minecraft-modpack-server
+  - node-inspect-debugger
+  - notion
+  - obliteratus
+  - obsidian
+  - openhue
+  - p5js
+  - pixel-art
+  - pokemon-player
+  - polymarket
+  - popular-web-designs
+  - powerpoint
+  - pretext
+  - segment-anything-model
+  - serving-llms-vllm
+  - songsee
+  - songwriting-and-ai-music
+  - spotify
+  - subagent-driven-development
+  - systematic-debugging
+  - teams-meeting-pipeline
+  - test-driven-development
+  - touchdesigner-mcp
+  - weights-and-biases
+  - writing-plans
+  - xurl
+  - youtube-content
+  - yuanbao
 curator:
   enabled: true
   interval_hours: 168
@@ -421,6 +470,13 @@ platform_toolsets:
 known_plugin_toolsets:
   discord:
   - spotify
+plugins:
+  enabled:
+  - disk-cleanup
+  disabled:
+  - google_meet
+  - spotify
+  - teams_pipeline
 
 # ── Fallback Model ────────────────────────────────────────────────────
 # Automatic provider failover when primary is unavailable.
