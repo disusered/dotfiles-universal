@@ -9,7 +9,7 @@ ExecStartPre=-/usr/bin/podman rm -f searxng
 ExecStart=/usr/bin/podman run --name searxng \
   -p 127.0.0.1:47123:8080 \
   -v %h/.config/searxng/settings.yml:/etc/searxng/settings.yml:ro \
-  -e SEARXNG_BASE_URL=http://localhost:47123/ \
+  -e SEARXNG_BASE_URL=http://search.disusered.com/ \
   --cap-drop ALL \
   docker.io/searxng/searxng:latest
 ExecStop=/usr/bin/podman stop searxng
