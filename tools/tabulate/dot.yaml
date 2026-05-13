@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: command -v tabulate &>/dev/null || uv tool install tabulate
+    depends:
+      - /languages/python/uv

@@ -13,6 +13,7 @@ linux[whoami.distro^="Arch"]:
     depends:
       - /tools/ffmpeg
       - /tools/ripgrep
+      - /tools/tabulate
   links:
     config.yaml: ~/.hermes/config.yaml
     env.tpl: ~/.hermes/env.tpl

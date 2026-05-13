@@ -28,7 +28,7 @@ export PGPORT="$(grep '^<PREFIX>_PGPORT=' ~/.hermes/.env | cut -d= -f2-)"
 export PGUSER="$(grep '^<PREFIX>_PGUSER=' ~/.hermes/.env | cut -d= -f2-)"
 export PGDATABASE="$(grep '^<PREFIX>_PGDATABASE=' ~/.hermes/.env | cut -d= -f2-)"
 export PGPASSWORD="$(grep '^<PREFIX>_PGPASSWORD=' ~/.hermes/.env | cut -d= -f2-)"
-psql -c "<SQL>"
+psql --csv -c "<SQL>"
 ```
 
 For multi-line queries:
@@ -39,7 +39,7 @@ export PGPORT="$(grep '^<PREFIX>_PGPORT=' ~/.hermes/.env | cut -d= -f2-)"
 export PGUSER="$(grep '^<PREFIX>_PGUSER=' ~/.hermes/.env | cut -d= -f2-)"
 export PGDATABASE="$(grep '^<PREFIX>_PGDATABASE=' ~/.hermes/.env | cut -d= -f2-)"
 export PGPASSWORD="$(grep '^<PREFIX>_PGPASSWORD=' ~/.hermes/.env | cut -d= -f2-)"
-psql -f - <<'SQL'
+psql --csv -f - <<'SQL'
   <multi-line SQL here>
 SQL
 ```
@@ -91,56 +91,40 @@ ORDER BY idx_scan;
 
 ## Output Formatting
 
+**Pipeline:**
+
+1. Run queries with `psql --csv` to get raw CSV output.
+2. Pipe through `tabulate` to render an ASCII table: `tabulate -s ',' -f fancy_grid -1`
+3. Wrap the table in a **triple-backtick code block** so Discord preserves whitespace and renders monospace.
+
+**Example command:**
+
+```bash
+psql --csv -c "SELECT id, name, status FROM users LIMIT 5" | tabulate -s ',' -f fancy_grid -1
+```
+
 **Rules:**
 
-- **NEVER use Markdown pipe tables** (`| col | col |`) — many channels don't render Markdown and raw pipes are unreadable.
-- **NEVER wrap tables in code fences** (```) — breaks rendering in channels that *do* support Markdown.
-- Always use **Unicode box-drawing characters** to construct plain-text tables. These render correctly in terminals, Slack, Discord, plain-text email, and Markdown (as monospace blocks).
-
-**Character set:**
-
-```
-Corners:    ╔ ╗ ╚ ╝
-Tees:       ╠ ╣ ╦ ╩
-Crossings:  ╬ ╪
-Horizontal: ═ ╤ ╧ ─ ┼
-Vertical:   ║ │
-```
-
-**Full table (with row separators):**
-
-```
-╔════════╦════════════════╦═══════════╗
-║   id   ║      name      ║  status   ║
-╠════════╬════════════════╬═══════════╣
-║      1 ║ Alice          ║ active    ║
-╟────────╫────────────────╫───────────╢
-║      2 ║ Bob            ║ inactive  ║
-╚════════╩════════════════╩═══════════╝
-```
-
-**Compact table (no row separators, use for short results):**
-
-```
-╔════════╦════════════════╦═══════════╗
-║   id   ║      name      ║  status   ║
-╠════════╬════════════════╬═══════════╣
-║      1 ║ Alice          ║ active    ║
-║      2 ║ Bob            ║ inactive  ║
-╚════════╩════════════════╩═══════════╝
-```
-
-**Guidelines:**
-
-- Right-align numeric columns, left-align text columns. Center column headers.
+- **Always use `psql --csv`** for data queries — this gives clean CSV that `tabulate` parses reliably.
+- **Always wrap tables in code fences** (triple backticks) for Discord rendering.
+- **Never manually draw tables** with Unicode or pipe characters — let `tabulate` handle it.
 - For scalar results (count, exists, single value), present the value inline — no table needed.
-- For wide result sets, truncate columns that exceed 30 characters with `…` rather than breaking the table layout.
-- If a query returns no rows, say "No results" — don't render an empty table shell.
+- If a query returns no rows, say "No results" — don't render an empty table.
 - If a column value is NULL, display `∅` (empty set) to distinguish it from an empty string.
+- For wide result sets, consider adding `LIMIT` or selecting fewer columns rather than letting the table overflow.
+
+## Language
+
+Respond in Spanish for reports and data discussions unless the user writes in English.
+
+## Common Reports
+
+See `references/common-reports.md` for reusable SQL patterns:
+- **Mini-Reporte de Clausura** — resumen general, desglose por evento, temporada, tickets escaneados, últimas órdenes
 
 ## Workflow
 
 1. Determine which environment the user wants (dev or qa). If not specified, ask.
-2. Build the query — start with schema exploration if unfamiliar with the tables
-3. Execute using the connection template above
-4. Present results using the **Output Formatting** rules above
+2. Build the query — start with schema exploration if unfamiliar with the tables. Check `references/common-reports.md` for ready-made report patterns before writing from scratch.
+3. Execute using the connection template above, adding `--csv` flag to `psql` for data queries.
+4. Pipe CSV output through `tabulate -s ',' -f fancy_grid -1` and wrap in a code block per the **Output Formatting** rules.
