@@ -1,7 +1,7 @@
 ---
 name: query
 description: "Query the XBOL PostgreSQL databases (dev or QA) via psql over Tailscale. Full access for schema inspection, data queries, writes, and DDL. Specify which environment: 'query dev for X' or 'query qa for X'."
-version: 1.0.0
+version: 2.0.0
 metadata:
   hermes:
     tags: [postgres, database, query, sql, xbol, boletera, dev, qa]
@@ -16,36 +16,27 @@ Connect to the team's PostgreSQL databases proxied through Tailscale at `work.an
 
 The user must specify which environment — **dev** or **qa**. If ambiguous, ask.
 
-| Env | 1Password Item | Vault |
-| --- | -------------- | ----- |
-| dev | XBOL Cloud SQL Dev | Odasoft |
-| qa | XBOL Cloud SQL QA | Odasoft |
-
 ## Connection
 
-Credentials come from 1Password via `op inject`. Set PG environment variables in one call, then run psql:
+Credentials are pre-resolved in `~/.hermes/.env` (populated by `hermes-init` via `op inject`). No runtime `op` calls needed.
+
+Replace `<PREFIX>` with `DEV` or `QA` (uppercase):
 
 ```bash
-eval "$(echo 'PGHOST={{ op://Odasoft/XBOL Cloud SQL <ENV>/host }}
-PGPORT={{ op://Odasoft/XBOL Cloud SQL <ENV>/port }}
-PGUSER={{ op://Odasoft/XBOL Cloud SQL <ENV>/user }}
-PGDATABASE={{ op://Odasoft/XBOL Cloud SQL <ENV>/database }}
-PGPASSWORD={{ op://Odasoft/XBOL Cloud SQL <ENV>/password }}' | op inject)" && psql -c "<SQL>"
+eval "$(sed -n "s/^<PREFIX>_\(PG.*\)/\1/p" ~/.hermes/.env)"
+psql -c "<SQL>"
 ```
-
-Replace `<ENV>` with `Dev` or `QA`.
 
 For multi-line queries:
 
 ```bash
-eval "$(echo 'PGHOST={{ op://Odasoft/XBOL Cloud SQL <ENV>/host }}
-PGPORT={{ op://Odasoft/XBOL Cloud SQL <ENV>/port }}
-PGUSER={{ op://Odasoft/XBOL Cloud SQL <ENV>/user }}
-PGDATABASE={{ op://Odasoft/XBOL Cloud SQL <ENV>/database }}
-PGPASSWORD={{ op://Odasoft/XBOL Cloud SQL <ENV>/password }}' | op inject)" && psql -f - <<'SQL'
+eval "$(sed -n "s/^<PREFIX>_\(PG.*\)/\1/p" ~/.hermes/.env)"
+psql -f - <<'SQL'
   <multi-line SQL here>
 SQL
 ```
+
+If the connection fails with auth errors, the user may need to run `hermes-init` to refresh credentials.
 
 Full read/write access on both environments. No restrictions on statement types. Use good judgment: confirm before destructive operations (DROP, TRUNCATE) unless the user is clearly asking for it.
 
