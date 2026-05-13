@@ -1,0 +1,12 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      podman pull docker.io/searxng/searxng:latest
+      mkdir -p ~/.config/searxng
+      systemctl --user daemon-reload
+      systemctl --user enable --now searxng.service
+    depends:
+      - /packages/podman
+  links:
+    settings.yml: ~/.config/searxng/settings.yml
+    searxng.service: ~/.config/systemd/user/searxng.service
