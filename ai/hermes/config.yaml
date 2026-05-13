@@ -192,7 +192,7 @@ privacy:
 tts:
   provider: edge
   edge:
-    voice: en-US-AriaNeural
+    voice: en-US-AvaMultilingualNeural
   elevenlabs:
     voice_id: pNInz6obpgDQGcFmaJgB
     model_id: eleven_multilingual_v2
@@ -218,7 +218,7 @@ stt:
   enabled: true
   provider: local
   local:
-    model: base
+    model: small
     language: ''
   openai:
     model: whisper-1
