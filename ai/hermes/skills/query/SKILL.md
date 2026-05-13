@@ -89,9 +89,58 @@ FROM pg_stat_user_indexes
 ORDER BY idx_scan;
 ```
 
+## Output Formatting
+
+**Rules:**
+
+- **NEVER use Markdown pipe tables** (`| col | col |`) — many channels don't render Markdown and raw pipes are unreadable.
+- **NEVER wrap tables in code fences** (```) — breaks rendering in channels that *do* support Markdown.
+- Always use **Unicode box-drawing characters** to construct plain-text tables. These render correctly in terminals, Slack, Discord, plain-text email, and Markdown (as monospace blocks).
+
+**Character set:**
+
+```
+Corners:    ╔ ╗ ╚ ╝
+Tees:       ╠ ╣ ╦ ╩
+Crossings:  ╬ ╪
+Horizontal: ═ ╤ ╧ ─ ┼
+Vertical:   ║ │
+```
+
+**Full table (with row separators):**
+
+```
+╔════════╦════════════════╦═══════════╗
+║   id   ║      name      ║  status   ║
+╠════════╬════════════════╬═══════════╣
+║      1 ║ Alice          ║ active    ║
+╟────────╫────────────────╫───────────╢
+║      2 ║ Bob            ║ inactive  ║
+╚════════╩════════════════╩═══════════╝
+```
+
+**Compact table (no row separators, use for short results):**
+
+```
+╔════════╦════════════════╦═══════════╗
+║   id   ║      name      ║  status   ║
+╠════════╬════════════════╬═══════════╣
+║      1 ║ Alice          ║ active    ║
+║      2 ║ Bob            ║ inactive  ║
+╚════════╩════════════════╩═══════════╝
+```
+
+**Guidelines:**
+
+- Right-align numeric columns, left-align text columns. Center column headers.
+- For scalar results (count, exists, single value), present the value inline — no table needed.
+- For wide result sets, truncate columns that exceed 30 characters with `…` rather than breaking the table layout.
+- If a query returns no rows, say "No results" — don't render an empty table shell.
+- If a column value is NULL, display `∅` (empty set) to distinguish it from an empty string.
+
 ## Workflow
 
 1. Determine which environment the user wants (dev or qa). If not specified, ask.
 2. Build the query — start with schema exploration if unfamiliar with the tables
 3. Execute using the connection template above
-4. Present results clearly — format tables, highlight key findings
+4. Present results using the **Output Formatting** rules above
