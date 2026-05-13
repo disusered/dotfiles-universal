@@ -1,9 +1,12 @@
 model:
-  base_url: https://api.z.ai/api/coding/paas/v4
-  default: glm-5.1
-  provider: zai
+  base_url: https://api.githubcopilot.com
+  default: claude-opus-4.7
+  provider: copilot
+  api_mode: chat_completions
 providers: {}
-fallback_providers: []
+fallback_model:
+  provider: google-gemini-cli
+  model: gemini-2.5-pro
 credential_pool_strategies: {}
 toolsets:
 - hermes-cli
@@ -19,6 +22,7 @@ agent:
   gateway_auto_continue_freshness: 3600
   image_input_mode: auto
   disabled_toolsets: []
+  reasoning_effort: medium
 terminal:
   backend: local
   modal_mode: auto
@@ -44,9 +48,7 @@ terminal:
   docker_run_as_host_user: false
   persistent_shell: true
 web:
-  backend: ''
-  search_backend: ''
-  extract_backend: ''
+  search_backend: searxng
 browser:
   inactivity_timeout: 120
   command_timeout: 30
@@ -111,77 +113,42 @@ bedrock:
     trace: disabled
 auxiliary:
   vision:
-    provider: auto
-    model: ''
-    base_url: ''
-    api_key: ''
+    provider: google-gemini-cli
+    model: gemini-2.5-flash
     timeout: 120
-    extra_body: {}
     download_timeout: 30
   web_extract:
-    provider: auto
-    model: ''
-    base_url: ''
-    api_key: ''
+    provider: google-gemini-cli
+    model: gemini-2.5-flash
     timeout: 360
-    extra_body: {}
   compression:
-    provider: auto
-    model: ''
-    base_url: ''
-    api_key: ''
+    provider: google-gemini-cli
+    model: gemini-2.5-flash
     timeout: 120
-    extra_body: {}
   session_search:
-    provider: auto
-    model: ''
-    base_url: ''
-    api_key: ''
+    provider: google-gemini-cli
+    model: gemini-2.5-flash
     timeout: 30
-    extra_body: {}
     max_concurrency: 3
+  title_generation:
+    provider: google-gemini-cli
+    model: gemini-2.5-flash
+    timeout: 30
   skills_hub:
     provider: auto
-    model: ''
-    base_url: ''
-    api_key: ''
     timeout: 30
-    extra_body: {}
   approval:
     provider: auto
-    model: ''
-    base_url: ''
-    api_key: ''
     timeout: 30
-    extra_body: {}
   mcp:
     provider: auto
-    model: ''
-    base_url: ''
-    api_key: ''
     timeout: 30
-    extra_body: {}
-  title_generation:
-    provider: auto
-    model: ''
-    base_url: ''
-    api_key: ''
-    timeout: 30
-    extra_body: {}
   triage_specifier:
     provider: auto
-    model: ''
-    base_url: ''
-    api_key: ''
     timeout: 120
-    extra_body: {}
   curator:
     provider: auto
-    model: ''
-    base_url: ''
-    api_key: ''
     timeout: 600
-    extra_body: {}
 display:
   compact: false
   personality: kawaii

@@ -14,6 +14,7 @@ linux[whoami.distro^="Arch"]:
       - /tools/ffmpeg
       - /tools/ripgrep
       - /tools/tabulate
+      - /tools/searxng
   links:
     config.yaml: ~/.hermes/config.yaml
     env.tpl: ~/.hermes/env.tpl
