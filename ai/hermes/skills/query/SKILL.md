@@ -106,12 +106,26 @@ psql --csv -c "SELECT id, name, status FROM users LIMIT 5" | tabulate -s ',' -f 
 **Rules:**
 
 - **Always use `psql --csv`** for data queries — this gives clean CSV that `tabulate` parses reliably.
-- **Always wrap tables in code fences** (triple backticks) for Discord rendering.
+- **Only the table goes in code fences** — titles, descriptions, and commentary use normal Markdown outside the code block (bold headers, bullet points, etc.).
 - **Never manually draw tables** with Unicode or pipe characters — let `tabulate` handle it.
 - For scalar results (count, exists, single value), present the value inline — no table needed.
 - If a query returns no rows, say "No results" — don't render an empty table.
 - If a column value is NULL, display `∅` (empty set) to distinguish it from an empty string.
 - For wide result sets, consider adding `LIMIT` or selecting fewer columns rather than letting the table overflow.
+
+**Example response:**
+
+**Users — last 5 active**
+
+```
+╒════╤═════════╤══════════╕
+│ id │ name    │ status   │
+╞════╪═════════╪══════════╡
+│  1 │ Alice   │ active   │
+│  2 │ Bob     │ inactive │
+╘════╧═════════╧══════════╛
+```
+_3 rows total, 2 shown._
 
 ## Language
 
