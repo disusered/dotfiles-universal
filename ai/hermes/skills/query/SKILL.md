@@ -23,18 +23,28 @@ Credentials are pre-resolved in `~/.hermes/.env` (populated by `hermes-init` via
 Replace `<PREFIX>` with `DEV` or `QA` (uppercase):
 
 ```bash
-eval "$(sed -n "s/^<PREFIX>_\(PG.*\)/\1/p" ~/.hermes/.env)"
+export PGHOST="$(grep '^<PREFIX>_PGHOST=' ~/.hermes/.env | cut -d= -f2-)"
+export PGPORT="$(grep '^<PREFIX>_PGPORT=' ~/.hermes/.env | cut -d= -f2-)"
+export PGUSER="$(grep '^<PREFIX>_PGUSER=' ~/.hermes/.env | cut -d= -f2-)"
+export PGDATABASE="$(grep '^<PREFIX>_PGDATABASE=' ~/.hermes/.env | cut -d= -f2-)"
+export PGPASSWORD="$(grep '^<PREFIX>_PGPASSWORD=' ~/.hermes/.env | cut -d= -f2-)"
 psql -c "<SQL>"
 ```
 
 For multi-line queries:
 
 ```bash
-eval "$(sed -n "s/^<PREFIX>_\(PG.*\)/\1/p" ~/.hermes/.env)"
+export PGHOST="$(grep '^<PREFIX>_PGHOST=' ~/.hermes/.env | cut -d= -f2-)"
+export PGPORT="$(grep '^<PREFIX>_PGPORT=' ~/.hermes/.env | cut -d= -f2-)"
+export PGUSER="$(grep '^<PREFIX>_PGUSER=' ~/.hermes/.env | cut -d= -f2-)"
+export PGDATABASE="$(grep '^<PREFIX>_PGDATABASE=' ~/.hermes/.env | cut -d= -f2-)"
+export PGPASSWORD="$(grep '^<PREFIX>_PGPASSWORD=' ~/.hermes/.env | cut -d= -f2-)"
 psql -f - <<'SQL'
   <multi-line SQL here>
 SQL
 ```
+
+**Pitfall:** Do NOT use `eval` to load these variables — the password contains shell-special characters (`[`, `)`, `|`) that break `eval`. The `grep | cut` + `export VAR="$(...)"` pattern avoids this by capturing values in subshells.
 
 If the connection fails with auth errors, the user may need to run `hermes-init` to refresh credentials.
 
