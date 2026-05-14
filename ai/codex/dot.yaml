@@ -1,0 +1,9 @@
+linux|darwin:
+  installs:
+    cmd: command -v codex &>/dev/null || npm install -g @openai/codex
+    depends:
+      - /tools/antidote
+  links:
+    config.toml: ~/.codex/config.toml
+    AGENTS.md: ~/.codex/AGENTS.md
+    rules: ~/.codex/rules/

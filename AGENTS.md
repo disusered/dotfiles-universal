@@ -15,7 +15,7 @@ bd ready              # Find available work
 bd show <id>          # View issue details
 bd update <id> --status in_progress  # Claim work
 bd close <id>         # Complete work
-bd sync               # Sync with git
+# Do not run bd sync, bd push, or bd dolt push from Codex.
 ```
 
 ## Landing the Plane (Session Completion)
@@ -31,7 +31,6 @@ bd sync               # Sync with git
 
    ```bash
    git pull --rebase
-   bd sync
    git push
    git status  # MUST show "up to date with origin"
    ```
@@ -189,7 +188,7 @@ bd close bd-42 --reason "Completed" --json
 bd automatically syncs via Dolt:
 
 - Each write auto-commits to Dolt history
-- Use `bd dolt push`/`bd dolt pull` for remote sync
+- Do not run `bd sync`, `bd push`, or `bd dolt push` from Codex; these push beads state.
 - No manual export/import needed!
 
 ### Important Rules

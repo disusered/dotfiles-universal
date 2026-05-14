@@ -1,0 +1,118 @@
+# Codex exec policy. Rules control commands requested outside the sandbox.
+
+prefix_rule(
+    pattern = [["tofu", "terraform"]],
+    decision = "forbidden",
+    justification = "Do not run Terraform/OpenTofu locally. The tailscale-infra repo plans on PR and applies on merge through GitHub Actions.",
+    match = [
+        "tofu plan",
+        "tofu apply",
+        "terraform init",
+        "terraform plan",
+    ],
+)
+
+prefix_rule(
+    pattern = [["rg", "jq", "ast-grep", "ls", "pwd", "wc", "cat"]],
+    decision = "allow",
+    justification = "Read-only inspection tools are safe to run outside the sandbox.",
+    match = [
+        "rg codex",
+        "jq . file.json",
+        "ast-grep --pattern foo",
+        "ls -la",
+        "pwd",
+        "wc -l README.md",
+        "cat AGENTS.md",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", ["status", "diff", "log", "show"]],
+    decision = "allow",
+    justification = "Read-only git inspection commands do not mutate the worktree.",
+    match = [
+        "git status --short",
+        "git diff --stat",
+        "git log --oneline -5",
+        "git show HEAD",
+    ],
+)
+
+prefix_rule(
+    pattern = ["git", "branch", "--show-current"],
+    decision = "allow",
+    justification = "Reading the current branch does not mutate the worktree.",
+    match = [
+        "git branch --show-current",
+    ],
+    not_match = [
+        "git branch -D old-branch",
+    ],
+)
+
+prefix_rule(
+    pattern = ["bd", ["onboard", "prime", "ready", "show"]],
+    decision = "allow",
+    justification = "Read-only beads commands provide issue-tracking context.",
+    match = [
+        "bd onboard --json",
+        "bd prime",
+        "bd ready --json",
+        "bd show bd-123 --json",
+    ],
+)
+
+prefix_rule(
+    pattern = ["bd", "push"],
+    decision = "forbidden",
+    justification = "Do not push beads directly. Beads state must not be pushed or synced from Codex.",
+    match = [
+        "bd push",
+    ],
+    not_match = [
+        "bd ready --json",
+    ],
+)
+
+prefix_rule(
+    pattern = ["bd", "sync"],
+    decision = "forbidden",
+    justification = "Do not sync beads from Codex because bd sync pushes beads state.",
+    match = [
+        "bd sync",
+    ],
+    not_match = [
+        "bd ready --json",
+    ],
+)
+
+prefix_rule(
+    pattern = ["bd", "dolt", "push"],
+    decision = "forbidden",
+    justification = "Do not push the beads Dolt database directly. Beads state must not be pushed or synced from Codex.",
+    match = [
+        "bd dolt push",
+    ],
+    not_match = [
+        "bd dolt pull",
+    ],
+)
+
+prefix_rule(
+    pattern = ["gh", ["pr", "issue"], ["view", "list", "status"]],
+    decision = "allow",
+    justification = "Read-only GitHub inspection through gh is allowed.",
+    match = [
+        "gh pr view 123 --json title,body",
+        "gh pr list",
+        "gh pr status",
+        "gh issue view 42",
+        "gh issue list",
+        "gh issue status",
+    ],
+    not_match = [
+        "gh pr create",
+        "gh issue comment 42 --body hi",
+    ],
+)
