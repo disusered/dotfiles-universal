@@ -64,6 +64,22 @@ prefix_rule(
 )
 
 prefix_rule(
+    pattern = ["bd", ["create", "update"]],
+    decision = "allow",
+    justification = "Creating and updating beads issues is part of the local issue-tracking workflow.",
+    match = [
+        "bd create \"Follow-up task\" --type task --priority 2 --json",
+        "bd update bd-123 --status in_progress --json",
+        "bd update bd-123 --claim --json",
+    ],
+    not_match = [
+        "bd push",
+        "bd sync",
+        "bd dolt push",
+    ],
+)
+
+prefix_rule(
     pattern = ["bd", "push"],
     decision = "forbidden",
     justification = "Do not push beads directly. Beads state must not be pushed or synced from Codex.",
