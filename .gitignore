@@ -38,3 +38,6 @@ ai/claude/.cache/
 .dolt/
 .beads/.beads-credential-key
 *.db
+/ai/hermes/catppuccin.yaml
+/ai/hermes/dashboard-catppuccin.yaml
+/ai/opencode/catppuccin.json
