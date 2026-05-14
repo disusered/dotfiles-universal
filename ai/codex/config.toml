@@ -1,9 +1,10 @@
 personality = "pragmatic"
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
+commit_attribution = ""
 
 [features]
-codex_git_commit = true
+codex_git_commit = false
 memories = true
 
 [shell_environment_policy]
@@ -17,10 +18,13 @@ status_line = ["model-with-reasoning", "current-dir", "git-branch", "branch-chan
 status_line_use_colors = true
 
 [tui.model_availability_nux]
-"gpt-5.5" = 3
+"gpt-5.5" = 4
 
 [projects."/home/carlos/.dotfiles"]
 trust_level = "trusted"
 
 [projects."/home/carlos/Development/XBOL"]
+trust_level = "trusted"
+
+[projects."/home/carlos/Development/XBOL/xbol-api-admin"]
 trust_level = "trusted"

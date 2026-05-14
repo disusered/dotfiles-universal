@@ -52,6 +52,21 @@ prefix_rule(
 )
 
 prefix_rule(
+    pattern = ["git", ["pull", "push"]],
+    decision = "forbidden",
+    justification = "Do not pull or push git remotes from Codex.",
+    match = [
+        "git pull",
+        "git pull --rebase",
+        "git push",
+    ],
+    not_match = [
+        "git status --short",
+        "git log --oneline -5",
+    ],
+)
+
+prefix_rule(
     pattern = ["bd", ["onboard", "prime", "ready", "show"]],
     decision = "allow",
     justification = "Read-only beads commands provide issue-tracking context.",
@@ -64,13 +79,15 @@ prefix_rule(
 )
 
 prefix_rule(
-    pattern = ["bd", ["create", "update"]],
+    pattern = ["bd", ["create", "update", "dep"]],
     decision = "allow",
     justification = "Creating and updating beads issues is part of the local issue-tracking workflow.",
     match = [
         "bd create \"Follow-up task\" --type task --priority 2 --json",
         "bd update bd-123 --status in_progress --json",
         "bd update bd-123 --claim --json",
+        "bd dep add XBOL-mgo.9 XBOL-mgo.2 --json",
+        "bd search \"registration finished email\" --json"
     ],
     not_match = [
         "bd push",
@@ -132,3 +149,4 @@ prefix_rule(
         "gh issue comment 42 --body hi",
     ],
 )
+prefix_rule(pattern=["dotnet", "build"], decision="allow")
