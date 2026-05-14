@@ -1,13 +1,33 @@
 model:
-  base_url: https://api.githubcopilot.com
-  default: claude-opus-4.7
-  provider: copilot
-  api_mode: chat_completions
+  default: glm-5.1
+  provider: zai
 providers: {}
 fallback_model:
-  provider: google-gemini-cli
-  model: gemini-2.5-pro
+  - provider: copilot
+    model: claude-opus-4.7
+  - provider: google-gemini-cli
+    model: gemini-2.5-pro
 credential_pool_strategies: {}
+mcp_servers:
+  zai-vision:
+    command: npx
+    args:
+      - "-y"
+      - "@z_ai/mcp-server"
+    env:
+      Z_AI_API_KEY: "${GLM_API_KEY}"
+      Z_AI_MODE: "ZAI"
+    enabled: true
+  web-search-prime:
+    url: "https://api.z.ai/api/mcp/web_search_prime/mcp"
+    headers:
+      Authorization: "Bearer ${GLM_API_KEY}"
+    enabled: true
+  web-reader:
+    url: "https://api.z.ai/api/mcp/web_reader/mcp"
+    headers:
+      Authorization: "Bearer ${GLM_API_KEY}"
+    enabled: true
 toolsets:
 - hermes-cli
 agent:
