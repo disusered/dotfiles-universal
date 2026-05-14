@@ -1,6 +1,9 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: systemctl --user enable --now opencode-serve.service
+    cmd: |
+      npm i -g opencode-ai
+      npx -y opencode-openai-codex-auth@latest
+      systemctl --user enable --now opencode-serve.service
     depends:
       - /tools/tailscale
   links:
