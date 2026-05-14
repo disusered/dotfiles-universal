@@ -249,6 +249,25 @@
       }
     }
   },
+  "permission": {
+    "bash": {
+      "git push*": "deny",
+      "git *push*": "deny",
+      "git remote*": "deny",
+      "git fetch*": "deny",
+      "git pull*": "deny",
+      "git clone*": "deny",
+      "snip git push*": "deny",
+      "snip git *push*": "deny",
+      "snip git remote*": "deny",
+      "snip git fetch*": "deny",
+      "snip git pull*": "deny",
+      "snip git clone*": "deny",
+      "git *": "allow",
+      "snip git *": "allow",
+      "*": "allow"
+    }
+  },
   "mcp": {
     "web-reader": {
       "type": "remote",
