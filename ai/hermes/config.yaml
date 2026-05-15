@@ -1,33 +1,10 @@
 model:
-  default: glm-5.1
-  provider: zai
+  default: gpt-5.5
+  provider: openai-codex
+  base_url: https://chatgpt.com/backend-api/codex
 providers: {}
-fallback_model:
-  - provider: copilot
-    model: claude-opus-4.7
-  - provider: google-gemini-cli
-    model: gemini-2.5-pro
+fallback_providers: []
 credential_pool_strategies: {}
-mcp_servers:
-  zai-vision:
-    command: npx
-    args:
-      - "-y"
-      - "@z_ai/mcp-server"
-    env:
-      Z_AI_API_KEY: "${GLM_API_KEY}"
-      Z_AI_MODE: "ZAI"
-    enabled: true
-  web-search-prime:
-    url: "https://api.z.ai/api/mcp/web_search_prime/mcp"
-    headers:
-      Authorization: "Bearer ${GLM_API_KEY}"
-    enabled: true
-  web-reader:
-    url: "https://api.z.ai/api/mcp/web_reader/mcp"
-    headers:
-      Authorization: "Bearer ${GLM_API_KEY}"
-    enabled: true
 toolsets:
 - hermes-cli
 agent:
@@ -68,7 +45,9 @@ terminal:
   docker_run_as_host_user: false
   persistent_shell: true
 web:
+  backend: ''
   search_backend: searxng
+  extract_backend: ''
 browser:
   inactivity_timeout: 120
   command_timeout: 30
@@ -135,40 +114,75 @@ auxiliary:
   vision:
     provider: google-gemini-cli
     model: gemini-2.5-flash
+    base_url: ''
+    api_key: ''
     timeout: 120
+    extra_body: {}
     download_timeout: 30
   web_extract:
     provider: google-gemini-cli
     model: gemini-2.5-flash
+    base_url: ''
+    api_key: ''
     timeout: 360
+    extra_body: {}
   compression:
     provider: google-gemini-cli
     model: gemini-2.5-flash
+    base_url: ''
+    api_key: ''
     timeout: 120
+    extra_body: {}
   session_search:
     provider: google-gemini-cli
     model: gemini-2.5-flash
+    base_url: ''
+    api_key: ''
     timeout: 30
+    extra_body: {}
     max_concurrency: 3
+  skills_hub:
+    provider: auto
+    model: ''
+    base_url: ''
+    api_key: ''
+    timeout: 30
+    extra_body: {}
+  approval:
+    provider: auto
+    model: ''
+    base_url: ''
+    api_key: ''
+    timeout: 30
+    extra_body: {}
+  mcp:
+    provider: auto
+    model: ''
+    base_url: ''
+    api_key: ''
+    timeout: 30
+    extra_body: {}
   title_generation:
     provider: google-gemini-cli
     model: gemini-2.5-flash
+    base_url: ''
+    api_key: ''
     timeout: 30
-  skills_hub:
-    provider: auto
-    timeout: 30
-  approval:
-    provider: auto
-    timeout: 30
-  mcp:
-    provider: auto
-    timeout: 30
+    extra_body: {}
   triage_specifier:
     provider: auto
+    model: ''
+    base_url: ''
+    api_key: ''
     timeout: 120
+    extra_body: {}
   curator:
     provider: auto
+    model: ''
+    base_url: ''
+    api_key: ''
     timeout: 600
+    extra_body: {}
 display:
   compact: false
   personality: kawaii
@@ -433,6 +447,31 @@ updates:
   pre_update_backup: false
   backup_keep: 5
 _config_version: 23
+fallback_model:
+- provider: copilot
+  model: claude-opus-4.7
+- provider: google-gemini-cli
+  model: gemini-2.5-pro
+mcp_servers:
+  zai-vision:
+    command: npx
+    args:
+    - -y
+    - '@z_ai/mcp-server'
+    env:
+      Z_AI_API_KEY: ${GLM_API_KEY}
+      Z_AI_MODE: ZAI
+    enabled: true
+  web-search-prime:
+    url: https://api.z.ai/api/mcp/web_search_prime/mcp
+    headers:
+      Authorization: Bearer ${GLM_API_KEY}
+    enabled: true
+  web-reader:
+    url: https://api.z.ai/api/mcp/web_reader/mcp
+    headers:
+      Authorization: Bearer ${GLM_API_KEY}
+    enabled: true
 session_reset:
   at_hour: 4
   idle_minutes: 1440
@@ -482,25 +521,3 @@ platforms:
       - '1448742332907262023'
       group_user_allowed_commands:
       - query
-
-# ── Fallback Model ────────────────────────────────────────────────────
-# Automatic provider failover when primary is unavailable.
-# Uncomment and configure to enable. Triggers on rate limits (429),
-# overload (529), service errors (503), or connection failures.
-#
-# Supported providers:
-#   openrouter   (OPENROUTER_API_KEY)  — routes to any model
-#   openai-codex (OAuth — hermes auth) — OpenAI Codex
-#   nous         (OAuth — hermes auth) — Nous Portal
-#   zai          (ZAI_API_KEY)         — Z.AI / GLM
-#   kimi-coding  (KIMI_API_KEY)        — Kimi / Moonshot
-#   kimi-coding-cn (KIMI_CN_API_KEY)   — Kimi / Moonshot (China)
-#   minimax      (MINIMAX_API_KEY)     — MiniMax
-#   minimax-cn   (MINIMAX_CN_API_KEY)  — MiniMax (China)
-#   bedrock      (AWS IAM / boto3)     — AWS Bedrock (Converse API)
-#
-# For custom OpenAI-compatible endpoints, add base_url and key_env.
-#
-# fallback_model:
-#   provider: openrouter
-#   model: anthropic/claude-sonnet-4
