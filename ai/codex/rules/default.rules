@@ -79,7 +79,7 @@ prefix_rule(
 )
 
 prefix_rule(
-    pattern = ["bd", ["create", "update", "dep"]],
+    pattern = ["bd", ["create", "update", "dep", "search"]],
     decision = "allow",
     justification = "Creating and updating beads issues is part of the local issue-tracking workflow.",
     match = [
@@ -150,3 +150,94 @@ prefix_rule(
     ],
 )
 prefix_rule(pattern=["dotnet", "build"], decision="allow")
+prefix_rule(pattern=["dotnet", "run"], decision="allow")
+
+prefix_rule(
+    pattern = [["sh", "bash", "zsh"]],
+    decision = "forbidden",
+    justification = "Do not execute shell installers from downloaded scripts.",
+    match = [
+        "sh",
+        "bash",
+        "zsh",
+        "sh -s",
+        "bash -s",
+    ],
+)
+
+prefix_rule(
+    pattern = ["curl"],
+    decision = "allow",
+    justification = "curl is allowed for direct HTTP requests, but shell installer pipelines must remain blocked by the shell rule.",
+    match = [
+        "curl https://example.com",
+        "curl -fsSL https://example.com/install.sh",
+    ],
+)
+
+prefix_rule(
+    pattern = ["psql"],
+    decision = "allow",
+    justification = "psql is allowed for database inspection and local development queries.",
+    match = [
+        "psql --version",
+        "psql postgresql://localhost/postgres -c 'select 1'",
+    ],
+)
+
+prefix_rule(
+    pattern = [["./gradlew", "gradlew"]],
+    decision = "allow",
+    justification = "Gradle wrapper commands are allowed for local Android and React Native builds.",
+    match = [
+        "./gradlew assembleDebug",
+        "./gradlew test",
+        "gradlew assembleDebug",
+    ],
+)
+
+prefix_rule(
+    pattern = ["npx", "react-native"],
+    decision = "allow",
+    justification = "React Native CLI commands are allowed for local mobile development workflows.",
+    match = [
+        "npx react-native start",
+        "npx react-native run-android",
+        "npx react-native doctor",
+    ],
+)
+
+prefix_rule(
+    pattern = [["npm", "yarn", "pnpm"], "run", ["android", "ios", "start"]],
+    decision = "allow",
+    justification = "Package-manager React Native entrypoints are allowed for local mobile development workflows.",
+    match = [
+        "npm run android",
+        "npm run ios",
+        "npm run start",
+        "pnpm run android",
+    ],
+)
+
+prefix_rule(
+    pattern = ["yarn", ["android", "ios", "start", "react-native"]],
+    decision = "allow",
+    justification = "Yarn React Native entrypoints are allowed for local mobile development workflows.",
+    match = [
+        "yarn android",
+        "yarn ios",
+        "yarn start",
+        "yarn react-native run-android",
+    ],
+)
+
+prefix_rule(
+    pattern = [["npm", "yarn", "pnpm"], "exec", "react-native"],
+    decision = "allow",
+    justification = "Package-manager React Native CLI execution is allowed for local mobile development workflows.",
+    match = [
+        "npm exec react-native run-android",
+        "yarn exec react-native run-ios",
+        "pnpm exec react-native run-android",
+    ],
+)
