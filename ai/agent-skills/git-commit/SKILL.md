@@ -29,6 +29,8 @@ Review the changes in the repo and prepare logical, organized, clean and descrip
    - If the full suite fails on unrelated pre-existing files, run targeted checks against changed files and report both facts exactly.
    - For builds requiring env vars, either use existing project env setup or provide explicit dummy public env values and state that the build was run with those values.
 4. Respect Carlos' workflow preference: ask for authorization before creating commits. Do not push.
+   - If the branch is ahead/behind its remote, report that fact during review, but do not run `git pull`, `git rebase`, or `git push` as part of commit preparation unless Carlos explicitly authorizes that separate operation.
+   - Commit authorization is not push authorization.
 5. After authorization, stage only the files for the intended logical commit, commit with a conventional message, then repeat for the next group.
 6. Verify the final state with `git status --short`, `git log --oneline -5`, and `git diff HEAD --stat`.
 
