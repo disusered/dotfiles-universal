@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: command -v abtop &>/dev/null || cargo install abtop
+    depends:
+      - /languages/rust
