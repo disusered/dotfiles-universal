@@ -41,3 +41,12 @@ ai/claude/.cache/
 /ai/hermes/catppuccin.yaml
 /ai/hermes/dashboard-catppuccin.yaml
 /ai/opencode/catppuccin.json
+
+# Agent skills are centralized under /ai/agent-skills; do not re-add
+# per-app copies/symlinks for shared skills.
+/ai/codex/skills/
+/ai/hermes/skills/git-commit/
+/ai/claude/skills/git-commit/
+/ai/opencode/skills/
+/ai/opencode/commands/git-commit.md
+/ai/claude/commands/git-commit.md

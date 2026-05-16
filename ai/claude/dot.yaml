@@ -6,7 +6,7 @@ global:
   links:
     skills: ~/.claude/skills/
     hooks: ~/.claude/hooks
-    commands: ~/.claude/commands
+    commands/slop-clean.md: ~/.claude/commands/slop-clean.md
     agents: ~/.claude/agents/
     reference: ~/.claude/reference/
     rules: ~/.claude/rules/

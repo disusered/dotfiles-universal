@@ -9,10 +9,15 @@ http://opencode.disusered.com {
 
 http://hermes.disusered.com {
 	bind {$CADDY_TAILSCALE_IP}
+	reverse_proxy localhost:18787
+}
+
+http://hermes-admin.disusered.com {
+	bind {$CADDY_TAILSCALE_IP}
 
 	@options method OPTIONS
 	handle @options {
-		header Access-Control-Allow-Origin "http://hermes.disusered.com"
+		header Access-Control-Allow-Origin "http://hermes-admin.disusered.com"
 		header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
 		header Access-Control-Allow-Headers "Authorization, Content-Type"
 		header Access-Control-Max-Age "600"
@@ -20,9 +25,9 @@ http://hermes.disusered.com {
 	}
 
 	handle {
-		reverse_proxy localhost:9119 {
-			header_up Host localhost:9119
-			header_down +Access-Control-Allow-Origin "http://hermes.disusered.com"
+		reverse_proxy localhost:19119 {
+			header_up Host localhost:19119
+			header_down +Access-Control-Allow-Origin "http://hermes-admin.disusered.com"
 		}
 	}
 }
