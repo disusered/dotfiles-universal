@@ -443,6 +443,7 @@ sessions:
 onboarding:
   seen:
     tool_progress_prompt: true
+    busy_input_prompt: true
 updates:
   pre_update_backup: false
   backup_keep: 5
@@ -479,21 +480,10 @@ session_reset:
 skin: catppuccin
 platform_toolsets:
   discord:
-  - browser
   - clarify
-  - code_execution
-  - computer_use
-  - cronjob
-  - delegation
-  - file
   - image_gen
   - kanban
-  - memory
-  - messaging
-  - session_search
-  - skills
   - terminal
-  - todo
   - tts
   - vision
   - web
