@@ -1,0 +1,23 @@
+[Unit]
+Description=Hermes Web UI
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/carlos/Development/ME/hermes-webui
+ExecStart=/bin/bash /home/carlos/Development/ME/hermes-webui/start.sh --foreground
+Environment="PATH=/home/carlos/.hermes/hermes-agent/venv/bin:/home/carlos/.local/share/mise/installs/node/24.10.0/bin:/home/carlos/.local/bin:/home/carlos/.cargo/bin:/home/carlos/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="HERMES_HOME=/home/carlos/.hermes"
+Environment="HERMES_WEBUI_HOST=127.0.0.1"
+Environment="HERMES_WEBUI_PORT=18787"
+Environment="HERMES_WEBUI_STATE_DIR=/home/carlos/.hermes/webui"
+Environment="HERMES_WEBUI_DEFAULT_WORKSPACE=/home/carlos/Development"
+EnvironmentFile=-/home/carlos/.hermes/webui.env
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

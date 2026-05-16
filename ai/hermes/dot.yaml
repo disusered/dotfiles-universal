@@ -9,7 +9,7 @@ linux[whoami.distro^="Arch"]:
       if [ ! -f /home/carlos/.hermes/hermes-agent/hermes_cli/web_dist/index.html ]; then
         cd /home/carlos/.hermes/hermes-agent/web && npm install --silent && npm run build
       fi
-      systemctl --user enable --now hermes-dashboard.service
+      systemctl --user enable --now hermes-dashboard.service hermes-webui.service
     depends:
       - /tools/ffmpeg
       - /tools/ripgrep
@@ -23,4 +23,5 @@ linux[whoami.distro^="Arch"]:
     dashboard-catppuccin.yaml: ~/.hermes/dashboard-themes/catppuccin.yaml
     hermes-dashboard.service: ~/.config/systemd/user/hermes-dashboard.service
     hermes-gateway.service: ~/.config/systemd/user/hermes-gateway.service
+    hermes-webui.service: ~/.config/systemd/user/hermes-webui.service
     skills/query/SKILL.md: ~/.hermes/skills/database/query/SKILL.md
