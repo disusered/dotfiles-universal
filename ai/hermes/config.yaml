@@ -6,7 +6,7 @@ providers: {}
 fallback_providers: []
 credential_pool_strategies: {}
 toolsets:
-- hermes-cli
+  - hermes-cli
 agent:
   max_turns: 90
   gateway_timeout: 1800
@@ -214,9 +214,9 @@ display:
   runtime_footer:
     enabled: false
     fields:
-    - model
-    - context_pct
-    - cwd
+      - model
+      - context_pct
+      - cwd
   copy_shortcut: auto
   tool_progress: all
 dashboard:
@@ -295,63 +295,63 @@ goals:
   max_turns: 20
 skills:
   external_dirs:
-  - ~/.dotfiles/ai/hermes/skills
+    - ~/.dotfiles/ai/hermes/skills
   template_vars: true
   inline_shell: false
   inline_shell_timeout: 10
   guard_agent_created: false
   disabled:
-  - airtable
-  - architecture-diagram
-  - arxiv
-  - ascii-video
-  - audiocraft-audio-generation
-  - baoyu-comic
-  - baoyu-infographic
-  - codex
-  - comfyui
-  - dogfood
-  - evaluating-llms-harness
-  - excalidraw
-  - godmode
-  - heartmula
-  - huggingface-hub
-  - ideation
-  - jupyter-live-kernel
-  - linear
-  - llama-cpp
-  - llm-wiki
-  - manim-video
-  - minecraft-modpack-server
-  - node-inspect-debugger
-  - notion
-  - obliteratus
-  - obsidian
-  - openhue
-  - p5js
-  - pixel-art
-  - pokemon-player
-  - polymarket
-  - popular-web-designs
-  - powerpoint
-  - pretext
-  - python-debugpy
-  - segment-anything-model
-  - serving-llms-vllm
-  - songsee
-  - songwriting-and-ai-music
-  - spotify
-  - subagent-driven-development
-  - systematic-debugging
-  - teams-meeting-pipeline
-  - test-driven-development
-  - touchdesigner-mcp
-  - webhook-subscriptions
-  - weights-and-biases
-  - writing-plans
-  - xurl
-  - youtube-content
-  - yuanbao
+    - airtable
+    - architecture-diagram
+    - arxiv
+    - ascii-video
+    - audiocraft-audio-generation
+    - baoyu-comic
+    - baoyu-infographic
+    - codex
+    - comfyui
+    - dogfood
+    - evaluating-llms-harness
+    - excalidraw
+    - godmode
+    - heartmula
+    - huggingface-hub
+    - ideation
+    - jupyter-live-kernel
+    - linear
+    - llama-cpp
+    - llm-wiki
+    - manim-video
+    - minecraft-modpack-server
+    - node-inspect-debugger
+    - notion
+    - obliteratus
+    - obsidian
+    - openhue
+    - p5js
+    - pixel-art
+    - pokemon-player
+    - polymarket
+    - popular-web-designs
+    - powerpoint
+    - pretext
+    - python-debugpy
+    - segment-anything-model
+    - serving-llms-vllm
+    - songsee
+    - songwriting-and-ai-music
+    - spotify
+    - subagent-driven-development
+    - systematic-debugging
+    - teams-meeting-pipeline
+    - test-driven-development
+    - touchdesigner-mcp
+    - webhook-subscriptions
+    - weights-and-biases
+    - writing-plans
+    - xurl
+    - youtube-content
+    - yuanbao
 curator:
   enabled: true
   interval_hours: 168
@@ -396,7 +396,7 @@ approvals:
   timeout: 60
   cron_mode: deny
   mcp_reload_confirm: true
-  destructive_slash_confirm: true
+  destructive_slash_confirm: false
 command_allowlist: []
 quick_commands: {}
 hooks: {}
@@ -417,7 +417,7 @@ security:
   allow_lazy_installs: true
 cron:
   wrap_response: true
-  max_parallel_jobs: null
+  max_parallel_jobs:
 kanban:
   dispatch_in_gateway: true
   dispatch_interval_seconds: 60
@@ -449,16 +449,16 @@ updates:
   backup_keep: 5
 _config_version: 23
 fallback_model:
-- provider: copilot
-  model: claude-opus-4.7
-- provider: openrouter
-  model: google/gemini-2.5-pro
+  - provider: copilot
+    model: claude-opus-4.7
+  - provider: openrouter
+    model: google/gemini-2.5-pro
 mcp_servers:
   zai-vision:
     command: npx
     args:
-    - -y
-    - '@z_ai/mcp-server'
+      - -y
+      - '@z_ai/mcp-server'
     env:
       Z_AI_API_KEY: ${GLM_API_KEY}
       Z_AI_MODE: ZAI
@@ -480,34 +480,34 @@ session_reset:
 skin: catppuccin
 platform_toolsets:
   discord:
-  - clarify
-  - image_gen
-  - kanban
-  - terminal
-  - tts
-  - vision
-  - web
+    - clarify
+    - image_gen
+    - kanban
+    - terminal
+    - tts
+    - vision
+    - web
 known_plugin_toolsets:
   discord:
-  - spotify
+    - spotify
 plugins:
   enabled:
-  - disk-cleanup
+    - disk-cleanup
   disabled:
-  - google_meet
-  - spotify
-  - teams_pipeline
+    - google_meet
+    - spotify
+    - teams_pipeline
 platforms:
   discord:
     gateway_restart_notification: false
     extra:
       allow_from:
-      - '1448742332907262023'
+        - '1448742332907262023'
       allow_admin_from:
-      - '1448742332907262023'
+        - '1448742332907262023'
       user_allowed_commands:
-      - query
+        - query
       group_allow_admin_from:
-      - '1448742332907262023'
+        - '1448742332907262023'
       group_user_allowed_commands:
-      - query
+        - query
