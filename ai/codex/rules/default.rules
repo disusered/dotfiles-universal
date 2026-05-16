@@ -186,6 +186,88 @@ prefix_rule(
 )
 
 prefix_rule(
+    pattern = [["docker", "podman"], ["ps", "logs", "inspect", "images", "version", "info", "stats", "top", "events"]],
+    decision = "allow",
+    justification = "Non-destructive Docker and Podman inspection commands are allowed.",
+    match = [
+        "docker ps",
+        "docker logs api",
+        "docker inspect api",
+        "docker images",
+        "docker version",
+        "docker info",
+        "docker stats --no-stream",
+        "docker top api",
+        "podman ps",
+        "podman logs api",
+    ],
+    not_match = [
+        "docker run postgres",
+        "docker rm api",
+        "podman run postgres",
+        "podman rm api",
+    ],
+)
+
+prefix_rule(
+    pattern = [["docker", "podman"], ["container", "image", "volume", "network", "context"], "ls"],
+    decision = "allow",
+    justification = "Non-destructive Docker and Podman list commands are allowed.",
+    match = [
+        "docker container ls",
+        "docker image ls",
+        "docker volume ls",
+        "docker network ls",
+        "docker context ls",
+        "podman container ls",
+        "podman image ls",
+    ],
+    not_match = [
+        "docker container rm api",
+        "docker image rm postgres",
+        "docker volume rm data",
+        "podman pod rm app",
+    ],
+)
+
+prefix_rule(
+    pattern = ["podman", "pod", "ls"],
+    decision = "allow",
+    justification = "Non-destructive Podman pod list commands are allowed.",
+    match = [
+        "podman pod ls",
+    ],
+    not_match = [
+        "podman pod rm app",
+    ],
+)
+
+prefix_rule(
+    pattern = ["docker", "compose", ["ps", "logs", "config", "ls", "images", "top", "port", "version", "events"]],
+    decision = "allow",
+    justification = "Non-destructive Docker Compose inspection commands are allowed.",
+    match = [
+        "docker compose ps",
+        "docker compose logs",
+        "docker compose config",
+        "docker compose ls",
+        "docker compose images",
+        "docker compose top",
+        "docker compose port api 8080",
+        "docker compose version",
+    ],
+    not_match = [
+        "docker compose up -d",
+        "docker compose down -v",
+        "docker compose run api",
+        "docker compose rm api",
+        "docker compose build",
+        "docker compose pull",
+        "docker compose push",
+    ],
+)
+
+prefix_rule(
     pattern = [["./gradlew", "gradlew"]],
     decision = "allow",
     justification = "Gradle wrapper commands are allowed for local Android and React Native builds.",
@@ -241,3 +323,7 @@ prefix_rule(
         "pnpm exec react-native run-android",
     ],
 )
+prefix_rule(pattern=["rm", ".next/lock"], decision="allow")
+prefix_rule(pattern=["npm", "run", "test:client"], decision="allow")
+prefix_rule(pattern=["npm", "install"], decision="allow")
+prefix_rule(pattern=["ps", "-ef"], decision="allow")
