@@ -6,8 +6,8 @@ providers: {}
 fallback_providers: []
 credential_pool_strategies: {}
 toolsets:
-  - hermes-cli
-  - memory
+- hermes-cli
+- memory
 agent:
   max_turns: 90
   gateway_timeout: 1800
@@ -16,11 +16,12 @@ agent:
   service_tier: ''
   tool_use_enforcement: auto
   gateway_timeout_warning: 900
+  clarify_timeout: 600
   gateway_notify_interval: 180
   gateway_auto_continue_freshness: 3600
   image_input_mode: auto
   disabled_toolsets: []
-  reasoning_effort: medium
+  reasoning_effort: high
 terminal:
   backend: local
   modal_mode: auto
@@ -61,6 +62,9 @@ browser:
   dialog_timeout_s: 300
   camofox:
     managed_persistence: false
+    user_id: ''
+    session_key: ''
+    adopt_existing_tab: false
 checkpoints:
   enabled: false
   max_snapshots: 20
@@ -92,6 +96,7 @@ compression:
   target_ratio: 0.2
   protect_last_n: 20
   hygiene_hard_message_limit: 400
+  protect_first_n: 3
 prompt_caching:
   cache_ttl: 5m
   long_lived_prefix: true
@@ -215,13 +220,14 @@ display:
   runtime_footer:
     enabled: false
     fields:
-      - model
-      - context_pct
-      - cwd
+    - model
+    - context_pct
+    - cwd
   copy_shortcut: auto
   tool_progress: all
 dashboard:
   theme: catppuccin
+  show_token_analytics: false
 privacy:
   redact_pii: false
 tts:
@@ -283,6 +289,7 @@ delegation:
   provider: ''
   base_url: ''
   api_key: ''
+  api_mode: ''
   inherit_mcp_toolsets: true
   max_iterations: 50
   child_timeout_seconds: 600
@@ -296,63 +303,63 @@ goals:
   max_turns: 20
 skills:
   external_dirs:
-    - ~/.dotfiles/ai/hermes/skills
+  - ~/.dotfiles/ai/hermes/skills
   template_vars: true
   inline_shell: false
   inline_shell_timeout: 10
   guard_agent_created: false
   disabled:
-    - airtable
-    - architecture-diagram
-    - arxiv
-    - ascii-video
-    - audiocraft-audio-generation
-    - baoyu-comic
-    - baoyu-infographic
-    - codex
-    - comfyui
-    - dogfood
-    - evaluating-llms-harness
-    - excalidraw
-    - godmode
-    - heartmula
-    - huggingface-hub
-    - ideation
-    - jupyter-live-kernel
-    - linear
-    - llama-cpp
-    - llm-wiki
-    - manim-video
-    - minecraft-modpack-server
-    - node-inspect-debugger
-    - notion
-    - obliteratus
-    - obsidian
-    - openhue
-    - p5js
-    - pixel-art
-    - pokemon-player
-    - polymarket
-    - popular-web-designs
-    - powerpoint
-    - pretext
-    - python-debugpy
-    - segment-anything-model
-    - serving-llms-vllm
-    - songsee
-    - songwriting-and-ai-music
-    - spotify
-    - subagent-driven-development
-    - systematic-debugging
-    - teams-meeting-pipeline
-    - test-driven-development
-    - touchdesigner-mcp
-    - webhook-subscriptions
-    - weights-and-biases
-    - writing-plans
-    - xurl
-    - youtube-content
-    - yuanbao
+  - airtable
+  - architecture-diagram
+  - arxiv
+  - ascii-video
+  - audiocraft-audio-generation
+  - baoyu-comic
+  - baoyu-infographic
+  - claude-code
+  - claude-design
+  - comfyui
+  - dogfood
+  - evaluating-llms-harness
+  - excalidraw
+  - godmode
+  - heartmula
+  - huggingface-hub
+  - ideation
+  - jupyter-live-kernel
+  - linear
+  - llama-cpp
+  - manim-video
+  - minecraft-modpack-server
+  - node-inspect-debugger
+  - notion
+  - obliteratus
+  - obsidian
+  - openhue
+  - p5js
+  - pixel-art
+  - pokemon-player
+  - polymarket
+  - popular-web-designs
+  - powerpoint
+  - pretext
+  - python-debugpy
+  - segment-anything-model
+  - serving-llms-vllm
+  - songsee
+  - songwriting-and-ai-music
+  - spotify
+  - subagent-driven-development
+  - systematic-debugging
+  - teams-meeting-pipeline
+  - test-driven-development
+  - touchdesigner-mcp
+  - webhook-subscriptions
+  - weights-and-biases
+  - writing-plans
+  - xurl
+  - youtube-content
+  - yuanbao
 curator:
   enabled: true
   interval_hours: 168
@@ -374,6 +381,9 @@ discord:
   free_response_channels: ''
   allowed_channels: ''
   auto_thread: true
+  thread_require_mention: false
+  history_backfill: true
+  history_backfill_limit: 50
   reactions: true
   channel_prompts: {}
   dm_role_auth_guild: ''
@@ -418,7 +428,7 @@ security:
   allow_lazy_installs: true
 cron:
   wrap_response: true
-  max_parallel_jobs:
+  max_parallel_jobs: null
 kanban:
   dispatch_in_gateway: true
   dispatch_interval_seconds: 60
@@ -448,18 +458,28 @@ onboarding:
 updates:
   pre_update_backup: false
   backup_keep: 5
+lsp:
+  enabled: true
+  wait_mode: document
+  wait_timeout: 5.0
+  install_strategy: auto
+  servers: {}
+x_search:
+  model: grok-4.20-reasoning
+  timeout_seconds: 180
+  retries: 2
 _config_version: 23
 fallback_model:
-  - provider: copilot
-    model: claude-opus-4.7
-  - provider: openrouter
-    model: google/gemini-2.5-pro
+- provider: copilot
+  model: claude-opus-4.7
+- provider: openrouter
+  model: google/gemini-2.5-pro
 mcp_servers:
   zai-vision:
     command: npx
     args:
-      - -y
-      - '@z_ai/mcp-server'
+    - -y
+    - '@z_ai/mcp-server'
     env:
       Z_AI_API_KEY: ${GLM_API_KEY}
       Z_AI_MODE: ZAI
@@ -481,34 +501,34 @@ session_reset:
 skin: catppuccin
 platform_toolsets:
   discord:
-    - clarify
-    - image_gen
-    - kanban
-    - terminal
-    - tts
-    - vision
-    - web
+  - clarify
+  - image_gen
+  - kanban
+  - terminal
+  - tts
+  - vision
+  - web
 known_plugin_toolsets:
   discord:
-    - spotify
+  - spotify
 plugins:
   enabled:
-    - disk-cleanup
+  - disk-cleanup
   disabled:
-    - google_meet
-    - spotify
-    - teams_pipeline
+  - google_meet
+  - spotify
+  - teams_pipeline
 platforms:
   discord:
     gateway_restart_notification: false
     extra:
       allow_from:
-        - '1448742332907262023'
+      - '1448742332907262023'
       allow_admin_from:
-        - '1448742332907262023'
+      - '1448742332907262023'
       user_allowed_commands:
-        - query
+      - query
       group_allow_admin_from:
-        - '1448742332907262023'
+      - '1448742332907262023'
       group_user_allowed_commands:
-        - query
+      - query

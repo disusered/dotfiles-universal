@@ -7,6 +7,9 @@ OPENROUTER_API_KEY=op://Personal/OpenRouter Hermes Token/token
 # SearXNG
 SEARXNG_URL=http://search.disusered.com
 
+# LLM Wiki
+WIKI_PATH=/home/carlos/wiki
+
 # XBOT
 DISCORD_HOME_CHANNEL=1450664552638189685
 DISCORD_HOME_CHANNEL_NAME=ayuda-con-la-tarea
