@@ -1,7 +1,7 @@
 global:
   links:
+    git-commit: ~/.agents/skills/git-commit
     git-commit/SKILL.md:
-      - ~/.agents/skills/git-commit/SKILL.md
       - ~/.hermes/skills/software-development/git-commit/SKILL.md
       - ~/.config/opencode/commands/git-commit.md
       - ~/.claude/commands/git-commit.md
