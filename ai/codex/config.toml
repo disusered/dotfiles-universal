@@ -62,8 +62,7 @@ enabled = true
 enabled = true
 
 [mcp_servers.atlassian]
-command = "npx"
-args = ["-y", "mcp-remote@0.1.13", "https://mcp.atlassian.com/v1/sse"]
+url = "https://mcp.atlassian.com/v1/mcp/authv2"
 startup_timeout_sec = 30
 tool_timeout_sec = 120
 enabled = true

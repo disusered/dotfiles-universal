@@ -483,6 +483,9 @@ fallback_model:
   - provider: openrouter
     model: google/gemini-2.5-pro
 mcp_servers:
+  atlassian:
+    url: https://mcp.atlassian.com/v1/mcp/authv2
+    enabled: true
   zai-vision:
     command: npx
     args:
