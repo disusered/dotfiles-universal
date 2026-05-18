@@ -57,7 +57,7 @@ papirus-folders = { path = "tools/papirus/set-folders.sh.tera", reload = "~/.dot
 vscode = { path = "editors/vscode/settings.json.tera" }
 
 # AI
-opencode-theme = { path = "ai/opencode/catppuccin.json.tera" }
+opencode-theme = { path = "ai/opencode/catppuccin.json.tera", link = "/ai/opencode" }
 hermes-skin = { path = "ai/hermes/catppuccin.yaml.tera" }
 hermes-dashboard = { path = "ai/hermes/dashboard-catppuccin.yaml.tera" }
 
