@@ -1,7 +1,11 @@
 return {
   {
     "nvim-neorg/neorg",
-    dependencies = { "benlubas/neorg-interim-ls" },
+    dependencies = {
+      "benlubas/neorg-interim-ls",
+      "nvim-neorg/tree-sitter-norg",
+      "nvim-neorg/tree-sitter-norg-meta",
+    },
     lazy = false,
     version = false,
     init = function()
@@ -65,6 +69,7 @@ return {
                 study = "~/Documents/study",
                 projects = "~/Documents/projects",
                 blog = "~/Documents/blog",
+                work = "~/Documents/work",
               },
               default_workspace = "notes",
             },
