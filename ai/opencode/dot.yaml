@@ -5,6 +5,7 @@ linux[whoami.distro^="Arch"]:
       npx -y opencode-openai-codex-auth@latest
       systemctl --user enable --now opencode-serve.service
     depends:
+      - /ai/agent-skills
       - /tools/tailscale
   links:
     opencode.json: ~/.config/opencode/opencode.json

@@ -11,6 +11,7 @@ linux[whoami.distro^="Arch"]:
       fi
       systemctl --user enable --now hermes-dashboard.service hermes-webui.service
     depends:
+      - /ai/agent-skills
       - /tools/ffmpeg
       - /tools/ripgrep
       - /tools/tabulate

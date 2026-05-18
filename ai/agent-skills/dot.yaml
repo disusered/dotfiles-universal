@@ -1,7 +1,14 @@
 global:
+  installs:
+    cmd: "true"
   links:
     git-commit: ~/.agents/skills/git-commit
-    git-commit/SKILL.md:
+    slop-clean: ~/.agents/skills/slop-clean
+    git-commit/commands/git-commit.md:
       - ~/.hermes/skills/software-development/git-commit/SKILL.md
       - ~/.config/opencode/commands/git-commit.md
       - ~/.claude/commands/git-commit.md
+    slop-clean/commands/slop-clean.md:
+      - ~/.hermes/skills/software-development/slop-clean/SKILL.md
+      - ~/.config/opencode/commands/slop-clean.md
+      - ~/.claude/commands/slop-clean.md

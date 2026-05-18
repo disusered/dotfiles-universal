@@ -33,6 +33,4 @@
 
 ## References
 
-- **Lessons:** See `@reference/LINEAGE.md` for past lessons and success patterns.
-- **Error, failure, and ownership:** See `@rules/error-failure-and-ownership.md`.
 - **Conventions:** See `rules/` directory for git, github, and tool usage rules.
