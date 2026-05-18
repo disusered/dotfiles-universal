@@ -9,8 +9,8 @@ linux[whoami.distro^="Arch"]:
       sudo mkdir -p /etc/systemd/system/caddy.service.d
       sudo cp ~/.dotfiles/tools/caddy/Caddyfile /etc/caddy/Caddyfile
       sudo chown root:root /etc/caddy/Caddyfile
-      sudo install -m 644 /dev/null /etc/systemd/system/caddy.service.d/override.conf
-      echo "[Service]" | sudo tee /etc/systemd/system/caddy.service.d/override.conf > /dev/null
-      echo "Environment=CADDY_TAILSCALE_IP=${TS_IP}" | sudo tee -a /etc/systemd/system/caddy.service.d/override.conf > /dev/null
+      printf 'CADDY_TAILSCALE_IP=%s\n' "$TS_IP" | sudo tee /etc/caddy/tailscale.env > /dev/null
+      sudo chown root:root /etc/caddy/tailscale.env
+      sudo ln -sf ~/.dotfiles/tools/caddy/tailscale.conf /etc/systemd/system/caddy.service.d/tailscale.conf
       sudo systemctl daemon-reload
       sudo systemctl restart caddy.service
