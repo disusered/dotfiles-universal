@@ -406,6 +406,8 @@ approvals:
   mode: manual
   timeout: 60
   cron_mode: deny
+  hardline_blocklist:
+    - git push
   mcp_reload_confirm: true
   destructive_slash_confirm: false
 command_allowlist: []
