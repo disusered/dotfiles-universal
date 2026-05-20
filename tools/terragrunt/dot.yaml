@@ -1,0 +1,15 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm --needed terragrunt
+    depends:
+      - /tools/opentofu
+  links:
+    terragrunt.zsh: ~/.config/zsh/0751_terragrunt.zsh
+linux[whoami.distro^="Fedora"]:
+  installs:
+    cmd: brew install terragrunt
+    depends:
+      - /packages/homebrew
+      - /tools/opentofu
+  links:
+    terragrunt.zsh: ~/.config/zsh/0751_terragrunt.zsh
