@@ -7,6 +7,111 @@ fn cfg() -> Command {
 }
 
 // =============================================================================
+// TMUX bridge command tests
+// =============================================================================
+
+#[test]
+fn tmux_bridge_list_panes_uses_hypr_client_pids() {
+    let clients = r#"[
+        {"address":"0xabc","pid":42,"class":"kitty"},
+        {"address":"0xdead","pid":0,"class":"kitty"}
+    ]"#;
+
+    cfg()
+        .env("CFG_TMUX_BRIDGE_CLIENTS_JSON", clients)
+        .args([
+            "tmux",
+            "list-panes",
+            "-a",
+            "-F",
+            "#{pane_pid} #{session_name}:#{window_index}.#{pane_index}",
+        ])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("42 cfg-hypr-0xabc:1.1"))
+        .stdout(predicate::str::contains("0xdead").not());
+}
+
+#[test]
+fn tmux_bridge_list_panes_uses_kitty_window_pids_when_available() {
+    let clients = r#"[
+        {"address":"0xabc","pid":449743,"class":"kitty"}
+    ]"#;
+    let kitty = r#"[
+        {
+            "tabs": [
+                {
+                    "windows": [
+                        {"id":1,"pid":449837},
+                        {"id":2,"pid":450010}
+                    ]
+                }
+            ]
+        }
+    ]"#;
+
+    cfg()
+        .env("CFG_TMUX_BRIDGE_CLIENTS_JSON", clients)
+        .env("CFG_TMUX_BRIDGE_KITTY_JSON", kitty)
+        .args([
+            "tmux",
+            "list-panes",
+            "-a",
+            "-F",
+            "#{pane_pid} #{session_name}:#{window_index}.#{pane_index}",
+        ])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains(
+            "449837 cfg-hypr-0xabc-kitty-449743-window-1:1.1",
+        ))
+        .stdout(predicate::str::contains(
+            "450010 cfg-hypr-0xabc-kitty-449743-window-2:1.1",
+        ))
+        .stdout(predicate::str::contains("449743 cfg-hypr-0xabc:1.1").not());
+}
+
+#[test]
+fn tmux_bridge_select_pane_dry_run_focuses_encoded_address() {
+    cfg()
+        .env("CFG_TMUX_BRIDGE_DRY_RUN", "1")
+        .args(["tmux", "select-pane", "-t", "cfg-hypr-0xabc:1.1"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains(
+            "hyprctl dispatch focuswindow address:0xabc",
+        ));
+}
+
+#[test]
+fn tmux_bridge_select_pane_dry_run_focuses_encoded_kitty_window() {
+    cfg()
+        .env("CFG_TMUX_BRIDGE_DRY_RUN", "1")
+        .args([
+            "tmux",
+            "select-pane",
+            "-t",
+            "cfg-hypr-0xabc-kitty-449743-window-2:1.1",
+        ])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains(
+            "hyprctl dispatch focuswindow address:0xabc",
+        ))
+        .stdout(predicate::str::contains(
+            "kitty @ --to unix:@mykitty-449743 focus-window --match id:2",
+        ));
+}
+
+#[test]
+fn tmux_bridge_switch_client_noops_for_fake_target() {
+    cfg()
+        .args(["tmux", "switch-client", "-t", "cfg-hypr-0xabc"])
+        .assert()
+        .success();
+}
+
+// =============================================================================
 // UPDATE command - invalid flag combinations
 // =============================================================================
 //

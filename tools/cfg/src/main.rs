@@ -5,6 +5,7 @@ mod leds;
 mod palette;
 mod render;
 mod templates;
+mod tmux_bridge;
 mod tui;
 mod wallpaper;
 
@@ -147,6 +148,12 @@ enum Command {
         /// Use a specific hidraw device path instead of auto-detecting
         #[arg(long, value_name = "PATH")]
         device: Option<PathBuf>,
+    },
+    /// Internal tmux compatibility bridge for selected tools
+    #[command(hide = true, trailing_var_arg = true)]
+    Tmux {
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
     },
 }
 
@@ -586,6 +593,12 @@ fn main() {
                     eprintln!("Error: {}", e);
                     std::process::exit(1);
                 }
+            }
+        }
+        Command::Tmux { args } => {
+            if let Err(e) = tmux_bridge::run(&args) {
+                eprintln!("Error: {}", e);
+                std::process::exit(1);
             }
         }
         Command::Font {
