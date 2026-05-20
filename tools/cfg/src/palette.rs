@@ -1,6 +1,6 @@
-use std::collections::HashMap;
-use serde::Deserialize;
 use crate::color::Color;
+use serde::Deserialize;
+use std::collections::HashMap;
 
 #[derive(Deserialize)]
 struct PaletteFile {
@@ -33,5 +33,4 @@ impl Palette {
     pub fn get(&self, name: &str) -> Option<&Color> {
         self.colors.get(name)
     }
-
 }

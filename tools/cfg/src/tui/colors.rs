@@ -5,7 +5,10 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span},
-    widgets::{Block, Borders, Clear, List, ListItem, ListState, Paragraph, Scrollbar, ScrollbarOrientation, ScrollbarState},
+    widgets::{
+        Block, Borders, Clear, List, ListItem, ListState, Paragraph, Scrollbar,
+        ScrollbarOrientation, ScrollbarState,
+    },
     Frame,
 };
 
@@ -40,16 +43,26 @@ fn format_label(fmt: &str) -> &'static str {
 
 /// Accent colors (can be set as primary/secondary)
 const ACCENT_COLORS: &[&str] = &[
-    "rosewater", "flamingo", "pink", "mauve", "red", "maroon",
-    "peach", "yellow", "green", "teal", "sky", "sapphire", "blue", "lavender",
+    "rosewater",
+    "flamingo",
+    "pink",
+    "mauve",
+    "red",
+    "maroon",
+    "peach",
+    "yellow",
+    "green",
+    "teal",
+    "sky",
+    "sapphire",
+    "blue",
+    "lavender",
 ];
 
 /// Surface/text colors
 const SURFACE_COLORS: &[&str] = &[
-    "text", "subtext1", "subtext0",
-    "overlay2", "overlay1", "overlay0",
-    "surface2", "surface1", "surface0",
-    "base", "mantle", "crust",
+    "text", "subtext1", "subtext0", "overlay2", "overlay1", "overlay0", "surface2", "surface1",
+    "surface0", "base", "mantle", "crust",
 ];
 
 #[derive(Debug, Clone)]
@@ -150,7 +163,8 @@ struct FlavorTheme {
 impl FlavorTheme {
     fn from_config(config: &Config, palette: &Palette) -> Self {
         let get_color = |name: &str| -> Color {
-            palette.get(name)
+            palette
+                .get(name)
                 .map(|c| Color::Rgb(c.r, c.g, c.b))
                 .unwrap_or(Color::White)
         };
@@ -228,7 +242,7 @@ impl ColorPicker {
             focus: Focus::List,
             select_target: SelectTarget::default(),
             blend_selection: 1, // Start at second color
-            modify_focus: 0, // Start on lightness control
+            modify_focus: 0,    // Start on lightness control
             preview_area: Rect::default(),
             lightness_row: 0,
             blend_row: 0,
@@ -245,12 +259,15 @@ impl ColorPicker {
     }
 
     fn selected_color(&self) -> Option<&ColorEntry> {
-        self.filtered.get(self.selected).and_then(|&i| self.colors.get(i))
+        self.filtered
+            .get(self.selected)
+            .and_then(|&i| self.colors.get(i))
     }
 
     /// Get the blend target color (from filtered list via blend_selection)
     fn blend_target(&self) -> Option<&ColorEntry> {
-        self.filtered.get(self.blend_selection)
+        self.filtered
+            .get(self.blend_selection)
             .and_then(|&i| self.colors.get(i))
     }
 
@@ -296,7 +313,10 @@ impl ColorPicker {
         // Blend filter
         if self.modifier.blend_amount > 0 {
             if let Some(target) = self.blend_target() {
-                filters.push(format!("blend(base={}, amount={})", target.name, self.modifier.blend_amount));
+                filters.push(format!(
+                    "blend(base={}, amount={})",
+                    target.name, self.modifier.blend_amount
+                ));
             }
         }
 
@@ -336,7 +356,11 @@ impl ColorPicker {
 
     /// Adjust lightness by step
     fn adjust_lightness(&mut self, delta: i8) {
-        self.modifier.lightness = self.modifier.lightness.saturating_add(delta).clamp(-100, 100);
+        self.modifier.lightness = self
+            .modifier
+            .lightness
+            .saturating_add(delta)
+            .clamp(-100, 100);
         self.modifier_input.clear();
     }
 
@@ -426,9 +450,11 @@ impl ColorPicker {
                 format_color(&color, self.current_format(), 1.0)
             };
             clipboard::copy(&formatted);
-            self.toast = Some(Toast::new(format!("Copied: {}", formatted))
-                .style(Style::default().fg(self.flavor_colors.green))
-                .border_style(Style::default().fg(self.flavor_colors.green)));
+            self.toast = Some(
+                Toast::new(format!("Copied: {}", formatted))
+                    .style(Style::default().fg(self.flavor_colors.green))
+                    .border_style(Style::default().fg(self.flavor_colors.green)),
+            );
         }
     }
 
@@ -496,7 +522,9 @@ impl ColorPicker {
             .border_style(Style::default().fg(theme.surface1))
             .title(Span::styled(
                 format!(" cfg theme  {} ", self.config.flavor),
-                Style::default().fg(theme.accent).add_modifier(Modifier::BOLD),
+                Style::default()
+                    .fg(theme.accent)
+                    .add_modifier(Modifier::BOLD),
             ));
 
         let inner = block.inner(area);
@@ -544,7 +572,11 @@ impl ColorPicker {
 
     fn render_color_list(&mut self, frame: &mut Frame, area: Rect) {
         let theme = &self.flavor_colors;
-        let border_color = if self.focus == Focus::List { theme.accent } else { theme.surface1 };
+        let border_color = if self.focus == Focus::List {
+            theme.accent
+        } else {
+            theme.surface1
+        };
         let block = Block::default()
             .borders(Borders::ALL)
             .border_style(Style::default().fg(border_color))
@@ -573,14 +605,18 @@ impl ColorPicker {
                 // "Surface Colors" header
                 items.push(ListItem::new(Line::from(Span::styled(
                     "Surface Colors",
-                    Style::default().fg(theme.overlay1).add_modifier(Modifier::BOLD),
+                    Style::default()
+                        .fg(theme.overlay1)
+                        .add_modifier(Modifier::BOLD),
                 ))));
                 self.row_to_data.push(None);
             } else if entry.is_primary && idx == 0 {
                 // "Accent Colors" header
                 items.push(ListItem::new(Line::from(Span::styled(
                     "Accent Colors",
-                    Style::default().fg(theme.overlay1).add_modifier(Modifier::BOLD),
+                    Style::default()
+                        .fg(theme.overlay1)
+                        .add_modifier(Modifier::BOLD),
                 ))));
                 self.row_to_data.push(None);
             }
@@ -588,7 +624,8 @@ impl ColorPicker {
 
             let c = &entry.color;
             let swatch_color = Color::Rgb(c.r, c.g, c.b);
-            let is_current = entry.name == self.config.primary || entry.name == self.config.secondary;
+            let is_current =
+                entry.name == self.config.primary || entry.name == self.config.secondary;
             let is_selected = idx == self.selected;
             let is_blend_target = self.modifier.blend_amount > 0 && idx == self.blend_selection;
 
@@ -608,7 +645,9 @@ impl ColorPicker {
             ];
 
             let name_style = if is_current {
-                Style::default().fg(theme.accent).add_modifier(Modifier::BOLD)
+                Style::default()
+                    .fg(theme.accent)
+                    .add_modifier(Modifier::BOLD)
             } else {
                 Style::default().fg(theme.text)
             };
@@ -617,7 +656,9 @@ impl ColorPicker {
                 spans.push(Span::styled(format!("{:<12}", entry.name), name_style));
             } else {
                 let highlight_style = name_style.fg(theme.accent).add_modifier(Modifier::BOLD);
-                let highlighted = self.search.highlight(&entry.name, name_style, highlight_style);
+                let highlighted = self
+                    .search
+                    .highlight(&entry.name, name_style, highlight_style);
                 for span in highlighted.spans {
                     spans.push(span);
                 }
@@ -631,9 +672,15 @@ impl ColorPicker {
             ));
 
             if entry.name == self.config.primary {
-                spans.push(Span::styled(" ← primary", Style::default().fg(theme.overlay1)));
+                spans.push(Span::styled(
+                    " ← primary",
+                    Style::default().fg(theme.overlay1),
+                ));
             } else if entry.name == self.config.secondary {
-                spans.push(Span::styled(" ← secondary", Style::default().fg(theme.overlay1)));
+                spans.push(Span::styled(
+                    " ← secondary",
+                    Style::default().fg(theme.overlay1),
+                ));
             }
 
             let style = if is_selected {
@@ -655,11 +702,14 @@ impl ColorPicker {
         if self.filtered.len() > inner.height as usize {
             let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
                 .style(Style::default().fg(theme.surface1));
-            let mut scrollbar_state = ScrollbarState::new(self.filtered.len())
-                .position(self.selected);
+            let mut scrollbar_state =
+                ScrollbarState::new(self.filtered.len()).position(self.selected);
             frame.render_stateful_widget(
                 scrollbar,
-                area.inner(ratatui::layout::Margin { horizontal: 0, vertical: 1 }),
+                area.inner(ratatui::layout::Margin {
+                    horizontal: 0,
+                    vertical: 1,
+                }),
                 &mut scrollbar_state,
             );
         }
@@ -670,7 +720,11 @@ impl ColorPicker {
         self.preview_area = area;
 
         let theme = &self.flavor_colors;
-        let border_color = if self.focus == Focus::Preview { theme.accent } else { theme.surface1 };
+        let border_color = if self.focus == Focus::Preview {
+            theme.accent
+        } else {
+            theme.surface1
+        };
         let block = Block::default()
             .borders(Borders::ALL)
             .border_style(Style::default().fg(border_color))
@@ -739,7 +793,10 @@ impl ColorPicker {
                 let swatch_str: String = "█".repeat(swatch_width);
 
                 for _ in 0..3 {
-                    lines.push(Line::from(Span::styled(swatch_str.clone(), Style::default().fg(orig_swatch))));
+                    lines.push(Line::from(Span::styled(
+                        swatch_str.clone(),
+                        Style::default().fg(orig_swatch),
+                    )));
                 }
                 lines.push(Line::from(""));
                 lines.push(Line::from(Span::styled(
@@ -770,7 +827,9 @@ impl ColorPicker {
                 let is_selected = i == self.format_idx;
                 let label_style = Style::default().fg(theme.overlay1);
                 let value_style = if is_selected {
-                    Style::default().fg(theme.accent).add_modifier(Modifier::BOLD)
+                    Style::default()
+                        .fg(theme.accent)
+                        .add_modifier(Modifier::BOLD)
                 } else {
                     Style::default().fg(theme.subtext0)
                 };
@@ -861,7 +920,11 @@ impl ColorPicker {
         self.preview_area = area;
 
         let theme = &self.flavor_colors;
-        let border_color = if self.focus == Focus::Preview { theme.accent } else { theme.surface1 };
+        let border_color = if self.focus == Focus::Preview {
+            theme.accent
+        } else {
+            theme.surface1
+        };
         let block = Block::default()
             .borders(Borders::ALL)
             .border_style(Style::default().fg(border_color))
@@ -899,7 +962,10 @@ impl ColorPicker {
                     mod_parts.push(format!("{:+}%", self.modifier.lightness));
                 }
                 lines.push(Line::from(vec![
-                    Span::styled(&entry_name, Style::default().fg(theme.text).add_modifier(Modifier::BOLD)),
+                    Span::styled(
+                        &entry_name,
+                        Style::default().fg(theme.text).add_modifier(Modifier::BOLD),
+                    ),
                     Span::raw("  "),
                     Span::styled(mod_parts.join(" "), Style::default().fg(theme.accent)),
                 ]));
@@ -932,7 +998,9 @@ impl ColorPicker {
                 let is_selected = i == self.format_idx;
                 let label_style = Style::default().fg(theme.overlay1);
                 let value_style = if is_selected {
-                    Style::default().fg(theme.accent).add_modifier(Modifier::BOLD)
+                    Style::default()
+                        .fg(theme.accent)
+                        .add_modifier(Modifier::BOLD)
                 } else {
                     Style::default().fg(theme.subtext0)
                 };
@@ -1051,11 +1119,21 @@ impl ColorPicker {
     }
 
     /// Helper to render a full-area color swatch with border and title
-    fn render_full_swatch_block(&self, frame: &mut Frame, area: Rect, color: Color, title: &str, theme: &FlavorTheme) {
+    fn render_full_swatch_block(
+        &self,
+        frame: &mut Frame,
+        area: Rect,
+        color: Color,
+        title: &str,
+        theme: &FlavorTheme,
+    ) {
         let block = Block::default()
             .borders(Borders::ALL)
             .border_style(Style::default().fg(theme.surface1))
-            .title(Span::styled(format!(" {} ", title), Style::default().fg(theme.overlay1)));
+            .title(Span::styled(
+                format!(" {} ", title),
+                Style::default().fg(theme.overlay1),
+            ));
 
         let inner = block.inner(area);
         frame.render_widget(block, area);
@@ -1081,14 +1159,23 @@ impl ColorPicker {
         let bar_width = 15;
         let center = bar_width / 2;
         // Map -100..+100 to 0..bar_width
-        let pos = ((value as i32 + 100) * bar_width as i32 / 200).clamp(0, bar_width as i32 - 1) as usize;
+        let pos =
+            ((value as i32 + 100) * bar_width as i32 / 200).clamp(0, bar_width as i32 - 1) as usize;
 
         let mut spans = vec![Span::raw(" ")];
         for i in 0..bar_width {
-            let char = if i == center { "│" } else if i == pos { "●" } else { "─" };
+            let char = if i == center {
+                "│"
+            } else if i == pos {
+                "●"
+            } else {
+                "─"
+            };
             let style = if i == pos {
                 if focused {
-                    Style::default().fg(theme.accent).add_modifier(Modifier::BOLD)
+                    Style::default()
+                        .fg(theme.accent)
+                        .add_modifier(Modifier::BOLD)
                 } else {
                     Style::default().fg(theme.text)
                 }
@@ -1113,7 +1200,9 @@ impl ColorPicker {
             let char = if i == pos { "●" } else { "─" };
             let style = if i == pos {
                 if focused {
-                    Style::default().fg(theme.accent).add_modifier(Modifier::BOLD)
+                    Style::default()
+                        .fg(theme.accent)
+                        .add_modifier(Modifier::BOLD)
                 } else {
                     Style::default().fg(theme.text)
                 }
@@ -1209,37 +1298,47 @@ impl ColorPicker {
 
         // Context-aware help based on current focus
         let (title, bindings): (&str, Vec<(&str, &str)>) = match self.focus {
-            Focus::List => ("Colors", vec![
-                ("j/k ↑/↓", "Navigate"),
-                ("g/G", "Top/bottom"),
-                ("Ctrl+d/u", "Page down/up"),
-                ("/", "Search"),
-                ("Enter", "Set as primary/secondary"),
-                ("s", "Switch target"),
-                ("y", "Copy color"),
-                ("Tab", "→ Modify pane"),
-                ("Esc", "Clear search"),
-                ("?", "Toggle help"),
-                ("q", "Quit"),
-            ]),
-            Focus::Preview => ("Modify", vec![
-                ("j/k", "Switch control"),
-                ("h/l", "Adjust value"),
-                ("+/-", "Fine adjust ±5"),
-                ("0-9", "Type value"),
-                ("n", "Reset all"),
-                ("", ""),
-                ("f", "Cycle format"),
-                ("y", "Copy modified"),
-                ("Tab/Esc", "→ Colors"),
-            ]),
+            Focus::List => (
+                "Colors",
+                vec![
+                    ("j/k ↑/↓", "Navigate"),
+                    ("g/G", "Top/bottom"),
+                    ("Ctrl+d/u", "Page down/up"),
+                    ("/", "Search"),
+                    ("Enter", "Set as primary/secondary"),
+                    ("s", "Switch target"),
+                    ("y", "Copy color"),
+                    ("Tab", "→ Modify pane"),
+                    ("Esc", "Clear search"),
+                    ("?", "Toggle help"),
+                    ("q", "Quit"),
+                ],
+            ),
+            Focus::Preview => (
+                "Modify",
+                vec![
+                    ("j/k", "Switch control"),
+                    ("h/l", "Adjust value"),
+                    ("+/-", "Fine adjust ±5"),
+                    ("0-9", "Type value"),
+                    ("n", "Reset all"),
+                    ("", ""),
+                    ("f", "Cycle format"),
+                    ("y", "Copy modified"),
+                    ("Tab/Esc", "→ Colors"),
+                ],
+            ),
         };
 
         let popup = HelpPopup::new(title)
             .bindings(bindings)
             .style(Style::default().bg(theme.surface0))
             .border_style(Style::default().fg(theme.accent))
-            .key_style(Style::default().fg(theme.accent).add_modifier(Modifier::BOLD))
+            .key_style(
+                Style::default()
+                    .fg(theme.accent)
+                    .add_modifier(Modifier::BOLD),
+            )
             .desc_style(Style::default().fg(theme.text));
 
         frame.render_widget(popup, area);
@@ -1268,9 +1367,19 @@ impl ColorPicker {
             Line::from(""),
             Line::from(vec![
                 Span::raw("Apply changes? "),
-                Span::styled("y", Style::default().fg(theme.green).add_modifier(Modifier::BOLD)),
+                Span::styled(
+                    "y",
+                    Style::default()
+                        .fg(theme.green)
+                        .add_modifier(Modifier::BOLD),
+                ),
                 Span::raw("es / "),
-                Span::styled("n", Style::default().fg(theme.accent).add_modifier(Modifier::BOLD)),
+                Span::styled(
+                    "n",
+                    Style::default()
+                        .fg(theme.accent)
+                        .add_modifier(Modifier::BOLD),
+                ),
                 Span::raw("o"),
             ]),
         ];
@@ -1312,41 +1421,39 @@ impl ColorPicker {
                             _ => {}
                         }
                     }
-                    Mode::Search => {
-                        match key.code {
-                            KeyCode::Esc => {
-                                self.search.clear();
-                                self.update_filter();
-                                self.mode = Mode::Normal;
-                            }
-                            KeyCode::Enter => {
-                                self.mode = Mode::Normal;
-                            }
-                            KeyCode::Backspace => {
-                                self.search.backspace();
-                                self.update_filter();
-                            }
-                            KeyCode::Delete => {
-                                self.search.delete();
-                                self.update_filter();
-                            }
-                            KeyCode::Left => self.search.move_left(),
-                            KeyCode::Right => self.search.move_right(),
-                            KeyCode::Home => self.search.move_start(),
-                            KeyCode::End => self.search.move_end(),
-                            KeyCode::Char(c) => {
-                                self.search.insert(c);
-                                self.update_filter();
-                            }
-                            KeyCode::Down => {
-                                self.move_down();
-                            }
-                            KeyCode::Up => {
-                                self.move_up();
-                            }
-                            _ => {}
+                    Mode::Search => match key.code {
+                        KeyCode::Esc => {
+                            self.search.clear();
+                            self.update_filter();
+                            self.mode = Mode::Normal;
                         }
-                    }
+                        KeyCode::Enter => {
+                            self.mode = Mode::Normal;
+                        }
+                        KeyCode::Backspace => {
+                            self.search.backspace();
+                            self.update_filter();
+                        }
+                        KeyCode::Delete => {
+                            self.search.delete();
+                            self.update_filter();
+                        }
+                        KeyCode::Left => self.search.move_left(),
+                        KeyCode::Right => self.search.move_right(),
+                        KeyCode::Home => self.search.move_start(),
+                        KeyCode::End => self.search.move_end(),
+                        KeyCode::Char(c) => {
+                            self.search.insert(c);
+                            self.update_filter();
+                        }
+                        KeyCode::Down => {
+                            self.move_down();
+                        }
+                        KeyCode::Up => {
+                            self.move_up();
+                        }
+                        _ => {}
+                    },
                     Mode::Normal => {
                         // Global keys (work in any focus)
                         match key.code {
@@ -1386,44 +1493,48 @@ impl ColorPicker {
 
                         // Focus-specific keys
                         match self.focus {
-                            Focus::List => {
-                                match key.code {
-                                    KeyCode::Char('/') => self.mode = Mode::Search,
-                                    KeyCode::Char('j') | KeyCode::Down => self.move_down(),
-                                    KeyCode::Char('k') | KeyCode::Up => self.move_up(),
-                                    KeyCode::Char('g') | KeyCode::Home => self.move_top(),
-                                    KeyCode::Char('G') | KeyCode::End => self.move_bottom(),
-                                    KeyCode::Char('h') | KeyCode::Left => self.move_up(),
-                                    KeyCode::Char('l') | KeyCode::Right => self.move_down(),
-                                    KeyCode::Char('d') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                                        self.page_down(10);
-                                    }
-                                    KeyCode::Char('u') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                                        self.page_up(10);
-                                    }
-                                    KeyCode::Enter => {
-                                        match self.select_target {
-                                            SelectTarget::Primary => self.select_as_primary(),
-                                            SelectTarget::Secondary => self.select_as_secondary(),
-                                        }
-                                        if self.has_changes() {
-                                            self.mode = Mode::Confirm;
-                                        }
-                                    }
-                                    KeyCode::Char('s') => {
-                                        self.select_target = match self.select_target {
-                                            SelectTarget::Primary => SelectTarget::Secondary,
-                                            SelectTarget::Secondary => SelectTarget::Primary,
-                                        };
-                                    }
-                                    KeyCode::Char(c) if !key.modifiers.contains(KeyModifiers::CONTROL) => {
-                                        self.mode = Mode::Search;
-                                        self.search.insert(c);
-                                        self.update_filter();
-                                    }
-                                    _ => {}
+                            Focus::List => match key.code {
+                                KeyCode::Char('/') => self.mode = Mode::Search,
+                                KeyCode::Char('j') | KeyCode::Down => self.move_down(),
+                                KeyCode::Char('k') | KeyCode::Up => self.move_up(),
+                                KeyCode::Char('g') | KeyCode::Home => self.move_top(),
+                                KeyCode::Char('G') | KeyCode::End => self.move_bottom(),
+                                KeyCode::Char('h') | KeyCode::Left => self.move_up(),
+                                KeyCode::Char('l') | KeyCode::Right => self.move_down(),
+                                KeyCode::Char('d')
+                                    if key.modifiers.contains(KeyModifiers::CONTROL) =>
+                                {
+                                    self.page_down(10);
                                 }
-                            }
+                                KeyCode::Char('u')
+                                    if key.modifiers.contains(KeyModifiers::CONTROL) =>
+                                {
+                                    self.page_up(10);
+                                }
+                                KeyCode::Enter => {
+                                    match self.select_target {
+                                        SelectTarget::Primary => self.select_as_primary(),
+                                        SelectTarget::Secondary => self.select_as_secondary(),
+                                    }
+                                    if self.has_changes() {
+                                        self.mode = Mode::Confirm;
+                                    }
+                                }
+                                KeyCode::Char('s') => {
+                                    self.select_target = match self.select_target {
+                                        SelectTarget::Primary => SelectTarget::Secondary,
+                                        SelectTarget::Secondary => SelectTarget::Primary,
+                                    };
+                                }
+                                KeyCode::Char(c)
+                                    if !key.modifiers.contains(KeyModifiers::CONTROL) =>
+                                {
+                                    self.mode = Mode::Search;
+                                    self.search.insert(c);
+                                    self.update_filter();
+                                }
+                                _ => {}
+                            },
                             Focus::Preview => {
                                 match key.code {
                                     // j/k to switch between lightness (0) and blend (1) controls
@@ -1431,7 +1542,8 @@ impl ColorPicker {
                                         self.modify_focus = (self.modify_focus + 1) % 2;
                                     }
                                     KeyCode::Char('k') | KeyCode::Up => {
-                                        self.modify_focus = if self.modify_focus == 0 { 1 } else { 0 };
+                                        self.modify_focus =
+                                            if self.modify_focus == 0 { 1 } else { 0 };
                                     }
                                     // h/l to adjust the currently focused control
                                     KeyCode::Char('h') | KeyCode::Left => {
@@ -1535,8 +1647,10 @@ impl ColorPicker {
                                 horizontal: 1,
                                 vertical: 1,
                             });
-                            if mouse.row >= inner.y && mouse.row < inner.y + inner.height
-                               && mouse.column < self.preview_area.x {
+                            if mouse.row >= inner.y
+                                && mouse.row < inner.y + inner.height
+                                && mouse.column < self.preview_area.x
+                            {
                                 self.focus = Focus::List;
                                 let clicked_row = (mouse.row - inner.y) as usize;
                                 // Use row_to_data mapping to handle section headers
@@ -1642,7 +1756,11 @@ impl ColorPicker {
 }
 
 /// Run the color picker TUI
-pub fn run_picker(config: &Config, palette: &Palette, config_path: &str) -> io::Result<Option<bool>> {
+pub fn run_picker(
+    config: &Config,
+    palette: &Palette,
+    config_path: &str,
+) -> io::Result<Option<bool>> {
     let picker = ColorPicker::new(config.clone(), palette, config_path.to_string());
     picker.run()
 }

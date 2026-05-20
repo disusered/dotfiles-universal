@@ -53,8 +53,7 @@ impl TagCache {
         let tmp = format!("{}.tmp", path);
         let json = serde_json::to_string_pretty(self)
             .map_err(|e| format!("failed to serialize tag cache: {}", e))?;
-        fs::write(&tmp, json)
-            .map_err(|e| format!("failed to write tag cache '{}': {}", tmp, e))?;
+        fs::write(&tmp, json).map_err(|e| format!("failed to write tag cache '{}': {}", tmp, e))?;
         fs::rename(&tmp, path)
             .map_err(|e| format!("failed to rename tag cache to '{}': {}", path, e))?;
         Ok(())

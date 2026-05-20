@@ -111,4 +111,3 @@ impl Widget for HelpPopup<'_> {
             .render(popup_area, buf);
     }
 }
-

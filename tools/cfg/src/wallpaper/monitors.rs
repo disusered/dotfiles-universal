@@ -50,11 +50,7 @@ impl MonitorLayout {
     /// Testable retry loop: `run` is invoked up to `max_attempts` times,
     /// with `delay_ms` between attempts on retryable failures. Returns on
     /// the first successful parse with at least one monitor.
-    pub fn detect_with<F>(
-        mut run: F,
-        max_attempts: u32,
-        delay_ms: u64,
-    ) -> Result<Self, String>
+    pub fn detect_with<F>(mut run: F, max_attempts: u32, delay_ms: u64) -> Result<Self, String>
     where
         F: FnMut() -> Result<String, String>,
     {

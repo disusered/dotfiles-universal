@@ -54,8 +54,7 @@ pub fn resize_and_crop(
     gravity: &str,
     cache_dir: &str,
 ) -> Result<String, String> {
-    std::fs::create_dir_all(cache_dir)
-        .map_err(|e| format!("Failed to create cache dir: {}", e))?;
+    std::fs::create_dir_all(cache_dir).map_err(|e| format!("Failed to create cache dir: {}", e))?;
 
     let key = cache_key(source, gravity, width, height);
     let ext = Path::new(source)
@@ -72,9 +71,12 @@ pub fn resize_and_crop(
     let status = Command::new("magick")
         .args([
             source,
-            "-gravity", gravity,
-            "-resize", &format!("{}^", geometry),
-            "-extent", &geometry,
+            "-gravity",
+            gravity,
+            "-resize",
+            &format!("{}^", geometry),
+            "-extent",
+            &geometry,
             "+repage",
             &output,
         ])
@@ -109,8 +111,7 @@ pub fn extract_slice(
     x_offset: i32,
     cache_dir: &str,
 ) -> Result<String, String> {
-    std::fs::create_dir_all(cache_dir)
-        .map_err(|e| format!("Failed to create cache dir: {}", e))?;
+    std::fs::create_dir_all(cache_dir).map_err(|e| format!("Failed to create cache dir: {}", e))?;
 
     let key = slice_cache_key(spanning, width, height, x_offset);
     let ext = Path::new(spanning)
@@ -125,12 +126,7 @@ pub fn extract_slice(
 
     let crop_arg = format!("{}x{}+{}+0", width, height, x_offset);
     let status = Command::new("magick")
-        .args([
-            spanning,
-            "-crop", &crop_arg,
-            "+repage",
-            &output,
-        ])
+        .args([spanning, "-crop", &crop_arg, "+repage", &output])
         .status()
         .map_err(|e| format!("Failed to run magick: {}", e))?;
 

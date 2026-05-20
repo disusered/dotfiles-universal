@@ -203,10 +203,7 @@ const SANS_FONTS: &[FontEntry] = &[
 
 /// Get installed font families from fc-list
 fn get_installed_fonts() -> HashSet<String> {
-    let output = Command::new("fc-list")
-        .args([":", "family"])
-        .output()
-        .ok();
+    let output = Command::new("fc-list").args([":", "family"]).output().ok();
 
     match output {
         Some(out) if out.status.success() => {
@@ -387,8 +384,7 @@ pub fn preview_font_styled(
         || font_name.contains("Victor")
         || font_name.contains("Hasklug");
     let is_nerd_font = font_name.contains("Nerd");
-    let is_mono =
-        font_name.contains("Mono") || font_name.contains("Code") || is_nerd_font;
+    let is_mono = font_name.contains("Mono") || font_name.contains("Code") || is_nerd_font;
 
     // Title
     println!("{}{}{}", primary, font_name, reset);
@@ -399,7 +395,10 @@ pub fn preview_font_styled(
     println!();
     let sample = "The quick brown fox jumps over the lazy dog 0123456789";
     for scale in 1..=4 {
-        print!("\x1b]66;s={};{}\x07  {}({}x){}", scale, sample, dim, scale, reset);
+        print!(
+            "\x1b]66;s={};{}\x07  {}({}x){}",
+            scale, sample, dim, scale, reset
+        );
         for _ in 0..scale {
             println!();
         }

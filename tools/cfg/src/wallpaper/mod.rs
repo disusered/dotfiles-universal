@@ -56,21 +56,17 @@ pub fn apply(config: &Config, cfg_dir: &str) -> Result<(), String> {
     let source = match cfg.mode.as_str() {
         "pinned" => {
             if cfg.path.trim().is_empty() {
-                return Err(
-                    "wallpaper.mode=pinned but wallpaper.path is empty — \
+                return Err("wallpaper.mode=pinned but wallpaper.path is empty — \
                      run: cfg wallpaper --set path=<file>"
-                        .to_string(),
-                );
+                    .to_string());
             }
             expand_tilde(&cfg.path)
         }
         "picker" => {
             if cfg.source_dir.trim().is_empty() {
-                return Err(
-                    "wallpaper.mode=picker but wallpaper.source_dir is empty — \
+                return Err("wallpaper.mode=picker but wallpaper.source_dir is empty — \
                      run: cfg wallpaper --set source_dir=<directory>"
-                        .to_string(),
-                );
+                    .to_string());
             }
             picker::pick(config, cfg_dir)?
         }
@@ -82,9 +78,8 @@ pub fn apply(config: &Config, cfg_dir: &str) -> Result<(), String> {
         }
     };
 
-    let meta = std::fs::metadata(&source).map_err(|_| {
-        format!("wallpaper path does not exist or is not a file: {}", source)
-    })?;
+    let meta = std::fs::metadata(&source)
+        .map_err(|_| format!("wallpaper path does not exist or is not a file: {}", source))?;
     if !meta.is_file() {
         return Err(format!(
             "wallpaper path does not exist or is not a file: {}",
@@ -103,13 +98,8 @@ pub fn apply(config: &Config, cfg_dir: &str) -> Result<(), String> {
 
     if layout.is_single() {
         let m = &layout.monitors[0];
-        let img = processing::resize_and_crop(
-            &source,
-            m.width,
-            m.height,
-            &cfg.gravity,
-            &cache_dir,
-        )?;
+        let img =
+            processing::resize_and_crop(&source, m.width, m.height, &cfg.gravity, &cache_dir)?;
         entries.push(hyprpaper::WallpaperEntry {
             monitor: m.name.clone(),
             path: img,
@@ -125,13 +115,8 @@ pub fn apply(config: &Config, cfg_dir: &str) -> Result<(), String> {
         let min_x = layout.min_x();
         for m in &layout.monitors {
             let x_offset = m.x - min_x;
-            let slice = processing::extract_slice(
-                &spanning,
-                m.width,
-                m.height,
-                x_offset,
-                &cache_dir,
-            )?;
+            let slice =
+                processing::extract_slice(&spanning, m.width, m.height, x_offset, &cache_dir)?;
             entries.push(hyprpaper::WallpaperEntry {
                 monitor: m.name.clone(),
                 path: slice,
@@ -152,7 +137,10 @@ mod tests {
     #[test]
     fn expand_tilde_with_home_set() {
         std::env::set_var("HOME", "/home/test");
-        assert_eq!(expand_tilde("~/Pictures/x.png"), "/home/test/Pictures/x.png");
+        assert_eq!(
+            expand_tilde("~/Pictures/x.png"),
+            "/home/test/Pictures/x.png"
+        );
         assert_eq!(expand_tilde("~"), "/home/test");
         assert_eq!(expand_tilde("/absolute/path"), "/absolute/path");
         assert_eq!(expand_tilde(""), "");

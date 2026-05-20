@@ -5,7 +5,10 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Margin, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span},
-    widgets::{Block, Borders, List, ListItem, ListState, Paragraph, Scrollbar, ScrollbarOrientation, ScrollbarState},
+    widgets::{
+        Block, Borders, List, ListItem, ListState, Paragraph, Scrollbar, ScrollbarOrientation,
+        ScrollbarState,
+    },
     Frame,
 };
 
@@ -78,17 +81,12 @@ pub struct UpdatePicker {
 }
 
 impl UpdatePicker {
-    pub fn new(
-        palette: &Palette,
-        primary: &str,
-        cfg_dir: String,
-        dotfiles_dir: String,
-    ) -> Self {
+    pub fn new(palette: &Palette, primary: &str, cfg_dir: String, dotfiles_dir: String) -> Self {
         let theme = Theme::from_palette(palette, primary);
 
         let templates_path = format!("{}/templates.toml", cfg_dir);
-        let templates = TemplatesFile::load(&templates_path).unwrap_or_else(|_| {
-            TemplatesFile { templates: std::collections::HashMap::new() }
+        let templates = TemplatesFile::load(&templates_path).unwrap_or_else(|_| TemplatesFile {
+            templates: std::collections::HashMap::new(),
         });
 
         let mut units: Vec<UnitEntry> = templates
@@ -129,7 +127,11 @@ impl UpdatePicker {
             .collect();
 
         self.selected = 0;
-        self.list_state.select(if self.filtered.is_empty() { None } else { Some(0) });
+        self.list_state.select(if self.filtered.is_empty() {
+            None
+        } else {
+            Some(0)
+        });
     }
 
     fn selected_unit_index(&self) -> Option<usize> {
@@ -278,15 +280,14 @@ impl UpdatePicker {
                 };
 
                 if self.search.is_empty() {
-                    spans.push(Span::styled(
-                        format!("{:<30}", unit.name),
-                        name_style,
-                    ));
+                    spans.push(Span::styled(format!("{:<30}", unit.name), name_style));
                 } else {
                     let highlight_style = name_style
                         .fg(self.theme.accent)
                         .add_modifier(Modifier::BOLD);
-                    let highlighted = self.search.highlight(&unit.name, name_style, highlight_style);
+                    let highlighted =
+                        self.search
+                            .highlight(&unit.name, name_style, highlight_style);
                     for span in highlighted.spans {
                         spans.push(span);
                     }
@@ -320,7 +321,10 @@ impl UpdatePicker {
                 ScrollbarState::new(self.filtered.len()).position(self.selected);
             frame.render_stateful_widget(
                 scrollbar,
-                area.inner(Margin { horizontal: 0, vertical: 1 }),
+                area.inner(Margin {
+                    horizontal: 0,
+                    vertical: 1,
+                }),
                 &mut scrollbar_state,
             );
         }
@@ -349,7 +353,10 @@ impl UpdatePicker {
             .flat_map(|(i, (key, desc))| {
                 let mut s = vec![
                     Span::styled(*key, Style::default().fg(self.theme.accent)),
-                    Span::styled(format!(" {} ", desc), Style::default().fg(self.theme.overlay1)),
+                    Span::styled(
+                        format!(" {} ", desc),
+                        Style::default().fg(self.theme.overlay1),
+                    ),
                 ];
                 if i < hints.len() - 1 {
                     s.push(Span::raw(" "));
@@ -372,8 +379,16 @@ impl UpdatePicker {
             .split(area);
 
         // Header
-        let ok_count = self.render_results.iter().filter(|r| r.output.is_ok()).count();
-        let fail_count = self.render_results.iter().filter(|r| r.output.is_err()).count();
+        let ok_count = self
+            .render_results
+            .iter()
+            .filter(|r| r.output.is_ok())
+            .count();
+        let fail_count = self
+            .render_results
+            .iter()
+            .filter(|r| r.output.is_err())
+            .count();
         let title = if fail_count > 0 {
             format!(" cfg update  {} ok, {} failed ", ok_count, fail_count)
         } else {
@@ -386,7 +401,11 @@ impl UpdatePicker {
             .title(Span::styled(
                 title,
                 Style::default()
-                    .fg(if fail_count > 0 { self.theme.red } else { self.theme.green })
+                    .fg(if fail_count > 0 {
+                        self.theme.red
+                    } else {
+                        self.theme.green
+                    })
                     .add_modifier(Modifier::BOLD),
             ));
         frame.render_widget(header_block, chunks[0]);

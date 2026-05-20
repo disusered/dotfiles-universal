@@ -164,7 +164,10 @@ impl FuzzyInputState {
         let haystack = Utf32Str::new(text, &mut buf);
 
         let mut indices = Vec::new();
-        if pattern.indices(haystack, &mut self.matcher, &mut indices).is_some() {
+        if pattern
+            .indices(haystack, &mut self.matcher, &mut indices)
+            .is_some()
+        {
             // Convert u32 indices to char positions
             let mut spans = Vec::new();
             let chars: Vec<char> = text.chars().collect();
@@ -207,7 +210,11 @@ impl StatefulWidget for FuzzyInput {
         // Create the input display with cursor
         let (before, after) = state.query.split_at(state.cursor);
         let cursor_char = after.chars().next().unwrap_or(' ');
-        let after = if after.is_empty() { "" } else { &after[cursor_char.len_utf8()..] };
+        let after = if after.is_empty() {
+            ""
+        } else {
+            &after[cursor_char.len_utf8()..]
+        };
 
         let spans = vec![
             Span::styled("/ ", self.border_style),

@@ -136,7 +136,12 @@ impl WallpaperPicker {
                     }
                     _ => (None, None),
                 };
-                Entry { path, name, score, best_dominant }
+                Entry {
+                    path,
+                    name,
+                    score,
+                    best_dominant,
+                }
             })
             .collect();
 
@@ -214,8 +219,11 @@ impl WallpaperPicker {
         };
         self.filtered = indexes;
         self.selected = 0;
-        self.list_state
-            .select(if self.filtered.is_empty() { None } else { Some(0) });
+        self.list_state.select(if self.filtered.is_empty() {
+            None
+        } else {
+            Some(0)
+        });
     }
 
     fn ensure_protocol(&mut self, path: &Path) {
@@ -294,7 +302,11 @@ impl WallpaperPicker {
         } else {
             ""
         };
-        let match_tag = if self.match_only { " · MATCH ONLY" } else { "" };
+        let match_tag = if self.match_only {
+            " · MATCH ONLY"
+        } else {
+            ""
+        };
         format!(
             " cfg wallpaper -i · {}/{}{}{} ",
             count, total, match_tag, preview_tag
@@ -313,21 +325,22 @@ impl WallpaperPicker {
 
                 // Color swatch + score badge
                 let (swatch_color, badge_text) = match (e.best_dominant, e.score) {
-                    (Some(c), Some(s)) => (
-                        Color::Rgb(c.r, c.g, c.b),
-                        format!("{:>3.0}", s),
-                    ),
+                    (Some(c), Some(s)) => (Color::Rgb(c.r, c.g, c.b), format!("{:>3.0}", s)),
                     _ => (self.theme.subtext0, " — ".to_string()),
                 };
                 let matched = e.score.map(|s| s < MATCH_THRESHOLD).unwrap_or(false);
                 let badge_style = if matched {
-                    Style::default().fg(self.theme.accent).add_modifier(Modifier::BOLD)
+                    Style::default()
+                        .fg(self.theme.accent)
+                        .add_modifier(Modifier::BOLD)
                 } else {
                     Style::default().fg(self.theme.subtext0)
                 };
 
                 let name_style = if is_current {
-                    Style::default().fg(self.theme.accent).add_modifier(Modifier::BOLD)
+                    Style::default()
+                        .fg(self.theme.accent)
+                        .add_modifier(Modifier::BOLD)
                 } else {
                     Style::default().fg(self.theme.text)
                 };
@@ -369,7 +382,8 @@ impl WallpaperPicker {
         let path = match self.selected_path() {
             Some(p) => p.to_path_buf(),
             None => {
-                let p = Paragraph::new("no selection").style(Style::default().fg(self.theme.subtext0));
+                let p =
+                    Paragraph::new("no selection").style(Style::default().fg(self.theme.subtext0));
                 f.render_widget(p, inner);
                 return;
             }
@@ -383,7 +397,11 @@ impl WallpaperPicker {
             return;
         }
         if let Some(protocol) = self.protocols.get_mut(&path) {
-            f.render_stateful_widget(StatefulImage::new().resize(Resize::Fit(None)), inner, protocol);
+            f.render_stateful_widget(
+                StatefulImage::new().resize(Resize::Fit(None)),
+                inner,
+                protocol,
+            );
         }
     }
 
@@ -391,11 +409,7 @@ impl WallpaperPicker {
         if self.mode == Mode::Search {
             let input = FuzzyInput::default()
                 .style(Style::default().fg(self.theme.text))
-                .cursor_style(
-                    Style::default()
-                        .fg(self.theme.base)
-                        .bg(self.theme.text),
-                )
+                .cursor_style(Style::default().fg(self.theme.base).bg(self.theme.text))
                 .border_style(Style::default().fg(self.theme.subtext0));
             f.render_stateful_widget(input, area, &mut self.search);
             return;
@@ -412,7 +426,9 @@ impl WallpaperPicker {
                 primary
             )
         };
-        let style = Style::default().fg(self.theme.subtext0).bg(self.theme.surface0);
+        let style = Style::default()
+            .fg(self.theme.subtext0)
+            .bg(self.theme.surface0);
         let p = Paragraph::new(text).style(style);
         f.render_widget(p, area);
     }

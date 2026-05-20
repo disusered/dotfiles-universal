@@ -68,4 +68,3 @@ impl Widget for Toast {
             .render(toast_area, buf);
     }
 }
-

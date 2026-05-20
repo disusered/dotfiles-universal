@@ -58,10 +58,7 @@ pub fn tiebreak(pool: &[String], scores_by_secondary: &HashMap<String, f32>) -> 
     let mut ranked: Vec<(String, f32)> = pool
         .iter()
         .map(|p| {
-            let s = scores_by_secondary
-                .get(p)
-                .copied()
-                .unwrap_or(f32::INFINITY);
+            let s = scores_by_secondary.get(p).copied().unwrap_or(f32::INFINITY);
             (p.clone(), s)
         })
         .collect();
@@ -116,7 +113,10 @@ pub fn pick(config: &Config, cfg_dir: &str) -> Result<String, String> {
     let scored_primary: Vec<(String, f32)> = files
         .iter()
         .map(|p| {
-            let d = dominants_by_path.get(p).map(|v| v.as_slice()).unwrap_or(&[]);
+            let d = dominants_by_path
+                .get(p)
+                .map(|v| v.as_slice())
+                .unwrap_or(&[]);
             (p.clone(), score_wallpaper(d, &primary_color))
         })
         .collect();
@@ -129,7 +129,10 @@ pub fn pick(config: &Config, cfg_dir: &str) -> Result<String, String> {
             let scored_secondary: Vec<(String, f32)> = files
                 .iter()
                 .map(|p| {
-                    let d = dominants_by_path.get(p).map(|v| v.as_slice()).unwrap_or(&[]);
+                    let d = dominants_by_path
+                        .get(p)
+                        .map(|v| v.as_slice())
+                        .unwrap_or(&[]);
                     (p.clone(), score_wallpaper(d, &sec))
                 })
                 .collect();
@@ -150,7 +153,10 @@ pub fn pick(config: &Config, cfg_dir: &str) -> Result<String, String> {
             let secondary_scores: HashMap<String, f32> = pool
                 .iter()
                 .map(|p| {
-                    let d = dominants_by_path.get(p).map(|v| v.as_slice()).unwrap_or(&[]);
+                    let d = dominants_by_path
+                        .get(p)
+                        .map(|v| v.as_slice())
+                        .unwrap_or(&[]);
                     (p.clone(), score_wallpaper(d, &sec))
                 })
                 .collect();
@@ -211,19 +217,20 @@ fn analyze_and_cache(
             analyzed
         });
 
-    let analyze_result: Result<(), String> = to_analyze
-        .par_iter()
-        .try_for_each_with(tx.clone(), |tx, path| {
-            let n = counter.fetch_add(1, Ordering::Relaxed) + 1;
-            if show_progress {
-                eprintln!("{}", format_progress_line(n, total, path));
-            }
-            let dominants = analysis::analyze(path)?;
-            let mtime = file_mtime_secs(path).unwrap_or(0);
-            tx.send((path.clone(), dominants, mtime))
-                .map_err(|e| format!("tag cache merger channel closed: {}", e))?;
-            Ok(())
-        });
+    let analyze_result: Result<(), String> =
+        to_analyze
+            .par_iter()
+            .try_for_each_with(tx.clone(), |tx, path| {
+                let n = counter.fetch_add(1, Ordering::Relaxed) + 1;
+                if show_progress {
+                    eprintln!("{}", format_progress_line(n, total, path));
+                }
+                let dominants = analysis::analyze(path)?;
+                let mtime = file_mtime_secs(path).unwrap_or(0);
+                tx.send((path.clone(), dominants, mtime))
+                    .map_err(|e| format!("tag cache merger channel closed: {}", e))?;
+                Ok(())
+            });
 
     // Close the outer sender so the merger can finish draining; wait for it.
     drop(tx);
@@ -275,8 +282,8 @@ pub fn prewarm_cache(config: &Config) -> Result<usize, String> {
 }
 
 fn enumerate_wallpapers(dir: &str) -> Result<Vec<String>, String> {
-    let entries = fs::read_dir(dir)
-        .map_err(|e| format!("failed to read source_dir '{}': {}", dir, e))?;
+    let entries =
+        fs::read_dir(dir).map_err(|e| format!("failed to read source_dir '{}': {}", dir, e))?;
     let mut out = Vec::new();
     for entry in entries {
         let entry = entry.map_err(|e| format!("failed to read entry in '{}': {}", dir, e))?;
@@ -324,25 +331,33 @@ mod tests {
     #[test]
     fn score_wallpaper_returns_min_distance_across_dominants() {
         let dominants = vec![
-            dom(255, 0, 0, 0.5),   // red — far from peach
+            dom(255, 0, 0, 0.5),     // red — far from peach
             dom(250, 179, 135, 0.3), // peach — close to peach
-            dom(0, 255, 0, 0.2),   // green — far
+            dom(0, 255, 0, 0.2),     // green — far
         ];
         let peach = c(250, 179, 135);
         let score = score_wallpaper(&dominants, &peach);
-        assert!(score < 1.0, "expected near-zero min distance, got {}", score);
+        assert!(
+            score < 1.0,
+            "expected near-zero min distance, got {}",
+            score
+        );
     }
 
     #[test]
     fn score_wallpaper_ignores_weight_uses_distance_only() {
         // A tiny-weight exact match still wins over a heavy-weight distant match.
         let dominants = vec![
-            dom(0, 0, 0, 0.99),      // almost all pixels — black
+            dom(0, 0, 0, 0.99),       // almost all pixels — black
             dom(250, 179, 135, 0.01), // tiny sliver — peach
         ];
         let peach = c(250, 179, 135);
         let score = score_wallpaper(&dominants, &peach);
-        assert!(score < 1.0, "weight should not mask the close match; got {}", score);
+        assert!(
+            score < 1.0,
+            "weight should not mask the close match; got {}",
+            score
+        );
     }
 
     #[test]
@@ -365,10 +380,7 @@ mod tests {
 
     #[test]
     fn filter_pool_empty_when_all_over_threshold() {
-        let scored = vec![
-            ("a.jpg".to_string(), 100.0),
-            ("b.jpg".to_string(), 200.0),
-        ];
+        let scored = vec![("a.jpg".to_string(), 100.0), ("b.jpg".to_string(), 200.0)];
         assert!(filter_pool(&scored, 60.0).is_empty());
     }
 
