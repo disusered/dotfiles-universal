@@ -1,6 +1,7 @@
 mod color;
 mod config;
 mod fonts;
+mod leds;
 mod palette;
 mod render;
 mod templates;
@@ -126,6 +127,24 @@ enum Command {
         #[arg(long, group = "mode", value_name = "PATH")]
         scratchpad: Option<String>,
     },
+    /// Manage attached LEDs
+    Leds {
+        /// Apply current cfg theme primary color to supported LEDs
+        #[arg(long, conflicts_with = "set")]
+        apply: bool,
+        /// Set a LED value (color, brightness, effect, speed)
+        #[arg(long = "set", value_name = "KEY=VALUE")]
+        set: Vec<String>,
+        /// Persist current changes to device EEPROM
+        #[arg(long)]
+        save: bool,
+        /// Apply to one configured LED target by name
+        #[arg(long, conflicts_with = "device", value_name = "NAME")]
+        target: Option<String>,
+        /// Use a specific hidraw device path instead of auto-detecting
+        #[arg(long, value_name = "PATH")]
+        device: Option<PathBuf>,
+    },
 }
 
 /// Get the cfg configuration directory
@@ -168,10 +187,23 @@ fn update_apps(cfg_dir: &str, dotfiles_dir: &str, app_names: &[String], dry_run:
                 std::process::exit(1);
             }
         };
+        let include_leds = app_names.is_empty()
+            || app_names
+                .iter()
+                .any(|name| name == leds::LEDS_UPDATE_TARGET);
         let targets: Vec<&String> = if app_names.is_empty() {
             templates.names()
         } else {
-            app_names.iter().collect()
+            for name in app_names {
+                if name != leds::LEDS_UPDATE_TARGET && templates.get(name).is_none() {
+                    eprintln!("Unknown: {}", name);
+                    std::process::exit(1);
+                }
+            }
+            app_names
+                .iter()
+                .filter(|name| name.as_str() != leds::LEDS_UPDATE_TARGET)
+                .collect()
         };
         for name in &targets {
             let tpl_config = match templates.get(name) {
@@ -186,6 +218,9 @@ fn update_apps(cfg_dir: &str, dotfiles_dir: &str, app_names: &[String], dry_run:
                 Ok(output) => println!("[dry-run] {}  →  {}", name, output.display()),
                 Err(e) => eprintln!("  {} - error: {}", name, e),
             }
+        }
+        if include_leds {
+            println!("[dry-run] leds  →  apply current theme to configured LED targets");
         }
         return;
     }
@@ -208,11 +243,46 @@ fn update_apps(cfg_dir: &str, dotfiles_dir: &str, app_names: &[String], dry_run:
                     }
                 }
             }
+            if let Some(led_result) = &result.leds {
+                println!("\nLEDs...");
+                match led_result {
+                    Ok(()) => println!("  leds... ok"),
+                    Err(e) => println!("  leds... warning: {}", e),
+                }
+            }
         }
         Err(e) => {
             eprintln!("Error: {}", e);
             std::process::exit(1);
         }
+    }
+}
+
+fn load_config_and_palette(cfg_dir: &str) -> Result<(Config, Palette), String> {
+    let config = Config::load(&format!("{}/config.toml", cfg_dir)).unwrap_or_default();
+    let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
+    let palette =
+        Palette::load(&palette_path).map_err(|e| format!("Error loading palette: {}", e))?;
+    Ok((config, palette))
+}
+
+fn print_led_statuses(statuses: &[leds::LedStatus]) {
+    if statuses.is_empty() {
+        eprintln!("warning: no configured LED targets connected");
+        return;
+    }
+
+    for (index, status) in statuses.iter().enumerate() {
+        if index > 0 {
+            println!();
+        }
+        println!("target={}", status.target);
+        println!("device={}", status.device.display());
+        println!("protocol=0x{:04x}", status.protocol_version);
+        println!("brightness={}", status.brightness);
+        println!("effect={}", status.effect);
+        println!("speed={}", status.speed);
+        println!("color_hsv={},{}", status.color.h, status.color.s);
     }
 }
 
@@ -283,7 +353,11 @@ fn main() {
     };
 
     match command {
-        Command::Update { names, list, dry_run } => {
+        Command::Update {
+            names,
+            list,
+            dry_run,
+        } => {
             let cfg_dir = get_cfg_dir();
             let dotfiles_dir = get_dotfiles_dir();
 
@@ -297,7 +371,8 @@ fn main() {
                         std::process::exit(1);
                     }
                 };
-                let mut names: Vec<_> = templates.names();
+                let mut names: Vec<String> = templates.names().into_iter().cloned().collect();
+                names.push(leds::LEDS_UPDATE_TARGET.to_string());
                 names.sort();
                 for name in names {
                     println!("{}", name);
@@ -306,7 +381,15 @@ fn main() {
                 update_apps(&cfg_dir, &dotfiles_dir, &names, dry_run);
             }
         }
-        Command::Theme { get, set, list, apply, format, json, interactive } => {
+        Command::Theme {
+            get,
+            set,
+            list,
+            apply,
+            format,
+            json,
+            interactive,
+        } => {
             let cfg_dir = get_cfg_dir();
             let dotfiles_dir = get_dotfiles_dir();
             let config_path = format!("{}/config.toml", cfg_dir);
@@ -365,14 +448,23 @@ fn main() {
                     let mut obj = serde_json::Map::new();
                     for name in &names {
                         let c = palette.get(name).unwrap();
-                        obj.insert(name.to_string(), serde_json::json!(format_color(c, fmt, 1.0)));
+                        obj.insert(
+                            name.to_string(),
+                            serde_json::json!(format_color(c, fmt, 1.0)),
+                        );
                     }
-                    println!("{}", serde_json::to_string_pretty(&serde_json::Value::Object(obj)).unwrap());
+                    println!(
+                        "{}",
+                        serde_json::to_string_pretty(&serde_json::Value::Object(obj)).unwrap()
+                    );
                 } else {
                     for name in &names {
                         let c = palette.get(name).unwrap();
                         let formatted = format_color(c, fmt, 1.0);
-                        println!("\x1b[38;2;{};{};{}m██\x1b[0m {:12} {}", c.r, c.g, c.b, name, formatted);
+                        println!(
+                            "\x1b[38;2;{};{};{}m██\x1b[0m {:12} {}",
+                            c.r, c.g, c.b, name, formatted
+                        );
                     }
                 }
             } else if let Some(key_value) = set {
@@ -420,7 +512,75 @@ fn main() {
                 println!("secondary={}", config.secondary);
             }
         }
-        Command::Font { get, set, list, apply, mono, sans, json, preview, interactive, scratchpad } => {
+        Command::Leds {
+            apply,
+            set,
+            save,
+            target,
+            device,
+        } => {
+            let cfg_dir = get_cfg_dir();
+            let (config, palette) = match load_config_and_palette(&cfg_dir) {
+                Ok(values) => values,
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(1);
+                }
+            };
+
+            if save && !apply && set.is_empty() {
+                eprintln!("Error: --save requires --apply or --set");
+                std::process::exit(1);
+            }
+
+            let result = if apply {
+                leds::apply_theme(
+                    &config,
+                    &palette,
+                    save,
+                    target.as_deref(),
+                    device.as_deref(),
+                )
+            } else if !set.is_empty() {
+                let options = match leds::parse_set_options(&set) {
+                    Ok(options) => options,
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                        std::process::exit(1);
+                    }
+                };
+                leds::apply_set_options(
+                    &options,
+                    &config,
+                    &palette,
+                    save,
+                    target.as_deref(),
+                    device.as_deref(),
+                )
+            } else {
+                leds::read_status(&config, target.as_deref(), device.as_deref())
+            };
+
+            match result {
+                Ok(statuses) => print_led_statuses(&statuses),
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    std::process::exit(1);
+                }
+            }
+        }
+        Command::Font {
+            get,
+            set,
+            list,
+            apply,
+            mono,
+            sans,
+            json,
+            preview,
+            interactive,
+            scratchpad,
+        } => {
             let cfg_dir = get_cfg_dir();
             let dotfiles_dir = get_dotfiles_dir();
             let config_path = format!("{}/config.toml", cfg_dir);
@@ -436,11 +596,16 @@ fn main() {
 
                 // Load palette for theming
                 let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
-                let palette = Palette::load(&palette_path).unwrap_or_else(|_| {
-                    Palette { colors: std::collections::HashMap::new() }
+                let palette = Palette::load(&palette_path).unwrap_or_else(|_| Palette {
+                    colors: std::collections::HashMap::new(),
                 });
 
-                match tui::fonts::run_scratchpad_preview(&font_name, &config, &palette, &config_path) {
+                match tui::fonts::run_scratchpad_preview(
+                    &font_name,
+                    &config,
+                    &palette,
+                    &config_path,
+                ) {
                     Ok(true) => {
                         // User saved - update apps that use mono font
                         update_apps(&cfg_dir, &dotfiles_dir, &[], false);
@@ -475,8 +640,8 @@ fn main() {
 
                 // Load palette for theming
                 let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
-                let palette = Palette::load(&palette_path).unwrap_or_else(|_| {
-                    Palette { colors: std::collections::HashMap::new() }
+                let palette = Palette::load(&palette_path).unwrap_or_else(|_| Palette {
+                    colors: std::collections::HashMap::new(),
                 });
 
                 match tui::fonts::run_picker(&config, &palette, &config_path) {
@@ -498,33 +663,42 @@ fn main() {
                 }
             } else if list {
                 if json {
-                    let mono_fonts: Vec<serde_json::Value> = fonts::list_fonts(Some(fonts::FontCategory::Mono))
-                        .iter()
-                        .map(|f| serde_json::json!({
-                            "name": f.name,
-                            "description": f.description,
-                            "installed": f.installed,
-                            "ligatures": f.ligatures,
-                            "nerd_font": f.nerd_font
-                        }))
-                        .collect();
+                    let mono_fonts: Vec<serde_json::Value> =
+                        fonts::list_fonts(Some(fonts::FontCategory::Mono))
+                            .iter()
+                            .map(|f| {
+                                serde_json::json!({
+                                    "name": f.name,
+                                    "description": f.description,
+                                    "installed": f.installed,
+                                    "ligatures": f.ligatures,
+                                    "nerd_font": f.nerd_font
+                                })
+                            })
+                            .collect();
 
-                    let sans_fonts: Vec<serde_json::Value> = fonts::list_fonts(Some(fonts::FontCategory::Sans))
-                        .iter()
-                        .map(|f| serde_json::json!({
-                            "name": f.name,
-                            "description": f.description,
-                            "installed": f.installed,
-                            "ligatures": f.ligatures,
-                            "nerd_font": f.nerd_font
-                        }))
-                        .collect();
+                    let sans_fonts: Vec<serde_json::Value> =
+                        fonts::list_fonts(Some(fonts::FontCategory::Sans))
+                            .iter()
+                            .map(|f| {
+                                serde_json::json!({
+                                    "name": f.name,
+                                    "description": f.description,
+                                    "installed": f.installed,
+                                    "ligatures": f.ligatures,
+                                    "nerd_font": f.nerd_font
+                                })
+                            })
+                            .collect();
 
                     let mut result = serde_json::Map::new();
                     result.insert("mono".to_string(), serde_json::Value::Array(mono_fonts));
                     result.insert("sans".to_string(), serde_json::Value::Array(sans_fonts));
 
-                    println!("{}", serde_json::to_string_pretty(&serde_json::Value::Object(result)).unwrap());
+                    println!(
+                        "{}",
+                        serde_json::to_string_pretty(&serde_json::Value::Object(result)).unwrap()
+                    );
                     return;
                 }
 
@@ -533,11 +707,13 @@ fn main() {
                 let palette = Palette::load(&palette_path).ok();
 
                 // Get primary color for highlighting current font
-                let primary = palette.as_ref()
+                let primary = palette
+                    .as_ref()
                     .and_then(|p| p.get(&config.primary))
                     .map(|c| format!("\x1b[38;2;{};{};{}m", c.r, c.g, c.b))
                     .unwrap_or_default();
-                let green = palette.as_ref()
+                let green = palette
+                    .as_ref()
                     .and_then(|p| p.get("green"))
                     .map(|c| format!("\x1b[38;2;{};{};{}m", c.r, c.g, c.b))
                     .unwrap_or_else(|| "\x1b[32m".to_string());
@@ -561,9 +737,21 @@ fn main() {
 
                 // Helper to print a font row
                 let print_font = |font: &fonts::FontListing, is_current: bool| {
-                    let status = if font.installed { format!("{}✓{}", green, reset) } else { " ".to_string() };
-                    let lig = if font.ligatures { format!("{}lig{}", dim, reset) } else { "   ".to_string() };
-                    let nerd = if font.nerd_font { format!("{}nf{}", dim, reset) } else { "  ".to_string() };
+                    let status = if font.installed {
+                        format!("{}✓{}", green, reset)
+                    } else {
+                        " ".to_string()
+                    };
+                    let lig = if font.ligatures {
+                        format!("{}lig{}", dim, reset)
+                    } else {
+                        "   ".to_string()
+                    };
+                    let nerd = if font.nerd_font {
+                        format!("{}nf{}", dim, reset)
+                    } else {
+                        "  ".to_string()
+                    };
 
                     // Highlight current font with primary color
                     let (name_start, name_end) = if is_current {
@@ -592,9 +780,10 @@ fn main() {
 
                 if show_mono {
                     println!("{}Monospace:{}", primary, reset);
-                    for font in listings.iter().filter(|f| {
-                        fonts::is_valid_font(f.name, fonts::FontCategory::Mono)
-                    }) {
+                    for font in listings
+                        .iter()
+                        .filter(|f| fonts::is_valid_font(f.name, fonts::FontCategory::Mono))
+                    {
                         let is_current = font.name == config.fonts.mono;
                         print_font(font, is_current);
                     }
@@ -605,16 +794,20 @@ fn main() {
                         println!();
                     }
                     println!("{}Sans-serif:{}", primary, reset);
-                    for font in listings.iter().filter(|f| {
-                        fonts::is_valid_font(f.name, fonts::FontCategory::Sans)
-                    }) {
+                    for font in listings
+                        .iter()
+                        .filter(|f| fonts::is_valid_font(f.name, fonts::FontCategory::Sans))
+                    {
                         let is_current = font.name == config.fonts.sans;
                         print_font(font, is_current);
                     }
                 }
 
                 println!();
-                println!("{}✓{} installed  {}lig{} ligatures  {}nf{} nerd font", green, reset, dim, reset, dim, reset);
+                println!(
+                    "{}✓{} installed  {}lig{} ligatures  {}nf{} nerd font",
+                    green, reset, dim, reset, dim, reset
+                );
             } else if let Some(key_value) = set {
                 // Parse key=value
                 let parts: Vec<&str> = key_value.splitn(2, '=').collect();
@@ -656,7 +849,10 @@ fn main() {
                         }
                     }
                     _ => {
-                        eprintln!("Unknown key: {} (valid: mono, mono_size, sans, sans_size)", key);
+                        eprintln!(
+                            "Unknown key: {} (valid: mono, mono_size, sans, sans_size)",
+                            key
+                        );
                         std::process::exit(1);
                     }
                 }
@@ -684,7 +880,10 @@ fn main() {
                     "sans" => println!("{}", config.fonts.sans),
                     "sans_size" => println!("{}", config.fonts.sans_size),
                     _ => {
-                        eprintln!("Unknown key: {} (valid: mono, mono_size, sans, sans_size)", key);
+                        eprintln!(
+                            "Unknown key: {} (valid: mono, mono_size, sans, sans_size)",
+                            key
+                        );
                         std::process::exit(1);
                     }
                 }
@@ -696,7 +895,14 @@ fn main() {
                 println!("sans_size={}", config.fonts.sans_size);
             }
         }
-        Command::Wallpaper { get, set, apply, rescan, interactive, scratchpad } => {
+        Command::Wallpaper {
+            get,
+            set,
+            apply,
+            rescan,
+            interactive,
+            scratchpad,
+        } => {
             let cfg_dir = get_cfg_dir();
             let config_path = format!("{}/config.toml", cfg_dir);
 

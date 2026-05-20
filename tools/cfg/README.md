@@ -34,12 +34,21 @@ cfg update mako kitty   # Update specific templates
 cfg update --dry-run    # Preview without writing
 
 # Theme
-cfg theme               # Show current (flavor, accent, secondary)
+cfg theme               # Show current (flavor, primary, secondary)
 cfg theme --list        # Show palette colors
-cfg theme --get accent  # Get specific value
-cfg theme --set accent=green              # Set value only
-cfg theme --set accent=green --apply      # Set + update all
-cfg theme --set accent=green --apply mako # Set + update specific
+cfg theme --get primary # Get specific value
+cfg theme --set primary=green              # Set value only
+cfg theme --set primary=green --apply      # Set + update all
+cfg theme --set primary=green --apply mako # Set + update specific
+
+# LEDs
+cfg leds                         # Show supported LED device state
+cfg leds --apply                 # Apply current primary color live, no EEPROM write
+cfg leds --apply --save          # Explicitly persist current LED theme to EEPROM
+cfg leds --target keychron-v1    # Limit to one configured keyboard
+cfg leds --set color=sapphire    # Set a palette color live
+cfg leds --set effect=reactive_multiwide --set brightness=223
+cfg leds --set effect=solid --save # Explicitly persist a manual LED change
 
 # Font
 cfg font                # Show current (mono, sans, sizes)

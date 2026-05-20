@@ -73,6 +73,90 @@ fn update_dry_run_alone_accepted() {
     );
 }
 
+#[test]
+fn update_list_includes_leds_virtual_target() {
+    let output = cfg()
+        .args(["update", "--list"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+    let stdout = String::from_utf8_lossy(&output);
+
+    assert!(
+        stdout.lines().any(|line| line == "leds"),
+        "stdout was: {}",
+        stdout
+    );
+}
+
+#[test]
+fn update_dry_run_leds_virtual_target_accepted() {
+    cfg()
+        .args(["update", "--dry-run", "leds"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("[dry-run] leds"));
+}
+
+// =============================================================================
+// LEDS command tests
+// =============================================================================
+
+#[test]
+fn leds_help_lists_apply_set_and_save() {
+    cfg()
+        .args(["leds", "--help"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("--apply"))
+        .stdout(predicate::str::contains("--set"))
+        .stdout(predicate::str::contains("--save"));
+}
+
+#[test]
+fn leds_apply_rejects_set() {
+    cfg()
+        .args(["leds", "--apply", "--set", "brightness=223"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
+fn leds_help_lists_target() {
+    cfg()
+        .args(["leds", "--help"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("--target"));
+}
+
+#[test]
+fn leds_save_without_apply_or_set_rejected_before_hid_access() {
+    cfg()
+        .args(["leds", "--save", "--device", "/nonexistent/definitely-nope"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("--save requires --apply or --set"));
+}
+
+#[test]
+fn leds_set_accepts_reactive_multiwide_effect_name() {
+    cfg()
+        .args([
+            "leds",
+            "--set",
+            "effect=reactive_multiwide",
+            "--device",
+            "/nonexistent/definitely-nope",
+        ])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("Failed to open"));
+}
+
 // =============================================================================
 // FONT command tests
 // =============================================================================
@@ -80,7 +164,13 @@ fn update_dry_run_alone_accepted() {
 #[test]
 fn font_get_rejects_set() {
     cfg()
-        .args(["font", "--get", "mono", "--set", "mono=JetBrainsMono Nerd Font"])
+        .args([
+            "font",
+            "--get",
+            "mono",
+            "--set",
+            "mono=JetBrainsMono Nerd Font",
+        ])
         .assert()
         .failure()
         .stderr(predicate::str::contains("cannot be used with"));
@@ -143,7 +233,12 @@ fn font_scratchpad_rejects_get() {
 #[test]
 fn font_scratchpad_rejects_set() {
     cfg()
-        .args(["font", "--scratchpad", "--set", "mono=JetBrainsMono Nerd Font"])
+        .args([
+            "font",
+            "--scratchpad",
+            "--set",
+            "mono=JetBrainsMono Nerd Font",
+        ])
         .assert()
         .failure()
         .stderr(predicate::str::contains("cannot be used with"));
@@ -179,7 +274,12 @@ fn font_interactive_rejects_get() {
 #[test]
 fn font_interactive_rejects_set() {
     cfg()
-        .args(["font", "--interactive", "--set", "mono=JetBrainsMono Nerd Font"])
+        .args([
+            "font",
+            "--interactive",
+            "--set",
+            "mono=JetBrainsMono Nerd Font",
+        ])
         .assert()
         .failure()
         .stderr(predicate::str::contains("cannot be used with"));
@@ -233,34 +333,22 @@ fn font_list_json_outputs_valid_structure() {
 
 #[test]
 fn theme_shows_current() {
-    cfg()
-        .arg("theme")
-        .assert()
-        .success();
+    cfg().arg("theme").assert().success();
 }
 
 #[test]
 fn theme_get_accent() {
-    cfg()
-        .args(["theme", "--get", "primary"])
-        .assert()
-        .success();
+    cfg().args(["theme", "--get", "primary"]).assert().success();
 }
 
 #[test]
 fn theme_list() {
-    cfg()
-        .args(["theme", "--list"])
-        .assert()
-        .success();
+    cfg().args(["theme", "--list"]).assert().success();
 }
 
 #[test]
 fn theme_list_json() {
-    cfg()
-        .args(["theme", "--list", "--json"])
-        .assert()
-        .success();
+    cfg().args(["theme", "--list", "--json"]).assert().success();
 }
 
 #[test]
@@ -293,7 +381,14 @@ fn theme_set_rejects_list() {
 #[test]
 fn theme_get_set_list_all_conflict() {
     cfg()
-        .args(["theme", "--get", "primary", "--set", "accent=blue", "--list"])
+        .args([
+            "theme",
+            "--get",
+            "primary",
+            "--set",
+            "accent=blue",
+            "--list",
+        ])
         .assert()
         .failure()
         .stderr(predicate::str::contains("cannot be used with"));
@@ -414,7 +509,11 @@ fn wallpaper_apply_missing_file_errors() {
     let dir = isolated_cfg_dir("apply-missing-file");
     cfg()
         .env("CFG_DIR", &dir)
-        .args(["wallpaper", "--set", "path=/nonexistent/definitely/nope.png"])
+        .args([
+            "wallpaper",
+            "--set",
+            "path=/nonexistent/definitely/nope.png",
+        ])
         .assert()
         .success();
     let output = cfg()
@@ -621,7 +720,13 @@ fn wallpaper_scratchpad_rejects_get() {
 #[test]
 fn wallpaper_scratchpad_rejects_set() {
     cfg()
-        .args(["wallpaper", "--scratchpad", "/tmp/x.jpg", "--set", "path=/tmp/y.jpg"])
+        .args([
+            "wallpaper",
+            "--scratchpad",
+            "/tmp/x.jpg",
+            "--set",
+            "path=/tmp/y.jpg",
+        ])
         .assert()
         .failure()
         .stderr(predicate::str::contains("cannot be used with"));
@@ -648,16 +753,16 @@ fn wallpaper_scratchpad_rejects_apply() {
 #[test]
 fn wallpaper_scratchpad_missing_file_errors() {
     let output = cfg()
-        .args(["wallpaper", "--scratchpad", "/nonexistent/definitely/nope.png"])
+        .args([
+            "wallpaper",
+            "--scratchpad",
+            "/nonexistent/definitely/nope.png",
+        ])
         .output()
         .unwrap();
     assert!(!output.status.success(), "expected non-zero exit");
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(
-        stderr.contains("does not exist"),
-        "stderr was: {}",
-        stderr
-    );
+    assert!(stderr.contains("does not exist"), "stderr was: {}", stderr);
 }
 
 #[test]

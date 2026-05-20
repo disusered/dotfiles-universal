@@ -1,6 +1,7 @@
 linux[whoami.distro^="Arch"]:
-  # https://www.reddit.com/r/Keychron/comments/1nqpheb/comment/ngl9uvf/
-  # sudo chmod a+rw /dev/hidraw3
-  # sudo chmod 600 /dev/hidraw3
+  # cfg leds uses the Keychron QMK/VIA Raw HID interface.
   installs:
-    cmd: sudo cp ~/.dotfiles/arch/keychron/keychron.rules /etc/udev/rules.d/
+    cmd: |
+      sudo cp ~/.dotfiles/arch/keychron/keychron.rules /etc/udev/rules.d/
+      sudo udevadm control --reload
+      sudo udevadm trigger --subsystem-match=hidraw

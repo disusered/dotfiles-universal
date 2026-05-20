@@ -1,11 +1,12 @@
+use serde::Deserialize;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::path::PathBuf;
 use std::process::Command;
 use std::time::{Duration, Instant};
-use serde::Deserialize;
 
 use crate::config::Config;
+use crate::leds;
 use crate::palette::Palette;
 use crate::render::{build_context, render_to_file};
 
@@ -65,8 +66,12 @@ pub fn coalesce_reloads<'a>(
     let mut groups: Vec<ReloadGroup<'a>> = Vec::new();
 
     for name in rendered {
-        let Some(tpl) = templates.get(name) else { continue };
-        let Some(cmd) = tpl.reload.as_deref() else { continue };
+        let Some(tpl) = templates.get(name) else {
+            continue;
+        };
+        let Some(cmd) = tpl.reload.as_deref() else {
+            continue;
+        };
 
         if let Some(group) = groups.iter_mut().find(|g| g.cmd == cmd) {
             group.names.push(name.as_str());
@@ -143,7 +148,10 @@ pub fn rotz_link(module: &str) -> Result<(), String> {
     if status.success() {
         Ok(())
     } else {
-        Err(format!("rotz link failed with exit code: {:?}", status.code()))
+        Err(format!(
+            "rotz link failed with exit code: {:?}",
+            status.code()
+        ))
     }
 }
 
@@ -163,30 +171,43 @@ pub struct ReloadResult {
 pub struct UpdateResult {
     pub rendered: Vec<RenderResult>,
     pub reloaded: Vec<ReloadResult>,
+    pub leds: Option<Result<(), String>>,
 }
 
 /// Run a full update: render templates, symlink, and reload apps.
 /// Returns structured results instead of printing to stdout.
-pub fn run_update(cfg_dir: &str, dotfiles_dir: &str, names: &[String]) -> Result<UpdateResult, String> {
+pub fn run_update(
+    cfg_dir: &str,
+    dotfiles_dir: &str,
+    names: &[String],
+) -> Result<UpdateResult, String> {
     let config = Config::load(&format!("{}/config.toml", cfg_dir)).unwrap_or_default();
     let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
-    let palette = Palette::load(&palette_path)
-        .map_err(|e| format!("Error loading palette: {}", e))?;
+    let palette =
+        Palette::load(&palette_path).map_err(|e| format!("Error loading palette: {}", e))?;
 
     let context = build_context(&config, &palette);
 
     let templates_path = format!("{}/templates.toml", cfg_dir);
     let templates = TemplatesFile::load(&templates_path)?;
 
+    let include_leds =
+        names.is_empty() || names.iter().any(|name| name == leds::LEDS_UPDATE_TARGET);
+    let explicit_leds =
+        !names.is_empty() && names.iter().any(|name| name == leds::LEDS_UPDATE_TARGET);
+
     let targets: Vec<&String> = if names.is_empty() {
         templates.names()
     } else {
         for name in names {
-            if templates.get(name).is_none() {
+            if name != leds::LEDS_UPDATE_TARGET && templates.get(name).is_none() {
                 return Err(format!("Unknown template: {}", name));
             }
         }
-        names.iter().collect()
+        names
+            .iter()
+            .filter(|name| name.as_str() != leds::LEDS_UPDATE_TARGET)
+            .collect()
     };
 
     let mut rendered_names: Vec<String> = Vec::new();
@@ -245,9 +266,20 @@ pub fn run_update(cfg_dir: &str, dotfiles_dir: &str, names: &[String]) -> Result
         }
     }
 
+    let led_result = if include_leds {
+        let result = leds::apply_theme(&config, &palette, false, None, None).map(|_| ());
+        if explicit_leds && result.is_err() {
+            return Err(format!("leds: {}", result.unwrap_err()));
+        }
+        Some(result)
+    } else {
+        None
+    };
+
     Ok(UpdateResult {
         rendered: render_results,
         reloaded: reload_results,
+        leds: led_result,
     })
 }
 
@@ -258,12 +290,15 @@ mod tests {
     fn make_templates(entries: Vec<(&str, Option<&str>, bool)>) -> TemplatesFile {
         let mut templates = HashMap::new();
         for (name, reload, background) in entries {
-            templates.insert(name.to_string(), TemplateConfig {
-                path: format!("test/{}.tera", name),
-                reload: reload.map(|s| s.to_string()),
-                link: None,
-                background,
-            });
+            templates.insert(
+                name.to_string(),
+                TemplateConfig {
+                    path: format!("test/{}.tera", name),
+                    reload: reload.map(|s| s.to_string()),
+                    link: None,
+                    background,
+                },
+            );
         }
         TemplatesFile { templates }
     }
@@ -321,9 +356,7 @@ mod tests {
 
     #[test]
     fn coalesce_skips_unknown_template() {
-        let tpl = make_templates(vec![
-            ("a", Some("reload-a"), false),
-        ]);
+        let tpl = make_templates(vec![("a", Some("reload-a"), false)]);
         let rendered: Vec<String> = vec!["a", "unknown"].into_iter().map(String::from).collect();
 
         let groups = coalesce_reloads(&rendered, &tpl);
@@ -341,7 +374,9 @@ mod tests {
             ("btop", None, false),
         ]);
         let rendered: Vec<String> = vec!["hyprland", "hyprbars", "mako", "kitty", "btop"]
-            .into_iter().map(String::from).collect();
+            .into_iter()
+            .map(String::from)
+            .collect();
 
         let groups = coalesce_reloads(&rendered, &tpl);
         assert_eq!(groups.len(), 3);
@@ -394,7 +429,10 @@ mod tests {
         let elapsed = start.elapsed();
 
         assert!(err.contains("timed out"));
-        assert!(elapsed < Duration::from_secs(1), "should return quickly after timeout");
+        assert!(
+            elapsed < Duration::from_secs(1),
+            "should return quickly after timeout"
+        );
     }
 
     // =========================================================================

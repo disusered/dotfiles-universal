@@ -18,6 +18,8 @@ pub struct Config {
     pub fonts: FontConfig,
     #[serde(default)]
     pub wallpaper: WallpaperConfig,
+    #[serde(default)]
+    pub leds: LedConfig,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, Default)]
@@ -44,6 +46,25 @@ pub struct WallpaperConfig {
     pub cache_dir: String,
     #[serde(default = "default_wallpaper_source_dir")]
     pub source_dir: String,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct LedConfig {
+    #[serde(default = "default_led_effect")]
+    pub effect: String,
+    #[serde(default = "default_led_brightness")]
+    pub brightness: u8,
+    #[serde(default = "default_led_speed")]
+    pub speed: u8,
+    #[serde(default = "default_led_devices")]
+    pub devices: Vec<LedDeviceConfig>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
+pub struct LedDeviceConfig {
+    pub name: String,
+    pub vendor_id: u16,
+    pub product_id: u16,
 }
 
 fn default_wallpaper_mode() -> String {
@@ -75,6 +96,37 @@ impl Default for WallpaperConfig {
             gravity: default_wallpaper_gravity(),
             cache_dir: default_wallpaper_cache_dir(),
             source_dir: default_wallpaper_source_dir(),
+        }
+    }
+}
+
+fn default_led_effect() -> String {
+    "reactive_multiwide".to_string()
+}
+
+fn default_led_brightness() -> u8 {
+    223
+}
+
+fn default_led_speed() -> u8 {
+    175
+}
+
+fn default_led_devices() -> Vec<LedDeviceConfig> {
+    vec![LedDeviceConfig {
+        name: "keychron-v1".to_string(),
+        vendor_id: 0x3434,
+        product_id: 0x0311,
+    }]
+}
+
+impl Default for LedConfig {
+    fn default() -> Self {
+        LedConfig {
+            effect: default_led_effect(),
+            brightness: default_led_brightness(),
+            speed: default_led_speed(),
+            devices: default_led_devices(),
         }
     }
 }
@@ -152,6 +204,9 @@ impl Config {
             "wallpaper.gravity" => Some(self.wallpaper.gravity.clone()),
             "wallpaper.cache_dir" => Some(self.wallpaper.cache_dir.clone()),
             "wallpaper.source_dir" => Some(self.wallpaper.source_dir.clone()),
+            "leds.effect" => Some(self.leds.effect.clone()),
+            "leds.brightness" => Some(self.leds.brightness.to_string()),
+            "leds.speed" => Some(self.leds.speed.to_string()),
             _ => None,
         }
     }
@@ -226,15 +281,24 @@ impl Config {
             }
             "wallpaper.gravity" => {
                 const VALID_GRAVITY: &[&str] = &[
-                    "NorthWest", "North", "NorthEast",
-                    "West", "Center", "East",
-                    "SouthWest", "South", "SouthEast",
+                    "NorthWest",
+                    "North",
+                    "NorthEast",
+                    "West",
+                    "Center",
+                    "East",
+                    "SouthWest",
+                    "South",
+                    "SouthEast",
                 ];
                 if VALID_GRAVITY.contains(&value) {
                     self.wallpaper.gravity = value.to_string();
                     Ok(())
                 } else {
-                    Err(format!("Invalid gravity '{}'. Valid: {:?}", value, VALID_GRAVITY))
+                    Err(format!(
+                        "Invalid gravity '{}'. Valid: {:?}",
+                        value, VALID_GRAVITY
+                    ))
                 }
             }
             "wallpaper.cache_dir" => {
@@ -243,6 +307,22 @@ impl Config {
             }
             "wallpaper.source_dir" => {
                 self.wallpaper.source_dir = value.to_string();
+                Ok(())
+            }
+            "leds.effect" => {
+                self.leds.effect = value.to_string();
+                Ok(())
+            }
+            "leds.brightness" => {
+                self.leds.brightness = value
+                    .parse()
+                    .map_err(|_| format!("Invalid number: {}", value))?;
+                Ok(())
+            }
+            "leds.speed" => {
+                self.leds.speed = value
+                    .parse()
+                    .map_err(|_| format!("Invalid number: {}", value))?;
                 Ok(())
             }
             _ => Err(format!("Unknown config key: {}", key)),
@@ -261,6 +341,7 @@ impl Default for Config {
             qt_style: "Darkly".to_string(),
             fonts: FontConfig::default(),
             wallpaper: WallpaperConfig::default(),
+            leds: LedConfig::default(),
         }
     }
 }
@@ -268,6 +349,19 @@ impl Default for Config {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn led_defaults_target_keychron_v1_live_sync_settings() {
+        let config = Config::default();
+
+        assert_eq!(config.leds.effect, "reactive_multiwide");
+        assert_eq!(config.leds.brightness, 223);
+        assert_eq!(config.leds.speed, 175);
+        assert_eq!(config.leds.devices.len(), 1);
+        assert_eq!(config.leds.devices[0].name, "keychron-v1");
+        assert_eq!(config.leds.devices[0].vendor_id, 0x3434);
+        assert_eq!(config.leds.devices[0].product_id, 0x0311);
+    }
 
     #[test]
     fn test_wallpaper_gravity_valid() {
@@ -287,8 +381,13 @@ mod tests {
     #[test]
     fn test_wallpaper_path_roundtrip() {
         let mut config = Config::default();
-        config.set("wallpaper.path", "~/Pictures/Wallpaper").unwrap();
-        assert_eq!(config.get("wallpaper.path").unwrap(), "~/Pictures/Wallpaper");
+        config
+            .set("wallpaper.path", "~/Pictures/Wallpaper")
+            .unwrap();
+        assert_eq!(
+            config.get("wallpaper.path").unwrap(),
+            "~/Pictures/Wallpaper"
+        );
     }
 
     #[test]
@@ -308,7 +407,10 @@ mod tests {
     fn wallpaper_source_dir_roundtrip() {
         let mut config = Config::default();
         config
-            .set("wallpaper.source_dir", "~/Pictures/Wallpapers/catppuccin-mocha")
+            .set(
+                "wallpaper.source_dir",
+                "~/Pictures/Wallpapers/catppuccin-mocha",
+            )
             .unwrap();
         assert_eq!(
             config.get("wallpaper.source_dir").unwrap(),
