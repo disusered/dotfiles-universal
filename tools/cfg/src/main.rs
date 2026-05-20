@@ -20,7 +20,7 @@ use templates::{run_update, TemplatesFile};
 #[command(name = "cfg")]
 #[command(about = "Linux Configuration Manager")]
 struct Cli {
-    /// Interactive settings TUI (colors + fonts)
+    /// Interactive settings TUI (colors, fonts, wallpapers, keyboard, update)
     #[arg(short, long, global = true)]
     interactive: bool,
 
@@ -130,14 +130,17 @@ enum Command {
     /// Manage attached LEDs
     Leds {
         /// Apply current cfg theme primary color to supported LEDs
-        #[arg(long, conflicts_with = "set")]
+        #[arg(long, conflicts_with_all = ["set", "list_effects"])]
         apply: bool,
-        /// Set a LED value (color, brightness, effect, speed)
+        /// Set a LED value (color, brightness, effect, speed). Use --list-effects for effect names.
         #[arg(long = "set", value_name = "KEY=VALUE")]
         set: Vec<String>,
         /// Persist current changes to device EEPROM
-        #[arg(long)]
+        #[arg(long, conflicts_with = "list_effects")]
         save: bool,
+        /// List supported LED effect names
+        #[arg(long, conflicts_with_all = ["apply", "set", "save", "target", "device"])]
+        list_effects: bool,
         /// Apply to one configured LED target by name
         #[arg(long, conflicts_with = "device", value_name = "NAME")]
         target: Option<String>,
@@ -325,6 +328,14 @@ fn main() {
                     if let Err(e) = wallpaper::apply(&config, &cfg_dir) {
                         eprintln!("Error applying wallpaper: {}", e);
                         std::process::exit(1);
+                    }
+                }
+                if scope.keyboard {
+                    match load_config_and_palette(&cfg_dir).and_then(|(config, palette)| {
+                        leds::apply_theme(&config, &palette, false, None, None).map(|_| ())
+                    }) {
+                        Ok(()) => {}
+                        Err(e) => eprintln!("warning: keyboard apply failed: {}", e),
                     }
                 }
             }
@@ -516,9 +527,17 @@ fn main() {
             apply,
             set,
             save,
+            list_effects,
             target,
             device,
         } => {
+            if list_effects {
+                for effect in leds::formatted_effects() {
+                    println!("{}", effect);
+                }
+                return;
+            }
+
             let cfg_dir = get_cfg_dir();
             let (config, palette) = match load_config_and_palette(&cfg_dir) {
                 Ok(values) => values,

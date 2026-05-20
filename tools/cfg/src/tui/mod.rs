@@ -2,6 +2,7 @@ pub mod app;
 pub mod clipboard;
 pub mod colors;
 pub mod fonts;
+pub mod keyboard;
 pub mod update;
 pub mod wallpapers;
 mod widgets;
@@ -34,9 +35,5 @@ pub fn restore() -> io::Result<()> {
 /// Check if we're in a proper terminal for TUI
 pub fn is_tty() -> bool {
     use std::io::IsTerminal;
-    stdout().is_terminal()
-        && std::env::var("TERM")
-            .map(|t| t != "dumb")
-            .unwrap_or(false)
+    stdout().is_terminal() && std::env::var("TERM").map(|t| t != "dumb").unwrap_or(false)
 }
-

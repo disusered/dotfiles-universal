@@ -134,6 +134,35 @@ fn leds_help_lists_target() {
 }
 
 #[test]
+fn leds_help_lists_effect_listing() {
+    cfg()
+        .args(["leds", "--help"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("--list-effects"));
+}
+
+#[test]
+fn leds_list_effects_prints_supported_names() {
+    cfg()
+        .args(["leds", "--list-effects"])
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("solid"))
+        .stdout(predicate::str::contains("reactive_multiwide"))
+        .stdout(predicate::str::contains("solid_splash"));
+}
+
+#[test]
+fn leds_list_effects_rejects_apply() {
+    cfg()
+        .args(["leds", "--list-effects", "--apply"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains("cannot be used with"));
+}
+
+#[test]
 fn leds_save_without_apply_or_set_rejected_before_hid_access() {
     cfg()
         .args(["leds", "--save", "--device", "/nonexistent/definitely-nope"])

@@ -40,6 +40,131 @@ impl RgbMatrixValue {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct LedEffect {
+    pub id: u8,
+    pub name: &'static str,
+    pub aliases: &'static [&'static str],
+}
+
+pub const SUPPORTED_EFFECTS: &[LedEffect] = &[
+    LedEffect {
+        id: 0,
+        name: "off",
+        aliases: &["none"],
+    },
+    LedEffect {
+        id: 1,
+        name: "solid",
+        aliases: &["solid_color"],
+    },
+    LedEffect {
+        id: 2,
+        name: "breathing",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 3,
+        name: "band_spiral_val",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 4,
+        name: "cycle_all",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 5,
+        name: "cycle_left_right",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 6,
+        name: "cycle_up_down",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 7,
+        name: "rainbow_moving_chevron",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 8,
+        name: "cycle_out_in",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 9,
+        name: "cycle_out_in_dual",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 10,
+        name: "cycle_pinwheel",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 11,
+        name: "cycle_spiral",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 12,
+        name: "dual_beacon",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 13,
+        name: "rainbow_beacon",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 14,
+        name: "jellybean_raindrops",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 15,
+        name: "pixel_rain",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 16,
+        name: "typing_heatmap",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 17,
+        name: "digital_rain",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 18,
+        name: "reactive_simple",
+        aliases: &["solid_reactive_simple"],
+    },
+    LedEffect {
+        id: 19,
+        name: "reactive_multiwide",
+        aliases: &["solid_reactive_multiwide"],
+    },
+    LedEffect {
+        id: 20,
+        name: "reactive_multinexus",
+        aliases: &["solid_reactive_multinexus"],
+    },
+    LedEffect {
+        id: 21,
+        name: "splash",
+        aliases: &[],
+    },
+    LedEffect {
+        id: 22,
+        name: "solid_splash",
+        aliases: &[],
+    },
+];
+
 pub struct ViaPacket;
 
 impl ViaPacket {
@@ -81,6 +206,14 @@ pub struct LedStatus {
     pub target: String,
     pub device: PathBuf,
     pub protocol_version: u16,
+    pub brightness: u8,
+    pub effect: u8,
+    pub speed: u8,
+    pub color: HsvColor,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct LedValues {
     pub brightness: u8,
     pub effect: u8,
     pub speed: u8,
@@ -256,6 +389,15 @@ pub fn read_status(
     Ok(statuses)
 }
 
+pub fn theme_values(config: &Config, palette: &Palette) -> Result<LedValues, String> {
+    Ok(LedValues {
+        brightness: config.leds.brightness,
+        effect: resolve_effect(&config.leds.effect)?,
+        speed: config.leds.speed,
+        color: resolve_color(&config.primary, palette)?,
+    })
+}
+
 pub fn apply_theme(
     config: &Config,
     palette: &Palette,
@@ -263,23 +405,24 @@ pub fn apply_theme(
     target: Option<&str>,
     device: Option<&Path>,
 ) -> Result<Vec<LedStatus>, String> {
+    let values = theme_values(config, palette)?;
+    apply_values(config, &values, save, target, device)
+}
+
+pub fn apply_values(
+    config: &Config,
+    values: &LedValues,
+    save: bool,
+    target: Option<&str>,
+    device: Option<&Path>,
+) -> Result<Vec<LedStatus>, String> {
     let devices = resolve_devices(config, target, device)?;
-    let effect = resolve_effect(&config.leds.effect)?;
-    let hsv = resolve_color(&config.primary, palette)?;
     let mut statuses = Vec::new();
 
     for device in devices {
         let mut hid = HidConnection::open(&device.path)?;
         let _current = read_status_from_connection(&device.name, &device.path, &mut hid)?;
-
-        send_set(
-            &mut hid,
-            RgbMatrixValue::Brightness,
-            &[config.leds.brightness],
-        )?;
-        send_set(&mut hid, RgbMatrixValue::Effect, &[effect])?;
-        send_set(&mut hid, RgbMatrixValue::EffectSpeed, &[config.leds.speed])?;
-        send_set(&mut hid, RgbMatrixValue::Color, &[hsv.h, hsv.s])?;
+        send_values(&mut hid, values)?;
         if save {
             send_save(&mut hid)?;
         }
@@ -292,6 +435,31 @@ pub fn apply_theme(
     }
 
     Ok(statuses)
+}
+
+pub fn restore_statuses(statuses: &[LedStatus], save: bool) -> Result<Vec<LedStatus>, String> {
+    let mut restored = Vec::new();
+
+    for status in statuses {
+        let mut hid = HidConnection::open(&status.device)?;
+        let values = LedValues {
+            brightness: status.brightness,
+            effect: status.effect,
+            speed: status.speed,
+            color: status.color,
+        };
+        send_values(&mut hid, &values)?;
+        if save {
+            send_save(&mut hid)?;
+        }
+        restored.push(read_status_from_connection(
+            &status.target,
+            &status.device,
+            &mut hid,
+        )?);
+    }
+
+    Ok(restored)
 }
 
 pub fn apply_set_options(
@@ -337,6 +505,17 @@ pub fn apply_set_options(
     }
 
     Ok(statuses)
+}
+
+fn send_values(hid: &mut HidConnection, values: &LedValues) -> Result<(), String> {
+    send_set(hid, RgbMatrixValue::Brightness, &[values.brightness])?;
+    send_set(hid, RgbMatrixValue::Effect, &[values.effect])?;
+    send_set(hid, RgbMatrixValue::EffectSpeed, &[values.speed])?;
+    send_set(
+        hid,
+        RgbMatrixValue::Color,
+        &[values.color.h, values.color.s],
+    )
 }
 
 fn read_status_from_connection(
@@ -588,43 +767,53 @@ pub fn resolve_effect(value: &str) -> Result<u8, String> {
         return Ok(effect);
     }
 
-    let normalized = value
+    find_effect(value).map(|effect| effect.id).ok_or_else(|| {
+        format!(
+            "Unknown leds effect '{}'. Use a supported effect name or 0-255",
+            value
+        )
+    })
+}
+
+#[cfg(test)]
+pub fn supported_effect_names() -> Vec<&'static str> {
+    SUPPORTED_EFFECTS.iter().map(|effect| effect.name).collect()
+}
+
+pub fn formatted_effects() -> Vec<String> {
+    SUPPORTED_EFFECTS
+        .iter()
+        .map(|effect| {
+            if effect.aliases.is_empty() {
+                format!("{:<2} {}", effect.id, effect.name)
+            } else {
+                format!(
+                    "{:<2} {} (aliases: {})",
+                    effect.id,
+                    effect.name,
+                    effect.aliases.join(", ")
+                )
+            }
+        })
+        .collect()
+}
+
+fn find_effect(value: &str) -> Option<&'static LedEffect> {
+    let normalized = normalize_effect_name(value);
+    SUPPORTED_EFFECTS.iter().find(|effect| {
+        normalize_effect_name(effect.name) == normalized
+            || effect
+                .aliases
+                .iter()
+                .any(|alias| normalize_effect_name(alias) == normalized)
+    })
+}
+
+fn normalize_effect_name(value: &str) -> String {
+    value
         .to_ascii_lowercase()
         .replace('-', "_")
-        .replace(' ', "_");
-    let effect = match normalized.as_str() {
-        "off" | "none" => 0,
-        "solid" | "solid_color" => 1,
-        "breathing" => 2,
-        "band_spiral_val" => 3,
-        "cycle_all" => 4,
-        "cycle_left_right" => 5,
-        "cycle_up_down" => 6,
-        "rainbow_moving_chevron" => 7,
-        "cycle_out_in" => 8,
-        "cycle_out_in_dual" => 9,
-        "cycle_pinwheel" => 10,
-        "cycle_spiral" => 11,
-        "dual_beacon" => 12,
-        "rainbow_beacon" => 13,
-        "jellybean_raindrops" => 14,
-        "pixel_rain" => 15,
-        "typing_heatmap" => 16,
-        "digital_rain" => 17,
-        "reactive_simple" | "solid_reactive_simple" => 18,
-        "reactive_multiwide" | "solid_reactive_multiwide" => 19,
-        "reactive_multinexus" | "solid_reactive_multinexus" => 20,
-        "splash" => 21,
-        "solid_splash" => 22,
-        _ => {
-            return Err(format!(
-                "Unknown leds effect '{}'. Use a supported effect name or 0-255",
-                value
-            ))
-        }
-    };
-
-    Ok(effect)
+        .replace(' ', "_")
 }
 
 fn parse_u8(key: &str, value: &str) -> Result<u8, String> {
@@ -776,6 +965,24 @@ mod tests {
 
         let err = resolve_effect("bootloader").unwrap_err();
         assert!(err.contains("Unknown leds effect"));
+    }
+
+    #[test]
+    fn supported_effects_expose_canonical_names_for_ui_and_help() {
+        let names = supported_effect_names();
+
+        assert!(names.contains(&"solid"));
+        assert!(names.contains(&"reactive_multiwide"));
+        assert!(names.contains(&"solid_splash"));
+    }
+
+    #[test]
+    fn formatted_effects_include_ids_names_and_aliases() {
+        let effects = formatted_effects().join("\n");
+
+        assert!(effects.contains("1  solid"));
+        assert!(effects.contains("19 reactive_multiwide"));
+        assert!(effects.contains("aliases: solid_reactive_multiwide"));
     }
 
     #[test]

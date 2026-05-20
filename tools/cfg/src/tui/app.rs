@@ -14,6 +14,7 @@ use crate::palette::Palette;
 
 use super::colors::ColorPicker;
 use super::fonts::FontPicker;
+use super::keyboard::KeyboardPicker;
 use super::update::UpdatePicker;
 use super::wallpapers::WallpaperPicker;
 use super::{init, restore};
@@ -26,11 +27,12 @@ pub struct ApplyScope {
     pub colors: bool,
     pub fonts: bool,
     pub wallpaper: bool,
+    pub keyboard: bool,
 }
 
 impl ApplyScope {
     pub fn any(&self) -> bool {
-        self.colors || self.fonts || self.wallpaper
+        self.colors || self.fonts || self.wallpaper || self.keyboard
     }
 }
 
@@ -51,6 +53,7 @@ pub enum Tab {
     Colors,
     Fonts,
     Wallpapers,
+    Keyboard,
     Update,
 }
 
@@ -60,7 +63,8 @@ impl Tab {
             Tab::Colors => 0,
             Tab::Fonts => 1,
             Tab::Wallpapers => 2,
-            Tab::Update => 3,
+            Tab::Keyboard => 3,
+            Tab::Update => 4,
         }
     }
 
@@ -68,7 +72,8 @@ impl Tab {
         match self {
             Tab::Colors => Tab::Fonts,
             Tab::Fonts => Tab::Wallpapers,
-            Tab::Wallpapers => Tab::Update,
+            Tab::Wallpapers => Tab::Keyboard,
+            Tab::Keyboard => Tab::Update,
             Tab::Update => Tab::Colors,
         }
     }
@@ -104,6 +109,7 @@ pub struct App {
     font_picker: FontPicker,
     wallpaper_picker: Option<WallpaperPicker>,
     wallpaper_init_error: Option<String>,
+    keyboard_picker: KeyboardPicker,
     update_picker: UpdatePicker,
     theme: TabTheme,
     should_apply: bool,
@@ -122,23 +128,16 @@ impl App {
         let theme = TabTheme::from_config(&config, palette);
         let color_picker = ColorPicker::new(config.clone(), palette, config_path.clone());
         let font_picker = FontPicker::new(config.clone(), palette, config_path.clone());
+        let keyboard_picker = KeyboardPicker::new(config.clone(), palette, config_path.clone());
 
-        let update_picker = UpdatePicker::new(
-            palette,
-            &config.primary,
-            cfg_dir.clone(),
-            dotfiles_dir,
-        );
+        let update_picker =
+            UpdatePicker::new(palette, &config.primary, cfg_dir.clone(), dotfiles_dir);
 
-        let (wallpaper_picker, wallpaper_init_error) = match WallpaperPicker::new(
-            config.clone(),
-            palette,
-            config_path,
-            cfg_dir,
-        ) {
-            Ok(p) => (Some(p), None),
-            Err(e) => (None, Some(e)),
-        };
+        let (wallpaper_picker, wallpaper_init_error) =
+            match WallpaperPicker::new(config.clone(), palette, config_path, cfg_dir) {
+                Ok(p) => (Some(p), None),
+                Err(e) => (None, Some(e)),
+            };
 
         Self {
             active_tab: Tab::default(),
@@ -146,6 +145,7 @@ impl App {
             font_picker,
             wallpaper_picker,
             wallpaper_init_error,
+            keyboard_picker,
             update_picker,
             theme,
             should_apply: false,
@@ -189,28 +189,57 @@ impl App {
                     frame.render_widget(para, chunks[1]);
                 }
             }
+            Tab::Keyboard => self.keyboard_picker.render_in_area(frame, chunks[1]),
             Tab::Update => self.update_picker.render_in_area(frame, chunks[1]),
         }
     }
 
     fn render_tabs(&self, frame: &mut Frame, area: Rect) {
-        // Nerd font icons:  (palette),  (font),  (image)
         let titles: Vec<Line> = vec![
             Line::from(vec![
-                Span::styled("1", Style::default().fg(self.theme.subtext0).add_modifier(Modifier::DIM)),
-                Span::raw(" \u{f0e22} Colors"),  //  palette icon
+                Span::styled(
+                    "1",
+                    Style::default()
+                        .fg(self.theme.subtext0)
+                        .add_modifier(Modifier::DIM),
+                ),
+                Span::raw(" \u{f0e22} Colors"), //  palette icon
             ]),
             Line::from(vec![
-                Span::styled("2", Style::default().fg(self.theme.subtext0).add_modifier(Modifier::DIM)),
-                Span::raw(" \u{f031} Fonts"),  //  font icon
+                Span::styled(
+                    "2",
+                    Style::default()
+                        .fg(self.theme.subtext0)
+                        .add_modifier(Modifier::DIM),
+                ),
+                Span::raw(" \u{f031} Fonts"), //  font icon
             ]),
             Line::from(vec![
-                Span::styled("3", Style::default().fg(self.theme.subtext0).add_modifier(Modifier::DIM)),
-                Span::raw(" \u{f03e} Wallpapers"),  //  image icon
+                Span::styled(
+                    "3",
+                    Style::default()
+                        .fg(self.theme.subtext0)
+                        .add_modifier(Modifier::DIM),
+                ),
+                Span::raw(" \u{f03e} Wallpapers"), //  image icon
             ]),
             Line::from(vec![
-                Span::styled("4", Style::default().fg(self.theme.subtext0).add_modifier(Modifier::DIM)),
-                Span::raw(" \u{f0e4e} Update"),  // 󰑓 reload icon
+                Span::styled(
+                    "4",
+                    Style::default()
+                        .fg(self.theme.subtext0)
+                        .add_modifier(Modifier::DIM),
+                ),
+                Span::raw(" \u{f11c} Keyboard"),
+            ]),
+            Line::from(vec![
+                Span::styled(
+                    "5",
+                    Style::default()
+                        .fg(self.theme.subtext0)
+                        .add_modifier(Modifier::DIM),
+                ),
+                Span::raw(" \u{f0e4e} Update"), // 󰑓 reload icon
             ]),
         ];
 
@@ -233,14 +262,14 @@ impl App {
             if let MouseEventKind::Down(crossterm::event::MouseButton::Left) = mouse.kind {
                 // Check if click is in tab bar area
                 if mouse.row < self.tab_bar_area.height {
-                    // Tab layout: "1  Colors  2  Fonts  3  Wallpapers  4  Update"
-                    // Approximate column regions
                     if mouse.column < 13 {
                         self.active_tab = Tab::Colors;
                     } else if mouse.column < 23 {
                         self.active_tab = Tab::Fonts;
                     } else if mouse.column < 39 {
                         self.active_tab = Tab::Wallpapers;
+                    } else if mouse.column < 52 {
+                        self.active_tab = Tab::Keyboard;
                     } else {
                         self.active_tab = Tab::Update;
                     }
@@ -261,6 +290,7 @@ impl App {
                         .as_ref()
                         .map(|p| p.is_in_search())
                         .unwrap_or(false),
+                    Tab::Keyboard => self.keyboard_picker.is_in_search(),
                     Tab::Update => self.update_picker.is_in_search(),
                 };
 
@@ -279,6 +309,10 @@ impl App {
                             return Ok(true);
                         }
                         KeyCode::Char('4') => {
+                            self.active_tab = Tab::Keyboard;
+                            return Ok(true);
+                        }
+                        KeyCode::Char('5') => {
                             self.active_tab = Tab::Update;
                             return Ok(true);
                         }
@@ -314,6 +348,7 @@ impl App {
                     }
                 }
             },
+            Tab::Keyboard => self.keyboard_picker.handle_event(event)?,
             Tab::Update => self.update_picker.handle_event(event)?,
         };
 
@@ -327,6 +362,7 @@ impl App {
                     .as_ref()
                     .map(|p| p.wants_apply())
                     .unwrap_or(false),
+                Tab::Keyboard => self.keyboard_picker.wants_apply(),
                 Tab::Update => false, // Update tab handles its own updates
             };
         }
@@ -377,10 +413,15 @@ impl App {
             colors: colors_apply,
             fonts: fonts_apply,
             wallpaper: wallpaper_apply,
+            keyboard: self.keyboard_picker.wants_apply(),
         };
         if scope.any() {
             Ok(Outcome::Apply(scope))
-        } else if self.color_picker.was_saved() || self.font_picker.was_saved() || wallpaper_saved {
+        } else if self.color_picker.was_saved()
+            || self.font_picker.was_saved()
+            || wallpaper_saved
+            || self.keyboard_picker.was_saved()
+        {
             Ok(Outcome::SavedOnly)
         } else {
             Ok(Outcome::Cancelled)
@@ -404,4 +445,27 @@ pub fn run(
         dotfiles_dir.to_string(),
     );
     app.run()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn apply_scope_any_includes_keyboard() {
+        let scope = ApplyScope {
+            keyboard: true,
+            ..ApplyScope::default()
+        };
+
+        assert!(scope.any());
+    }
+
+    #[test]
+    fn tab_order_places_keyboard_before_update() {
+        assert_eq!(Tab::Keyboard.index(), 3);
+        assert_eq!(Tab::Update.index(), 4);
+        assert_eq!(Tab::Wallpapers.next(), Tab::Keyboard);
+        assert_eq!(Tab::Keyboard.next(), Tab::Update);
+    }
 }

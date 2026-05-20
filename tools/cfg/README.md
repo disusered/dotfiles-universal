@@ -41,8 +41,10 @@ cfg theme --set primary=green              # Set value only
 cfg theme --set primary=green --apply      # Set + update all
 cfg theme --set primary=green --apply mako # Set + update specific
 
-# LEDs
+# LEDs / Keyboard
+cfg -i                            # Keyboard tab lists modes and live-previews changes
 cfg leds                         # Show supported LED device state
+cfg leds --list-effects          # List supported effect names
 cfg leds --apply                 # Apply current primary color live, no EEPROM write
 cfg leds --apply --save          # Explicitly persist current LED theme to EEPROM
 cfg leds --target keychron-v1    # Limit to one configured keyboard
