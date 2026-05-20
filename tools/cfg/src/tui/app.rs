@@ -281,8 +281,7 @@ impl App {
         // Global tab switching (only in normal mode)
         if let Event::Key(key) = &event {
             if key.kind == KeyEventKind::Press {
-                // Check if active picker is in search mode
-                let in_search = match self.active_tab {
+                let captures_input = match self.active_tab {
                     Tab::Colors => self.color_picker.is_in_search(),
                     Tab::Fonts => self.font_picker.is_in_search(),
                     Tab::Wallpapers => self
@@ -290,11 +289,11 @@ impl App {
                         .as_ref()
                         .map(|p| p.is_in_search())
                         .unwrap_or(false),
-                    Tab::Keyboard => self.keyboard_picker.is_in_search(),
+                    Tab::Keyboard => self.keyboard_picker.captures_input(),
                     Tab::Update => self.update_picker.is_in_search(),
                 };
 
-                if !in_search {
+                if !captures_input {
                     match key.code {
                         KeyCode::Char('1') => {
                             self.active_tab = Tab::Colors;

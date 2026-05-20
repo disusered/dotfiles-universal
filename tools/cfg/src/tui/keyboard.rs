@@ -5,7 +5,7 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color as TuiColor, Modifier, Style},
     text::{Line, Span},
-    widgets::{Block, Borders, Clear, List, ListItem, ListState, Paragraph},
+    widgets::{Block, Borders, List, ListItem, ListState, Paragraph},
     Frame,
 };
 
@@ -25,6 +25,7 @@ struct EffectEntry {
 enum Mode {
     Normal,
     Search,
+    Preview,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -48,7 +49,6 @@ struct Theme {
     base: TuiColor,
     text: TuiColor,
     subtext0: TuiColor,
-    surface0: TuiColor,
     surface1: TuiColor,
     overlay1: TuiColor,
     green: TuiColor,
@@ -70,7 +70,6 @@ impl Theme {
             base: get("base"),
             text: get("text"),
             subtext0: get("subtext0"),
-            surface0: get("surface0"),
             surface1: get("surface1"),
             overlay1: get("overlay1"),
             green: get("green"),
@@ -150,8 +149,8 @@ impl KeyboardPicker {
         }
     }
 
-    pub fn is_in_search(&self) -> bool {
-        self.mode == Mode::Search
+    pub fn captures_input(&self) -> bool {
+        self.mode != Mode::Normal
     }
 
     pub fn wants_apply(&self) -> bool {
@@ -164,6 +163,10 @@ impl KeyboardPicker {
 
     pub fn selected_effect_name(&self) -> Option<&'static str> {
         self.selected_effect().map(|effect| effect.name)
+    }
+
+    fn active_effect_id(&self) -> Option<u8> {
+        leds::resolve_effect(&self.original_config.leds.effect).ok()
     }
 
     #[cfg(test)]
@@ -206,25 +209,14 @@ impl KeyboardPicker {
         let len = self.filtered.len() as isize;
         self.selected = (self.selected as isize + delta).rem_euclid(len) as usize;
         self.list_state.select(Some(self.selected));
-        self.preview_current();
     }
 
     fn adjust_brightness(&mut self, delta: i16) {
         self.config.leds.brightness = clamp_u8(self.config.leds.brightness, delta);
     }
 
-    fn adjust_brightness_and_preview(&mut self, delta: i16) {
-        self.adjust_brightness(delta);
-        self.preview_current();
-    }
-
     fn adjust_speed(&mut self, delta: i16) {
         self.config.leds.speed = clamp_u8(self.config.leds.speed, delta);
-    }
-
-    fn adjust_speed_and_preview(&mut self, delta: i16) {
-        self.adjust_speed(delta);
-        self.preview_current();
     }
 
     fn values(&self) -> Option<LedValues> {
@@ -292,15 +284,20 @@ impl KeyboardPicker {
         }
     }
 
-    fn restore_preview(&mut self) {
+    fn restore_preview(&mut self, reset_config: bool) {
         if !self.preview_touched {
+            if reset_config {
+                self.config = self.original_config.clone();
+            }
             return;
         }
 
         if let Some(statuses) = &self.original_statuses {
             let _ = leds::restore_statuses(statuses, false);
         }
-        self.config = self.original_config.clone();
+        if reset_config {
+            self.config = self.original_config.clone();
+        }
         self.preview_touched = false;
     }
 
@@ -321,7 +318,7 @@ impl KeyboardPicker {
 
         self.saved = true;
         self.should_apply = true;
-        self.preview_current();
+        self.original_config = self.config.clone();
         Ok(false)
     }
 
@@ -365,11 +362,17 @@ impl KeyboardPicker {
                 },
                 Mode::Normal => match key.code {
                     KeyCode::Char('q') | KeyCode::Esc => {
-                        self.restore_preview();
+                        self.restore_preview(true);
                         return Ok(false);
                     }
                     KeyCode::Char('/') => {
                         self.mode = Mode::Search;
+                    }
+                    KeyCode::Char('p') => {
+                        self.preview_current();
+                        if self.preview_touched {
+                            self.mode = Mode::Preview;
+                        }
                     }
                     KeyCode::Tab => {
                         self.focus = self.focus.next();
@@ -379,29 +382,41 @@ impl KeyboardPicker {
                     KeyCode::Up | KeyCode::Char('k') => self.move_selection(-1),
                     KeyCode::Left | KeyCode::Char('h') => match self.focus {
                         Focus::Effects => self.move_selection(-1),
-                        Focus::Brightness => self.adjust_brightness_and_preview(-8),
-                        Focus::Speed => self.adjust_speed_and_preview(-8),
+                        Focus::Brightness => self.adjust_brightness(-8),
+                        Focus::Speed => self.adjust_speed(-8),
                     },
                     KeyCode::Right | KeyCode::Char('l') => match self.focus {
                         Focus::Effects => self.move_selection(1),
-                        Focus::Brightness => self.adjust_brightness_and_preview(8),
-                        Focus::Speed => self.adjust_speed_and_preview(8),
+                        Focus::Brightness => self.adjust_brightness(8),
+                        Focus::Speed => self.adjust_speed(8),
                     },
                     KeyCode::Char('-') => match self.focus {
                         Focus::Effects => {}
-                        Focus::Brightness => self.adjust_brightness_and_preview(-1),
-                        Focus::Speed => self.adjust_speed_and_preview(-1),
+                        Focus::Brightness => self.adjust_brightness(-1),
+                        Focus::Speed => self.adjust_speed(-1),
                     },
                     KeyCode::Char('+') | KeyCode::Char('=') => match self.focus {
                         Focus::Effects => {}
-                        Focus::Brightness => self.adjust_brightness_and_preview(1),
-                        Focus::Speed => self.adjust_speed_and_preview(1),
+                        Focus::Brightness => self.adjust_brightness(1),
+                        Focus::Speed => self.adjust_speed(1),
                     },
                     KeyCode::Char(c) if !key.modifiers.contains(KeyModifiers::CONTROL) => {
                         self.mode = Mode::Search;
                         self.search.insert(c);
                         self.update_filter();
                     }
+                    _ => {}
+                },
+                Mode::Preview => match key.code {
+                    KeyCode::Char('q') | KeyCode::Esc => {
+                        self.restore_preview(true);
+                        return Ok(false);
+                    }
+                    KeyCode::Char('r') => {
+                        self.restore_preview(false);
+                        self.mode = Mode::Normal;
+                    }
+                    KeyCode::Enter => return self.commit(),
                     _ => {}
                 },
             },
@@ -419,7 +434,6 @@ impl KeyboardPicker {
                             self.selected = clicked;
                             self.list_state.select(Some(self.selected));
                             self.focus = Focus::Effects;
-                            self.preview_current();
                         }
                     }
                 }
@@ -432,12 +446,6 @@ impl KeyboardPicker {
     }
 
     pub fn render_in_area(&mut self, frame: &mut Frame, area: Rect) {
-        frame.render_widget(Clear, area);
-        frame.render_widget(
-            Block::default().style(Style::default().bg(self.theme.base)),
-            area,
-        );
-
         let chunks = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
@@ -477,22 +485,22 @@ impl KeyboardPicker {
             return;
         }
 
-        let current = self.selected_effect_name().unwrap_or("none");
-        let lines = vec![Line::from(vec![
+        frame.render_widget(Paragraph::new(vec![self.header_line()]), inner);
+    }
+
+    fn header_line(&self) -> Line<'static> {
+        Line::from(vec![
             Span::styled(
                 "Keyboard",
                 Style::default()
                     .fg(self.theme.accent)
                     .add_modifier(Modifier::BOLD),
             ),
-            Span::styled("  effect=", Style::default().fg(self.theme.subtext0)),
-            Span::styled(current, Style::default().fg(self.theme.text)),
             Span::styled(
                 "  primary color follows cfg theme",
                 Style::default().fg(self.theme.overlay1),
             ),
-        ])];
-        frame.render_widget(Paragraph::new(lines), inner);
+        ])
     }
 
     fn render_content(&mut self, frame: &mut Frame, area: Rect) {
@@ -509,25 +517,7 @@ impl KeyboardPicker {
         let items = self
             .filtered
             .iter()
-            .map(|&idx| {
-                let entry = &self.effects[idx];
-                let selected = self.selected_effect().map(|e| e.id) == Some(entry.effect.id);
-                let marker = if selected { "> " } else { "  " };
-                let aliases = if entry.effect.aliases.is_empty() {
-                    String::new()
-                } else {
-                    format!("  {}", entry.effect.aliases.join(", "))
-                };
-                ListItem::new(Line::from(vec![
-                    Span::styled(marker, Style::default().fg(self.theme.accent)),
-                    Span::styled(
-                        format!("{:<2} ", entry.effect.id),
-                        Style::default().fg(self.theme.overlay1),
-                    ),
-                    Span::styled(entry.effect.name, Style::default().fg(self.theme.text)),
-                    Span::styled(aliases, Style::default().fg(self.theme.subtext0)),
-                ]))
-            })
+            .map(|&idx| ListItem::new(self.effect_line(idx)))
             .collect::<Vec<_>>();
 
         let title = if self.focus == Focus::Effects {
@@ -545,11 +535,43 @@ impl KeyboardPicker {
                 Block::default()
                     .borders(Borders::ALL)
                     .title(Span::styled(title, Style::default().fg(self.theme.accent)))
-                    .border_style(border_style)
-                    .style(Style::default().bg(self.theme.surface0)),
+                    .border_style(border_style),
             )
             .highlight_style(Style::default().bg(self.theme.surface1));
         frame.render_stateful_widget(list, area, &mut self.list_state);
+    }
+
+    fn effect_line(&self, idx: usize) -> Line<'static> {
+        let entry = &self.effects[idx];
+        let selected = self.selected_effect().map(|e| e.id) == Some(entry.effect.id);
+        let active = self.active_effect_id() == Some(entry.effect.id);
+        let marker = if selected { "> " } else { "  " };
+        let aliases = if entry.effect.aliases.is_empty() {
+            String::new()
+        } else {
+            format!("  {}", entry.effect.aliases.join(", "))
+        };
+        let mut spans = vec![
+            Span::styled(marker, Style::default().fg(self.theme.accent)),
+            Span::styled(
+                format!("{:<2} ", entry.effect.id),
+                Style::default().fg(self.theme.overlay1),
+            ),
+            Span::styled(
+                entry.effect.name.to_string(),
+                Style::default().fg(self.theme.text),
+            ),
+            Span::styled(aliases, Style::default().fg(self.theme.subtext0)),
+        ];
+
+        if active {
+            spans.push(Span::styled(
+                " ← active",
+                Style::default().fg(self.theme.overlay1),
+            ));
+        }
+
+        Line::from(spans)
     }
 
     fn render_controls(&self, frame: &mut Frame, area: Rect) {
@@ -563,8 +585,7 @@ impl KeyboardPicker {
                 Style::default().fg(self.theme.surface1)
             } else {
                 Style::default().fg(self.theme.accent)
-            })
-            .style(Style::default().bg(self.theme.surface0));
+            });
         let inner = block.inner(area);
         frame.render_widget(block, area);
 
@@ -591,9 +612,11 @@ impl KeyboardPicker {
                     brightness_style,
                 ),
             ]),
-            render_meter(
+            render_slider(
                 self.config.leds.brightness,
+                self.focus == Focus::Brightness,
                 self.theme.accent,
+                self.theme.overlay1,
                 self.theme.surface1,
             ),
             Line::from(""),
@@ -601,9 +624,11 @@ impl KeyboardPicker {
                 Span::styled("Speed      ", Style::default().fg(self.theme.subtext0)),
                 Span::styled(format!("{:>3}", self.config.leds.speed), speed_style),
             ]),
-            render_meter(
+            render_slider(
                 self.config.leds.speed,
+                self.focus == Focus::Speed,
                 self.theme.green,
+                self.theme.overlay1,
                 self.theme.surface1,
             ),
             Line::from(""),
@@ -620,9 +645,10 @@ impl KeyboardPicker {
     fn render_footer(&self, frame: &mut Frame, area: Rect) {
         let text = match self.mode {
             Mode::Normal => {
-                "j/k nav  / search  Tab focus  h/l adjust  Enter save+apply  q/Esc cancel"
+                "j/k nav  / search  Tab focus  h/l adjust  p preview  Enter save+apply  q/Esc cancel"
             }
             Mode::Search => "type to search  j/k nav  Enter accept search  Esc clear",
+            Mode::Preview => "typing captured for LED preview  r revert  Enter keep+apply  q/Esc cancel",
         };
         frame.render_widget(
             Paragraph::new(text).style(Style::default().fg(self.theme.subtext0)),
@@ -631,15 +657,33 @@ impl KeyboardPicker {
     }
 }
 
-fn render_meter(value: u8, filled: TuiColor, empty: TuiColor) -> Line<'static> {
-    let width = 18usize;
-    let filled_count = ((value as usize * width) + 127) / 255;
-    let spans = (0..width)
-        .map(|idx| {
-            let color = if idx < filled_count { filled } else { empty };
-            Span::styled("█", Style::default().fg(color))
-        })
-        .collect::<Vec<_>>();
+fn render_slider(
+    value: u8,
+    focused: bool,
+    knob: TuiColor,
+    filled: TuiColor,
+    empty: TuiColor,
+) -> Line<'static> {
+    let width = 15usize;
+    let pos = (value as usize * (width - 1) / u8::MAX as usize).min(width - 1);
+    let mut spans = vec![Span::raw(" ")];
+
+    for idx in 0..width {
+        let marker = if idx == pos { "●" } else { "─" };
+        let style = if idx == pos {
+            if focused {
+                Style::default().fg(knob).add_modifier(Modifier::BOLD)
+            } else {
+                Style::default().fg(knob)
+            }
+        } else if idx <= pos {
+            Style::default().fg(filled)
+        } else {
+            Style::default().fg(empty)
+        };
+        spans.push(Span::styled(marker, style));
+    }
+
     Line::from(spans)
 }
 
@@ -650,6 +694,8 @@ fn clamp_u8(value: u8, delta: i16) -> u8 {
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+
+    use crossterm::event::KeyEvent;
 
     use crate::color::Color;
     use crate::config::{Config, LedConfig};
@@ -756,6 +802,10 @@ mod tests {
         }
     }
 
+    fn key_event(code: KeyCode) -> Event {
+        Event::Key(KeyEvent::new(code, KeyModifiers::NONE))
+    }
+
     #[test]
     fn initializes_selected_effect_from_config() {
         let palette = test_palette();
@@ -782,5 +832,152 @@ mod tests {
 
         assert_eq!(picker.brightness(), 0);
         assert_eq!(picker.speed(), 255);
+    }
+
+    #[test]
+    fn moving_selection_does_not_start_hardware_preview() {
+        let palette = test_palette();
+        let mut picker = KeyboardPicker::new(
+            test_config("solid"),
+            &palette,
+            "/tmp/cfg-keyboard-test.toml".to_string(),
+        );
+
+        picker.move_selection(1);
+
+        assert!(picker.original_statuses.is_none());
+        assert!(!picker.preview_touched);
+    }
+
+    #[test]
+    fn adjusting_values_does_not_start_hardware_preview() {
+        let palette = test_palette();
+        let mut picker = KeyboardPicker::new(
+            test_config("solid"),
+            &palette,
+            "/tmp/cfg-keyboard-test.toml".to_string(),
+        );
+
+        picker.adjust_brightness(8);
+        picker.adjust_speed(-8);
+
+        assert_eq!(picker.brightness(), 231);
+        assert_eq!(picker.speed(), 167);
+        assert!(picker.original_statuses.is_none());
+        assert!(!picker.preview_touched);
+    }
+
+    #[test]
+    fn header_does_not_repeat_effect_state() {
+        let palette = test_palette();
+        let picker = KeyboardPicker::new(
+            test_config("solid"),
+            &palette,
+            "/tmp/cfg-keyboard-test.toml".to_string(),
+        );
+
+        let text = picker
+            .header_line()
+            .spans
+            .iter()
+            .map(|span| span.content.as_ref())
+            .collect::<String>();
+
+        assert!(!text.contains("active="));
+        assert!(!text.contains("selected="));
+    }
+
+    #[test]
+    fn active_effect_indicator_is_inline_on_effect_row() {
+        let palette = test_palette();
+        let mut picker = KeyboardPicker::new(
+            test_config("solid"),
+            &palette,
+            "/tmp/cfg-keyboard-test.toml".to_string(),
+        );
+
+        picker.move_selection(1);
+        let active_line = picker.effect_line(1);
+        let selected_line = picker.effect_line(2);
+        let active_text = active_line
+            .spans
+            .iter()
+            .map(|span| span.content.as_ref())
+            .collect::<String>();
+        let selected_text = selected_line
+            .spans
+            .iter()
+            .map(|span| span.content.as_ref())
+            .collect::<String>();
+
+        assert!(active_text.contains("← active"));
+        assert_ne!(picker.selected_effect_name(), Some("solid"));
+        assert!(!selected_text.contains("← active"));
+    }
+
+    #[test]
+    fn slider_uses_color_picker_shape() {
+        let line = render_slider(128, false, TuiColor::Red, TuiColor::Blue, TuiColor::Green);
+        let text = line
+            .spans
+            .iter()
+            .map(|span| span.content.as_ref())
+            .collect::<String>();
+
+        assert!(text.starts_with(' '));
+        assert!(text.contains('●'));
+        assert!(text.contains('─'));
+        assert!(!text.contains('█'));
+    }
+
+    #[test]
+    fn preview_mode_captures_typing_without_searching() {
+        let palette = test_palette();
+        let mut picker = KeyboardPicker::new(
+            test_config("solid"),
+            &palette,
+            "/tmp/cfg-keyboard-test.toml".to_string(),
+        );
+        picker.mode = Mode::Preview;
+
+        picker.handle_event(key_event(KeyCode::Char('a'))).unwrap();
+
+        assert_eq!(picker.mode, Mode::Preview);
+        assert!(picker.search.is_empty());
+    }
+
+    #[test]
+    fn revert_from_preview_mode_returns_to_normal() {
+        let palette = test_palette();
+        let mut picker = KeyboardPicker::new(
+            test_config("solid"),
+            &palette,
+            "/tmp/cfg-keyboard-test.toml".to_string(),
+        );
+        picker.mode = Mode::Preview;
+
+        picker.handle_event(key_event(KeyCode::Char('r'))).unwrap();
+
+        assert_eq!(picker.mode, Mode::Normal);
+    }
+
+    #[test]
+    fn revert_from_preview_mode_keeps_pending_adjustments() {
+        let palette = test_palette();
+        let mut picker = KeyboardPicker::new(
+            test_config("solid"),
+            &palette,
+            "/tmp/cfg-keyboard-test.toml".to_string(),
+        );
+        picker.mode = Mode::Preview;
+        picker.preview_touched = true;
+        picker.original_statuses = Some(Vec::new());
+        picker.adjust_brightness(8);
+
+        picker.handle_event(key_event(KeyCode::Char('r'))).unwrap();
+
+        assert_eq!(picker.mode, Mode::Normal);
+        assert_eq!(picker.brightness(), 231);
+        assert!(!picker.preview_touched);
     }
 }
