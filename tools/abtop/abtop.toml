@@ -1,0 +1,7 @@
+[scratchpads.abtop]
+animation = "fromTop"
+command = "app2unit -s b -- kitty --class abtop_scratch /home/carlos/.cargo/bin/abtop --theme catppuccin"
+size = "70% 70%"
+preserve_aspect = false
+class = "abtop_scratch"
+lazy = false
