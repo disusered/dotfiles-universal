@@ -5,7 +5,7 @@ After=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=uwsm app -- cloud-sql-proxy --port 3307 boletera-qa:northamerica-south1:boletera
+ExecStart=uwsm app -- cloud-sql-proxy --address 0.0.0.0 --port 3307 boletera-qa:northamerica-south1:boletera
 Restart=on-failure
 RestartSec=5
 

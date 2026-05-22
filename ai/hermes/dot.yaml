@@ -24,5 +24,9 @@ linux[whoami.distro^="Arch"]:
     dashboard-catppuccin.yaml: ~/.hermes/dashboard-themes/catppuccin.yaml
     hermes-dashboard.service: ~/.config/systemd/user/hermes-dashboard.service
     hermes-gateway.service: ~/.config/systemd/user/hermes-gateway.service
+    hermes-gateway-xbol.service: ~/.config/systemd/user/hermes-gateway-xbol.service
     hermes-webui.service: ~/.config/systemd/user/hermes-webui.service
+    profiles/xbol/config.yaml: ~/.hermes/profiles/xbol/config.yaml
+    profiles/xbol/env.tpl: ~/.hermes/profiles/xbol/env.tpl
+    profiles/xbol/SOUL.md: ~/.hermes/profiles/xbol/SOUL.md
     skills/query/SKILL.md: ~/.hermes/skills/database/query/SKILL.md

@@ -27,7 +27,7 @@ agent:
 terminal:
   backend: local
   modal_mode: auto
-  cwd: .
+  cwd: /home/carlos/.dotfiles
   timeout: 180
   env_passthrough: []
   shell_init_files: []
@@ -519,14 +519,6 @@ session_reset:
   mode: both
 skin: catppuccin
 platform_toolsets:
-  discord:
-    - clarify
-    - image_gen
-    - kanban
-    - terminal
-    - tts
-    - vision
-    - web
   cli:
     - browser
     - clarify
@@ -556,17 +548,4 @@ plugins:
     - google_meet
     - spotify
     - teams_pipeline
-platforms:
-  discord:
-    gateway_restart_notification: false
-    extra:
-      allow_from:
-        - "1448742332907262023"
-      allow_admin_from:
-        - "1448742332907262023"
-      user_allowed_commands:
-        - query
-      group_allow_admin_from:
-        - "1448742332907262023"
-      group_user_allowed_commands:
-        - query
+platforms: {}
