@@ -113,11 +113,18 @@ fn default_led_speed() -> u8 {
 }
 
 fn default_led_devices() -> Vec<LedDeviceConfig> {
-    vec![LedDeviceConfig {
-        name: "keychron-v1".to_string(),
-        vendor_id: 0x3434,
-        product_id: 0x0311,
-    }]
+    vec![
+        LedDeviceConfig {
+            name: "keychron-v1".to_string(),
+            vendor_id: 0x3434,
+            product_id: 0x0311,
+        },
+        LedDeviceConfig {
+            name: "keychron-q11".to_string(),
+            vendor_id: 0x3434,
+            product_id: 0x01e0,
+        },
+    ]
 }
 
 impl Default for LedConfig {
@@ -351,16 +358,19 @@ mod tests {
     use super::*;
 
     #[test]
-    fn led_defaults_target_keychron_v1_live_sync_settings() {
+    fn led_defaults_target_supported_keychron_keyboards_live_sync_settings() {
         let config = Config::default();
 
         assert_eq!(config.leds.effect, "reactive_multiwide");
         assert_eq!(config.leds.brightness, 223);
         assert_eq!(config.leds.speed, 175);
-        assert_eq!(config.leds.devices.len(), 1);
+        assert_eq!(config.leds.devices.len(), 2);
         assert_eq!(config.leds.devices[0].name, "keychron-v1");
         assert_eq!(config.leds.devices[0].vendor_id, 0x3434);
         assert_eq!(config.leds.devices[0].product_id, 0x0311);
+        assert_eq!(config.leds.devices[1].name, "keychron-q11");
+        assert_eq!(config.leds.devices[1].vendor_id, 0x3434);
+        assert_eq!(config.leds.devices[1].product_id, 0x01e0);
     }
 
     #[test]

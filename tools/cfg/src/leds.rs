@@ -234,6 +234,12 @@ pub struct DiscoveredDevice {
     pub path: PathBuf,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LedTargetStatus {
+    pub name: String,
+    pub devices: Vec<DiscoveredDevice>,
+}
+
 pub fn is_qmk_raw_hid_descriptor(descriptor: &[u8]) -> bool {
     let mut i = 0;
     let mut usage_page = None;
@@ -606,6 +612,25 @@ fn resolve_devices(
     discover_devices(&config.leds.devices, target)
 }
 
+pub fn discover_target_statuses(
+    config: &Config,
+    target: Option<&str>,
+    device: Option<&Path>,
+) -> Result<Vec<LedTargetStatus>, String> {
+    if let Some(path) = device {
+        let name = target.unwrap_or("device").to_string();
+        return Ok(vec![LedTargetStatus {
+            name: name.clone(),
+            devices: vec![DiscoveredDevice {
+                name,
+                path: path.to_path_buf(),
+            }],
+        }]);
+    }
+
+    discover_target_statuses_in(Path::new("/sys/class/hidraw"), &config.leds.devices, target)
+}
+
 fn discover_devices(
     targets: &[LedDeviceConfig],
     target: Option<&str>,
@@ -618,13 +643,30 @@ pub fn discover_devices_in(
     targets: &[LedDeviceConfig],
     target: Option<&str>,
 ) -> Result<Vec<DiscoveredDevice>, String> {
+    Ok(discover_target_statuses_in(hidraw_dir, targets, target)?
+        .into_iter()
+        .flat_map(|status| status.devices)
+        .collect())
+}
+
+pub fn discover_target_statuses_in(
+    hidraw_dir: &Path,
+    targets: &[LedDeviceConfig],
+    target: Option<&str>,
+) -> Result<Vec<LedTargetStatus>, String> {
     let selected_targets = selected_targets(targets, target)?;
+    let mut statuses = selected_targets
+        .iter()
+        .map(|target| LedTargetStatus {
+            name: target.name.clone(),
+            devices: Vec::new(),
+        })
+        .collect::<Vec<_>>();
     let mut entries = fs::read_dir(hidraw_dir)
         .map_err(|e| format!("Failed to read {}: {}", hidraw_dir.display(), e))?
         .collect::<Result<Vec<_>, _>>()
         .map_err(|e| format!("Failed to read hidraw entry: {}", e))?;
     entries.sort_by_key(|entry| entry.file_name());
-    let mut discovered = Vec::new();
 
     for entry in entries {
         let sysfs_path = entry.path();
@@ -644,10 +686,10 @@ pub fn discover_devices_in(
             continue;
         }
 
-        for target in &selected_targets {
-            if vendor_id == target.vendor_id && product_id == target.product_id {
-                discovered.push(DiscoveredDevice {
-                    name: target.name.clone(),
+        for (target_index, selected_target) in selected_targets.iter().enumerate() {
+            if vendor_id == selected_target.vendor_id && product_id == selected_target.product_id {
+                statuses[target_index].devices.push(DiscoveredDevice {
+                    name: selected_target.name.clone(),
                     path: PathBuf::from("/dev").join(entry.file_name()),
                 });
             }
@@ -655,12 +697,44 @@ pub fn discover_devices_in(
     }
 
     if let Some(target) = target {
-        if discovered.is_empty() {
+        if statuses.iter().all(|status| status.devices.is_empty()) {
             return Err(format!("No configured LED target '{}' found", target));
         }
     }
 
-    Ok(discovered)
+    Ok(statuses)
+}
+
+pub fn format_target_summary(statuses: &[LedTargetStatus]) -> Vec<String> {
+    vec![
+        format!(
+            "connected_targets={}",
+            join_target_names(statuses.iter().filter(|status| !status.devices.is_empty()))
+        ),
+        format!(
+            "missing_targets={}",
+            join_target_names(statuses.iter().filter(|status| status.devices.is_empty()))
+        ),
+    ]
+}
+
+pub fn format_target_summary_line(statuses: &[LedTargetStatus]) -> String {
+    format!(
+        "connected: {}  missing: {}",
+        join_target_names(statuses.iter().filter(|status| !status.devices.is_empty())),
+        join_target_names(statuses.iter().filter(|status| status.devices.is_empty()))
+    )
+}
+
+fn join_target_names<'a>(statuses: impl Iterator<Item = &'a LedTargetStatus>) -> String {
+    let names = statuses
+        .map(|status| status.name.as_str())
+        .collect::<Vec<_>>();
+    if names.is_empty() {
+        "none".to_string()
+    } else {
+        names.join(",")
+    }
 }
 
 fn selected_targets<'a>(
@@ -1017,6 +1091,95 @@ mod tests {
         assert_eq!(discovered.len(), 1);
         assert_eq!(discovered[0].name, "keychron-v1");
         assert_eq!(discovered[0].path, PathBuf::from("/dev/hidraw3"));
+    }
+
+    #[test]
+    fn discovery_matches_configured_keychron_q11_raw_hid_target() {
+        let root = make_hidraw_tree("discovery-q11");
+        write_hidraw(
+            &root,
+            "hidraw3",
+            "0003:00003434:000001E0",
+            "Keychron Keychron Q11",
+            "0660ff0961a1010962150026ff009520750881020963150026ff00952075089102c0",
+        );
+
+        let discovered = discover_devices_in(
+            &root,
+            &[LedDeviceConfig {
+                name: "keychron-q11".to_string(),
+                vendor_id: 0x3434,
+                product_id: 0x01e0,
+            }],
+            None,
+        )
+        .unwrap();
+
+        assert_eq!(discovered.len(), 1);
+        assert_eq!(discovered[0].name, "keychron-q11");
+        assert_eq!(discovered[0].path, PathBuf::from("/dev/hidraw3"));
+    }
+
+    #[test]
+    fn target_statuses_include_connected_and_missing_default_targets() {
+        let root = make_hidraw_tree("target-statuses");
+        write_hidraw(
+            &root,
+            "hidraw3",
+            "0003:00003434:000001E0",
+            "Keychron Keychron Q11",
+            "0660ff0961a1010962150026ff009520750881020963150026ff00952075089102c0",
+        );
+        let targets = [
+            LedDeviceConfig {
+                name: "keychron-v1".to_string(),
+                vendor_id: 0x3434,
+                product_id: 0x0311,
+            },
+            LedDeviceConfig {
+                name: "keychron-q11".to_string(),
+                vendor_id: 0x3434,
+                product_id: 0x01e0,
+            },
+        ];
+
+        let statuses = discover_target_statuses_in(&root, &targets, None).unwrap();
+
+        assert_eq!(statuses.len(), 2);
+        assert_eq!(statuses[0].name, "keychron-v1");
+        assert!(statuses[0].devices.is_empty());
+        assert_eq!(statuses[1].name, "keychron-q11");
+        assert_eq!(statuses[1].devices.len(), 1);
+        assert_eq!(statuses[1].devices[0].path, PathBuf::from("/dev/hidraw3"));
+    }
+
+    #[test]
+    fn target_summary_formats_connected_and_missing_names() {
+        let statuses = [
+            LedTargetStatus {
+                name: "keychron-v1".to_string(),
+                devices: Vec::new(),
+            },
+            LedTargetStatus {
+                name: "keychron-q11".to_string(),
+                devices: vec![DiscoveredDevice {
+                    name: "keychron-q11".to_string(),
+                    path: PathBuf::from("/dev/hidraw3"),
+                }],
+            },
+        ];
+
+        assert_eq!(
+            format_target_summary(&statuses),
+            vec![
+                "connected_targets=keychron-q11".to_string(),
+                "missing_targets=keychron-v1".to_string(),
+            ]
+        );
+        assert_eq!(
+            format_target_summary_line(&statuses),
+            "connected: keychron-q11  missing: keychron-v1"
+        );
     }
 
     #[test]

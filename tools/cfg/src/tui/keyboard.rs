@@ -10,7 +10,9 @@ use ratatui::{
 };
 
 use crate::config::Config;
-use crate::leds::{self, HsvColor, LedEffect, LedStatus, LedValues, SUPPORTED_EFFECTS};
+use crate::leds::{
+    self, HsvColor, LedEffect, LedStatus, LedTargetStatus, LedValues, SUPPORTED_EFFECTS,
+};
 use crate::palette::Palette;
 
 use super::widgets::{FuzzyInput, FuzzyInputState, Toast};
@@ -93,6 +95,7 @@ pub struct KeyboardPicker {
     search: FuzzyInputState,
     mode: Mode,
     focus: Focus,
+    target_statuses: Vec<LedTargetStatus>,
     original_statuses: Option<Vec<LedStatus>>,
     preview_touched: bool,
     should_apply: bool,
@@ -126,6 +129,13 @@ impl KeyboardPicker {
             .position(|entry| entry.effect.id == selected_effect)
             .unwrap_or(0);
         let filtered = (0..effects.len()).collect::<Vec<_>>();
+        let target_statuses =
+            leds::discover_target_statuses(&config, None, None).unwrap_or_else(|_| {
+                vec![LedTargetStatus {
+                    name: "unknown".to_string(),
+                    devices: Vec::new(),
+                }]
+            });
 
         Self {
             config: config.clone(),
@@ -140,6 +150,7 @@ impl KeyboardPicker {
             search: FuzzyInputState::new(),
             mode: Mode::Normal,
             focus: Focus::Effects,
+            target_statuses,
             original_statuses: None,
             preview_touched: false,
             should_apply: false,
@@ -266,8 +277,9 @@ impl KeyboardPicker {
                     self.preview_touched = true;
                     self.toast = Some(
                         Toast::new(format!(
-                            "preview: {}",
-                            self.selected_effect_name().unwrap_or("unknown")
+                            "preview: {} on {}",
+                            self.selected_effect_name().unwrap_or("unknown"),
+                            format_status_targets(&statuses)
                         ))
                         .style(Style::default().fg(self.theme.green))
                         .border_style(Style::default().fg(self.theme.green)),
@@ -500,6 +512,13 @@ impl KeyboardPicker {
                 "  primary color follows cfg theme",
                 Style::default().fg(self.theme.overlay1),
             ),
+            Span::styled(
+                format!(
+                    "  {}",
+                    leds::format_target_summary_line(&self.target_statuses)
+                ),
+                Style::default().fg(self.theme.subtext0),
+            ),
         ])
     }
 
@@ -689,6 +708,21 @@ fn render_slider(
 
 fn clamp_u8(value: u8, delta: i16) -> u8 {
     (value as i16 + delta).clamp(0, 255) as u8
+}
+
+fn format_status_targets(statuses: &[LedStatus]) -> String {
+    let mut targets = statuses
+        .iter()
+        .map(|status| status.target.as_str())
+        .collect::<Vec<_>>();
+    targets.sort_unstable();
+    targets.dedup();
+
+    if targets.is_empty() {
+        "none".to_string()
+    } else {
+        targets.join(",")
+    }
 }
 
 #[cfg(test)]
@@ -885,6 +919,26 @@ mod tests {
 
         assert!(!text.contains("active="));
         assert!(!text.contains("selected="));
+    }
+
+    #[test]
+    fn header_includes_keyboard_target_summary() {
+        let palette = test_palette();
+        let picker = KeyboardPicker::new(
+            test_config("solid"),
+            &palette,
+            "/tmp/cfg-keyboard-test.toml".to_string(),
+        );
+
+        let text = picker
+            .header_line()
+            .spans
+            .iter()
+            .map(|span| span.content.as_ref())
+            .collect::<String>();
+
+        assert!(text.contains("connected:"));
+        assert!(text.contains("missing:"));
     }
 
     #[test]

@@ -276,10 +276,12 @@ fn load_config_and_palette(cfg_dir: &str) -> Result<(Config, Palette), String> {
     Ok((config, palette))
 }
 
-fn print_led_statuses(statuses: &[leds::LedStatus]) {
+fn print_led_statuses(
+    statuses: &[leds::LedStatus],
+    target_statuses: Option<&[leds::LedTargetStatus]>,
+) {
     if statuses.is_empty() {
         eprintln!("warning: no configured LED targets connected");
-        return;
     }
 
     for (index, status) in statuses.iter().enumerate() {
@@ -293,6 +295,15 @@ fn print_led_statuses(statuses: &[leds::LedStatus]) {
         println!("effect={}", status.effect);
         println!("speed={}", status.speed);
         println!("color_hsv={},{}", status.color.h, status.color.s);
+    }
+
+    if let Some(target_statuses) = target_statuses {
+        if !statuses.is_empty() {
+            println!();
+        }
+        for line in leds::format_target_summary(target_statuses) {
+            println!("{}", line);
+        }
     }
 }
 
@@ -588,7 +599,20 @@ fn main() {
             };
 
             match result {
-                Ok(statuses) => print_led_statuses(&statuses),
+                Ok(statuses) => {
+                    let target_statuses = match leds::discover_target_statuses(
+                        &config,
+                        target.as_deref(),
+                        device.as_deref(),
+                    ) {
+                        Ok(statuses) => Some(statuses),
+                        Err(e) => {
+                            eprintln!("warning: target summary unavailable: {}", e);
+                            None
+                        }
+                    };
+                    print_led_statuses(&statuses, target_statuses.as_deref());
+                }
                 Err(e) => {
                     eprintln!("Error: {}", e);
                     std::process::exit(1);
