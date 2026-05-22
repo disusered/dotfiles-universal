@@ -10,7 +10,7 @@ metadata:
 
 # Query — XBOL Databases
 
-Connect to the team's PostgreSQL databases proxied through Tailscale at `work.anchovy-lizard.ts.net:3307`.
+Connect to the team's PostgreSQL databases proxied through Tailscale at `work.anchovy-lizard.ts.net:3308`.
 
 ## Environments
 
@@ -18,27 +18,35 @@ The user must specify which environment — **dev** or **qa**. If ambiguous, ask
 
 ## Connection
 
-Credentials are pre-resolved in `~/.hermes/.env` (populated by `hermes-init` via `op inject`). No runtime `op` calls needed.
+Credentials are pre-resolved in the active Hermes profile env file (populated by `hermes-init` via `op inject`). No runtime `op` calls needed.
+
+Use `HERMES_HOME/.env` when `HERMES_HOME` is set; otherwise fall back to the default profile at `~/.hermes/.env`. **Do not search the filesystem for other `.env` files.** If the expected env file or keys are missing, stop and tell the user to run `hermes-init` for the active profile.
 
 Replace `<PREFIX>` with `DEV` or `QA` (uppercase):
 
 ```bash
-export PGHOST="$(grep '^<PREFIX>_PGHOST=' ~/.hermes/.env | cut -d= -f2-)"
-export PGPORT="$(grep '^<PREFIX>_PGPORT=' ~/.hermes/.env | cut -d= -f2-)"
-export PGUSER="$(grep '^<PREFIX>_PGUSER=' ~/.hermes/.env | cut -d= -f2-)"
-export PGDATABASE="$(grep '^<PREFIX>_PGDATABASE=' ~/.hermes/.env | cut -d= -f2-)"
-export PGPASSWORD="$(grep '^<PREFIX>_PGPASSWORD=' ~/.hermes/.env | cut -d= -f2-)"
+HERMES_ENV="${HERMES_HOME:-$HOME/.hermes}/.env"
+[ -r "$HERMES_ENV" ] || { echo "Missing Hermes env file: $HERMES_ENV" >&2; exit 1; }
+export PGHOST="$(grep '^<PREFIX>_PGHOST=' "$HERMES_ENV" | cut -d= -f2-)"
+export PGPORT="$(grep '^<PREFIX>_PGPORT=' "$HERMES_ENV" | cut -d= -f2-)"
+export PGUSER="$(grep '^<PREFIX>_PGUSER=' "$HERMES_ENV" | cut -d= -f2-)"
+export PGDATABASE="$(grep '^<PREFIX>_PGDATABASE=' "$HERMES_ENV" | cut -d= -f2-)"
+export PGPASSWORD="$(grep '^<PREFIX>_PGPASSWORD=' "$HERMES_ENV" | cut -d= -f2-)"
+[ -n "$PGHOST" ] && [ -n "$PGPORT" ] && [ -n "$PGUSER" ] && [ -n "$PGDATABASE" ] && [ -n "$PGPASSWORD" ] || { echo "Missing <PREFIX> database credentials in $HERMES_ENV" >&2; exit 1; }
 psql --csv -c "<SQL>"
 ```
 
 For multi-line queries:
 
 ```bash
-export PGHOST="$(grep '^<PREFIX>_PGHOST=' ~/.hermes/.env | cut -d= -f2-)"
-export PGPORT="$(grep '^<PREFIX>_PGPORT=' ~/.hermes/.env | cut -d= -f2-)"
-export PGUSER="$(grep '^<PREFIX>_PGUSER=' ~/.hermes/.env | cut -d= -f2-)"
-export PGDATABASE="$(grep '^<PREFIX>_PGDATABASE=' ~/.hermes/.env | cut -d= -f2-)"
-export PGPASSWORD="$(grep '^<PREFIX>_PGPASSWORD=' ~/.hermes/.env | cut -d= -f2-)"
+HERMES_ENV="${HERMES_HOME:-$HOME/.hermes}/.env"
+[ -r "$HERMES_ENV" ] || { echo "Missing Hermes env file: $HERMES_ENV" >&2; exit 1; }
+export PGHOST="$(grep '^<PREFIX>_PGHOST=' "$HERMES_ENV" | cut -d= -f2-)"
+export PGPORT="$(grep '^<PREFIX>_PGPORT=' "$HERMES_ENV" | cut -d= -f2-)"
+export PGUSER="$(grep '^<PREFIX>_PGUSER=' "$HERMES_ENV" | cut -d= -f2-)"
+export PGDATABASE="$(grep '^<PREFIX>_PGDATABASE=' "$HERMES_ENV" | cut -d= -f2-)"
+export PGPASSWORD="$(grep '^<PREFIX>_PGPASSWORD=' "$HERMES_ENV" | cut -d= -f2-)"
+[ -n "$PGHOST" ] && [ -n "$PGPORT" ] && [ -n "$PGUSER" ] && [ -n "$PGDATABASE" ] && [ -n "$PGPASSWORD" ] || { echo "Missing <PREFIX> database credentials in $HERMES_ENV" >&2; exit 1; }
 psql --csv -f - <<'SQL'
   <multi-line SQL here>
 SQL
@@ -46,7 +54,7 @@ SQL
 
 **Pitfall:** Do NOT use `eval` to load these variables — the password contains shell-special characters (`[`, `)`, `|`) that break `eval`. The `grep | cut` + `export VAR="$(...)"` pattern avoids this by capturing values in subshells.
 
-If the connection fails with auth errors, the user may need to run `hermes-init` to refresh credentials.
+If the expected env file or keys are missing, the user may need to run `hermes-init` for the active profile, e.g. `hermes-init xbol`. Do not use `find`, `grep -R`, or broad home-directory scans to locate credentials.
 
 Full read/write access on both environments. No restrictions on statement types. Use good judgment: confirm before destructive operations (DROP, TRUNCATE) unless the user is clearly asking for it.
 
@@ -125,6 +133,7 @@ psql --csv -c "SELECT id, name, status FROM users LIMIT 5" | tabulate -s ',' -f 
 │  2 │ Bob     │ inactive │
 ╘════╧═════════╧══════════╛
 ```
+
 _3 rows total, 2 shown._
 
 ## Language
@@ -134,6 +143,7 @@ Respond in Spanish for reports and data discussions unless the user writes in En
 ## Common Reports
 
 See `references/common-reports.md` for reusable SQL patterns:
+
 - **Mini-Reporte de Clausura** — resumen general, desglose por evento, temporada, tickets escaneados, últimas órdenes
 
 ## Workflow
