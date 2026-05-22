@@ -4,6 +4,7 @@ global:
   links:
     git-commit: ~/.agents/skills/git-commit
     slop-clean: ~/.agents/skills/slop-clean
+    thermo-nuclear-code-quality-review: ~/.agents/skills/thermo-nuclear-code-quality-review
     git-commit/commands/git-commit.md:
       - ~/.hermes/skills/software-development/git-commit/SKILL.md
       - ~/.config/opencode/commands/git-commit.md
