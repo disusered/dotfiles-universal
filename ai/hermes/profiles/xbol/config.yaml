@@ -20,16 +20,17 @@ agent:
   image_input_mode: auto
   disabled_toolsets: []
 terminal:
-  backend: local
+  backend: docker
   modal_mode: auto
-  cwd: /home/carlos/Development/XBOL
+  cwd: /workspace
   timeout: 180
   env_passthrough: []
   shell_init_files: []
   auto_source_bashrc: true
-  docker_image: nikolaik/python-nodejs:python3.11-nodejs20
+  docker_image: localhost/xbol-agent-sandbox:latest
   docker_forward_env: []
-  docker_env: {}
+  docker_env:
+    HERMES_HOME: /root/.hermes
   singularity_image: docker://nikolaik/python-nodejs:python3.11-nodejs20
   modal_image: nikolaik/python-nodejs:python3.11-nodejs20
   daytona_image: nikolaik/python-nodejs:python3.11-nodejs20
@@ -38,7 +39,10 @@ terminal:
   container_memory: 5120
   container_disk: 51200
   container_persistent: true
-  docker_volumes: []
+  credential_files:
+  - .env
+  docker_volumes:
+  - /home/carlos/Development/XBOL:/workspace
   docker_mount_cwd_to_workspace: false
   docker_extra_args: []
   docker_run_as_host_user: false

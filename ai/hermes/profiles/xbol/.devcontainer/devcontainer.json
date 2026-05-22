@@ -1,0 +1,52 @@
+{
+  "name": "XBOL Agent Sandbox",
+  "build": {
+    "dockerfile": "../Containerfile",
+    "context": "..",
+    "args": {
+      "NODE_MAJOR": "20",
+      "OPENTOFU_VERSION": "1.10.7",
+      "TERRAGRUNT_VERSION": "0.93.9",
+      "TFLINT_VERSION": "0.60.0",
+      "TFSEC_VERSION": "1.28.14",
+      "TERRAFORM_DOCS_VERSION": "0.20.0"
+    }
+  },
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=/home/carlos/Development/XBOL,target=/workspace,type=bind",
+  "containerEnv": {
+    "HERMES_HOME": "/root/.hermes",
+    "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+    "DOTNET_SKIP_FIRST_TIME_EXPERIENCE": "1"
+  },
+  "runArgs": [
+    "--init",
+    "--security-opt",
+    "no-new-privileges",
+    "--cap-drop",
+    "ALL",
+    "--pids-limit",
+    "256",
+    "--cpus",
+    "1",
+    "--memory",
+    "5120m",
+    "--tmpfs",
+    "/tmp:rw,nosuid,size=512m",
+    "--tmpfs",
+    "/var/tmp:rw,noexec,nosuid,size=256m",
+    "--tmpfs",
+    "/run:rw,noexec,nosuid,size=64m"
+  ],
+  "postCreateCommand": "dotnet --version && node --version && npm --version && python3 --version && psql --version && tofu version && terragrunt --version && gcloud --version && kubectl version --client=true && tflint --version && tfsec --version && terraform-docs --version && pre-commit --version",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "hashicorp.terraform",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
+}
