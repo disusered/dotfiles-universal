@@ -1,0 +1,5 @@
+global:
+  installs:
+    cmd: command -v devcontainer &>/dev/null || npm install -g @devcontainers/cli
+    depends:
+      - /languages/javascript/node/latest
