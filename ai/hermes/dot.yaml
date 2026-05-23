@@ -9,6 +9,7 @@ linux[whoami.distro^="Arch"]:
       if [ ! -f /home/carlos/.hermes/hermes-agent/hermes_cli/web_dist/index.html ]; then
         cd /home/carlos/.hermes/hermes-agent/web && npm install --silent && npm run build
       fi
+      systemctl --user daemon-reload
       systemctl --user enable --now hermes-dashboard.service hermes-webui.service
     depends:
       - /ai/agent-skills

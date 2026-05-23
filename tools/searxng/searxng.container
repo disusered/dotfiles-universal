@@ -1,0 +1,21 @@
+[Unit]
+Description=SearXNG Meta Search Engine
+
+[Quadlet]
+DefaultDependencies=false
+
+[Container]
+ContainerName=searxng
+Image=docker.io/searxng/searxng:latest
+Pull=never
+PublishPort=127.0.0.1:47123:8080
+Volume=%h/.config/searxng/settings.yml:/etc/searxng/settings.yml:ro
+Environment=SEARXNG_BASE_URL=http://search.disusered.com/
+DropCapability=all
+
+[Service]
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

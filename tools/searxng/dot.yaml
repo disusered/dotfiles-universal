@@ -3,10 +3,12 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       podman pull docker.io/searxng/searxng:latest
       mkdir -p ~/.config/searxng
+      mkdir -p ~/.config/containers/systemd
+      rm -f ~/.config/systemd/user/searxng.service ~/.config/systemd/user/default.target.wants/searxng.service
       systemctl --user daemon-reload
-      systemctl --user enable --now searxng.service
+      systemctl --user restart searxng.service
     depends:
       - /packages/podman
   links:
     settings.yml: ~/.config/searxng/settings.yml
-    searxng.service: ~/.config/systemd/user/searxng.service
+    searxng.container: ~/.config/containers/systemd/searxng.container

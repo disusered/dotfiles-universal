@@ -3,6 +3,7 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       npm i -g opencode-ai
       npx -y opencode-openai-codex-auth@latest
+      systemctl --user daemon-reload
       systemctl --user enable --now opencode-serve.service
     depends:
       - /ai/agent-skills

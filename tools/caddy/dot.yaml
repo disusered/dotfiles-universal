@@ -4,13 +4,12 @@ linux[whoami.distro^="Arch"]:
       if ! pacman -Qi caddy &>/dev/null; then
         sudo pacman -S --noconfirm --needed caddy
       fi
-      TS_IP=$(tailscale ip -4)
       sudo mkdir -p /etc/caddy
-      sudo mkdir -p /etc/systemd/system/caddy.service.d
       sudo cp ~/.dotfiles/tools/caddy/Caddyfile /etc/caddy/Caddyfile
       sudo chown root:root /etc/caddy/Caddyfile
-      printf 'CADDY_TAILSCALE_IP=%s\n' "$TS_IP" | sudo tee /etc/caddy/tailscale.env > /dev/null
-      sudo chown root:root /etc/caddy/tailscale.env
-      sudo ln -sf ~/.dotfiles/tools/caddy/tailscale.conf /etc/systemd/system/caddy.service.d/tailscale.conf
+      sudo cp ~/.dotfiles/tools/caddy/caddy.service /etc/systemd/system/caddy.service
+      sudo chown root:root /etc/systemd/system/caddy.service
+      sudo rm -f /etc/systemd/system/caddy.service.d/tailscale.conf
       sudo systemctl daemon-reload
+      sudo systemctl enable caddy.service
       sudo systemctl restart caddy.service
