@@ -52,6 +52,9 @@ web:
   backend: ""
   search_backend: searxng
   extract_backend: ""
+image_gen:
+  provider: openai-codex
+  model: gpt-image-2-medium
 browser:
   inactivity_timeout: 120
   command_timeout: 30
@@ -544,6 +547,9 @@ known_plugin_toolsets:
 plugins:
   enabled:
     - disk-cleanup
+    - image_gen/openai-codex
+    - platforms/google_chat
+    - web/searxng
   disabled:
     - google_meet
     - spotify
