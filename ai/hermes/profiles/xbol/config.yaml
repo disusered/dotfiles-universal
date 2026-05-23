@@ -6,7 +6,7 @@ providers: {}
 fallback_providers: []
 credential_pool_strategies: {}
 toolsets:
-- hermes-cli
+  - hermes-cli
 agent:
   max_turns: 90
   gateway_timeout: 1800
@@ -40,9 +40,9 @@ terminal:
   container_disk: 51200
   container_persistent: true
   credential_files:
-  - .env
+    - .env
   docker_volumes:
-  - /home/carlos/Development/XBOL:/workspace
+    - /home/carlos/Development/XBOL:/workspace
   docker_mount_cwd_to_workspace: false
   docker_extra_args: []
   docker_run_as_host_user: false
@@ -220,9 +220,9 @@ display:
   runtime_footer:
     enabled: false
     fields:
-    - model
-    - context_pct
-    - cwd
+      - model
+      - context_pct
+      - cwd
   copy_shortcut: auto
   tool_progress: all
 dashboard:
@@ -301,63 +301,63 @@ goals:
   max_turns: 20
 skills:
   external_dirs:
-  - ~/.dotfiles/ai/hermes/skills
+    - ~/.dotfiles/ai/hermes/skills
   template_vars: true
   inline_shell: false
   inline_shell_timeout: 10
   guard_agent_created: false
   disabled:
-  - airtable
-  - architecture-diagram
-  - arxiv
-  - ascii-video
-  - audiocraft-audio-generation
-  - baoyu-comic
-  - baoyu-infographic
-  - codex
-  - comfyui
-  - dogfood
-  - evaluating-llms-harness
-  - excalidraw
-  - godmode
-  - heartmula
-  - huggingface-hub
-  - ideation
-  - jupyter-live-kernel
-  - linear
-  - llama-cpp
-  - llm-wiki
-  - manim-video
-  - minecraft-modpack-server
-  - node-inspect-debugger
-  - notion
-  - obliteratus
-  - obsidian
-  - openhue
-  - p5js
-  - pixel-art
-  - pokemon-player
-  - polymarket
-  - popular-web-designs
-  - powerpoint
-  - pretext
-  - python-debugpy
-  - segment-anything-model
-  - serving-llms-vllm
-  - songsee
-  - songwriting-and-ai-music
-  - spotify
-  - subagent-driven-development
-  - systematic-debugging
-  - teams-meeting-pipeline
-  - test-driven-development
-  - touchdesigner-mcp
-  - webhook-subscriptions
-  - weights-and-biases
-  - writing-plans
-  - xurl
-  - youtube-content
-  - yuanbao
+    - airtable
+    - architecture-diagram
+    - arxiv
+    - ascii-video
+    - audiocraft-audio-generation
+    - baoyu-comic
+    - baoyu-infographic
+    - codex
+    - comfyui
+    - dogfood
+    - evaluating-llms-harness
+    - excalidraw
+    - godmode
+    - heartmula
+    - huggingface-hub
+    - ideation
+    - jupyter-live-kernel
+    - linear
+    - llama-cpp
+    - llm-wiki
+    - manim-video
+    - minecraft-modpack-server
+    - node-inspect-debugger
+    - notion
+    - obliteratus
+    - obsidian
+    - openhue
+    - p5js
+    - pixel-art
+    - pokemon-player
+    - polymarket
+    - popular-web-designs
+    - powerpoint
+    - pretext
+    - python-debugpy
+    - segment-anything-model
+    - serving-llms-vllm
+    - songsee
+    - songwriting-and-ai-music
+    - spotify
+    - subagent-driven-development
+    - systematic-debugging
+    - teams-meeting-pipeline
+    - test-driven-development
+    - touchdesigner-mcp
+    - webhook-subscriptions
+    - weights-and-biases
+    - writing-plans
+    - xurl
+    - youtube-content
+    - yuanbao
 curator:
   enabled: true
   interval_hours: 168
@@ -402,7 +402,7 @@ approvals:
   timeout: 60
   cron_mode: deny
   mcp_reload_confirm: true
-  destructive_slash_confirm: true
+  destructive_slash_confirm: false
 command_allowlist: []
 quick_commands: {}
 hooks: {}
@@ -423,7 +423,7 @@ security:
   allow_lazy_installs: true
 cron:
   wrap_response: true
-  max_parallel_jobs: null
+  max_parallel_jobs:
 kanban:
   dispatch_in_gateway: true
   dispatch_interval_seconds: 60
@@ -460,48 +460,57 @@ session_reset:
 skin: catppuccin
 platform_toolsets:
   discord:
-  - browser
-  - clarify
-  - code_execution
-  - computer_use
-  - cronjob
-  - delegation
-  - file
-  - image_gen
-  - kanban
-  - memory
-  - messaging
-  - session_search
-  - skills
-  - terminal
-  - todo
-  - tts
-  - vision
-  - web
+    - browser
+    - clarify
+    - code_execution
+    - computer_use
+    - cronjob
+    - delegation
+    - file
+    - image_gen
+    - kanban
+    - memory
+    - messaging
+    - session_search
+    - skills
+    - terminal
+    - todo
+    - tts
+    - vision
+    - web
 known_plugin_toolsets:
   discord:
-  - spotify
+    - spotify
 plugins:
   enabled:
-  - disk-cleanup
-  - image_gen/openai-codex
-  - platforms/google_chat
-  - web/searxng
+    - disk-cleanup
+    - image_gen/openai-codex
+    - platforms/google_chat
+    - web/searxng
   disabled:
-  - google_meet
-  - spotify
-  - teams_pipeline
+    - google_meet
+    - spotify
+    - teams_pipeline
 platforms:
   discord:
     gateway_restart_notification: false
     extra:
       allow_from:
-      - '1448742332907262023'
+        - '1448742332907262023'
       allow_admin_from:
-      - '1448742332907262023'
+        - '1448742332907262023'
       user_allowed_commands:
-      - query
+        - query
       group_allow_admin_from:
-      - '1448742332907262023'
+        - '1448742332907262023'
       group_user_allowed_commands:
-      - query
+        - query
+mcp_servers:
+  grafana:
+    command: uvx
+    args:
+      - mcp-grafana
+    env:
+      GRAFANA_URL: http://127.0.0.1:43000
+    timeout: 120
+    connect_timeout: 60

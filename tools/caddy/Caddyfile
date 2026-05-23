@@ -36,3 +36,8 @@ http://search.disusered.com {
 	bind {$CADDY_TAILSCALE_IP}
 	reverse_proxy localhost:47123
 }
+
+http://xbol.disusered.com {
+	bind {$CADDY_TAILSCALE_IP}
+	reverse_proxy localhost:43000
+}
