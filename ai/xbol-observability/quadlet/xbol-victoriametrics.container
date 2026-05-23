@@ -1,6 +1,5 @@
 [Unit]
 Description=XBOL VictoriaMetrics local TSDB
-After=network-online.target
 
 [Container]
 ContainerName=xbol-victoriametrics
