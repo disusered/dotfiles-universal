@@ -1,7 +1,7 @@
 [Unit]
 Description=XBOL Grafana Alloy collector
-After=xbol-victoriametrics.service
-Requires=xbol-victoriametrics.service
+After=xbol-victoriametrics.service xbol-loki.service
+Requires=xbol-victoriametrics.service xbol-loki.service
 
 [Container]
 ContainerName=xbol-alloy
@@ -10,6 +10,7 @@ Pull=never
 Network=xbol-observability.network
 PublishPort=127.0.0.1:12345:12345
 Volume=%h/.dotfiles/ai/xbol-observability/alloy/config.alloy:/etc/alloy/config.alloy:ro
+Volume=%h/.local/share/xbol-observability/log-spool:/var/lib/xbol-observability/log-spool:ro
 Volume=%h/.config/gcloud/application_default_credentials.json:/tmp/gcloud_adc.json:ro
 Environment=GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcloud_adc.json
 UserNS=keep-id

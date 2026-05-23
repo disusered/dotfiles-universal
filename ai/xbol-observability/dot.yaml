@@ -3,31 +3,44 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       podman pull docker.io/grafana/alloy:latest
       podman pull docker.io/victoriametrics/victoria-metrics:latest
+      podman pull docker.io/grafana/loki:latest
       podman pull docker.io/grafana/grafana-oss:latest
       mkdir -p ~/.config/containers/systemd
+      mkdir -p ~/.config/systemd/user
       mkdir -p ~/.config/xbol-observability/alloy
+      mkdir -p ~/.config/xbol-observability/loki
       mkdir -p ~/.config/xbol-observability/grafana/provisioning/datasources
       mkdir -p ~/.config/xbol-observability/grafana/provisioning/dashboards
       mkdir -p ~/.config/xbol-observability/grafana/dashboards
       mkdir -p ~/.local/share/xbol-observability/alloy
       mkdir -p ~/.local/share/xbol-observability/victoriametrics
+      mkdir -p ~/.local/share/xbol-observability/loki
       mkdir -p ~/.local/share/xbol-observability/grafana
+      mkdir -p ~/.local/share/xbol-observability/log-fetch
+      mkdir -p ~/.local/share/xbol-observability/log-spool/cloudlogging
       if [ ! -f ~/.config/gcloud/application_default_credentials.json ]; then
         echo "Missing ~/.config/gcloud/application_default_credentials.json; run: gcloud auth application-default login" >&2
         exit 1
       fi
-      ~/.rotz/bin/rotz link /ai/xbol-observability
+      ~/.rotz/bin/rotz link /ai/xbol-observability -f
       systemctl --user daemon-reload
-      systemctl --user restart xbol-victoriametrics.service xbol-alloy.service xbol-grafana.service
+      systemctl --user restart xbol-victoriametrics.service xbol-loki.service xbol-alloy.service xbol-grafana.service
     depends:
       - /packages/podman
   links:
     alloy/config.alloy: ~/.config/xbol-observability/alloy/config.alloy
+    loki/config.yaml: ~/.config/xbol-observability/loki/config.yaml
     grafana/provisioning/datasources/victoriametrics.yaml: ~/.config/xbol-observability/grafana/provisioning/datasources/victoriametrics.yaml
+    grafana/provisioning/datasources/loki.yaml: ~/.config/xbol-observability/grafana/provisioning/datasources/loki.yaml
     grafana/provisioning/dashboards/dashboards.yaml: ~/.config/xbol-observability/grafana/provisioning/dashboards/dashboards.yaml
     grafana/dashboards/xbol-gke-cloudsql.json: ~/.config/xbol-observability/grafana/dashboards/xbol-gke-cloudsql.json
+    grafana/dashboards/xbol-logs.json: ~/.config/xbol-observability/grafana/dashboards/xbol-logs.json
     quadlet/xbol-observability.network: ~/.config/containers/systemd/xbol-observability.network
     quadlet/xbol-victoriametrics.container: ~/.config/containers/systemd/xbol-victoriametrics.container
+    quadlet/xbol-loki.container: ~/.config/containers/systemd/xbol-loki.container
     quadlet/xbol-alloy.container: ~/.config/containers/systemd/xbol-alloy.container
     quadlet/xbol-grafana.container: ~/.config/containers/systemd/xbol-grafana.container
     scripts/xbol-observability-smoke: ~/.local/bin/xbol-observability-smoke
+    scripts/xbol-gcp-log-fetch: ~/.local/bin/xbol-gcp-log-fetch
+    systemd/xbol-gcp-log-fetch.service: ~/.config/systemd/user/xbol-gcp-log-fetch.service
+    systemd/xbol-gcp-log-fetch.timer: ~/.config/systemd/user/xbol-gcp-log-fetch.timer

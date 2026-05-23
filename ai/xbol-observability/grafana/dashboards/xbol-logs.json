@@ -1,0 +1,734 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [
+    {
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "targetBlank": true,
+      "title": "Alloy UI",
+      "tooltip": "Grafana Alloy local UI",
+      "type": "link",
+      "url": "http://127.0.0.1:12345"
+    },
+    {
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "targetBlank": true,
+      "title": "VictoriaMetrics UI",
+      "tooltip": "VictoriaMetrics local UI",
+      "type": "link",
+      "url": "http://127.0.0.1:8428/vmui/"
+    },
+    {
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "targetBlank": true,
+      "title": "VM targets",
+      "tooltip": "VictoriaMetrics targets",
+      "type": "link",
+      "url": "http://127.0.0.1:8428/targets"
+    },
+    {
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "targetBlank": true,
+      "title": "Loki labels",
+      "tooltip": "Loki label/tag names for the local GCP log stream",
+      "type": "link",
+      "url": "http://127.0.0.1:3100/loki/api/v1/labels"
+    },
+    {
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "targetBlank": true,
+      "title": "Grafana health",
+      "tooltip": "Grafana health endpoint",
+      "type": "link",
+      "url": "http://127.0.0.1:43000/api/health"
+    }
+  ],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "xbol-loki"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": true,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "xbol-loki"
+          },
+          "editorMode": "code",
+          "expr": "{job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\", dest_namespace=~\"${app_namespace:raw}\", workload=~\"${workload:raw}\", resource_type=~\"${resource_type:raw}\", severity=~\"ERROR|CRITICAL|ALERT|EMERGENCY\"} |~ \"${search:raw}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Recent GCP errors",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "xbol-loki"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 45,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "xbol-loki"
+          },
+          "editorMode": "code",
+          "expr": "sum by (severity) (count_over_time({job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\", dest_namespace=~\"${app_namespace:raw}\", workload=~\"${workload:raw}\", resource_type=~\"${resource_type:raw}\", severity=~\"${severity:regex}\"} |~ \"${search:raw}\"[5m]))",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Log volume by severity",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "xbol-loki"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 45,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "xbol-loki"
+          },
+          "editorMode": "code",
+          "expr": "sum by (workload) (count_over_time({job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\", dest_namespace=~\"${app_namespace:raw}\", workload=~\"${workload:raw}\", resource_type=~\"${resource_type:raw}\", severity=~\"${severity:regex}\"} |~ \"${search:raw}\"[5m]))",
+          "queryType": "range",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "xbol-loki"
+          },
+          "editorMode": "code",
+          "expr": "sum by (resource_type) (count_over_time({job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\", dest_namespace=~\"${app_namespace:raw}\", workload=~\"${workload:raw}\", resource_type=~\"${resource_type:raw}\", severity=~\"${severity:regex}\"} |~ \"${search:raw}\"[5m]))",
+          "queryType": "range",
+          "refId": "B"
+        }
+      ],
+      "title": "Log volume by workload / GCP resource",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "xbol-loki"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 5,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": true,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "xbol-loki"
+          },
+          "editorMode": "code",
+          "expr": "{job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\", dest_namespace=~\"${app_namespace:raw}\", workload=~\"${workload:raw}\", resource_type=~\"${resource_type:raw}\"} |~ \"${search:raw}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Selected namespace / workload events",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "xbol-loki"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
+      "id": 6,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": true,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "xbol-loki"
+          },
+          "editorMode": "code",
+          "expr": "{job=\"xbol/gcp-cloudlogging\", log_scope=~\"gateway|cloudsql|waf-gateway\", dest_namespace=~\"${app_namespace:raw}\", workload=~\"${workload:raw}\", resource_type=~\"${resource_type:raw}\"} |~ \"${search:raw}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Gateway / Cloud SQL / WAF events",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "xbol-loki"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 36
+      },
+      "id": 3,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": true,
+        "showCommonLabels": false,
+        "showLabels": true,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "xbol-loki"
+          },
+          "editorMode": "code",
+          "expr": "{job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\", dest_namespace=~\"${app_namespace:raw}\", workload=~\"${workload:raw}\", resource_type=~\"${resource_type:raw}\", severity=~\"${severity:regex}\"} |~ \"${search:raw}\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Filtered GCP log stream",
+      "type": "logs"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": [
+    "xbol",
+    "gcp",
+    "logs"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": ".*"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Loki tag: scope",
+        "multi": false,
+        "name": "log_scope",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": ".*"
+          },
+          {
+            "selected": false,
+            "text": "XBOL / ArgoCD",
+            "value": "argocd"
+          },
+          {
+            "selected": false,
+            "text": "Gateway",
+            "value": "gateway"
+          },
+          {
+            "selected": false,
+            "text": "Cloud SQL",
+            "value": "cloudsql"
+          },
+          {
+            "selected": false,
+            "text": "WAF / LB",
+            "value": "waf-gateway"
+          },
+          {
+            "selected": false,
+            "text": "GKE infra",
+            "value": "gke"
+          }
+        ],
+        "query": "All : .*, XBOL / ArgoCD : argocd, Gateway : gateway, Cloud SQL : cloudsql, WAF / LB : waf-gateway, GKE infra : gke",
+        "skipUrlSync": false,
+        "type": "custom"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": ".*"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "App/platform namespace",
+        "multi": false,
+        "name": "app_namespace",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": ".*"
+          },
+          {
+            "selected": false,
+            "text": "dev-boletera",
+            "value": "dev-boletera"
+          },
+          {
+            "selected": false,
+            "text": "qa-boletera",
+            "value": "qa-boletera"
+          },
+          {
+            "selected": false,
+            "text": "argocd",
+            "value": "argocd"
+          },
+          {
+            "selected": false,
+            "text": "gateway-apisix",
+            "value": "gateway-apisix"
+          },
+          {
+            "selected": false,
+            "text": "cert-manager",
+            "value": "cert-manager"
+          },
+          {
+            "selected": false,
+            "text": "kube-system",
+            "value": "kube-system"
+          },
+          {
+            "selected": false,
+            "text": "gmp-system",
+            "value": "gmp-system"
+          },
+          {
+            "selected": false,
+            "text": "unknown / external",
+            "value": "unknown"
+          }
+        ],
+        "query": "All : .*, dev-boletera : dev-boletera, qa-boletera : qa-boletera, argocd : argocd, gateway-apisix : gateway-apisix, cert-manager : cert-manager, kube-system : kube-system, gmp-system : gmp-system, unknown / external : unknown",
+        "skipUrlSync": false,
+        "type": "custom"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": ".*"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Workload (known list)",
+        "multi": false,
+        "name": "workload",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": ".*"
+          },
+          {
+            "selected": false,
+            "text": "dev-xbol-api-admin-worker",
+            "value": "dev-xbol-api-admin-worker"
+          },
+          {
+            "selected": false,
+            "text": "dev-xbol-web-admin",
+            "value": "dev-xbol-web-admin"
+          },
+          {
+            "selected": false,
+            "text": "dev-xbol-api-gateway",
+            "value": "dev-xbol-api-gateway"
+          },
+          {
+            "selected": false,
+            "text": "qa-boletera-gateway-apisix-waf",
+            "value": "qa-boletera-gateway-apisix-waf"
+          },
+          {
+            "selected": false,
+            "text": "Cloud SQL: boletera",
+            "value": "boletera"
+          },
+          {
+            "selected": false,
+            "text": "Gateway: apisix",
+            "value": "apisix"
+          },
+          {
+            "selected": false,
+            "text": "HTTP load balancer",
+            "value": "http-load-balancer"
+          },
+          {
+            "selected": false,
+            "text": "argocd-application-controller",
+            "value": "argocd-application-controller"
+          },
+          {
+            "selected": false,
+            "text": "argocd-repo-server",
+            "value": "argocd-repo-server"
+          },
+          {
+            "selected": false,
+            "text": "argocd-notifications-controller",
+            "value": "argocd-notifications-controller"
+          },
+          {
+            "selected": false,
+            "text": "cert-manager",
+            "value": "cert-manager"
+          },
+          {
+            "selected": false,
+            "text": "konnectivity-agent",
+            "value": "konnectivity-agent"
+          },
+          {
+            "selected": false,
+            "text": "unknown",
+            "value": "unknown"
+          }
+        ],
+        "query": "All : .*, dev-xbol-api-admin-worker : dev-xbol-api-admin-worker, dev-xbol-web-admin : dev-xbol-web-admin, dev-xbol-api-gateway : dev-xbol-api-gateway, qa-boletera-gateway-apisix-waf : qa-boletera-gateway-apisix-waf, Cloud SQL: boletera : boletera, Gateway: apisix : apisix, HTTP load balancer : http-load-balancer, argocd-application-controller : argocd-application-controller, argocd-repo-server : argocd-repo-server, argocd-notifications-controller : argocd-notifications-controller, cert-manager : cert-manager, konnectivity-agent : konnectivity-agent, unknown : unknown",
+        "skipUrlSync": false,
+        "type": "custom"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": ".*"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "GCP resource",
+        "multi": false,
+        "name": "resource_type",
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": ".*"
+          },
+          {
+            "selected": false,
+            "text": "k8s_container",
+            "value": "k8s_container"
+          },
+          {
+            "selected": false,
+            "text": "cloudsql_database",
+            "value": "cloudsql_database"
+          },
+          {
+            "selected": false,
+            "text": "http_load_balancer",
+            "value": "http_load_balancer"
+          }
+        ],
+        "query": "All : .*, k8s_container : k8s_container, cloudsql_database : cloudsql_database, http_load_balancer : http_load_balancer",
+        "skipUrlSync": false,
+        "type": "custom"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "loki",
+          "uid": "xbol-loki"
+        },
+        "definition": "label_values({job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\"}, severity)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Severity",
+        "multi": false,
+        "name": "severity",
+        "options": [],
+        "query": "label_values({job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\"}, severity)",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": ".*",
+          "value": ".*"
+        },
+        "hide": 0,
+        "label": "Search/highlight regex",
+        "name": "search",
+        "options": [
+          {
+            "selected": true,
+            "text": ".*",
+            "value": ".*"
+          }
+        ],
+        "query": ".*",
+        "skipUrlSync": false,
+        "type": "textbox"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "XBOL GCP Logs",
+  "uid": "xbol-gcp-logs",
+  "version": 5,
+  "weekStart": ""
+}

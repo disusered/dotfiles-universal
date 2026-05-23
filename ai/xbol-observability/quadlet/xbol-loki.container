@@ -1,0 +1,25 @@
+[Unit]
+Description=XBOL local Loki log store
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+ContainerName=xbol-loki
+Image=docker.io/grafana/loki:latest
+Pull=never
+Network=xbol-observability.network
+PublishPort=127.0.0.1:3100:3100
+Volume=%h/.dotfiles/ai/xbol-observability/loki/config.yaml:/etc/loki/config.yaml:ro
+Volume=%h/.local/share/xbol-observability/loki:/loki:Z
+UserNS=keep-id
+User=1000
+Exec=-config.file=/etc/loki/config.yaml
+DropCapability=all
+NoNewPrivileges=true
+
+[Service]
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

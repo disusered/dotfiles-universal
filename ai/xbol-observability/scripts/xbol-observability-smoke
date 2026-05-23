@@ -4,11 +4,13 @@ set -euo pipefail
 VM_URL="${XBOL_VM_URL:-http://127.0.0.1:8428}"
 GRAFANA_URL="${XBOL_GRAFANA_URL:-http://127.0.0.1:43000}"
 ALLOY_URL="${XBOL_ALLOY_URL:-http://127.0.0.1:12345}"
+LOKI_URL="${XBOL_LOKI_URL:-http://127.0.0.1:3100}"
 
 echo "XBOL observability smoke check"
 echo "VictoriaMetrics: ${VM_URL}"
 echo "Grafana:         ${GRAFANA_URL}"
 echo "Alloy:           ${ALLOY_URL}"
+echo "Loki:            ${LOKI_URL}"
 echo
 
 check_url() {
@@ -23,6 +25,7 @@ check_url() {
 check_url "VictoriaMetrics" "${VM_URL}/health"
 check_url "Grafana" "${GRAFANA_URL}/api/health"
 check_url "Alloy" "${ALLOY_URL}/-/ready"
+check_url "Loki" "${LOKI_URL}/ready"
 
 echo
 echo "GKE metric names in VictoriaMetrics:"
@@ -51,7 +54,17 @@ curl -fsS --max-time 10 \
   | jq '.data[:10]'
 
 echo
+if curl -fsS --max-time 10 "${LOKI_URL}/loki/api/v1/labels" >/dev/null; then
+  echo "Loki labels:"
+  curl -fsS --max-time 10 "${LOKI_URL}/loki/api/v1/labels" | jq -r '.data[]?' | sort | sed -n '1,80p'
+else
+  echo "warn: Loki labels unavailable at ${LOKI_URL}" >&2
+fi
+
+echo
 echo "Useful URLs:"
 echo "  Grafana: ${GRAFANA_URL}/d/xbol-gke-cloudsql/xbol-gke-cloud-sql-metrics"
+echo "  Grafana logs: ${GRAFANA_URL}/d/xbol-gcp-logs/xbol-gcp-logs"
 echo "  VictoriaMetrics query UI: ${VM_URL}/vmui/"
+echo "  Loki labels API: ${LOKI_URL}/loki/api/v1/labels"
 echo "  Alloy UI: ${ALLOY_URL}/"

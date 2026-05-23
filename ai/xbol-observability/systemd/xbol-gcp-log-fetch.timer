@@ -1,0 +1,12 @@
+[Unit]
+Description=Run XBOL GCP log fetcher periodically
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=2min
+RandomizedDelaySec=30s
+Persistent=true
+Unit=xbol-gcp-log-fetch.service
+
+[Install]
+WantedBy=timers.target

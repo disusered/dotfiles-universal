@@ -1,7 +1,7 @@
 [Unit]
 Description=XBOL Grafana dashboard
-After=xbol-victoriametrics.service
-Requires=xbol-victoriametrics.service
+After=xbol-victoriametrics.service xbol-loki.service
+Requires=xbol-victoriametrics.service xbol-loki.service
 
 [Container]
 ContainerName=xbol-grafana
