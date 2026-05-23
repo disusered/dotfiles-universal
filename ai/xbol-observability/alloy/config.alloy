@@ -1,0 +1,81 @@
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+// GCP Cloud Monitoring collector for XBOL.
+// Auth: this container receives only Carlos' ADC JSON file at
+// /var/lib/alloy/gcloud/application_default_credentials.json via Quadlet.
+// Hermes/XBOT and Grafana do not receive GCP credentials.
+prometheus.exporter.gcp "xbol_gcp" {
+  project_ids = ["boletera-qa"]
+
+  metrics_prefixes = [
+    // GKE / Kubernetes container health.
+    "kubernetes.io/container/cpu/core_usage_time",
+    "kubernetes.io/container/cpu/request_cores",
+    "kubernetes.io/container/cpu/request_utilization",
+    "kubernetes.io/container/memory/used_bytes",
+    "kubernetes.io/container/memory/request_utilization",
+    "kubernetes.io/container/restart_count",
+
+    // Cloud SQL instance health.
+    "cloudsql.googleapis.com/database/cpu/reserved_cores",
+    "cloudsql.googleapis.com/database/cpu/usage_time",
+    "cloudsql.googleapis.com/database/cpu/utilization",
+    "cloudsql.googleapis.com/database/memory/usage",
+    "cloudsql.googleapis.com/database/memory/quota",
+    "cloudsql.googleapis.com/database/memory/utilization",
+    "cloudsql.googleapis.com/database/disk/bytes_used",
+    "cloudsql.googleapis.com/database/disk/quota",
+    "cloudsql.googleapis.com/database/disk/utilization",
+    "cloudsql.googleapis.com/database/disk/read_bytes_count",
+    "cloudsql.googleapis.com/database/disk/write_bytes_count",
+    "cloudsql.googleapis.com/database/network/connections",
+    "cloudsql.googleapis.com/database/network/received_bytes_count",
+    "cloudsql.googleapis.com/database/network/sent_bytes_count",
+
+    // Cloud SQL PostgreSQL health for boletera's POSTGRES_16 instance.
+    "cloudsql.googleapis.com/database/postgresql/backends_in_wait",
+    "cloudsql.googleapis.com/database/postgresql/data_cache/hit_ratio",
+    "cloudsql.googleapis.com/database/postgresql/deadlock_count",
+    "cloudsql.googleapis.com/database/postgresql/new_connection_count",
+    "cloudsql.googleapis.com/database/postgresql/num_backends",
+    "cloudsql.googleapis.com/database/postgresql/transaction_count",
+    "cloudsql.googleapis.com/database/postgresql/temp_bytes_written_count",
+    "cloudsql.googleapis.com/database/postgresql/disk/read_bytes_count",
+    "cloudsql.googleapis.com/database/postgresql/disk/write_bytes_count",
+  ]
+
+  extra_filters = [
+    "kubernetes.io/container:resource.labels.cluster_name=\"boletera-qa\"",
+    "cloudsql.googleapis.com/database:resource.labels.database_id=\"boletera-qa:boletera\"",
+  ]
+
+  drop_delegated_projects = true
+  ingest_delay            = true
+  request_interval        = "5m"
+  request_offset          = "0s"
+  gcp_client_timeout      = "30s"
+}
+
+prometheus.scrape "xbol_gcp" {
+  targets         = prometheus.exporter.gcp.xbol_gcp.targets
+  scrape_interval = "60s"
+  scrape_timeout  = "45s"
+  forward_to      = [prometheus.remote_write.victoriametrics.receiver]
+}
+
+prometheus.exporter.self "alloy" { }
+
+prometheus.scrape "alloy_self" {
+  targets         = prometheus.exporter.self.alloy.targets
+  scrape_interval = "60s"
+  forward_to      = [prometheus.remote_write.victoriametrics.receiver]
+}
+
+prometheus.remote_write "victoriametrics" {
+  endpoint {
+    url = "http://xbol-victoriametrics:8428/api/v1/write"
+  }
+}

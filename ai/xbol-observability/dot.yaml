@@ -1,0 +1,33 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      podman pull docker.io/grafana/alloy:latest
+      podman pull docker.io/victoriametrics/victoria-metrics:latest
+      podman pull docker.io/grafana/grafana-oss:latest
+      mkdir -p ~/.config/containers/systemd
+      mkdir -p ~/.config/xbol-observability/alloy
+      mkdir -p ~/.config/xbol-observability/grafana/provisioning/datasources
+      mkdir -p ~/.config/xbol-observability/grafana/provisioning/dashboards
+      mkdir -p ~/.config/xbol-observability/grafana/dashboards
+      mkdir -p ~/.local/share/xbol-observability/alloy
+      mkdir -p ~/.local/share/xbol-observability/victoriametrics
+      mkdir -p ~/.local/share/xbol-observability/grafana
+      if [ ! -f ~/.config/gcloud/application_default_credentials.json ]; then
+        echo "Missing ~/.config/gcloud/application_default_credentials.json; run: gcloud auth application-default login" >&2
+        exit 1
+      fi
+      ~/.rotz/bin/rotz link /ai/xbol-observability
+      systemctl --user daemon-reload
+      systemctl --user restart xbol-victoriametrics.service xbol-alloy.service xbol-grafana.service
+    depends:
+      - /packages/podman
+  links:
+    alloy/config.alloy: ~/.config/xbol-observability/alloy/config.alloy
+    grafana/provisioning/datasources/victoriametrics.yaml: ~/.config/xbol-observability/grafana/provisioning/datasources/victoriametrics.yaml
+    grafana/provisioning/dashboards/dashboards.yaml: ~/.config/xbol-observability/grafana/provisioning/dashboards/dashboards.yaml
+    grafana/dashboards/xbol-gke-cloudsql.json: ~/.config/xbol-observability/grafana/dashboards/xbol-gke-cloudsql.json
+    quadlet/xbol-observability.network: ~/.config/containers/systemd/xbol-observability.network
+    quadlet/xbol-victoriametrics.container: ~/.config/containers/systemd/xbol-victoriametrics.container
+    quadlet/xbol-alloy.container: ~/.config/containers/systemd/xbol-alloy.container
+    quadlet/xbol-grafana.container: ~/.config/containers/systemd/xbol-grafana.container
+    scripts/xbol-observability-smoke: ~/.local/bin/xbol-observability-smoke

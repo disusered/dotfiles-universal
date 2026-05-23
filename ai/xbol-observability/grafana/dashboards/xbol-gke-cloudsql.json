@@ -1,0 +1,562 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "GKE CPU request utilization",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "xbol-victoriametrics"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(10, avg_over_time(stackdriver_k_8_s_container_kubernetes_io_container_cpu_request_utilization{cluster_name=\"boletera-qa\"}[15m]))",
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "xbol-victoriametrics"
+          },
+          "legendFormat": "{{namespace_name}} {{pod_name}} {{container_name}} {{database_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "GKE memory request utilization",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "xbol-victoriametrics"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(10, avg_over_time(stackdriver_k_8_s_container_kubernetes_io_container_memory_request_utilization{cluster_name=\"boletera-qa\"}[15m]))",
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "xbol-victoriametrics"
+          },
+          "legendFormat": "{{namespace_name}} {{pod_name}} {{container_name}} {{database_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "GKE memory used bytes",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "xbol-victoriametrics"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(10, avg_over_time(stackdriver_k_8_s_container_kubernetes_io_container_memory_used_bytes{cluster_name=\"boletera-qa\"}[15m]))",
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "xbol-victoriametrics"
+          },
+          "legendFormat": "{{namespace_name}} {{pod_name}} {{container_name}} {{database_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "GKE container restarts over 1h",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "xbol-victoriametrics"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(20, increase(stackdriver_k_8_s_container_kubernetes_io_container_restart_count{cluster_name=\"boletera-qa\"}[1h]))",
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "xbol-victoriametrics"
+          },
+          "legendFormat": "{{namespace_name}} {{pod_name}} {{container_name}} {{database_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Cloud SQL CPU utilization",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 16
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "xbol-victoriametrics"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "stackdriver_cloudsql_database_cloudsql_googleapis_com_database_cpu_utilization{database_id=\"boletera-qa:boletera\"}",
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "xbol-victoriametrics"
+          },
+          "legendFormat": "{{namespace_name}} {{pod_name}} {{container_name}} {{database_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Cloud SQL memory utilization",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 16
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "xbol-victoriametrics"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "stackdriver_cloudsql_database_cloudsql_googleapis_com_database_memory_utilization{database_id=\"boletera-qa:boletera\"}",
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "xbol-victoriametrics"
+          },
+          "legendFormat": "{{namespace_name}} {{pod_name}} {{container_name}} {{database_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Cloud SQL disk utilization",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 16
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "xbol-victoriametrics"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "stackdriver_cloudsql_database_cloudsql_googleapis_com_database_disk_utilization{database_id=\"boletera-qa:boletera\"}",
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "xbol-victoriametrics"
+          },
+          "legendFormat": "{{namespace_name}} {{pod_name}} {{container_name}} {{database_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Cloud SQL PostgreSQL backends",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 24
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "xbol-victoriametrics"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_num_backends{database_id=\"boletera-qa:boletera\"}",
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "xbol-victoriametrics"
+          },
+          "legendFormat": "{{namespace_name}} {{pod_name}} {{container_name}} {{database_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Cloud SQL PostgreSQL cache hit ratio",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 24
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "xbol-victoriametrics"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_data_cache_hit_ratio{database_id=\"boletera-qa:boletera\"}",
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "xbol-victoriametrics"
+          },
+          "legendFormat": "{{namespace_name}} {{pod_name}} {{container_name}} {{database_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Cloud SQL PostgreSQL transactions / min",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 24
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "xbol-victoriametrics"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "rate(stackdriver_cloudsql_database_cloudsql_googleapis_com_database_postgresql_transaction_count{database_id=\"boletera-qa:boletera\"}[5m]) * 60",
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "xbol-victoriametrics"
+          },
+          "legendFormat": "{{namespace_name}} {{pod_name}} {{container_name}} {{database_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "Alloy scrape health",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "xbol-victoriametrics"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "up{job=\"integrations/gcp\"}",
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "xbol-victoriametrics"
+          },
+          "legendFormat": "{{namespace_name}} {{pod_name}} {{container_name}} {{database_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "All collected metric names",
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "xbol-victoriametrics"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count by (__name__)({__name__=~\"stackdriver_.*\"})",
+          "range": true,
+          "datasource": {
+            "type": "prometheus",
+            "uid": "xbol-victoriametrics"
+          },
+          "legendFormat": "{{namespace_name}} {{pod_name}} {{container_name}} {{database_id}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      }
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 39,
+  "tags": [
+    "xbol",
+    "gke",
+    "cloudsql",
+    "alloy",
+    "victoriametrics"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "XBOL GKE + Cloud SQL metrics",
+  "uid": "xbol-gke-cloudsql",
+  "version": 1,
+  "weekStart": ""
+}

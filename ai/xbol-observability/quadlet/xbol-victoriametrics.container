@@ -1,0 +1,21 @@
+[Unit]
+Description=XBOL VictoriaMetrics local TSDB
+After=network-online.target
+
+[Container]
+ContainerName=xbol-victoriametrics
+Image=docker.io/victoriametrics/victoria-metrics:latest
+Pull=never
+Network=xbol-observability.network
+PublishPort=127.0.0.1:8428:8428
+Volume=%h/.local/share/xbol-observability/victoriametrics:/victoria-metrics-data:Z
+Exec=--storageDataPath=/victoria-metrics-data --retentionPeriod=14d --httpListenAddr=:8428
+DropCapability=all
+NoNewPrivileges=true
+
+[Service]
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
