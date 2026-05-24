@@ -22,8 +22,12 @@ linux[whoami.distro^="Arch"]:
     config.yaml: ~/.hermes/config.yaml
     env.tpl: ~/.hermes/env.tpl
     scripts/hermes-init: ~/.local/bin/hermes-init
-    catppuccin.yaml: ~/.hermes/skins/catppuccin.yaml
-    dashboard-catppuccin.yaml: ~/.hermes/dashboard-themes/catppuccin.yaml
+    catppuccin.yaml:
+      - ~/.hermes/skins/catppuccin.yaml
+      - ~/.hermes/profiles/herding-cats/skins/catppuccin.yaml
+    dashboard-catppuccin.yaml:
+      - ~/.hermes/dashboard-themes/catppuccin.yaml
+      - ~/.hermes/profiles/herding-cats/dashboard-themes/catppuccin.yaml
     hermes-dashboard.service: ~/.config/systemd/user/hermes-dashboard.service
     hermes-gateway.service: ~/.config/systemd/user/hermes-gateway.service
     hermes-gateway-xbol.service: ~/.config/systemd/user/hermes-gateway-xbol.service
