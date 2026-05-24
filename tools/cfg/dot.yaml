@@ -1,8 +1,12 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: cd tools/cfg && cargo build --release
+    cmd: |
+      if ! command -v cfg &>/dev/null; then
+        printf '%s\n' 'cfg is not installed. Build it from /home/carlos/Development/ME/herding-cats/utilities/cfg with: make release' >&2
+      fi
+    depends:
+      - /cfg
   links:
-    target/release/cfg: ~/.local/bin/cfg
     cfg.conf: {{ dirs.base.config }}/hypr/conf.d/cfg.conf
     cfg.desktop: ~/.local/share/applications/cfg.desktop
     cfg.svg: ~/.local/share/icons/hicolor/scalable/apps/cfg.svg
