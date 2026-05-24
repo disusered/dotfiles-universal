@@ -56,6 +56,9 @@ vim.g.loaded_node_provider = 0
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_ruby_provider = 0
 
+-- Keep language-server stderr from turning into a multi-hundred-MB startup tax.
+vim.lsp.log.set_level("OFF")
+
 vim.g.python3_host_prog = vim.fn.expand("~/.local/share/virtualenvs/neovim/bin/python3")
 
 -- Set undofile for persistent undo

@@ -2,6 +2,7 @@ return {
   -- Plugin to center current pane
   {
     "shortcuts/no-neck-pain.nvim",
+    cmd = "NoNeckPain",
 
     config = function()
       local NoNeckPain = require("no-neck-pain")

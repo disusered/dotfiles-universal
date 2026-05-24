@@ -2,6 +2,7 @@ return {
   -- Image rendering in Neovim
   {
     "3rd/image.nvim",
+    ft = { "quarto", "norg" },
     opts = {
       backend = "kitty",
       processor = "magick_rock", -- "magick_cli" or "magick_rock"
@@ -15,7 +16,7 @@ return {
         markdown = {
           enabled = true,
           download_remote_images = true,
-          filetypes = { "markdown", "vimwiki", "quarto" },
+          filetypes = { "quarto" },
           clear_in_insert_mode = false,
           only_render_image_at_cursor = false,
           only_render_image_at_cursor_mode = "inline", -- "inline" or "popup"
@@ -31,7 +32,7 @@ return {
         html = {
           enabled = true,
           download_remote_images = true,
-          filetypes = { "html", "xhtml", "htm", "markdown", "quarto" },
+          filetypes = { "html", "xhtml", "htm", "quarto" },
           clear_in_insert_mode = false,
           only_render_image_at_cursor = false,
           only_render_image_at_cursor_mode = "inline", -- "inline" or "popup"
@@ -43,7 +44,7 @@ return {
     -- Diagram rendering in Neovim
     "3rd/diagram.nvim",
     dependencies = { "3rd/image.nvim" },
-    ft = { "markdown", "quarto", "norg" },
+    ft = { "quarto", "norg" },
     config = function()
       -- Extend markdown integration with Quarto filetype
       local markdown_integration = require("diagram.integrations.markdown")
@@ -78,7 +79,7 @@ return {
           require("diagram").show_diagram_hover()
         end,
         mode = "n",
-        ft = { "markdown", "quarto", "norg" },
+        ft = { "quarto", "norg" },
         desc = "Show diagram in new tab",
       },
     },
@@ -91,25 +92,25 @@ return {
     opts = {
       -- https://github.com/hakonharnes/img-clip.nvim?tab=readme-ov-file#setup
       default = {
-          -- file and directory options
-          use_absolute_path = false, ---@type boolean | fun(): boolean
-          relative_to_current_file = false, ---@type boolean | fun(): boolean
+        -- file and directory options
+        use_absolute_path = false, ---@type boolean | fun(): boolean
+        relative_to_current_file = false, ---@type boolean | fun(): boolean
 
-          -- logging options
-          verbose = false, ---@type boolean | fun(): boolean
+        -- logging options
+        verbose = false, ---@type boolean | fun(): boolean
 
-          -- image options
-          -- TODO: Image optimization/minification
-          -- process_cmd = "", ---@type string | fun(): string
-          -- copy_images = false, ---@type boolean | fun(): boolean
-          -- download_images = true, ---@type boolean | fun(): boolean
-          -- formats = { "jpeg", "jpg", "png" }, ---@type string[]
+        -- image options
+        -- TODO: Image optimization/minification
+        -- process_cmd = "", ---@type string | fun(): string
+        -- copy_images = false, ---@type boolean | fun(): boolean
+        -- download_images = true, ---@type boolean | fun(): boolean
+        -- formats = { "jpeg", "jpg", "png" }, ---@type string[]
 
-          -- drag and drop options
-          drag_and_drop = {
-            enabled = true, ---@type boolean | fun(): boolean
-            insert_mode = false, ---@type boolean | fun(): boolean
-          },
+        -- drag and drop options
+        drag_and_drop = {
+          enabled = true, ---@type boolean | fun(): boolean
+          insert_mode = false, ---@type boolean | fun(): boolean
+        },
       },
 
       -- filetype specific options

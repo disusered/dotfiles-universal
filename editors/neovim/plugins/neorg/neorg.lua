@@ -2,11 +2,12 @@ return {
   {
     "nvim-neorg/neorg",
     dependencies = {
-      "benlubas/neorg-interim-ls",
-      "nvim-neorg/tree-sitter-norg",
-      "nvim-neorg/tree-sitter-norg-meta",
+      { "benlubas/neorg-interim-ls", lazy = true },
+      { "nvim-neorg/tree-sitter-norg", lazy = true },
+      { "nvim-neorg/tree-sitter-norg-meta", lazy = true },
     },
-    lazy = false,
+    ft = "norg",
+    cmd = "Neorg",
     version = false,
     init = function()
       local Snacks = require("snacks")

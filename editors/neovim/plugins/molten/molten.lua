@@ -1,7 +1,22 @@
 return {
   {
     "benlubas/molten-nvim",
-    lazy = false,
+    ft = "quarto",
+    cmd = {
+      "MoltenDelete",
+      "MoltenEnterOutput",
+      "MoltenEvaluateLine",
+      "MoltenEvaluateOperator",
+      "MoltenEvaluateVisual",
+      "MoltenHideOutput",
+      "MoltenImagePopup",
+      "MoltenInit",
+      "MoltenInterrupt",
+      "MoltenNext",
+      "MoltenPrev",
+      "MoltenReevaluateAll",
+      "MoltenReevaluateCell",
+    },
     version = "^1.0.0",
     build = ":UpdateRemotePlugins",
     init = function()

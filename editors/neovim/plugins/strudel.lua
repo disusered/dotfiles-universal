@@ -1,7 +1,16 @@
 return {
   {
     "gruvw/strudel.nvim",
-    lazy = false,
+    ft = "javascript",
+    cmd = {
+      "StrudelExecute",
+      "StrudelLaunch",
+      "StrudelQuit",
+      "StrudelSetBuffer",
+      "StrudelStop",
+      "StrudelToggle",
+      "StrudelUpdate",
+    },
     build = "npm install",
     config = function()
       require("strudel").setup({

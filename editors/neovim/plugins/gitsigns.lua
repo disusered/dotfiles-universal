@@ -11,24 +11,27 @@ return {
     },
   },
 
-  keys = function()
-    local gitsigns = require("gitsigns")
-    return {
-      {
-        "<leader>gw",
-        gitsigns.stage_buffer,
-        desc = "Stage Buffer",
-      },
-      {
-        "<leader>gr",
-        gitsigns.reset_buffer,
-        desc = "Reset Buffer",
-      },
-      {
-        "<leader>gI",
-        gitsigns.preview_hunk_inline,
-        desc = "Preview Hunk Inline",
-      },
-    }
-  end,
+  keys = {
+    {
+      "<leader>gw",
+      function()
+        require("gitsigns").stage_buffer()
+      end,
+      desc = "Stage Buffer",
+    },
+    {
+      "<leader>gr",
+      function()
+        require("gitsigns").reset_buffer()
+      end,
+      desc = "Reset Buffer",
+    },
+    {
+      "<leader>gI",
+      function()
+        require("gitsigns").preview_hunk_inline()
+      end,
+      desc = "Preview Hunk Inline",
+    },
+  },
 }

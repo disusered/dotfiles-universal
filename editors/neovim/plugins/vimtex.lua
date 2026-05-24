@@ -1,6 +1,7 @@
 return {
   "lervag/vimtex",
-  lazy = false, -- we don't want to lazy load VimTeX
+  lazy = true,
+  ft = { "tex", "plaintex", "bib" },
   init = function()
     -- vim.g.tex_flavor = "latex"
     -- TODO: Use different viewer for Windows, WSL, Linux, MacOS

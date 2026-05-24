@@ -1,7 +1,7 @@
 return {
   {
     "quarto-dev/quarto-nvim",
-    ft = { "quarto", "markdown" },
+    ft = { "quarto", "rmd" },
     dependencies = {
       "jmbuhr/otter.nvim",
       "nvim-treesitter/nvim-treesitter",
@@ -114,7 +114,7 @@ return {
   {
     "GCBallesteros/jupytext.nvim",
     config = true,
-    lazy = false,
+    event = "VeryLazy",
     opts = {
       custom_language_formatting = {
         python = {

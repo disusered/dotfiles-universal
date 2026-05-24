@@ -1,6 +1,21 @@
 return {
   {
     "brenoprata10/nvim-highlight-colors",
+    ft = {
+      "astro",
+      "css",
+      "html",
+      "javascript",
+      "javascriptreact",
+      "less",
+      "lua",
+      "sass",
+      "scss",
+      "svelte",
+      "typescript",
+      "typescriptreact",
+      "vue",
+    },
     init = function()
       local Snacks = require("snacks")
 
@@ -8,7 +23,8 @@ return {
         .new({
           name = "Toggle CSV View",
           get = function()
-            return require("nvim-highlight-colors").is_active()
+            local highlight = package.loaded["nvim-highlight-colors"]
+            return highlight and highlight.is_active() or false
           end,
           set = function(enabled)
             local highlight = require("nvim-highlight-colors")

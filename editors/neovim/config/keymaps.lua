@@ -30,7 +30,8 @@ require("snacks").toggle
   .new({
     name = "Zen Mode",
     get = function()
-      return require("no-neck-pain.state").enabled
+      local state = package.loaded["no-neck-pain.state"]
+      return state and state.enabled or false
     end,
     set = function()
       vim.cmd("NoNeckPain")
