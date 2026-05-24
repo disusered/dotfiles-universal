@@ -74,6 +74,7 @@ return {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
       opts.servers = opts.servers or {}
+      opts.servers.gdscript = opts.servers.gdscript or {}
       opts.servers.marksman = { enabled = false }
     end,
   },

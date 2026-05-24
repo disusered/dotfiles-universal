@@ -2,5 +2,6 @@
 _G.utils = require("config.utils")
 
 require("config.shims")
+require("config.godot")
 require("config.lazy")
 require("config.open")
