@@ -17,10 +17,11 @@ linux[whoami.distro^="Arch"]:
       - /tools/ripgrep
       - /tools/tabulate
       - /tools/searxng
+      - /ai/openviking
   links:
     config.yaml: ~/.hermes/config.yaml
     env.tpl: ~/.hermes/env.tpl
-    hermes.zsh: ~/.config/zsh/5001_hermes.zsh
+    scripts/hermes-init: ~/.local/bin/hermes-init
     catppuccin.yaml: ~/.hermes/skins/catppuccin.yaml
     dashboard-catppuccin.yaml: ~/.hermes/dashboard-themes/catppuccin.yaml
     hermes-dashboard.service: ~/.config/systemd/user/hermes-dashboard.service
