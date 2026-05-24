@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+openviking_home="${OPENVIKING_HOME:-$HOME/.openviking}"
+env_template="$openviking_home/env.tpl"
+config_template="$openviking_home/ov.conf.tpl"
+env_file="$openviking_home/.env"
+config_file="$openviking_home/ov.conf"
+
+mkdir -p "$openviking_home" "$HOME/.local/share/openviking"
+
+op inject -i "$env_template" -o "$env_file"
+chmod 600 "$env_file"
+
+set -a
+# shellcheck source=/dev/null
+source "$env_file"
+set +a
+
+envsubst < "$config_template" > "$config_file"
+chmod 600 "$config_file"
+
+jq empty "$config_file"
+echo "Rendered $config_file"

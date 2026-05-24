@@ -1,0 +1,22 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      uv tool install --upgrade openviking
+      podman pull ghcr.io/volcengine/openviking:latest
+      mkdir -p ~/.openviking ~/.local/share/openviking ~/.config/containers/systemd
+      systemctl --user daemon-reload
+      if [ -f ~/.openviking/ov.conf ]; then
+        systemctl --user enable --now openviking.service
+      else
+        echo "OpenViking linked. Run openviking-init, then enable openviking.service."
+      fi
+    depends:
+      - /packages/podman
+      - /languages/python/uv
+  links:
+    env.tpl: ~/.openviking/env.tpl
+    ov.conf.tpl: ~/.openviking/ov.conf.tpl
+    ovcli.conf: ~/.openviking/ovcli.conf
+    openviking.zsh: ~/.config/zsh/5002_openviking.zsh
+    quadlet/openviking.container: ~/.config/containers/systemd/openviking.container
+    scripts/openviking-render-config: ~/.local/bin/openviking-render-config
