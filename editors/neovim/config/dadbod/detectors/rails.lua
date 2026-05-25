@@ -5,7 +5,6 @@ local M = {}
 
 ---
 -- Tries to set up connections from a Ruby on Rails `database.yml` file.
--- Requires `tpope/vim-rails` for its YAML parsing function.
 -- @return (table|nil) A list of connections if found, otherwise nil.
 function M.find()
   local db_config_path = vim.fn.findfile("config/database.yml", ".;")
@@ -13,10 +12,9 @@ function M.find()
     return nil -- Not a Rails project
   end
 
-  -- This relies on vim-rails being installed for `rails#yaml_parse_file`
-  local ok, configs = pcall(vim.fn["rails#yaml_parse_file"], "config/database.yml")
-  if not ok or type(configs) ~= "table" then
-    vim.notify("vim-dadbod-ui: Could not parse database.yml. Is vim-rails installed?", vim.log.levels.WARN)
+  local configs = utils.parse_yaml_file(db_config_path)
+  if type(configs) ~= "table" then
+    vim.notify("vim-dadbod-ui: Could not parse database.yml.", vim.log.levels.WARN)
     return nil
   end
 

@@ -62,8 +62,8 @@ end
 local function merge_services(files)
   local merged = {}
   for _, file in ipairs(files) do
-    local ok, data = pcall(vim.fn["rails#yaml_parse_file"], file)
-    if ok and type(data) == "table" then
+    local data = utils.parse_yaml_file(file)
+    if type(data) == "table" then
       local services = data.services or data
       if type(services) == "table" then
         for name, config in pairs(services) do
@@ -185,7 +185,15 @@ function M.find()
     local file_noun = file_count == 1 and "file" or "files"
     local conn_noun = #connections == 1 and "connection" or "connections"
     vim.notify(
-      "  Found " .. #connections .. " " .. conn_noun .. " in " .. file_count .. " docker-compose " .. file_noun .. ".",
+      "  Found "
+        .. #connections
+        .. " "
+        .. conn_noun
+        .. " in "
+        .. file_count
+        .. " docker-compose "
+        .. file_noun
+        .. ".",
       vim.log.levels.INFO,
       { title = "Database UI" }
     )
