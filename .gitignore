@@ -50,3 +50,4 @@ ai/claude/.cache/
 /ai/opencode/skills/
 /ai/opencode/commands/git-commit.md
 /ai/claude/commands/git-commit.md
+/ai/xbol-observability/tests/__pycache__

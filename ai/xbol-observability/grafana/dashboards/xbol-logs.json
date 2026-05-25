@@ -106,7 +106,7 @@
             "uid": "xbol-loki"
           },
           "editorMode": "code",
-          "expr": "{job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\", dest_namespace=~\"${app_namespace:raw}\", workload=~\"${workload:raw}\", resource_type=~\"${resource_type:raw}\", severity=~\"ERROR|CRITICAL|ALERT|EMERGENCY\"} |~ \"${search:raw}\"",
+          "expr": "{job=\"xbol/gcp-cloudlogging\", resource_type=~\"${resource_type:raw}\", namespace_name=~\"${namespace_name:raw}\", database_id=~\"${database_id:raw}\", severity=~\"ERROR|CRITICAL|ALERT|EMERGENCY\"} |~ \"${search:raw}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -198,7 +198,7 @@
             "uid": "xbol-loki"
           },
           "editorMode": "code",
-          "expr": "sum by (severity) (count_over_time({job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\", dest_namespace=~\"${app_namespace:raw}\", workload=~\"${workload:raw}\", resource_type=~\"${resource_type:raw}\", severity=~\"${severity:regex}\"} |~ \"${search:raw}\"[5m]))",
+          "expr": "sum by (severity) (count_over_time({job=\"xbol/gcp-cloudlogging\", resource_type=~\"${resource_type:raw}\", namespace_name=~\"${namespace_name:raw}\", database_id=~\"${database_id:raw}\", severity=~\"${severity:regex}\"} |~ \"${search:raw}\"[5m]))",
           "queryType": "range",
           "refId": "A"
         }
@@ -290,7 +290,7 @@
             "uid": "xbol-loki"
           },
           "editorMode": "code",
-          "expr": "sum by (workload) (count_over_time({job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\", dest_namespace=~\"${app_namespace:raw}\", workload=~\"${workload:raw}\", resource_type=~\"${resource_type:raw}\", severity=~\"${severity:regex}\"} |~ \"${search:raw}\"[5m]))",
+          "expr": "sum by (namespace_name) (count_over_time({job=\"xbol/gcp-cloudlogging\", resource_type=~\"${resource_type:raw}\", namespace_name=~\"${namespace_name:raw}\", database_id=~\"${database_id:raw}\", severity=~\"${severity:regex}\"} |~ \"${search:raw}\"[5m]))",
           "queryType": "range",
           "refId": "A"
         },
@@ -300,12 +300,12 @@
             "uid": "xbol-loki"
           },
           "editorMode": "code",
-          "expr": "sum by (resource_type) (count_over_time({job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\", dest_namespace=~\"${app_namespace:raw}\", workload=~\"${workload:raw}\", resource_type=~\"${resource_type:raw}\", severity=~\"${severity:regex}\"} |~ \"${search:raw}\"[5m]))",
+          "expr": "sum by (resource_type) (count_over_time({job=\"xbol/gcp-cloudlogging\", resource_type=~\"${resource_type:raw}\", namespace_name=~\"${namespace_name:raw}\", database_id=~\"${database_id:raw}\", severity=~\"${severity:regex}\"} |~ \"${search:raw}\"[5m]))",
           "queryType": "range",
           "refId": "B"
         }
       ],
-      "title": "Log volume by workload / GCP resource",
+      "title": "Log volume by namespace / GCP resource",
       "type": "timeseries"
     },
     {
@@ -341,12 +341,12 @@
             "uid": "xbol-loki"
           },
           "editorMode": "code",
-          "expr": "{job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\", dest_namespace=~\"${app_namespace:raw}\", workload=~\"${workload:raw}\", resource_type=~\"${resource_type:raw}\"} |~ \"${search:raw}\"",
+          "expr": "{job=\"xbol/gcp-cloudlogging\", resource_type=~\"${resource_type:raw}\", namespace_name=~\"${namespace_name:raw}\", database_id=~\"${database_id:raw}\"} |~ \"${search:raw}\"",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Selected namespace / workload events",
+      "title": "Selected raw GCP events",
       "type": "logs"
     },
     {
@@ -382,12 +382,12 @@
             "uid": "xbol-loki"
           },
           "editorMode": "code",
-          "expr": "{job=\"xbol/gcp-cloudlogging\", log_scope=~\"gateway|cloudsql|waf-gateway\", dest_namespace=~\"${app_namespace:raw}\", workload=~\"${workload:raw}\", resource_type=~\"${resource_type:raw}\"} |~ \"${search:raw}\"",
+          "expr": "{job=\"xbol/gcp-cloudlogging\", resource_type=~\"cloudsql_database|k8s_container|http_load_balancer\", namespace_name=~\"${namespace_name:raw}\", database_id=~\"${database_id:raw}\"} |~ \"${search:raw}\"",
           "queryType": "range",
           "refId": "A"
         }
       ],
-      "title": "Gateway / Cloud SQL / WAF events",
+      "title": "GKE / Cloud SQL / load balancer events",
       "type": "logs"
     },
     {
@@ -423,7 +423,7 @@
             "uid": "xbol-loki"
           },
           "editorMode": "code",
-          "expr": "{job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\", dest_namespace=~\"${app_namespace:raw}\", workload=~\"${workload:raw}\", resource_type=~\"${resource_type:raw}\", severity=~\"${severity:regex}\"} |~ \"${search:raw}\"",
+          "expr": "{job=\"xbol/gcp-cloudlogging\", resource_type=~\"${resource_type:raw}\", namespace_name=~\"${namespace_name:raw}\", database_id=~\"${database_id:raw}\", severity=~\"${severity:regex}\"} |~ \"${search:raw}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -442,237 +442,29 @@
   "templating": {
     "list": [
       {
+        "allValue": ".*",
         "current": {
           "selected": true,
           "text": "All",
-          "value": ".*"
+          "value": "$__all"
         },
-        "hide": 0,
-        "includeAll": false,
-        "label": "Loki tag: scope",
-        "multi": false,
-        "name": "log_scope",
-        "options": [
-          {
-            "selected": true,
-            "text": "All",
-            "value": ".*"
-          },
-          {
-            "selected": false,
-            "text": "XBOL / ArgoCD",
-            "value": "argocd"
-          },
-          {
-            "selected": false,
-            "text": "Gateway",
-            "value": "gateway"
-          },
-          {
-            "selected": false,
-            "text": "Cloud SQL",
-            "value": "cloudsql"
-          },
-          {
-            "selected": false,
-            "text": "WAF / LB",
-            "value": "waf-gateway"
-          },
-          {
-            "selected": false,
-            "text": "GKE infra",
-            "value": "gke"
-          }
-        ],
-        "query": "All : .*, XBOL / ArgoCD : argocd, Gateway : gateway, Cloud SQL : cloudsql, WAF / LB : waf-gateway, GKE infra : gke",
-        "skipUrlSync": false,
-        "type": "custom"
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": "All",
-          "value": ".*"
+        "datasource": {
+          "type": "loki",
+          "uid": "xbol-loki"
         },
+        "definition": "label_values({job=\"xbol/gcp-cloudlogging\"}, resource_type)",
         "hide": 0,
-        "includeAll": false,
-        "label": "App/platform namespace",
-        "multi": false,
-        "name": "app_namespace",
-        "options": [
-          {
-            "selected": true,
-            "text": "All",
-            "value": ".*"
-          },
-          {
-            "selected": false,
-            "text": "dev-boletera",
-            "value": "dev-boletera"
-          },
-          {
-            "selected": false,
-            "text": "qa-boletera",
-            "value": "qa-boletera"
-          },
-          {
-            "selected": false,
-            "text": "argocd",
-            "value": "argocd"
-          },
-          {
-            "selected": false,
-            "text": "gateway-apisix",
-            "value": "gateway-apisix"
-          },
-          {
-            "selected": false,
-            "text": "cert-manager",
-            "value": "cert-manager"
-          },
-          {
-            "selected": false,
-            "text": "kube-system",
-            "value": "kube-system"
-          },
-          {
-            "selected": false,
-            "text": "gmp-system",
-            "value": "gmp-system"
-          },
-          {
-            "selected": false,
-            "text": "unknown / external",
-            "value": "unknown"
-          }
-        ],
-        "query": "All : .*, dev-boletera : dev-boletera, qa-boletera : qa-boletera, argocd : argocd, gateway-apisix : gateway-apisix, cert-manager : cert-manager, kube-system : kube-system, gmp-system : gmp-system, unknown / external : unknown",
-        "skipUrlSync": false,
-        "type": "custom"
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": "All",
-          "value": ".*"
-        },
-        "hide": 0,
-        "includeAll": false,
-        "label": "Workload (known list)",
-        "multi": false,
-        "name": "workload",
-        "options": [
-          {
-            "selected": true,
-            "text": "All",
-            "value": ".*"
-          },
-          {
-            "selected": false,
-            "text": "dev-xbol-api-admin-worker",
-            "value": "dev-xbol-api-admin-worker"
-          },
-          {
-            "selected": false,
-            "text": "dev-xbol-web-admin",
-            "value": "dev-xbol-web-admin"
-          },
-          {
-            "selected": false,
-            "text": "dev-xbol-api-gateway",
-            "value": "dev-xbol-api-gateway"
-          },
-          {
-            "selected": false,
-            "text": "qa-boletera-gateway-apisix-waf",
-            "value": "qa-boletera-gateway-apisix-waf"
-          },
-          {
-            "selected": false,
-            "text": "Cloud SQL: boletera",
-            "value": "boletera"
-          },
-          {
-            "selected": false,
-            "text": "Gateway: apisix",
-            "value": "apisix"
-          },
-          {
-            "selected": false,
-            "text": "HTTP load balancer",
-            "value": "http-load-balancer"
-          },
-          {
-            "selected": false,
-            "text": "argocd-application-controller",
-            "value": "argocd-application-controller"
-          },
-          {
-            "selected": false,
-            "text": "argocd-repo-server",
-            "value": "argocd-repo-server"
-          },
-          {
-            "selected": false,
-            "text": "argocd-notifications-controller",
-            "value": "argocd-notifications-controller"
-          },
-          {
-            "selected": false,
-            "text": "cert-manager",
-            "value": "cert-manager"
-          },
-          {
-            "selected": false,
-            "text": "konnectivity-agent",
-            "value": "konnectivity-agent"
-          },
-          {
-            "selected": false,
-            "text": "unknown",
-            "value": "unknown"
-          }
-        ],
-        "query": "All : .*, dev-xbol-api-admin-worker : dev-xbol-api-admin-worker, dev-xbol-web-admin : dev-xbol-web-admin, dev-xbol-api-gateway : dev-xbol-api-gateway, qa-boletera-gateway-apisix-waf : qa-boletera-gateway-apisix-waf, Cloud SQL: boletera : boletera, Gateway: apisix : apisix, HTTP load balancer : http-load-balancer, argocd-application-controller : argocd-application-controller, argocd-repo-server : argocd-repo-server, argocd-notifications-controller : argocd-notifications-controller, cert-manager : cert-manager, konnectivity-agent : konnectivity-agent, unknown : unknown",
-        "skipUrlSync": false,
-        "type": "custom"
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": "All",
-          "value": ".*"
-        },
-        "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "GCP resource",
         "multi": false,
         "name": "resource_type",
-        "options": [
-          {
-            "selected": true,
-            "text": "All",
-            "value": ".*"
-          },
-          {
-            "selected": false,
-            "text": "k8s_container",
-            "value": "k8s_container"
-          },
-          {
-            "selected": false,
-            "text": "cloudsql_database",
-            "value": "cloudsql_database"
-          },
-          {
-            "selected": false,
-            "text": "http_load_balancer",
-            "value": "http_load_balancer"
-          }
-        ],
-        "query": "All : .*, k8s_container : k8s_container, cloudsql_database : cloudsql_database, http_load_balancer : http_load_balancer",
+        "options": [],
+        "query": "label_values({job=\"xbol/gcp-cloudlogging\"}, resource_type)",
+        "refresh": 1,
+        "regex": "",
         "skipUrlSync": false,
-        "type": "custom"
+        "sort": 1,
+        "type": "query"
       },
       {
         "allValue": ".*",
@@ -685,14 +477,64 @@
           "type": "loki",
           "uid": "xbol-loki"
         },
-        "definition": "label_values({job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\"}, severity)",
+        "definition": "label_values({job=\"xbol/gcp-cloudlogging\", resource_type=~\"${resource_type:raw}\"}, namespace_name)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Kubernetes namespace",
+        "multi": false,
+        "name": "namespace_name",
+        "options": [],
+        "query": "label_values({job=\"xbol/gcp-cloudlogging\", resource_type=~\"${resource_type:raw}\"}, namespace_name)",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "loki",
+          "uid": "xbol-loki"
+        },
+        "definition": "label_values({job=\"xbol/gcp-cloudlogging\", resource_type=~\"${resource_type:raw}\"}, database_id)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Cloud SQL database",
+        "multi": false,
+        "name": "database_id",
+        "options": [],
+        "query": "label_values({job=\"xbol/gcp-cloudlogging\", resource_type=~\"${resource_type:raw}\"}, database_id)",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "loki",
+          "uid": "xbol-loki"
+        },
+        "definition": "label_values({job=\"xbol/gcp-cloudlogging\", resource_type=~\"${resource_type:raw}\"}, severity)",
         "hide": 0,
         "includeAll": true,
         "label": "Severity",
         "multi": false,
         "name": "severity",
         "options": [],
-        "query": "label_values({job=\"xbol/gcp-cloudlogging\", log_scope=~\"${log_scope:raw}\"}, severity)",
+        "query": "label_values({job=\"xbol/gcp-cloudlogging\", resource_type=~\"${resource_type:raw}\"}, severity)",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,

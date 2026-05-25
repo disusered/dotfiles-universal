@@ -24,6 +24,7 @@ linux[whoami.distro^="Arch"]:
       fi
       ~/.rotz/bin/rotz link /ai/xbol-observability -f
       systemctl --user daemon-reload
+      systemctl --user enable --now xbol-gcp-log-fetch.timer
       systemctl --user restart xbol-victoriametrics.service xbol-loki.service xbol-alloy.service xbol-grafana.service
     depends:
       - /packages/podman

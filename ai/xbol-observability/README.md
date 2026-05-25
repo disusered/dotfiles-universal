@@ -13,7 +13,7 @@ GCP Cloud Monitoring metrics
 
 GCP Cloud Logging entries
   -> host-side xbol-gcp-log-fetch using Carlos' existing gcloud auth
-  -> local NDJSON spool under ~/.local/share/xbol-observability/log-spool
+  -> raw Cloud Logging NDJSON spool under ~/.local/share/xbol-observability/log-spool
   -> Grafana Alloy loki.source.file
   -> local Loki single-node
   -> Grafana Loki datasource and log panels
@@ -54,8 +54,8 @@ User systemd units:
   - one-shot host-side fetch of narrowly scoped GCP logs
   - runs `~/.local/bin/xbol-gcp-log-fetch --once`
 - `xbol-gcp-log-fetch.timer`
-  - optional periodic fetch every ~2 minutes
-  - not enabled automatically by this module; enable only after confirming the filters are acceptable
+  - periodic fetch every ~2 minutes
+  - enabled and started by this module's Rotz install path
 
 The Quadlet containers mount committed config directories directly from this repo rather than the Rotz-linked `~/.config/xbol-observability` paths. Container-visible absolute symlinks from Rotz links otherwise break Grafana provisioning.
 
@@ -70,7 +70,7 @@ The metrics path still mounts Carlos' ADC JSON into Alloy only:
 
 Grafana, VictoriaMetrics, Loki, Hermes, and the XBOL sandbox do not receive GCP credentials.
 
-The logs path does not add any new Google credential mount. `xbol-gcp-log-fetch` runs on the host as Carlos and uses existing `gcloud` auth, then writes local NDJSON spool files for Alloy to tail.
+The logs path does not add any new Google credential mount. `xbol-gcp-log-fetch` runs on the host as Carlos and uses existing `gcloud` auth, then writes raw local NDJSON spool files for Alloy to tail.
 
 Longer term, replace Carlos' ADC with a dedicated read-only identity that has only the minimum monitoring/log-reading permissions. That requires admin support and is not assumed here.
 
@@ -138,7 +138,7 @@ Fetch once and write local spool files:
 xbol-gcp-log-fetch --once --limit 50
 ```
 
-Enable periodic fetching only after confirming the filters are acceptable:
+Enable or restart periodic fetching:
 
 ```bash
 systemctl --user enable --now xbol-gcp-log-fetch.timer
@@ -163,6 +163,7 @@ Useful overrides:
 - `XBOL_GCP_LOG_LIMIT`
 - `XBOL_GCP_LOG_LOOKBACK_MINUTES`
 - `XBOL_GCP_LOG_OVERLAP_MINUTES`
+- `XBOL_GCP_LOG_MAX_STATE_AGE_MINUTES`
 - `XBOL_LOG_FETCH_STATE_DIR`
 - `XBOL_LOG_SPOOL_DIR`
 
@@ -186,8 +187,8 @@ The MCP server talks to Grafana. Grafana talks to VictoriaMetrics and Loki. Neit
 
 The starter Grafana metrics dashboard uses the expected Stackdriver-exporter metric name pattern. If a panel is empty, run `xbol-observability-smoke` and update the panel query to match the actual exported metric/label names.
 
-The starter Grafana logs dashboard uses the Loki datasource UID `xbol-loki` and LogQL selector `{job="xbol/gcp-cloudlogging"}`. It will be empty until `xbol-gcp-log-fetch` writes spool files and Alloy ships them to Loki.
+The starter Grafana logs dashboard uses the Loki datasource UID `xbol-loki` and LogQL selector `{job="xbol/gcp-cloudlogging"}`. It will be empty until `xbol-gcp-log-fetch` writes raw spool files and Alloy ships them to Loki.
 
-Logs are sensitive. They may contain customer data, credentials, request payloads, or operational context. Keep the fetcher filters narrow, exclude audit logs by default, and do not expose GCP credentials to the XBOL sandbox or public-facing bot process.
+Logs are sensitive. They may contain customer data, credentials, request payloads, or operational context. Keep the fetcher filters narrow, exclude audit logs by default, and do not expose GCP credentials to the XBOL sandbox or public-facing bot process. The current spool intentionally preserves raw Cloud Logging payloads; any redaction, tagging, workload grouping, or other ETL belongs in a later pipeline.
 
-If logs are already exported to Cloud Storage buckets, prefer a host-side bucket download/normalization extension to `xbol-gcp-log-fetch`; still expose only local normalized spool files to Alloy.
+If logs are already exported to Cloud Storage buckets, prefer a host-side bucket download extension to `xbol-gcp-log-fetch`; still expose only local raw spool files to Alloy.

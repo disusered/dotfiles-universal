@@ -102,22 +102,19 @@ loki.process "xbol_gcp" {
 	stage.json {
 		drop_malformed = true
 		expressions    = {
-			ts             = "ts",
-			project_id     = "project_id",
-			resource_type  = "resource_type",
-			log_scope      = "log_scope",
-			cluster_name   = "cluster_name",
-			namespace_name = "namespace_name",
-			dest_namespace = "dest_namespace",
-			environment    = "environment",
-			workload       = "workload",
-			application    = "application",
-			container_name = "container_name",
-			service_name   = "service_name",
-			database_id    = "database_id",
+			ts             = "timestamp",
+			log_name       = "logName",
+			resource_type  = "resource.type",
+			cluster_name   = "resource.labels.cluster_name",
+			namespace_name = "resource.labels.namespace_name",
+			database_id    = "resource.labels.database_id",
 			severity       = "severity",
-			message        = "message",
 		}
+	}
+
+	stage.regex {
+		source     = "log_name"
+		expression = "projects/(?P<project_id>[^/]+)/logs/.+"
 	}
 
 	stage.timestamp {
@@ -126,25 +123,15 @@ loki.process "xbol_gcp" {
 		fallback_formats = ["RFC3339"]
 	}
 
-	// Promote only the dashboard selectors to Loki labels. The fetcher emits
-	// non-empty values for these fields, so Grafana dropdowns do not depend on
-	// brittle regex parsing or hidden JSON fields inside the log body.
 	stage.labels {
 		values = {
 			project_id     = "",
 			resource_type  = "",
-			log_scope      = "",
+			cluster_name   = "",
 			namespace_name = "",
-			dest_namespace = "",
-			environment    = "",
-			workload       = "",
 			database_id    = "",
 			severity       = "",
 		}
-	}
-
-	stage.output {
-		source = "message"
 	}
 
 	forward_to = [loki.write.xbol_loki.receiver]

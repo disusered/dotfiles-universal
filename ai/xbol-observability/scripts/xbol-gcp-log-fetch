@@ -15,7 +15,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import re
 import subprocess
 import sys
 from typing import Any
@@ -29,28 +28,7 @@ DEFAULT_BASE_FILTERS = {
 DEFAULT_EXCLUDE_FILTER = 'NOT logName:"cloudaudit.googleapis.com"'
 DEFAULT_STATE_DIR = Path.home() / ".local/share/xbol-observability/log-fetch"
 DEFAULT_SPOOL_DIR = Path.home() / ".local/share/xbol-observability/log-spool/cloudlogging"
-
-# Workloads we intentionally surface in Grafana. This is not an allow-list; it is
-# the human-facing picker for the XBOL paths we care about first.
-XBOL_INTERESTING_WORKLOADS = (
-    "dev-xbol-api-admin-worker",
-    "dev-xbol-web-admin",
-    "dev-xbol-api-gateway",
-    "qa-boletera-gateway-apisix-waf",
-    "boletera",
-    "apisix",
-    "http-load-balancer",
-    "argocd-application-controller",
-    "argocd-repo-server",
-    "argocd-notifications-controller",
-    "cert-manager",
-    "konnectivity-agent",
-    "unknown",
-)
-
-SECRET_PATTERNS = [
-    re.compile(r"(?i)(password|passwd|pwd|secret|token|api[_-]?key|authorization)([=:]\s*)([^\s,;\"']+)")
-]
+DEFAULT_MAX_STATE_AGE_MINUTES = 60
 
 
 def utc_now() -> dt.datetime:
@@ -91,194 +69,41 @@ def save_state(path: Path, state: dict[str, Any]) -> None:
     tmp.replace(path)
 
 
-def redact(value: Any) -> Any:
-    if isinstance(value, str):
-        redacted = value
-        for pattern in SECRET_PATTERNS:
-            redacted = pattern.sub(r"\1\2[REDACTED]", redacted)
-        return redacted
-    if isinstance(value, list):
-        return [redact(item) for item in value]
-    if isinstance(value, dict):
-        return {key: redact(item) for key, item in value.items()}
-    return value
+def entry_timestamp(entry: dict[str, Any]) -> str:
+    return str(entry.get("timestamp") or entry.get("receiveTimestamp") or iso(utc_now()))
 
 
-def first_payload_message(entry: dict[str, Any]) -> str:
-    if "textPayload" in entry:
-        return str(entry.get("textPayload") or "")
-    payload = entry.get("jsonPayload")
-    if isinstance(payload, dict):
-        for key in ("message", "msg", "error", "log", "event"):
-            if key in payload:
-                return str(payload.get(key) or "")
-        return json.dumps(payload, ensure_ascii=False, sort_keys=True)
-    payload = entry.get("protoPayload")
-    if isinstance(payload, dict):
-        for key in ("status", "methodName", "resourceName"):
-            if key in payload:
-                return str(payload.get(key) or "")
-        return json.dumps(payload, ensure_ascii=False, sort_keys=True)
-    return ""
+def spool_entry(entry: dict[str, Any]) -> dict[str, Any]:
+    return entry
 
 
-def extract_value(message: str, key: str) -> str:
-    """Extract key=value or key="value" fields from common Kubernetes/Argo log lines."""
-    match = re.search(rf"(?:^|\s){re.escape(key)}=(\"[^\"]*\"|\S+)", message)
-    if not match:
-        return ""
-    value = match.group(1)
-    if value.startswith('"') and value.endswith('"'):
-        value = value[1:-1]
-    return value
-
-
-def strip_k8s_suffix(name: str) -> str:
-    """Best-effort deployment/workload name from a pod name."""
-    if not name:
-        return ""
-    # deployment pod: qa-xbol-api-admin-7f7b9c8f9b-jx2qm
-    match = re.match(r"^(.+)-[a-f0-9]{8,10}-[a-z0-9]{5}$", name)
-    if match:
-        return match.group(1)
-    # statefulset pod: argocd-application-controller-0
-    match = re.match(r"^(.+)-\d+$", name)
-    if match:
-        return match.group(1)
-    return name
-
-
-def label_value(value: str | None, default: str = "unknown") -> str:
-    """Return a non-empty Loki label value."""
-    cleaned = str(value or "").strip()
-    return cleaned or default
-
-
-def derive_workload(
-    resource_type: str,
-    application: str,
-    pod_name: str,
-    service_name: str,
-    container_name: str,
-    database_id: str,
-) -> str:
-    if application:
-        return application
-    if resource_type == "cloudsql_database":
-        return database_id.rsplit(":", 1)[-1] or "cloudsql-postgres"
-    if resource_type == "http_load_balancer":
-        return "http-load-balancer"
-    return strip_k8s_suffix(pod_name) or service_name or container_name
-
-
-def derive_application(message: str, payload: Any) -> str:
-    application = extract_value(message, "application")
-    if application:
-        return application
-    if isinstance(payload, dict):
-        resource = str(payload.get("resource") or "")
-        match = re.search(r"(?:^|/)\w+-xbol-[\w-]+$", resource)
-        if match:
-            return resource.rsplit("/", 1)[-1]
-    match = re.search(r"Path:workloads/boletera/(dev|qa)/([^,}]+)", message)
-    if match:
-        return f"{match.group(1)}-{match.group(2)}"
-    return ""
-
-
-def derive_dest_namespace(message: str, application: str, namespace_name: str) -> str:
-    dest_namespace = extract_value(message, "dest-namespace")
-    if dest_namespace:
-        return dest_namespace
-    match = re.search(r"namespace:\s*([\w-]+)\)", message)
-    if match:
-        return match.group(1)
-    if application.startswith("dev-"):
-        return "dev-boletera"
-    if application.startswith("qa-"):
-        return "qa-boletera"
-    match = re.search(r'"(dev|qa)-boletera\.', message)
-    if match:
-        return f"{match.group(1)}-boletera"
-    return namespace_name
-
-
-def derive_environment(application: str, namespace_name: str, dest_namespace: str) -> str:
-    source = " ".join([application, namespace_name, dest_namespace])
-    if re.search(r"(?:^|[\s-])dev(?:[\s-]|$)", source):
-        return "dev"
-    if re.search(r"(?:^|[\s-])qa(?:[\s-]|$)", source):
-        return "qa"
-    return ""
-
-
-def derive_log_scope(resource_type: str, namespace_name: str, container_name: str, application: str, log_name: str) -> str:
-    resource_type = resource_type or "unknown"
-    namespace_name = namespace_name or ""
-    container_name = container_name or ""
-    if resource_type == "cloudsql_database":
-        return "cloudsql"
-    if resource_type in {"http_load_balancer", "gce_backend_service"}:
-        return "waf-gateway"
-    if namespace_name == "argocd" or application:
-        return "argocd"
-    if "gateway" in namespace_name or container_name == "apisix":
-        return "gateway"
-    if resource_type == "k8s_container":
-        return "gke"
-    if "cloudarmor" in log_name.lower():
-        return "waf"
-    return resource_type
-
-
-def normalize_entry(entry: dict[str, Any], project: str) -> dict[str, Any]:
-    resource = entry.get("resource") or {}
-    labels = resource.get("labels") or {}
-    payload = entry.get("jsonPayload", entry.get("protoPayload", entry.get("textPayload", {})))
-    message = first_payload_message(entry)
-    resource_type = label_value(resource.get("type"))
-    namespace_name = labels.get("namespace_name", "")
-    pod_name = labels.get("pod_name", "")
-    container_name = labels.get("container_name", "")
-    service_name = labels.get("service_name", "")
-    log_name = entry.get("logName", "")
-    application = derive_application(message, payload)
-    database_id = labels.get("database_id", "")
-    dest_namespace = derive_dest_namespace(message, application, namespace_name)
-    workload = derive_workload(resource_type, application, pod_name, service_name, container_name, database_id)
-    log_scope = derive_log_scope(resource_type, namespace_name, container_name, application, log_name)
-    environment = derive_environment(application, namespace_name, dest_namespace)
-    normalized = {
-        "ts": entry.get("timestamp") or entry.get("receiveTimestamp") or iso(utc_now()),
-        "project_id": label_value(project),
-        "resource_type": resource_type,
-        "log_scope": label_value(log_scope),
-        "cluster_name": labels.get("cluster_name", ""),
-        "namespace_name": label_value(namespace_name),
-        "dest_namespace": label_value(dest_namespace),
-        "environment": label_value(environment),
-        "pod_name": pod_name,
-        "workload": label_value(workload),
-        "application": application,
-        "container_name": container_name,
-        "service_name": service_name,
-        "database_id": label_value(database_id, "none"),
-        "severity": label_value(entry.get("severity", "DEFAULT"), "DEFAULT"),
-        "log_name": log_name,
-        "insert_id": entry.get("insertId", ""),
-        "message": message,
-        "payload": payload,
-    }
-    return redact(normalized)
+def fetch_start(
+    high_water: dt.datetime | None,
+    end: dt.datetime,
+    lookback_minutes: int,
+    overlap_minutes: int,
+    max_state_age_minutes: int,
+) -> dt.datetime:
+    lookback_start = end - dt.timedelta(minutes=lookback_minutes)
+    if high_water is None:
+        return lookback_start
+    if high_water > end:
+        return lookback_start
+    if max_state_age_minutes > 0 and end - high_water > dt.timedelta(minutes=max_state_age_minutes):
+        return lookback_start
+    return high_water - dt.timedelta(minutes=overlap_minutes)
 
 
 def entry_key(entry: dict[str, Any]) -> str:
+    payload = entry.get("textPayload", entry.get("jsonPayload", entry.get("protoPayload", "")))
+    if not isinstance(payload, str):
+        payload = json.dumps(payload, ensure_ascii=False, sort_keys=True)
     raw = "|".join(
         [
-            str(entry.get("ts", "")),
-            str(entry.get("log_name", "")),
-            str(entry.get("insert_id", "")),
-            str(entry.get("message", ""))[:256],
+            entry_timestamp(entry),
+            str(entry.get("logName", "")),
+            str(entry.get("insertId", "")),
+            payload[:256],
         ]
     )
     return hashlib.sha256(raw.encode("utf-8", "replace")).hexdigest()
@@ -331,7 +156,7 @@ def append_spool(spool_dir: Path, rows: list[dict[str, Any]]) -> int:
     written = 0
     by_day: dict[str, list[dict[str, Any]]] = {}
     for row in rows:
-        parsed = parse_ts(str(row.get("ts", ""))) or utc_now()
+        parsed = parse_ts(entry_timestamp(row)) or utc_now()
         by_day.setdefault(parsed.date().isoformat(), []).append(row)
     for day, day_rows in sorted(by_day.items()):
         path = spool_dir / f"{day}.ndjson"
@@ -352,7 +177,12 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=int(os.environ.get("XBOL_GCP_LOG_LIMIT", "500")))
     parser.add_argument("--lookback-minutes", type=int, default=int(os.environ.get("XBOL_GCP_LOG_LOOKBACK_MINUTES", "15")))
     parser.add_argument("--overlap-minutes", type=int, default=int(os.environ.get("XBOL_GCP_LOG_OVERLAP_MINUTES", "2")))
-    parser.add_argument("--dry-run", action="store_true", help="Print normalized logs instead of writing spool/state")
+    parser.add_argument(
+        "--max-state-age-minutes",
+        type=int,
+        default=int(os.environ.get("XBOL_GCP_LOG_MAX_STATE_AGE_MINUTES", str(DEFAULT_MAX_STATE_AGE_MINUTES))),
+    )
+    parser.add_argument("--dry-run", action="store_true", help="Print raw logs instead of writing spool/state")
     parser.add_argument("--once", action="store_true", help="Run one fetch cycle; accepted for systemd readability")
     args = parser.parse_args()
 
@@ -378,10 +208,13 @@ def main() -> int:
         for scope, base_filter in base_filters_from_args(args.base_filter).items():
             scope_state = scopes_state.setdefault(scope, {})
             high_water = parse_ts(scope_state.get("high_water")) or parse_ts(state.get("high_water"))
-            if high_water:
-                start = high_water - dt.timedelta(minutes=args.overlap_minutes)
-            else:
-                start = end - dt.timedelta(minutes=args.lookback_minutes)
+            start = fetch_start(
+                high_water=high_water,
+                end=end,
+                lookback_minutes=args.lookback_minutes,
+                overlap_minutes=args.overlap_minutes,
+                max_state_age_minutes=args.max_state_age_minutes,
+            )
 
             log_filter = build_filter(base_filter, args.exclude_filter, start, end)
             entries = run_gcloud(args.project, log_filter, args.limit)
@@ -392,7 +225,7 @@ def main() -> int:
                 parsed_ts = parse_ts(entry.get("timestamp") or entry.get("receiveTimestamp"))
                 if parsed_ts and (max_ts is None or parsed_ts > max_ts):
                     max_ts = parsed_ts
-                row = normalize_entry(entry, args.project)
+                row = spool_entry(entry)
                 key = entry_key(row)
                 if key in recent_keys:
                     continue

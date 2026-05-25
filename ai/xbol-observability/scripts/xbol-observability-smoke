@@ -62,6 +62,20 @@ else
 fi
 
 echo
+echo "XBOL log fetch timer:"
+systemctl --user is-active xbol-gcp-log-fetch.timer || true
+
+echo
+echo "Recent XBOL log stream sample:"
+curl -fsS --max-time 10 \
+  --get "${LOKI_URL}/loki/api/v1/query_range" \
+  --data-urlencode 'query={job="xbol/gcp-cloudlogging"}' \
+  --data-urlencode 'start='"$(date -u -d '15 minutes ago' +%s)" \
+  --data-urlencode 'end='"$(date -u +%s)" \
+  --data-urlencode 'limit=3' \
+  | jq '.data.result[:3]'
+
+echo
 echo "Useful URLs:"
 echo "  Grafana: ${GRAFANA_URL}/d/xbol-gke-cloudsql/xbol-gke-cloud-sql-metrics"
 echo "  Grafana logs: ${GRAFANA_URL}/d/xbol-gcp-logs/xbol-gcp-logs"
