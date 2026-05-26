@@ -1,0 +1,30 @@
+linux|darwin:
+  links:
+    config.toml: ~/.config/jj/config.toml
+    jj.zsh: ~/.config/zsh/0752_jj.zsh
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm --needed jujutsu
+    depends:
+      - /tools/delta
+linux[whoami.distro^="Fedora"]:
+  installs:
+    cmd: brew install jj
+    depends:
+      - /packages/homebrew
+      - /tools/delta
+darwin:
+  installs:
+    cmd: brew install jj delta git
+    depends:
+      - /packages/homebrew
+windows:
+  installs:
+    cmd: scoop install main/jj
+    depends:
+      - /packages/scoop
+      - /tools/delta
+  links:
+    config.toml: >-
+      {{ env.APPDATA }}/jj/config.toml
+    jj.ps1: ~/.config/powershell/profile.d/jj.ps1
