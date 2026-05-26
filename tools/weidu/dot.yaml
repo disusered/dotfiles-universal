@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S --noconfirm --needed weidu-bin
+    depends:
+      - /tools/yay
