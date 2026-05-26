@@ -32,6 +32,7 @@ linux[whoami.distro^="Arch"]:
     hermes-gateway.service: ~/.config/systemd/user/hermes-gateway.service
     hermes-gateway-xbol.service: ~/.config/systemd/user/hermes-gateway-xbol.service
     hermes-webui.service: ~/.config/systemd/user/hermes-webui.service
+    profiles/herding-cats/config.yaml: ~/.hermes/profiles/herding-cats/config.yaml
     profiles/xbol/config.yaml: ~/.hermes/profiles/xbol/config.yaml
     profiles/xbol/env.tpl: ~/.hermes/profiles/xbol/env.tpl
     profiles/xbol/SOUL.md: ~/.hermes/profiles/xbol/SOUL.md
