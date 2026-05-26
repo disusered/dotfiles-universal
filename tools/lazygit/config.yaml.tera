@@ -56,7 +56,7 @@ gui:
     "*": "#{{ lavender | hex }}"
 customCommands:
   - key: D
-    description: "Visual diff (kitten diff)"
-    command: "git difftool --no-symlinks -y -- {% raw %}{{.SelectedFile.Name}}{% endraw %}"
+    description: "Image diff (kitten diff)"
+    command: 'lazygit-image-diff {% raw %}{{if .SelectedFile.HasUnstagedChanges}}worktree{{else}}cached{{end}} -- {{.SelectedFile.Name | quote}}{% endraw %}'
     context: files
-    subprocess: true
+    output: terminal

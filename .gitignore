@@ -24,6 +24,7 @@ ai/claude/.cache/
 /tools/eza/catppuccin.yml
 /tools/git/gitconfig
 /tools/kitty/kitty.conf
+/tools/kitty/diff.conf
 /tools/lazygit/config.yaml
 /tools/mako/config
 /tools/papirus/set-folders.sh

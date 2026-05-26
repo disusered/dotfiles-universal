@@ -64,13 +64,11 @@
   diffFilter = delta --color-only
 [diff "image"]
   command = sh -c 'kitten diff "$2" "$5"' -
-[diff]
-  tool = kitty
 [difftool]
   prompt = false
   trustExitCode = true
-[difftool "kitty"]
-  cmd = kitten diff $LOCAL $REMOTE
+[difftool "kitty-image"]
+  cmd = kitten diff "$LOCAL" "$REMOTE"
 [delta]
   features = catppuccin-mocha shell links
 [delta "links"]

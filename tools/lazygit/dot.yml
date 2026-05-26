@@ -15,14 +15,19 @@ linux[whoami.distro^="Fedora"]:
     depends:
       - /packages/homebrew
       - /tools/delta
+      - /tools/git
   links:
     config.yaml: ~/.config/lazygit/config.yml
+    lazygit-image-diff: ~/.local/bin/lazygit-image-diff
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: sudo pacman -S --noconfirm --needed lazygit
     depends:
       - /tools/delta
+      - /tools/git
+      - /tools/kitty
       - /tools/hyprspace
   links:
     config.yaml: ~/.config/lazygit/config.yml
+    lazygit-image-diff: ~/.local/bin/lazygit-image-diff
     lazygit.conf: {{ dirs.base.config }}/hypr/conf.d/lazygit.conf

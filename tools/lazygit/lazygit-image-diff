@@ -1,0 +1,66 @@
+#!/usr/bin/env sh
+set -eu
+
+usage() {
+  echo "usage: lazygit-image-diff worktree|cached -- <path>" >&2
+}
+
+if [ "$#" -lt 2 ]; then
+  usage
+  exit 2
+fi
+
+mode=$1
+shift
+
+if [ "${1:-}" = "--" ]; then
+  shift
+fi
+
+if [ "$#" -ne 1 ]; then
+  usage
+  exit 2
+fi
+
+path=$1
+
+is_image_path() {
+  attr=$(git check-attr diff -- "$path" 2>/dev/null || true)
+  case "$attr" in
+    *": diff: image")
+      return 0
+      ;;
+  esac
+
+  lower_path=$(printf '%s' "$path" | tr '[:upper:]' '[:lower:]')
+  case "$lower_path" in
+    *.png|*.jpg|*.jpeg|*.gif|*.webp|*.ico|*.bmp|*.tiff|*.tif)
+      return 0
+      ;;
+  esac
+
+  return 1
+}
+
+if ! is_image_path; then
+  printf '%s is not configured as an image diff; keeping lazygit delta diff for text files.\n' "$path"
+  exit 0
+fi
+
+if ! command -v kitten >/dev/null 2>&1; then
+  echo "lazygit-image-diff: kitten is not available on PATH" >&2
+  exit 127
+fi
+
+case "$mode" in
+  cached|staged)
+    git difftool --cached --tool=kitty-image --no-symlinks -y -- "$path"
+    ;;
+  worktree|unstaged)
+    git difftool --tool=kitty-image --no-symlinks -y -- "$path"
+    ;;
+  *)
+    usage
+    exit 2
+    ;;
+esac

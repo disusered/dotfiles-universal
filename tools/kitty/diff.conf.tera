@@ -1,0 +1,48 @@
+# Catppuccin {{ flavor | capitalize }} colors for kitten diff
+color_scheme dark
+
+foreground #{{ text | hex }}
+background #{{ base | hex }}
+title_fg #{{ lavender | hex }}
+title_bg #{{ mantle | hex }}
+margin_bg #{{ mantle | hex }}
+margin_fg #{{ overlay0 | hex }}
+removed_bg #{{ red | blend(base=base, amount=10) | hex }}
+highlight_removed_bg #{{ red | blend(base=base, amount=25) | hex }}
+removed_margin_bg #{{ red | blend(base=base, amount=25) | hex }}
+added_bg #{{ green | blend(base=base, amount=10) | hex }}
+highlight_added_bg #{{ green | blend(base=base, amount=25) | hex }}
+added_margin_bg #{{ green | blend(base=base, amount=25) | hex }}
+moved_bg #{{ yellow | blend(base=base, amount=10) | hex }}
+moved_margin_bg #{{ yellow | blend(base=base, amount=25) | hex }}
+filler_bg #{{ mantle | hex }}
+margin_filler_bg #{{ mantle | hex }}
+hunk_margin_bg #{{ blue | blend(base=base, amount=25) | hex }}
+hunk_bg #{{ blue | blend(base=base, amount=10) | hex }}
+search_bg #{{ blue | blend(base=base, amount=35) | hex }}
+search_fg #{{ text | hex }}
+select_bg #{{ surface1 | hex }}
+select_fg #{{ text | hex }}
+
+dark_foreground #{{ text | hex }}
+dark_background #{{ base | hex }}
+dark_title_fg #{{ lavender | hex }}
+dark_title_bg #{{ mantle | hex }}
+dark_margin_bg #{{ mantle | hex }}
+dark_margin_fg #{{ overlay0 | hex }}
+dark_removed_bg #{{ red | blend(base=base, amount=10) | hex }}
+dark_highlight_removed_bg #{{ red | blend(base=base, amount=25) | hex }}
+dark_removed_margin_bg #{{ red | blend(base=base, amount=25) | hex }}
+dark_added_bg #{{ green | blend(base=base, amount=10) | hex }}
+dark_highlight_added_bg #{{ green | blend(base=base, amount=25) | hex }}
+dark_added_margin_bg #{{ green | blend(base=base, amount=25) | hex }}
+dark_moved_bg #{{ yellow | blend(base=base, amount=10) | hex }}
+dark_moved_margin_bg #{{ yellow | blend(base=base, amount=25) | hex }}
+dark_filler_bg #{{ mantle | hex }}
+dark_margin_filler_bg #{{ mantle | hex }}
+dark_hunk_margin_bg #{{ blue | blend(base=base, amount=25) | hex }}
+dark_hunk_bg #{{ blue | blend(base=base, amount=10) | hex }}
+dark_search_bg #{{ blue | blend(base=base, amount=35) | hex }}
+dark_search_fg #{{ text | hex }}
+dark_select_bg #{{ surface1 | hex }}
+dark_select_fg #{{ text | hex }}
