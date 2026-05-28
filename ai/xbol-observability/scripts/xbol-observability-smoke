@@ -5,6 +5,12 @@ VM_URL="${XBOL_VM_URL:-http://127.0.0.1:8428}"
 GRAFANA_URL="${XBOL_GRAFANA_URL:-http://127.0.0.1:43000}"
 ALLOY_URL="${XBOL_ALLOY_URL:-http://127.0.0.1:12345}"
 LOKI_URL="${XBOL_LOKI_URL:-http://127.0.0.1:3100}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+GRAFANA_BOOTSTRAP="${XBOL_GRAFANA_BOOTSTRAP:-xbol-grafana-bootstrap}"
+
+if [[ -x "${SCRIPT_DIR}/xbol-grafana-bootstrap" ]]; then
+  GRAFANA_BOOTSTRAP="${SCRIPT_DIR}/xbol-grafana-bootstrap"
+fi
 
 echo "XBOL observability smoke check"
 echo "VictoriaMetrics: ${VM_URL}"
@@ -26,6 +32,10 @@ check_url "VictoriaMetrics" "${VM_URL}/health"
 check_url "Grafana" "${GRAFANA_URL}/api/health"
 check_url "Alloy" "${ALLOY_URL}/-/ready"
 check_url "Loki" "${LOKI_URL}/ready"
+
+echo
+echo "Grafana auth:"
+"${GRAFANA_BOOTSTRAP}" --grafana-url "${GRAFANA_URL}" --wait-seconds 5 check
 
 echo
 echo "GKE metric names in VictoriaMetrics:"

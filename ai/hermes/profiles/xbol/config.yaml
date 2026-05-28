@@ -512,5 +512,7 @@ mcp_servers:
       - mcp-grafana
     env:
       GRAFANA_URL: http://127.0.0.1:43000
+      GRAFANA_SERVICE_ACCOUNT_TOKEN: ${GRAFANA_SERVICE_ACCOUNT_TOKEN}
+      GRAFANA_ORG_ID: '1'
     timeout: 120
     connect_timeout: 60

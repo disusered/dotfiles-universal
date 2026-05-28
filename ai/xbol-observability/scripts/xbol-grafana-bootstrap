@@ -1,0 +1,593 @@
+#!/usr/bin/env python3
+import argparse
+from dataclasses import dataclass
+import base64
+import json
+import secrets as secret_values
+import subprocess
+import sys
+import time
+from urllib import error, parse, request
+
+
+DEFAULT_GRAFANA_URL = "http://127.0.0.1:43000"
+PUBLIC_GRAFANA_URL = "http://xbol.disusered.com"
+OP_VAULT = "Personal"
+OP_ITEM_TITLE = "XBOL Grafana Local"
+ADMIN_LOGIN = "admin"
+CARLOS_LOGIN = "carlos"
+CARLOS_NAME = "Carlos"
+CARLOS_EMAIL = "carlos@localhost"
+AGENT_SERVICE_ACCOUNT_NAME = "xbol-agent"
+AGENT_SERVICE_ACCOUNT_TOKEN_NAME = "xbol-agent-mcp"
+
+
+class BootstrapError(Exception):
+    pass
+
+
+class CommandError(BootstrapError):
+    def __init__(self, args, returncode, stdout, stderr):
+        super().__init__(f"{args[0]} exited {returncode}")
+        self.args_list = list(args)
+        self.returncode = returncode
+        self.stdout = stdout
+        self.stderr = stderr
+
+
+class GrafanaApiError(BootstrapError):
+    def __init__(self, method, path, status, body):
+        super().__init__(f"Grafana {method} {path} returned HTTP {status}: {body[:240]}")
+        self.method = method
+        self.path = path
+        self.status = status
+        self.body = body
+
+
+@dataclass
+class GrafanaSecrets:
+    admin_password: str
+    carlos_password: str
+    agent_service_account_token: str
+
+
+class CommandRunner:
+    def run(self, args, *, input_text=None, check=True):
+        completed = subprocess.run(
+            args,
+            input=input_text,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+        if check and completed.returncode != 0:
+            raise CommandError(args, completed.returncode, completed.stdout, completed.stderr)
+        return completed.stdout
+
+
+class OnePasswordStore:
+    def __init__(self, runner, *, vault=OP_VAULT, title=OP_ITEM_TITLE):
+        self.runner = runner
+        self.vault = vault
+        self.title = title
+
+    def get_item(self):
+        try:
+            return json.loads(
+                self.runner.run(
+                    [
+                        "op",
+                        "item",
+                        "get",
+                        self.title,
+                        "--vault",
+                        self.vault,
+                        "--format",
+                        "json",
+                        "--reveal",
+                    ]
+                )
+            )
+        except CommandError as exc:
+            if is_op_not_found(exc):
+                return None
+            raise BootstrapError("Unable to read the XBOL Grafana 1Password item") from exc
+
+    def create_item(self, item):
+        self.runner.run(
+            [
+                "op",
+                "item",
+                "create",
+                "--vault",
+                self.vault,
+                "-",
+            ],
+            input_text=json.dumps(item, sort_keys=True),
+        )
+
+    def edit_item(self, item):
+        item_id = item.get("id") or self.title
+        self.runner.run(
+            [
+                "op",
+                "item",
+                "edit",
+                item_id,
+                "--vault",
+                self.vault,
+            ],
+            input_text=json.dumps(item, sort_keys=True),
+        )
+
+    def set_agent_service_account_token(self, token):
+        item = self.get_item()
+        if item is None:
+            raise BootstrapError("Cannot store Grafana token because the 1Password item is missing")
+        set_field(item, "agent_service_account_token", token, "CONCEALED")
+        self.edit_item(item)
+
+
+class GrafanaClient:
+    def __init__(self, base_url, admin_user=ADMIN_LOGIN, admin_password=""):
+        self.base_url = base_url.rstrip("/")
+        self.admin_user = admin_user
+        self.admin_password = admin_password
+
+    def health(self):
+        return self.request("GET", "/api/health")
+
+    def authenticate_basic(self, username, password):
+        status, _body = self.request(
+            "GET",
+            "/api/user",
+            basic=(username, password),
+            expected=(200, 401, 403),
+        )
+        return status == 200
+
+    def authenticate_service_account(self, token):
+        if not token:
+            return False
+        status, _body = self.request(
+            "GET",
+            "/api/user",
+            bearer=token,
+            expected=(200, 401, 403),
+        )
+        return status == 200
+
+    def anonymous_is_blocked(self):
+        status, _body = self.request("GET", "/api/user", expected=(200, 401, 403))
+        return status == 401
+
+    def lookup_user(self, login_or_email):
+        query = parse.urlencode({"loginOrEmail": login_or_email})
+        status, body = self.request(
+            "GET",
+            f"/api/users/lookup?{query}",
+            basic=(self.admin_user, self.admin_password),
+            expected=(200, 404),
+        )
+        if status == 404:
+            return None
+        return body
+
+    def create_user(self, *, login, name, email, password):
+        _status, body = self.request(
+            "POST",
+            "/api/admin/users",
+            basic=(self.admin_user, self.admin_password),
+            body={
+                "name": name,
+                "email": email,
+                "login": login,
+                "password": password,
+                "OrgId": 1,
+            },
+        )
+        return body["id"]
+
+    def set_user_password(self, user_id, password):
+        self.request(
+            "PUT",
+            f"/api/admin/users/{user_id}/password",
+            basic=(self.admin_user, self.admin_password),
+            body={"password": password},
+        )
+
+    def set_user_server_admin(self, user_id, enabled=True):
+        self.request(
+            "PUT",
+            f"/api/admin/users/{user_id}/permissions",
+            basic=(self.admin_user, self.admin_password),
+            body={"isGrafanaAdmin": enabled},
+        )
+
+    def set_org_role(self, user_id, role):
+        self.request(
+            "PATCH",
+            f"/api/org/users/{user_id}",
+            basic=(self.admin_user, self.admin_password),
+            body={"role": role},
+        )
+
+    def search_service_account(self, name):
+        query = parse.urlencode({"query": name})
+        _status, body = self.request(
+            "GET",
+            f"/api/serviceaccounts/search?{query}",
+            basic=(self.admin_user, self.admin_password),
+        )
+        accounts = body.get("serviceAccounts", []) if isinstance(body, dict) else []
+        for account in accounts:
+            if account.get("name") == name:
+                return account
+        return None
+
+    def create_service_account(self, name, role):
+        _status, body = self.request(
+            "POST",
+            "/api/serviceaccounts",
+            basic=(self.admin_user, self.admin_password),
+            body={"name": name, "role": role, "isDisabled": False},
+            expected=(200, 201),
+        )
+        return body
+
+    def update_service_account(self, service_account_id, name, role):
+        _status, body = self.request(
+            "PATCH",
+            f"/api/serviceaccounts/{service_account_id}",
+            basic=(self.admin_user, self.admin_password),
+            body={"name": name, "role": role, "isDisabled": False},
+        )
+        return body
+
+    def create_service_account_token(self, service_account_id, token_name):
+        _status, body = self.request(
+            "POST",
+            f"/api/serviceaccounts/{service_account_id}/tokens",
+            basic=(self.admin_user, self.admin_password),
+            body={"name": token_name},
+            expected=(200, 201),
+        )
+        token = body.get("key")
+        if not token:
+            raise BootstrapError("Grafana did not return a service account token key")
+        return token
+
+    def service_account_permissions(self, token):
+        _status, body = self.request(
+            "GET",
+            "/api/access-control/user/permissions",
+            bearer=token,
+        )
+        return body if isinstance(body, dict) else {}
+
+    def request(self, method, path, *, basic=None, bearer=None, body=None, expected=(200,)):
+        headers = {"Accept": "application/json"}
+        data = None
+        if body is not None:
+            data = json.dumps(body).encode("utf-8")
+            headers["Content-Type"] = "application/json"
+        if basic is not None:
+            raw = f"{basic[0]}:{basic[1]}".encode("utf-8")
+            headers["Authorization"] = "Basic " + base64.b64encode(raw).decode("ascii")
+        if bearer is not None:
+            headers["Authorization"] = f"Bearer {bearer}"
+
+        req = request.Request(self.base_url + path, data=data, headers=headers, method=method)
+        try:
+            with request.urlopen(req, timeout=10) as response:
+                payload = response.read().decode("utf-8")
+                return response.status, decode_json(payload)
+        except error.HTTPError as exc:
+            payload = exc.read().decode("utf-8", errors="replace")
+            if exc.code in expected:
+                return exc.code, decode_json(payload)
+            raise GrafanaApiError(method, path, exc.code, payload) from exc
+        except error.URLError as exc:
+            raise BootstrapError(f"Unable to reach Grafana at {self.base_url}: {exc}") from exc
+
+
+def decode_json(payload):
+    if not payload:
+        return {}
+    try:
+        return json.loads(payload)
+    except json.JSONDecodeError:
+        return payload
+
+
+def is_op_not_found(exc):
+    text = f"{exc.stdout}\n{exc.stderr}".lower()
+    return "not found" in text or "isn't an item" in text or "couldn't find" in text or "could not find" in text
+
+
+def generate_password(_label):
+    return secret_values.token_urlsafe(36)
+
+
+def field_value(item, label):
+    for field in item.get("fields", []):
+        if field.get("label") == label or field.get("id") == label:
+            return field.get("value") or ""
+    return ""
+
+
+def set_field(item, label, value, field_type):
+    for field in item.setdefault("fields", []):
+        if field.get("label") == label or field.get("id") == label:
+            field["id"] = field.get("id") or label
+            field["label"] = label
+            field["type"] = field_type
+            field["value"] = value
+            return
+    item["fields"].append({"id": label, "label": label, "type": field_type, "value": value})
+
+
+def set_public_url(item):
+    item["urls"] = [{"label": "primary", "primary": True, "href": PUBLIC_GRAFANA_URL}]
+
+
+def make_1password_item(admin_password, carlos_password):
+    item = {
+        "title": OP_ITEM_TITLE,
+        "category": "LOGIN",
+        "urls": [],
+        "fields": [],
+    }
+    set_public_url(item)
+    set_field(item, "username", ADMIN_LOGIN, "STRING")
+    set_field(item, "password", admin_password, "CONCEALED")
+    set_field(item, "admin_password", admin_password, "CONCEALED")
+    set_field(item, "carlos_password", carlos_password, "CONCEALED")
+    set_field(item, "agent_service_account_token", "", "CONCEALED")
+    return item
+
+
+def ensure_1password_item(runner, password_factory=generate_password):
+    store = OnePasswordStore(runner)
+    item = store.get_item()
+    if item is None:
+        admin_password = password_factory("admin_password")
+        carlos_password = password_factory("carlos_password")
+        item = make_1password_item(admin_password, carlos_password)
+        store.create_item(item)
+        return GrafanaSecrets(admin_password, carlos_password, "")
+
+    changed = False
+    admin_password = field_value(item, "admin_password") or field_value(item, "password")
+    if not admin_password:
+        admin_password = password_factory("admin_password")
+        changed = True
+    carlos_password = field_value(item, "carlos_password")
+    if not carlos_password:
+        carlos_password = password_factory("carlos_password")
+        changed = True
+    agent_token = field_value(item, "agent_service_account_token")
+
+    if not item.get("urls") or item["urls"][0].get("href") != PUBLIC_GRAFANA_URL:
+        set_public_url(item)
+        changed = True
+    if field_value(item, "username") != ADMIN_LOGIN:
+        set_field(item, "username", ADMIN_LOGIN, "STRING")
+        changed = True
+    if field_value(item, "password") != admin_password:
+        set_field(item, "password", admin_password, "CONCEALED")
+        changed = True
+    if field_value(item, "admin_password") != admin_password:
+        set_field(item, "admin_password", admin_password, "CONCEALED")
+        changed = True
+    if field_value(item, "carlos_password") != carlos_password:
+        set_field(item, "carlos_password", carlos_password, "CONCEALED")
+        changed = True
+    if field_value(item, "agent_service_account_token") != agent_token:
+        set_field(item, "agent_service_account_token", agent_token, "CONCEALED")
+        changed = True
+
+    if changed:
+        store.edit_item(item)
+    return GrafanaSecrets(admin_password, carlos_password, agent_token)
+
+
+def read_1password_secrets(runner):
+    item = OnePasswordStore(runner).get_item()
+    if item is None:
+        raise BootstrapError(f"Missing 1Password item: {OP_ITEM_TITLE}")
+    secrets = GrafanaSecrets(
+        admin_password=field_value(item, "admin_password") or field_value(item, "password"),
+        carlos_password=field_value(item, "carlos_password"),
+        agent_service_account_token=field_value(item, "agent_service_account_token"),
+    )
+    if not secrets.admin_password or not secrets.carlos_password:
+        raise BootstrapError("1Password item is missing required Grafana passwords")
+    return secrets
+
+
+def reset_grafana_admin_password(runner, admin_password):
+    runner.run(
+        [
+            "podman",
+            "exec",
+            "-i",
+            "xbol-grafana",
+            "grafana",
+            "cli",
+            "--homepath",
+            "/usr/share/grafana",
+            "admin",
+            "reset-admin-password",
+            "--password-from-stdin",
+        ],
+        input_text=admin_password,
+    )
+
+
+def wait_for_grafana(grafana, wait_seconds):
+    deadline = time.monotonic() + wait_seconds
+    last_error = None
+    while time.monotonic() <= deadline:
+        try:
+            grafana.health()
+            return
+        except BootstrapError as exc:
+            last_error = exc
+            time.sleep(1)
+    raise BootstrapError(f"Grafana did not become reachable within {wait_seconds}s: {last_error}")
+
+
+def ensure_carlos_user(grafana, carlos_password):
+    user = grafana.lookup_user(CARLOS_LOGIN)
+    if user is None:
+        user_id = grafana.create_user(
+            login=CARLOS_LOGIN,
+            name=CARLOS_NAME,
+            email=CARLOS_EMAIL,
+            password=carlos_password,
+        )
+    else:
+        user_id = user["id"]
+        grafana.set_user_password(user_id, carlos_password)
+    grafana.set_user_server_admin(user_id, True)
+    grafana.set_org_role(user_id, "Admin")
+    return user_id
+
+
+def ensure_agent_service_account(grafana):
+    account = grafana.search_service_account(AGENT_SERVICE_ACCOUNT_NAME)
+    if account is None:
+        account = grafana.create_service_account(AGENT_SERVICE_ACCOUNT_NAME, "Editor")
+    else:
+        account = grafana.update_service_account(account["id"], AGENT_SERVICE_ACCOUNT_NAME, "Editor")
+    return account["id"]
+
+
+def ensure_agent_token(grafana, service_account_id, secrets, op_store, rotate_agent_token):
+    current_token = secrets.agent_service_account_token
+    if current_token and grafana.authenticate_service_account(current_token):
+        return current_token
+    if current_token and not rotate_agent_token:
+        raise BootstrapError(
+            "Stored xbol-agent Grafana token is invalid; rerun with --rotate-agent-token to replace it"
+        )
+
+    token = grafana.create_service_account_token(service_account_id, AGENT_SERVICE_ACCOUNT_TOKEN_NAME)
+    if op_store is None:
+        raise BootstrapError("Cannot persist new Grafana service account token without a 1Password store")
+    op_store.set_agent_service_account_token(token)
+    secrets.agent_service_account_token = token
+    return token
+
+
+def check_token_permissions(grafana, token):
+    permissions = grafana.service_account_permissions(token)
+    required = ("dashboards:write",)
+    missing = [permission for permission in required if permission not in permissions]
+    if missing:
+        raise BootstrapError(f"Grafana service account token is missing permissions: {', '.join(missing)}")
+    alert_write_keys = [
+        key for key in permissions if key.startswith("alert.") and key.endswith(":write")
+    ]
+    if not alert_write_keys:
+        raise BootstrapError("Grafana service account token is missing alert write permissions")
+
+
+def apply(args):
+    runner = CommandRunner()
+    secrets = ensure_1password_item(runner)
+    if not args.skip_admin_reset:
+        reset_grafana_admin_password(runner, secrets.admin_password)
+
+    grafana = GrafanaClient(args.grafana_url, ADMIN_LOGIN, secrets.admin_password)
+    wait_for_grafana(grafana, args.wait_seconds)
+    if not grafana.authenticate_basic(ADMIN_LOGIN, secrets.admin_password):
+        raise BootstrapError("Built-in Grafana admin login failed after password reset")
+
+    ensure_carlos_user(grafana, secrets.carlos_password)
+    service_account_id = ensure_agent_service_account(grafana)
+    token = ensure_agent_token(
+        grafana,
+        service_account_id,
+        secrets,
+        OnePasswordStore(runner),
+        args.rotate_agent_token,
+    )
+    check_token_permissions(grafana, token)
+    print("ok: Grafana users and xbol-agent service account are configured")
+
+
+def check(args):
+    runner = CommandRunner()
+    secrets = read_1password_secrets(runner)
+    grafana = GrafanaClient(args.grafana_url, ADMIN_LOGIN, secrets.admin_password)
+    wait_for_grafana(grafana, args.wait_seconds)
+
+    if not grafana.anonymous_is_blocked():
+        raise BootstrapError("Grafana anonymous /api/user access is not blocked")
+    if not grafana.authenticate_basic(CARLOS_LOGIN, secrets.carlos_password):
+        raise BootstrapError("Grafana carlos login failed")
+    if not grafana.authenticate_service_account(secrets.agent_service_account_token):
+        raise BootstrapError("Grafana xbol-agent service account token failed")
+    check_token_permissions(grafana, secrets.agent_service_account_token)
+    print("ok: Grafana anonymous access is blocked")
+    print("ok: Grafana carlos login works")
+    print("ok: Grafana xbol-agent service account token works")
+
+
+def parse_args(argv):
+    parser = argparse.ArgumentParser(description="Bootstrap XBOL local Grafana authentication")
+
+    def add_connection_args(target):
+        target.add_argument(
+            "--grafana-url",
+            default=DEFAULT_GRAFANA_URL,
+            help=f"Grafana base URL for API calls (default: {DEFAULT_GRAFANA_URL})",
+        )
+        target.add_argument(
+            "--wait-seconds",
+            type=int,
+            default=30,
+            help="Seconds to wait for Grafana health before failing",
+        )
+
+    add_connection_args(parser)
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    apply_parser = subparsers.add_parser("apply", help="Create/update users and service account")
+    add_connection_args(apply_parser)
+    apply_parser.add_argument(
+        "--rotate-agent-token",
+        action="store_true",
+        help="Replace a stored xbol-agent service account token if it no longer authenticates",
+    )
+    apply_parser.add_argument(
+        "--skip-admin-reset",
+        action="store_true",
+        help="Do not reset the built-in Grafana admin password before API bootstrap",
+    )
+
+    check_parser = subparsers.add_parser("check", help="Verify configured Grafana authentication")
+    add_connection_args(check_parser)
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    args = parse_args(argv or sys.argv[1:])
+    try:
+        if args.command == "apply":
+            apply(args)
+        elif args.command == "check":
+            check(args)
+        else:
+            raise BootstrapError(f"Unknown command: {args.command}")
+    except BootstrapError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

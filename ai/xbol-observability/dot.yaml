@@ -1,6 +1,7 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
+      set -euo pipefail
       podman pull docker.io/grafana/alloy:latest
       podman pull docker.io/victoriametrics/victoria-metrics:latest
       podman pull docker.io/grafana/loki:latest
@@ -26,6 +27,9 @@ linux[whoami.distro^="Arch"]:
       systemctl --user daemon-reload
       systemctl --user enable --now xbol-gcp-log-fetch.timer
       systemctl --user restart xbol-victoriametrics.service xbol-loki.service xbol-alloy.service xbol-grafana.service
+      ~/.local/bin/xbol-grafana-bootstrap apply --wait-seconds 60
+      ~/.local/bin/hermes-init xbol
+      systemctl --user try-restart hermes-gateway-xbol.service
     depends:
       - /packages/podman
   links:
@@ -42,6 +46,7 @@ linux[whoami.distro^="Arch"]:
     quadlet/xbol-alloy.container: ~/.config/containers/systemd/xbol-alloy.container
     quadlet/xbol-grafana.container: ~/.config/containers/systemd/xbol-grafana.container
     scripts/xbol-observability-smoke: ~/.local/bin/xbol-observability-smoke
+    scripts/xbol-grafana-bootstrap: ~/.local/bin/xbol-grafana-bootstrap
     scripts/xbol-gcp-log-fetch: ~/.local/bin/xbol-gcp-log-fetch
     systemd/xbol-gcp-log-fetch.service: ~/.config/systemd/user/xbol-gcp-log-fetch.service
     systemd/xbol-gcp-log-fetch.timer: ~/.config/systemd/user/xbol-gcp-log-fetch.timer
