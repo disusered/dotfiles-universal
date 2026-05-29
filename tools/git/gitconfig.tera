@@ -64,6 +64,12 @@
   diffFilter = delta --color-only
 [diff "image"]
   command = sh -c 'kitten diff "$2" "$5"' -
+[merge]
+  tool = nvim
+[mergetool "nvim"]
+  cmd = nvim -f \"$MERGED\"
+[mergetool]
+  prompt = false
 [difftool]
   prompt = false
   trustExitCode = true
