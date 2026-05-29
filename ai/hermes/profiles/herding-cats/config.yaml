@@ -495,18 +495,18 @@ mcp_servers:
     - -y
     - '@z_ai/mcp-server'
     env:
-      Z_AI_API_KEY: ${GLM_API_KEY}
+      Z_AI_API_KEY: ${GLM_MCP_API_KEY}
       Z_AI_MODE: ZAI
     enabled: false
   web-search-prime:
     url: https://api.z.ai/api/mcp/web_search_prime/mcp
     headers:
-      Authorization: Bearer ${GLM_API_KEY}
+      Authorization: Bearer ${GLM_MCP_API_KEY}
     enabled: false
   web-reader:
     url: https://api.z.ai/api/mcp/web_reader/mcp
     headers:
-      Authorization: Bearer ${GLM_API_KEY}
+      Authorization: Bearer ${GLM_MCP_API_KEY}
     enabled: false
   codex:
     command: npx
