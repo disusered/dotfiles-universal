@@ -34,3 +34,4 @@ x-scheme-handler/discord=vesktop.desktop
 x-scheme-handler/http=firefox.desktop
 x-scheme-handler/https=firefox.desktop
 x-scheme-handler/bruno=bruno.desktop
+x-scheme-handler/antigravity=antigravity.desktop
