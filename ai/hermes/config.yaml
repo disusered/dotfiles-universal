@@ -517,6 +517,8 @@ image_gen:
 fallback_model:
 - provider: copilot
   model: claude-opus-4.7
+- provider: zai
+  model: glm-5.1
 - provider: openrouter
   model: google/gemini-2.5-pro
 mcp_servers:
