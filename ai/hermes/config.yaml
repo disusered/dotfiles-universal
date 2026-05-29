@@ -21,8 +21,7 @@ agent:
   gateway_auto_continue_freshness: 3600
   image_input_mode: auto
   disabled_toolsets: []
-  disabled_tools:
-  - skill_manage
+  disabled_tools: []
   reasoning_effort: high
 terminal:
   backend: local
@@ -378,7 +377,7 @@ skills:
   - xurl
   - youtube-content
   - yuanbao
-  creation_nudge_interval: 0
+  creation_nudge_interval: 5
 curator:
   enabled: true
   interval_hours: 168
