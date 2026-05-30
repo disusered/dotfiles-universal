@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenViking local context database
+
+[Service]
+ExecStart=%h/.local/bin/openviking-server-wrapper
+Restart=on-failure
+RestartSec=5
+SyslogIdentifier=openviking
+
+[Install]
+WantedBy=default.target

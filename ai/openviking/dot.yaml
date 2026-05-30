@@ -2,13 +2,12 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       uv tool install --upgrade openviking
-      podman pull ghcr.io/volcengine/openviking:latest
-      mkdir -p ~/.openviking ~/.local/share/openviking ~/.config/containers/systemd
+      mkdir -p ~/.openviking ~/.local/share/openviking
       systemctl --user daemon-reload
       if [ -f ~/.openviking/ov.conf ]; then
         systemctl --user enable --now openviking.service
       else
-        echo "OpenViking linked. Run openviking-init, then enable openviking.service."
+        echo "OpenViking linked. Run openviking-render-config, then enable openviking.service."
       fi
 
       # OpenCode
@@ -19,13 +18,14 @@ linux[whoami.distro^="Arch"]:
       cp -r /tmp/OpenViking/examples/opencode-plugin/lib ~/.config/opencode/plugins/openviking/
       npm --prefix ~/.config/opencode/plugins/openviking install
     depends:
-      - /packages/podman
       - /languages/python/uv
+      - /tools/gh
   links:
     env.tpl: ~/.openviking/env.tpl
     ov.conf.tpl: ~/.openviking/ov.conf.tpl
     ovcli.conf: ~/.openviking/ovcli.conf
     openviking.zsh: ~/.config/zsh/5002_openviking.zsh
-    quadlet/openviking.container: ~/.config/containers/systemd/openviking.container
+    systemd/openviking.service: ~/.config/systemd/user/openviking.service
     scripts/openviking-render-config: ~/.local/bin/openviking-render-config
+    scripts/openviking-server-wrapper: ~/.local/bin/openviking-server-wrapper
     openviking-config.json: ~/.config/opencode/plugins/openviking-config.json

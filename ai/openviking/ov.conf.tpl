@@ -1,6 +1,6 @@
 {
   "storage": {
-    "workspace": "/app/.openviking/data"
+    "workspace": "${HOME}/.local/share/openviking"
   },
   "embedding": {
     "dense": {

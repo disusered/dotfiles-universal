@@ -12,4 +12,5 @@ linux[whoami.distro^="Arch"]:
     opencode.json: ~/.config/opencode/opencode.json
     opencode.zsh: ~/.config/zsh/5100_opencode.zsh
     catppuccin.json: ~/.config/opencode/themes/catppuccin.json
+    opencode-serve.sh: ~/.local/bin/opencode-serve.sh
     opencode-serve.service: ~/.config/systemd/user/opencode-serve.service

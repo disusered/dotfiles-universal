@@ -5,7 +5,7 @@ After=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=uwsm app -- /home/carlos/.opencode/bin/opencode serve --port 3014 --hostname 127.0.0.1
+ExecStart=uwsm app -- /home/carlos/.local/bin/opencode-serve.sh
 Restart=on-failure
 RestartSec=5
 

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+export GITHUB_TOKEN="$(gh auth token)"
+exec /home/carlos/.local/share/uv/tools/openviking/bin/openviking-server --host 127.0.0.1

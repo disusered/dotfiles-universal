@@ -1,7 +1,10 @@
 # OpenViking
 
-This module installs OpenViking as a local user service through Podman Quadlet and
-links the shared CLI config.
+This module installs OpenViking as a native user service and links the shared
+CLI config.
+
+The service runs natively (not containerized) so it has direct access to host
+SSH keys, git credentials, and the `gh` CLI for private repository indexing.
 
 The service is intentionally local-only:
 
@@ -10,8 +13,8 @@ The service is intentionally local-only:
 - vikingbot: disabled
 - storage: `~/.local/share/openviking`
 
-The Quadlet uses host networking so OpenViking can remain bound to localhost. If
-you publish the container port on `0.0.0.0`, OpenViking requires a root API key.
+Private repos are indexed using the GitHub ZIP archive API with `GITHUB_TOKEN`
+from `gh auth token`, falling back to `git clone` with host SSH keys.
 
 ## First Run
 
@@ -21,22 +24,18 @@ you publish the container port on `0.0.0.0`, OpenViking requires a root API key.
    ~/.rotz/bin/rotz install /ai/openviking
    ```
 
-2. Run the official setup wizard:
+2. Render the config with secrets from 1Password:
 
    ```bash
-   openviking-init
+   openviking-render-config
    ```
-
-   This runs `openviking-server init` inside the same container mount that the
-   Quadlet service uses, so the generated `~/.openviking/ov.conf` is ready for
-   the service without path rewriting.
 
 3. Start the service:
 
    ```bash
    systemctl --user daemon-reload
    systemctl --user enable --now openviking.service
-   openviking-health
+   ov health
    ```
 
 ## Hermes Memory
