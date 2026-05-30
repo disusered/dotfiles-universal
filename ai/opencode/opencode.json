@@ -7,7 +7,8 @@
     "@mohak34/opencode-notifier@latest",
     "opencode-pty",
     "@franlol/opencode-md-table-formatter@latest",
-    "opencode-websearch-cited@1.2.0"
+    "opencode-websearch-cited@1.2.0",
+    "./plugins/openviking.mjs"
   ],
   "provider": {
     "google": {

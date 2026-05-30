@@ -10,6 +10,14 @@ linux[whoami.distro^="Arch"]:
       else
         echo "OpenViking linked. Run openviking-init, then enable openviking.service."
       fi
+
+      # OpenCode
+      git clone https://github.com/volcengine/OpenViking.git /tmp/OpenViking
+      mkdir -p ~/.config/opencode/plugins/openviking
+      cp /tmp/OpenViking/examples/opencode-plugin/wrappers/openviking.mjs ~/.config/opencode/plugins/openviking.mjs
+      cp /tmp/OpenViking/examples/opencode-plugin/index.mjs /tmp/OpenViking/examples/opencode-plugin/package.json ~/.config/opencode/plugins/openviking/
+      cp -r /tmp/OpenViking/examples/opencode-plugin/lib ~/.config/opencode/plugins/openviking/
+      npm --prefix ~/.config/opencode/plugins/openviking install
     depends:
       - /packages/podman
       - /languages/python/uv
@@ -20,3 +28,4 @@ linux[whoami.distro^="Arch"]:
     openviking.zsh: ~/.config/zsh/5002_openviking.zsh
     quadlet/openviking.container: ~/.config/containers/systemd/openviking.container
     scripts/openviking-render-config: ~/.local/bin/openviking-render-config
+    openviking-config.json: ~/.config/opencode/plugins/openviking-config.json

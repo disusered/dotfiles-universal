@@ -1,0 +1,9 @@
+{
+  "endpoint": "http://localhost:1933",
+  "apiKey": "",
+  "account": "",
+  "user": "",
+  "agentId": "opencode",
+  "enabled": true,
+  "timeoutMs": 30000
+}
