@@ -1,0 +1,3 @@
+linux[whoami.distro^="Arch"]:
+  links:
+    fact-checker.md: ~/.codex/agents/fact-checker.md
