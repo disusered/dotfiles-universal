@@ -8,7 +8,8 @@
     "opencode-pty",
     "@franlol/opencode-md-table-formatter@latest",
     "opencode-websearch-cited@1.2.0",
-    "./plugins/openviking.mjs"
+    "./plugins/openviking.mjs",
+    "opencode-ralph-loop"
   ],
   "provider": {
     "google": {
@@ -293,6 +294,18 @@
       "url": "https://api.z.ai/api/mcp/zread/mcp",
       "headers": {
         "Authorization": "Bearer {file:~/.config/opencode/.zai-key}"
+      }
+    },
+    "zai-vision": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@z_ai/mcp-server"
+      ],
+      "environment": {
+        "Z_AI_API_KEY": "{file:~/.config/opencode/.zai-key}",
+        "Z_AI_MODE": "ZAI"
       }
     },
     "ouroboros": {
