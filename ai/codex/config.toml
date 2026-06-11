@@ -83,6 +83,9 @@ trust_level = "trusted"
 [projects."/home/carlos/Development/BRI/Brillai.API"]
 trust_level = "trusted"
 
+[projects."/home/carlos/Development/ME/MAGIC/jeu_analysis"]
+trust_level = "trusted"
+
 [plugins."codex-security@openai-curated"]
 enabled = true
 
