@@ -1,0 +1,6 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: command -v argonaut &>/dev/null || yay -S --noconfirm --needed argonaut-bin
+    depends:
+      - /tools/yay
+      - /tools/argocd
