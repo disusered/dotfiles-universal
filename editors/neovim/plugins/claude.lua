@@ -214,7 +214,7 @@ return {
     opts = {
       -- Server Configuration
       port_range = { min = 10000, max = 65535 },
-      auto_start = true,
+      auto_start = false,
       log_level = "info", -- "trace", "debug", "info", "warn", "error"
       terminal_cmd = '/home/carlos/.local/share/mise/shims/claude ""',
       -- For local installations: "~/.claude/local/claude"
