@@ -4,6 +4,8 @@ linux[whoami.distro^="Arch"]:
       set -e
       # Ensure Beamdog per-user config dir exists before Rotz links baldur.lua
       mkdir -p "$HOME/.local/share/Beamdog/Planescape Torment Enhanced Edition"
+      # Ensure PST:EE override dir exists before Rotz links dialog fixes
+      mkdir -p "$HOME/.local/share/Steam/steamapps/common/Project P/override"
       "$HOME/.dotfiles/games/lib/steam-set-launch-options.sh" \
         466300 \
         '~/.local/bin/pst-ee-launch %command%' \
@@ -12,3 +14,4 @@ linux[whoami.distro^="Arch"]:
     pst-ee-launch.sh: ~/.local/bin/pst-ee-launch
     planescape.conf: ~/.config/hypr/conf.d/planescape.conf
     baldur.lua: ~/.local/share/Beamdog/Planescape Torment Enhanced Edition/baldur.lua
+    DMACH3.DLG: ~/.local/share/Steam/steamapps/common/Project P/override/DMACH3.DLG

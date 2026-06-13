@@ -27,6 +27,8 @@ Hyprland/Wayland and gamescope.
   - 60 FPS cap
   - Instant tooltip delay
   - Intro movie (`OPENING`) marked as seen
+- Symlinks `DMACH3.DLG` into the Steam game `override/` directory as a
+  persisted dialog bugfix override.
 
 ## Install
 
