@@ -17,7 +17,15 @@ linux[whoami.distro^="Arch"]:
       cp /tmp/OpenViking/examples/opencode-plugin/index.mjs /tmp/OpenViking/examples/opencode-plugin/package.json ~/.config/opencode/plugins/openviking/
       cp -r /tmp/OpenViking/examples/opencode-plugin/lib ~/.config/opencode/plugins/openviking/
       npm --prefix ~/.config/opencode/plugins/openviking install
+
+      # Codex
+      if command -v codex >/dev/null 2>&1 && command -v openviking-codex-plugin-install >/dev/null 2>&1; then
+        openviking-codex-plugin-install
+      else
+        echo "OpenViking Codex plugin linked. Run openviking-codex-plugin-install after Codex is installed."
+      fi
     depends:
+      - /ai/codex
       - /languages/python/uv
       - /tools/gh
   links:
@@ -29,3 +37,7 @@ linux[whoami.distro^="Arch"]:
     scripts/openviking-render-config: ~/.local/bin/openviking-render-config
     scripts/openviking-server-wrapper: ~/.local/bin/openviking-server-wrapper
     openviking-config.json: ~/.config/opencode/plugins/openviking-config.json
+    codex-memory-plugin: ~/.openviking/codex-memory-plugin
+    openviking-codex.zsh: ~/.config/zsh/5003_openviking_codex.zsh
+    scripts/openviking-codex-plugin-install: ~/.local/bin/openviking-codex-plugin-install
+    scripts/openviking-codex-plugin-render-cache: ~/.local/bin/openviking-codex-plugin-render-cache

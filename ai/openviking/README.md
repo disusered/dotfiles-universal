@@ -55,6 +55,35 @@ The XBOL profile uses a separate memory:
 - `OPENVIKING_AGENT=xbol`
 - `OPENVIKING_AGENT_ID=xbol`
 
-Claude Code, Codex, and OpenCode are not wrapped by this module. If those tools
-need OpenViking later, use their official OpenViking plugin setup and point them
-at the same account/agent identity instead of creating tool-specific silos.
+OpenCode is configured with the same default identity through
+`openviking-config.json`.
+
+## Codex Memory
+
+Codex uses a local copy of OpenViking's Codex memory plugin. The checked-in
+plugin is rendered into a local Codex marketplace/cache entry by:
+
+```bash
+openviking-codex-plugin-install
+```
+
+The shell wrapper in `openviking-codex.zsh` reads `~/.openviking/ovcli.conf`
+before launching `codex`, exports the resolved OpenViking URL and identity, and
+keeps Codex's cached `.mcp.json` pointed at the local `/mcp` endpoint.
+
+Default Codex memory uses the same general identity as Hermes and OpenCode:
+
+- `OPENVIKING_ACCOUNT=local-dev`
+- `OPENVIKING_USER=carlos`
+- `OPENVIKING_AGENT_ID=local-dev`
+
+Project-specific memory is selected by `codex-memory-plugin/scope-map.json`.
+The XBOL scope currently maps paths under `/home/carlos/Development/XBOL` to:
+
+- `OPENVIKING_ACCOUNT=xbol`
+- `OPENVIKING_USER=carlos`
+- `OPENVIKING_AGENT_ID=xbol`
+
+Codex recall searches the active project scope first and then general memory.
+Codex capture writes only to the active scope. This is OpenViking shared memory;
+it is not a sync layer for Codex's native memory feature.

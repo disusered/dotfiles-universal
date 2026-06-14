@@ -1,0 +1,101 @@
+#!/usr/bin/env node
+
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
+
+function readJson(file) {
+  try {
+    return JSON.parse(fs.readFileSync(file, "utf8"));
+  } catch {
+    return {};
+  }
+}
+
+function findCacheDirs() {
+  if (process.env.OPENVIKING_PLUGIN_CACHE_DIR) {
+    return [process.env.OPENVIKING_PLUGIN_CACHE_DIR];
+  }
+
+  const home = os.homedir();
+  const root = path.join(home, ".codex", "plugins", "cache", "openviking-plugins-local", "openviking-memory");
+  try {
+    return fs.readdirSync(root, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => path.join(root, entry.name));
+  } catch {
+    return [];
+  }
+}
+
+function resolveOvcliPath() {
+  return process.env.OPENVIKING_CLI_CONFIG_FILE || path.join(os.homedir(), ".openviking", "ovcli.conf");
+}
+
+function resolveConnection() {
+  const ovcli = readJson(resolveOvcliPath());
+  const baseUrl = (process.env.OPENVIKING_URL || process.env.OPENVIKING_BASE_URL || ovcli.url || "http://127.0.0.1:1933").replace(/\/+$/, "");
+  const mcpUrl = process.env.OPENVIKING_MCP_URL || `${baseUrl}/mcp`;
+  const apiKey = process.env.OPENVIKING_API_KEY || process.env.OPENVIKING_BEARER_TOKEN || ovcli.api_key || "";
+
+  return {
+    mcpUrl,
+    apiKey,
+  };
+}
+
+function renderMcp(cacheDir, connection) {
+  const mcpPath = path.join(cacheDir, ".mcp.json");
+  const config = readJson(mcpPath);
+  const server = config.mcpServers?.["openviking-memory"];
+  if (!server) return false;
+
+  server.url = connection.mcpUrl;
+  server.env_http_headers = {
+    "X-OpenViking-Account": "OPENVIKING_ACCOUNT",
+    "X-OpenViking-User": "OPENVIKING_USER",
+    "X-OpenViking-Agent": "OPENVIKING_AGENT_ID",
+  };
+
+  if (connection.apiKey) {
+    server.bearer_token_env_var = "OPENVIKING_API_KEY";
+  } else {
+    delete server.bearer_token_env_var;
+  }
+
+  fs.writeFileSync(mcpPath, JSON.stringify(config, null, 2) + "\n");
+  return true;
+}
+
+function renderHooks(cacheDir) {
+  const hooksPath = path.join(cacheDir, "hooks", "hooks.json");
+  let raw;
+  try {
+    raw = fs.readFileSync(hooksPath, "utf8");
+  } catch {
+    return false;
+  }
+
+  const rendered = raw.replaceAll("__OPENVIKING_PLUGIN_ROOT__", cacheDir);
+  fs.writeFileSync(hooksPath, rendered);
+  return true;
+}
+
+function main() {
+  const cacheDirs = findCacheDirs();
+  const connection = resolveConnection();
+  let rendered = 0;
+
+  for (const cacheDir of cacheDirs) {
+    const mcpRendered = renderMcp(cacheDir, connection);
+    const hooksRendered = renderHooks(cacheDir);
+    if (mcpRendered || hooksRendered) rendered += 1;
+  }
+
+  if (rendered === 0) {
+    process.stderr.write("No openviking-memory plugin cache found.\n");
+    process.exitCode = 1;
+  }
+}
+
+main();

@@ -1,0 +1,32 @@
+{
+  "defaultScope": {
+    "name": "general",
+    "account": "local-dev",
+    "user": "carlos",
+    "agentId": "local-dev"
+  },
+  "generalFallback": true,
+  "scopes": [
+    {
+      "name": "xbol",
+      "account": "xbol",
+      "user": "carlos",
+      "agentId": "xbol",
+      "paths": [
+        "/home/carlos/Development/XBOL"
+      ]
+    },
+    {
+      "name": "jeu_analysis",
+      "account": "jeu_analysis",
+      "user": "carlos",
+      "agentId": "jeu_analysis",
+      "resourceUris": [
+        "viking://resources/jeu_analysis"
+      ],
+      "paths": [
+        "/home/carlos/Development/ME/MAGIC/jeu_analysis"
+      ]
+    }
+  ]
+}
