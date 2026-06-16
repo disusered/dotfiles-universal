@@ -1,0 +1,27 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -euo pipefail
+      podman pull docker.io/library/mariadb:latest
+      podman pull docker.io/rommapp/romm:latest
+      mkdir -p ~/.config/containers/systemd
+      mkdir -p ~/.config/romm
+      mkdir -p ~/Games/romm/library/roms
+      mkdir -p ~/Games/romm/library/bios
+      mkdir -p ~/Games/romm/assets
+      mkdir -p ~/Games/romm/config
+      ~/.rotz/bin/rotz link /games/romm -f
+      ~/.dotfiles/games/romm/scripts/romm-init
+      systemctl --user daemon-reload
+      systemctl --user restart romm-db.service romm.service
+    depends:
+      - /packages/podman
+      - /tools/1password
+      - /tools/caddy
+  links:
+    env.tpl: ~/.config/romm/env.tpl
+    scripts/romm-init: ~/.local/bin/romm-init
+    scripts/romm-smoke: ~/.local/bin/romm-smoke
+    quadlet/romm.network: ~/.config/containers/systemd/romm.network
+    quadlet/romm-db.container: ~/.config/containers/systemd/romm-db.container
+    quadlet/romm.container: ~/.config/containers/systemd/romm.container

@@ -1,0 +1,213 @@
+#!/usr/bin/env python3
+import json
+from dataclasses import dataclass
+from pathlib import Path
+import secrets as secret_values
+import subprocess
+
+
+OP_VAULT = "Personal"
+OP_ITEM_TITLE = "RomM Local"
+PUBLIC_ROMM_URL = "http://romm.disusered.com"
+ROMM_HOME = Path.home() / ".config" / "romm"
+ENV_TEMPLATE = ROMM_HOME / "env.tpl"
+ENV_FILE = ROMM_HOME / "romm.env"
+
+REQUIRED_SECRET_FIELDS = (
+    "db_root_password",
+    "db_password",
+    "auth_secret_key",
+)
+
+OPTIONAL_FIELDS = ()
+
+
+class BootstrapError(Exception):
+    pass
+
+
+class CommandError(BootstrapError):
+    def __init__(self, args, returncode, stdout, stderr):
+        super().__init__(f"{args[0]} exited {returncode}")
+        self.args_list = list(args)
+        self.returncode = returncode
+        self.stdout = stdout
+        self.stderr = stderr
+
+
+@dataclass
+class RommSecrets:
+    db_root_password: str
+    db_password: str
+    auth_secret_key: str
+
+
+class CommandRunner:
+    def run(self, args, *, input_text=None, check=True):
+        completed = subprocess.run(
+            args,
+            input=input_text,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+        if check and completed.returncode != 0:
+            raise CommandError(args, completed.returncode, completed.stdout, completed.stderr)
+        return completed.stdout
+
+
+class OnePasswordStore:
+    def __init__(self, runner, *, vault=OP_VAULT, title=OP_ITEM_TITLE):
+        self.runner = runner
+        self.vault = vault
+        self.title = title
+
+    def get_item(self):
+        try:
+            return json.loads(
+                self.runner.run(
+                    [
+                        "op",
+                        "item",
+                        "get",
+                        self.title,
+                        "--vault",
+                        self.vault,
+                        "--format",
+                        "json",
+                        "--reveal",
+                    ]
+                )
+            )
+        except CommandError as exc:
+            if is_op_not_found(exc):
+                return None
+            raise BootstrapError("Unable to read the RomM 1Password item") from exc
+
+    def create_item(self, item):
+        self.runner.run(
+            ["op", "item", "create", "--vault", self.vault, "-"],
+            input_text=json.dumps(item, sort_keys=True),
+        )
+
+    def edit_item(self, item):
+        item_id = item.get("id") or self.title
+        self.runner.run(
+            ["op", "item", "edit", item_id, "--vault", self.vault],
+            input_text=json.dumps(item, sort_keys=True),
+        )
+
+
+def is_op_not_found(exc):
+    text = f"{exc.stdout}\n{exc.stderr}".lower()
+    return "not found" in text or "isn't an item" in text or "couldn't find" in text or "could not find" in text
+
+
+def generate_secret(label):
+    if label == "auth_secret_key":
+        return secret_values.token_hex(32)
+    return secret_values.token_urlsafe(36)
+
+
+def field_value(item, label):
+    for field in item.get("fields", []):
+        if field.get("label") == label or field.get("id") == label:
+            return field.get("value") or ""
+    return ""
+
+
+def set_field(item, label, value, field_type):
+    for field in item.setdefault("fields", []):
+        if field.get("label") == label or field.get("id") == label:
+            field["id"] = field.get("id") or label
+            field["label"] = label
+            field["type"] = field_type
+            field["value"] = value
+            return
+    item["fields"].append({"id": label, "label": label, "type": field_type, "value": value})
+
+
+def set_public_url(item):
+    item["urls"] = [{"label": "primary", "primary": True, "href": PUBLIC_ROMM_URL}]
+
+
+def make_1password_item(password_factory=generate_secret):
+    item = {
+        "title": OP_ITEM_TITLE,
+        "category": "LOGIN",
+        "urls": [],
+        "fields": [],
+    }
+    set_public_url(item)
+    set_field(item, "username", "romm-user", "STRING")
+    set_field(item, "password", password_factory("db_password"), "CONCEALED")
+    for label in REQUIRED_SECRET_FIELDS:
+        value = field_value(item, "password") if label == "db_password" else password_factory(label)
+        set_field(item, label, value, "CONCEALED")
+    for label, field_type in OPTIONAL_FIELDS:
+        set_field(item, label, "", field_type)
+    return item
+
+
+def ensure_1password_item(runner, password_factory=generate_secret):
+    store = OnePasswordStore(runner)
+    item = store.get_item()
+    if item is None:
+        item = make_1password_item(password_factory)
+        store.create_item(item)
+        return secrets_from_item(item)
+
+    changed = False
+    if not item.get("urls") or item["urls"][0].get("href") != PUBLIC_ROMM_URL:
+        set_public_url(item)
+        changed = True
+
+    if field_value(item, "username") != "romm-user":
+        set_field(item, "username", "romm-user", "STRING")
+        changed = True
+
+    for label in REQUIRED_SECRET_FIELDS:
+        if not field_value(item, label):
+            set_field(item, label, password_factory(label), "CONCEALED")
+            changed = True
+
+    if field_value(item, "password") != field_value(item, "db_password"):
+        set_field(item, "password", field_value(item, "db_password"), "CONCEALED")
+        changed = True
+
+    for label, field_type in OPTIONAL_FIELDS:
+        if not any(field.get("label") == label or field.get("id") == label for field in item.get("fields", [])):
+            set_field(item, label, "", field_type)
+            changed = True
+
+    if changed:
+        store.edit_item(item)
+
+    return secrets_from_item(item)
+
+
+def secrets_from_item(item):
+    return RommSecrets(
+        db_root_password=field_value(item, "db_root_password"),
+        db_password=field_value(item, "db_password"),
+        auth_secret_key=field_value(item, "auth_secret_key"),
+    )
+
+
+def render_env_file(runner, template_path=ENV_TEMPLATE, output_path=ENV_FILE):
+    rendered = runner.run(["op", "inject", "--force", "-i", str(template_path)])
+    output_path.write_text(rendered)
+    output_path.chmod(0o600)
+
+
+def main():
+    ROMM_HOME.mkdir(parents=True, exist_ok=True)
+    runner = CommandRunner()
+    ensure_1password_item(runner)
+    render_env_file(runner)
+    print(f"Rendered {ENV_FILE}")
+
+
+if __name__ == "__main__":
+    main()

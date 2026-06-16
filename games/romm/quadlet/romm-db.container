@@ -1,0 +1,23 @@
+[Unit]
+Description=RomM MariaDB database
+
+[Container]
+ContainerName=romm-db
+Image=docker.io/library/mariadb:latest
+Pull=never
+Network=romm.network
+EnvironmentFile=%h/.config/romm/romm.env
+Volume=romm-mysql-data:/var/lib/mysql
+HealthCmd=healthcheck.sh --connect --innodb_initialized
+HealthStartPeriod=30s
+HealthInterval=10s
+HealthTimeout=5s
+HealthRetries=5
+
+[Service]
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target

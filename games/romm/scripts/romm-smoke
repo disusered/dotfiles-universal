@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+systemctl --user is-active --quiet romm-db.service
+systemctl --user is-active --quiet romm.service
+curl -fsS -o /dev/null http://127.0.0.1:47224
+
+echo "RomM is responding at http://127.0.0.1:47224"

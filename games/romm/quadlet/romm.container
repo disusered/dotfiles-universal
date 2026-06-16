@@ -1,0 +1,26 @@
+[Unit]
+Description=RomM self-hosted ROM manager
+After=romm-db.service
+Requires=romm-db.service
+
+[Container]
+ContainerName=romm
+Image=docker.io/rommapp/romm:latest
+Pull=never
+Network=romm.network
+EnvironmentFile=%h/.config/romm/romm.env
+PublishPort=127.0.0.1:47224:8080
+Volume=romm-resources:/romm/resources
+Volume=romm-redis-data:/redis-data
+Volume=%h/Games/romm/library:/romm/library:Z
+Volume=%h/Games/romm/assets:/romm/assets:Z
+Volume=%h/Games/romm/config:/romm/config:Z
+NoNewPrivileges=true
+
+[Service]
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target
