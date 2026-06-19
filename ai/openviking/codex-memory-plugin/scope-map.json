@@ -12,6 +12,7 @@
       "account": "xbol",
       "user": "carlos",
       "agentId": "xbol",
+      "generalFallback": false,
       "paths": [
         "/home/carlos/Development/XBOL"
       ]

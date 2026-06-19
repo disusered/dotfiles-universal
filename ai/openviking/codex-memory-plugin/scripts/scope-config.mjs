@@ -52,6 +52,11 @@ function uniqueScopes(scopes) {
   return result;
 }
 
+function useGeneralFallback(map, active) {
+  if (typeof active.generalFallback === "boolean") return active.generalFallback;
+  return map.generalFallback !== false;
+}
+
 export function resolveScopeConfig(options = {}) {
   const mapPath = options.mapPath || process.env.OPENVIKING_SCOPE_MAP_FILE || DEFAULT_SCOPE_MAP;
   const map = loadJson(mapPath);
@@ -71,7 +76,7 @@ export function resolveScopeConfig(options = {}) {
   }
 
   const lookupScopes = uniqueScopes(
-    map.generalFallback === false ? [active] : [active, defaultScope],
+    useGeneralFallback(map, active) ? [active, defaultScope] : [active],
   ).map(identity);
 
   return {

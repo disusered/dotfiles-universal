@@ -17,6 +17,7 @@ if [ ! -d "$plugin_source/.codex-plugin" ]; then
   printf 'Codex OpenViking plugin source not found: %s\n' "$plugin_source" >&2
   exit 1
 fi
+plugin_source="$(cd -- "$plugin_source" && pwd -P)"
 
 plugin_version="$(node -e 'const p=require(process.argv[1]); process.stdout.write(p.version || "0.0.0")' "$plugin_source/.codex-plugin/plugin.json")"
 cache_dir="$HOME/.codex/plugins/cache/$marketplace_name/$plugin_name/$plugin_version"

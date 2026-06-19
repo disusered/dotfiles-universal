@@ -83,7 +83,10 @@ The XBOL scope currently maps paths under `/home/carlos/Development/XBOL` to:
 - `OPENVIKING_ACCOUNT=xbol`
 - `OPENVIKING_USER=carlos`
 - `OPENVIKING_AGENT_ID=xbol`
+- `generalFallback=false`
 
-Codex recall searches the active project scope first and then general memory.
-Codex capture writes only to the active scope. This is OpenViking shared memory;
-it is not a sync layer for Codex's native memory feature.
+Codex recall searches the active project scope first. Scopes can opt into
+general memory fallback, but XBOL is intentionally isolated so general
+`local-dev` memories do not appear in XBOL work. Codex capture writes only to
+the active scope. This is OpenViking shared memory; it is not a sync layer for
+Codex's native memory feature.
