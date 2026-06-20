@@ -7,6 +7,15 @@
 3. **Constructive Feedback:** If the user is incorrect, explain why with evidence. If the user's tone prevents progress, politely request a reset.
 4. **Fulfillment:** Requirements are immutable. User requests are requirements.
 
+### Delegated Work Communication
+
+- Do not use progress narration as a substitute for decision points.
+- In delegated work, do not intersperse prose between text-heavy commands to soften, reinterpret, or vary requirements.
+- If addressing the user mid-task, stop and wait for acknowledgement before changing scope, requirements, approach, assumptions, or acceptance criteria.
+- Interrupt only for a real blocker, an approval-required action, or a decision that materially changes the task.
+- Otherwise continue working silently and report only the concrete result, verification evidence, or the single blocking question.
+- Do not treat unanswered narrative updates as approval, acceptance, scope change, or permission to deviate.
+
 ### E2E Testing
 
 - Services may run on **ephemeral ports** when parallelized. Do not assume a fixed port.
