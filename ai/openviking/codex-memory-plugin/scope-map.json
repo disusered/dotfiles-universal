@@ -1,12 +1,22 @@
 {
   "defaultScope": {
     "name": "general",
-    "account": "local-dev",
+    "account": "general",
     "user": "carlos",
-    "agentId": "local-dev"
+    "agentId": "general"
   },
   "generalFallback": true,
   "scopes": [
+    {
+      "name": "dotfiles",
+      "account": "dotfiles",
+      "user": "carlos",
+      "agentId": "dotfiles",
+      "generalFallback": false,
+      "paths": [
+        "/home/carlos/.dotfiles"
+      ]
+    },
     {
       "name": "xbol",
       "account": "xbol",
@@ -15,6 +25,16 @@
       "generalFallback": false,
       "paths": [
         "/home/carlos/Development/XBOL"
+      ]
+    },
+    {
+      "name": "herding-cats",
+      "account": "local-dev",
+      "user": "carlos",
+      "agentId": "local-dev",
+      "generalFallback": false,
+      "paths": [
+        "/home/carlos/Development/ME/herding-cats"
       ]
     },
     {

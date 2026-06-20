@@ -53,7 +53,7 @@ class CodexMemoryPluginTests(unittest.TestCase):
         )
         self.assertEqual({"account": "xbol", "user": "carlos", "agentId": "xbol"}, config["writeScope"])
 
-    def test_scope_config_resolves_dotfiles_to_general_only(self):
+    def test_scope_config_resolves_dotfiles_only(self):
         self.assertTrue((PLUGIN_ROOT / "scripts" / "scope-config.mjs").exists())
 
         output = subprocess.check_output(
@@ -71,11 +71,65 @@ class CodexMemoryPluginTests(unittest.TestCase):
         config = json.loads(output)
 
         self.assertEqual(
+            [{"account": "dotfiles", "user": "carlos", "agentId": "dotfiles"}],
+            config["lookupScopes"],
+        )
+        self.assertEqual(
+            {"account": "dotfiles", "user": "carlos", "agentId": "dotfiles"},
+            config["writeScope"],
+        )
+
+    def test_scope_config_resolves_herding_cats_to_legacy_local_dev_only(self):
+        self.assertTrue((PLUGIN_ROOT / "scripts" / "scope-config.mjs").exists())
+
+        output = subprocess.check_output(
+            [
+                "node",
+                str(PLUGIN_ROOT / "scripts" / "scope-config.mjs"),
+                "--cwd",
+                "/home/carlos/Development/ME/herding-cats/utilities/cfg",
+                "--json",
+            ],
+            cwd=REPO_ROOT,
+            text=True,
+        )
+
+        config = json.loads(output)
+
+        self.assertEqual("herding-cats", config["activeScope"])
+        self.assertEqual(
             [{"account": "local-dev", "user": "carlos", "agentId": "local-dev"}],
             config["lookupScopes"],
         )
         self.assertEqual(
             {"account": "local-dev", "user": "carlos", "agentId": "local-dev"},
+            config["writeScope"],
+        )
+
+    def test_scope_config_default_is_general_not_legacy_local_dev(self):
+        self.assertTrue((PLUGIN_ROOT / "scripts" / "scope-config.mjs").exists())
+
+        output = subprocess.check_output(
+            [
+                "node",
+                str(PLUGIN_ROOT / "scripts" / "scope-config.mjs"),
+                "--cwd",
+                "/home/carlos/Development/ME/unmapped-project",
+                "--json",
+            ],
+            cwd=REPO_ROOT,
+            text=True,
+        )
+
+        config = json.loads(output)
+
+        self.assertEqual("general", config["activeScope"])
+        self.assertEqual(
+            [{"account": "general", "user": "carlos", "agentId": "general"}],
+            config["lookupScopes"],
+        )
+        self.assertEqual(
+            {"account": "general", "user": "carlos", "agentId": "general"},
             config["writeScope"],
         )
 
@@ -151,7 +205,7 @@ class CodexMemoryPluginTests(unittest.TestCase):
         self.assertEqual(
             [
                 {"account": "jeu_analysis", "user": "carlos", "agentId": "jeu_analysis"},
-                {"account": "local-dev", "user": "carlos", "agentId": "local-dev"},
+                {"account": "general", "user": "carlos", "agentId": "general"},
             ],
             config["lookupScopes"],
         )

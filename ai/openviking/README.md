@@ -41,12 +41,15 @@ from `gh auth token`, falling back to `git clone` with host SSH keys.
 ## Hermes Memory
 
 Hermes uses its built-in OpenViking memory provider. The default Hermes env is
-the local development memory:
+the legacy Herding Cats/Hermes memory:
 
 - `OPENVIKING_ACCOUNT=local-dev`
 - `OPENVIKING_USER=carlos`
 - `OPENVIKING_AGENT=local-dev`
 - `OPENVIKING_AGENT_ID=local-dev`
+
+This bank is intentionally scoped to `/home/carlos/Development/ME/herding-cats`
+for Codex recall. It is not the general Codex fallback.
 
 The XBOL profile uses a separate memory:
 
@@ -68,25 +71,42 @@ openviking-codex-plugin-install
 ```
 
 The shell wrapper in `openviking-codex.zsh` reads `~/.openviking/ovcli.conf`
-before launching `codex`, exports the resolved OpenViking URL and identity, and
-keeps Codex's cached `.mcp.json` pointed at the local `/mcp` endpoint.
+before launching `codex`, exports the resolved OpenViking URL and identity for
+the MCP endpoint, and keeps Codex's cached `.mcp.json` pointed at the local
+`/mcp` endpoint. Lifecycle hooks select their read/write identity from
+`codex-memory-plugin/scope-map.json`.
 
-Default Codex memory uses the same general identity as Hermes and OpenCode:
+Unmapped Codex work uses a separate general identity:
 
-- `OPENVIKING_ACCOUNT=local-dev`
+- `OPENVIKING_ACCOUNT=general`
 - `OPENVIKING_USER=carlos`
-- `OPENVIKING_AGENT_ID=local-dev`
+- `OPENVIKING_AGENT_ID=general`
 
 Project-specific memory is selected by `codex-memory-plugin/scope-map.json`.
-The XBOL scope currently maps paths under `/home/carlos/Development/XBOL` to:
+The dotfiles repo maps `/home/carlos/.dotfiles` to its own isolated memory:
+
+- `OPENVIKING_ACCOUNT=dotfiles`
+- `OPENVIKING_USER=carlos`
+- `OPENVIKING_AGENT_ID=dotfiles`
+- `generalFallback=false`
+
+The XBOL scope maps paths under `/home/carlos/Development/XBOL` to:
 
 - `OPENVIKING_ACCOUNT=xbol`
 - `OPENVIKING_USER=carlos`
 - `OPENVIKING_AGENT_ID=xbol`
 - `generalFallback=false`
 
+The Herding Cats scope maps `/home/carlos/Development/ME/herding-cats` to the
+legacy local development bank:
+
+- `OPENVIKING_ACCOUNT=local-dev`
+- `OPENVIKING_USER=carlos`
+- `OPENVIKING_AGENT_ID=local-dev`
+- `generalFallback=false`
+
 Codex recall searches the active project scope first. Scopes can opt into
-general memory fallback, but XBOL is intentionally isolated so general
-`local-dev` memories do not appear in XBOL work. Codex capture writes only to
-the active scope. This is OpenViking shared memory; it is not a sync layer for
-Codex's native memory feature.
+general memory fallback, but XBOL, dotfiles, and Herding Cats are intentionally
+isolated so unrelated project memories do not cross workspaces. Codex capture
+writes only to the active scope. This is OpenViking shared memory; it is not a
+sync layer for Codex's native memory feature.
