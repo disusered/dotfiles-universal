@@ -119,6 +119,7 @@ pub struct ColorPicker {
     /// Catppuccin flavor colors for theming
     flavor_colors: FlavorTheme,
     should_apply: bool,
+    saved: bool,
     /// Original config values to detect changes
     original_primary: String,
     original_secondary: String,
@@ -232,6 +233,7 @@ impl ColorPicker {
             config_path,
             flavor_colors,
             should_apply: false,
+            saved: false,
             original_primary,
             original_secondary,
             content_area: Rect::default(),
@@ -459,18 +461,30 @@ impl ColorPicker {
     }
 
     fn select_as_primary(&mut self) {
-        if let Some(entry) = self.selected_color() {
-            if entry.is_primary {
-                self.config.primary = entry.name.clone();
-            }
+        if let Some((name, true)) = self
+            .selected_color()
+            .map(|entry| (entry.name.clone(), entry.is_primary))
+        {
+            self.config.primary = name.clone();
+            self.toast = Some(
+                Toast::new(format!("primary staged: {}", name))
+                    .style(Style::default().fg(self.flavor_colors.green))
+                    .border_style(Style::default().fg(self.flavor_colors.green)),
+            );
         }
     }
 
     fn select_as_secondary(&mut self) {
-        if let Some(entry) = self.selected_color() {
-            if entry.is_primary {
-                self.config.secondary = entry.name.clone();
-            }
+        if let Some((name, true)) = self
+            .selected_color()
+            .map(|entry| (entry.name.clone(), entry.is_primary))
+        {
+            self.config.secondary = name.clone();
+            self.toast = Some(
+                Toast::new(format!("secondary staged: {}", name))
+                    .style(Style::default().fg(self.flavor_colors.green))
+                    .border_style(Style::default().fg(self.flavor_colors.green)),
+            );
         }
     }
 
@@ -1230,6 +1244,7 @@ impl ColorPicker {
                 vec![
                     ("j/k", "navigate"),
                     ("Enter", target),
+                    ("a", "apply"),
                     ("s", "switch"),
                     ("y", "copy"),
                     ("Tab", "modify"),
@@ -1305,7 +1320,8 @@ impl ColorPicker {
                     ("g/G", "Top/bottom"),
                     ("Ctrl+d/u", "Page down/up"),
                     ("/", "Search"),
-                    ("Enter", "Set as primary/secondary"),
+                    ("Enter", "Stage primary/secondary"),
+                    ("a", "Apply staged colors"),
                     ("s", "Switch target"),
                     ("y", "Copy color"),
                     ("Tab", "→ Modify pane"),
@@ -1409,6 +1425,7 @@ impl ColorPicker {
                                 if let Err(e) = self.config.save(&self.config_path) {
                                     eprintln!("Failed to save config: {}", e);
                                 }
+                                self.saved = true;
                                 self.should_apply = true;
                                 return Ok(false);
                             }
@@ -1516,6 +1533,12 @@ impl ColorPicker {
                                         SelectTarget::Primary => self.select_as_primary(),
                                         SelectTarget::Secondary => self.select_as_secondary(),
                                     }
+                                    self.select_target = match self.select_target {
+                                        SelectTarget::Primary => SelectTarget::Secondary,
+                                        SelectTarget::Secondary => SelectTarget::Primary,
+                                    };
+                                }
+                                KeyCode::Char('a') => {
                                     if self.has_changes() {
                                         self.mode = Mode::Confirm;
                                     }
@@ -1688,7 +1711,7 @@ impl ColorPicker {
 
     /// Check if picker saved without applying
     pub fn was_saved(&self) -> bool {
-        self.mode == Mode::Confirm && !self.should_apply
+        self.saved && !self.should_apply
     }
 
     /// Render picker in a specific area (for embedding in tabbed app)

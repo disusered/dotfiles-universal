@@ -332,30 +332,9 @@ fn main() {
         };
 
         match tui::app::run(&config, &palette, &config_path, &cfg_dir, &dotfiles_dir) {
-            Ok(tui::app::Outcome::Apply(scope)) => {
-                // Dispatch only to the subsystems the user actually changed.
-                // Colors/fonts still need the full template render (no
-                // dependency graph yet); wallpaper stays off the template
-                // path — hyprpaper.conf is written directly by
-                // `wallpaper::apply`, not through templates.toml.
-                if scope.colors || scope.fonts {
-                    update_apps(&cfg_dir, &dotfiles_dir, &[], false);
-                }
-                if scope.wallpaper {
-                    let config = Config::load(&config_path).unwrap_or_default();
-                    if let Err(e) = wallpaper::apply(&config, &cfg_dir) {
-                        eprintln!("Error applying wallpaper: {}", e);
-                        std::process::exit(1);
-                    }
-                }
-                if scope.keyboard {
-                    match load_config_and_palette(&cfg_dir).and_then(|(config, palette)| {
-                        leds::apply_theme(&config, &palette, false, None, None).map(|_| ())
-                    }) {
-                        Ok(()) => {}
-                        Err(e) => eprintln!("warning: keyboard apply failed: {}", e),
-                    }
-                }
+            Ok(tui::app::Outcome::Apply(_scope)) => {
+                // The tabbed TUI keeps the terminal open and shows apply
+                // results itself, including browser-triggering reloads.
             }
             Ok(tui::app::Outcome::SavedOnly) => {
                 println!("Config saved (run 'cfg update' to apply)");

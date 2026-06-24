@@ -5,12 +5,15 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span},
-    widgets::{Block, Clear, Tabs},
+    widgets::{Block, Clear, Paragraph, Tabs},
     Frame,
 };
 
 use crate::config::Config;
+use crate::leds;
 use crate::palette::Palette;
+use crate::templates::{run_update, ReloadResult, RenderResult};
+use crate::wallpaper;
 
 use super::colors::ColorPicker;
 use super::fonts::FontPicker;
@@ -33,6 +36,18 @@ pub struct ApplyScope {
 impl ApplyScope {
     pub fn any(&self) -> bool {
         self.colors || self.fonts || self.wallpaper || self.keyboard
+    }
+
+    pub fn with_color_side_effects(self) -> Self {
+        if self.colors {
+            Self {
+                wallpaper: true,
+                keyboard: true,
+                ..self
+            }
+        } else {
+            self
+        }
     }
 }
 
@@ -82,6 +97,7 @@ impl Tab {
 /// Theme colors for the tab bar
 struct TabTheme {
     base: Color,
+    text: Color,
     subtext0: Color,
     accent: Color,
 }
@@ -97,6 +113,7 @@ impl TabTheme {
 
         Self {
             base: get_color("base"),
+            text: get_color("text"),
             subtext0: get_color("subtext0"),
             accent: get_color(&config.primary),
         }
@@ -113,8 +130,20 @@ pub struct App {
     update_picker: UpdatePicker,
     theme: TabTheme,
     should_apply: bool,
+    config_path: String,
+    cfg_dir: String,
+    dotfiles_dir: String,
+    apply_results: Option<ApplyResults>,
     /// Tab bar area for mouse click detection
     tab_bar_area: Rect,
+}
+
+struct ApplyResults {
+    scope: ApplyScope,
+    rendered: Vec<RenderResult>,
+    reloaded: Vec<ReloadResult>,
+    wallpaper: Option<Result<(), String>>,
+    keyboard: Option<Result<(), String>>,
 }
 
 impl App {
@@ -130,14 +159,22 @@ impl App {
         let font_picker = FontPicker::new(config.clone(), palette, config_path.clone());
         let keyboard_picker = KeyboardPicker::new(config.clone(), palette, config_path.clone());
 
-        let update_picker =
-            UpdatePicker::new(palette, &config.primary, cfg_dir.clone(), dotfiles_dir);
+        let update_picker = UpdatePicker::new(
+            palette,
+            &config.primary,
+            cfg_dir.clone(),
+            dotfiles_dir.clone(),
+        );
 
-        let (wallpaper_picker, wallpaper_init_error) =
-            match WallpaperPicker::new(config.clone(), palette, config_path, cfg_dir) {
-                Ok(p) => (Some(p), None),
-                Err(e) => (None, Some(e)),
-            };
+        let (wallpaper_picker, wallpaper_init_error) = match WallpaperPicker::new(
+            config.clone(),
+            palette,
+            config_path.clone(),
+            cfg_dir.clone(),
+        ) {
+            Ok(p) => (Some(p), None),
+            Err(e) => (None, Some(e)),
+        };
 
         Self {
             active_tab: Tab::default(),
@@ -149,6 +186,10 @@ impl App {
             update_picker,
             theme,
             should_apply: false,
+            config_path,
+            cfg_dir,
+            dotfiles_dir,
+            apply_results: None,
             tab_bar_area: Rect::default(),
         }
     }
@@ -192,6 +233,153 @@ impl App {
             Tab::Keyboard => self.keyboard_picker.render_in_area(frame, chunks[1]),
             Tab::Update => self.update_picker.render_in_area(frame, chunks[1]),
         }
+
+        if let Some(results) = &self.apply_results {
+            self.render_apply_results(frame, area, results);
+        }
+    }
+
+    fn render_apply_results(&self, frame: &mut Frame, area: Rect, results: &ApplyResults) {
+        let width = area.width.saturating_sub(8).min(96);
+        let height = area.height.saturating_sub(4).min(28);
+        let popup = Rect::new(
+            area.x + (area.width.saturating_sub(width)) / 2,
+            area.y + (area.height.saturating_sub(height)) / 2,
+            width,
+            height,
+        );
+
+        frame.render_widget(Clear, popup);
+
+        let failures = results
+            .rendered
+            .iter()
+            .filter(|r| r.output.is_err())
+            .count()
+            + results
+                .reloaded
+                .iter()
+                .filter(|r| r.result.is_err())
+                .count()
+            + usize::from(results.wallpaper.as_ref().is_some_and(Result::is_err))
+            + usize::from(results.keyboard.as_ref().is_some_and(Result::is_err));
+
+        let title = if failures == 0 {
+            " apply complete "
+        } else {
+            " apply finished with warnings "
+        };
+        let block = Block::default()
+            .borders(ratatui::widgets::Borders::ALL)
+            .border_style(Style::default().fg(if failures == 0 {
+                self.theme.accent
+            } else {
+                Color::Yellow
+            }))
+            .title(Span::styled(
+                title,
+                Style::default()
+                    .fg(if failures == 0 {
+                        self.theme.accent
+                    } else {
+                        Color::Yellow
+                    })
+                    .add_modifier(Modifier::BOLD),
+            ));
+        let inner = block.inner(popup);
+        frame.render_widget(block, popup);
+
+        let mut lines = Vec::new();
+        lines.push(Line::from(vec![
+            Span::styled("  scope ", Style::default().fg(self.theme.subtext0)),
+            Span::styled(
+                format_scope(results.scope),
+                Style::default().fg(self.theme.text),
+            ),
+        ]));
+
+        if !results.rendered.is_empty() {
+            lines.push(Line::from(""));
+            lines.push(Line::from(Span::styled(
+                "  Templates",
+                Style::default()
+                    .fg(self.theme.subtext0)
+                    .add_modifier(Modifier::BOLD),
+            )));
+            for result in &results.rendered {
+                let (mark, style) = if result.output.is_ok() {
+                    ("ok", Style::default().fg(Color::Green))
+                } else {
+                    ("fail", Style::default().fg(Color::Red))
+                };
+                let detail = match &result.output {
+                    Ok(path) => path.display().to_string(),
+                    Err(e) => e.clone(),
+                };
+                lines.push(Line::from(vec![
+                    Span::styled(format!("  {:<4} ", mark), style),
+                    Span::styled(&result.name, Style::default().fg(self.theme.text)),
+                    Span::styled("  ", Style::default()),
+                    Span::styled(detail, Style::default().fg(self.theme.subtext0)),
+                ]));
+            }
+        }
+
+        if !results.reloaded.is_empty() {
+            lines.push(Line::from(""));
+            lines.push(Line::from(Span::styled(
+                "  Reloads",
+                Style::default()
+                    .fg(self.theme.subtext0)
+                    .add_modifier(Modifier::BOLD),
+            )));
+            for result in &results.reloaded {
+                let (mark, style) = if result.result.is_ok() {
+                    ("ok", Style::default().fg(Color::Green))
+                } else {
+                    ("fail", Style::default().fg(Color::Red))
+                };
+                let detail = match &result.result {
+                    Ok(()) => String::new(),
+                    Err(e) => e.clone(),
+                };
+                lines.push(Line::from(vec![
+                    Span::styled(format!("  {:<4} ", mark), style),
+                    Span::styled(
+                        result.names.join(", "),
+                        Style::default().fg(self.theme.text),
+                    ),
+                    Span::styled("  ", Style::default()),
+                    Span::styled(detail, Style::default().fg(self.theme.subtext0)),
+                ]));
+            }
+        }
+
+        if let Some(result) = &results.wallpaper {
+            lines.push(result_line(
+                "wallpaper",
+                result,
+                self.theme.text,
+                self.theme.subtext0,
+            ));
+        }
+
+        if let Some(result) = &results.keyboard {
+            lines.push(result_line(
+                "keyboard",
+                result,
+                self.theme.text,
+                self.theme.subtext0,
+            ));
+        }
+
+        lines.push(Line::from(""));
+        lines.push(Line::from(vec![
+            Span::styled("  any key", Style::default().fg(self.theme.accent)),
+            Span::styled(" close", Style::default().fg(self.theme.subtext0)),
+        ]));
+
+        frame.render_widget(Paragraph::new(lines), inner);
     }
 
     fn render_tabs(&self, frame: &mut Frame, area: Rect) {
@@ -257,6 +445,14 @@ impl App {
     }
 
     fn handle_event(&mut self, event: Event) -> io::Result<bool> {
+        if self.apply_results.is_some() {
+            if matches!(event, Event::Key(key) if key.kind == KeyEventKind::Press) {
+                self.apply_results = None;
+                return Ok(false);
+            }
+            return Ok(true);
+        }
+
         // Handle mouse clicks on tab bar
         if let Event::Mouse(mouse) = &event {
             if let MouseEventKind::Down(crossterm::event::MouseButton::Left) = mouse.kind {
@@ -369,8 +565,54 @@ impl App {
         Ok(continue_running)
     }
 
+    fn run_apply(&mut self, scope: ApplyScope) -> ApplyResults {
+        let scope = scope.with_color_side_effects();
+        let mut results = ApplyResults {
+            scope,
+            rendered: Vec::new(),
+            reloaded: Vec::new(),
+            wallpaper: None,
+            keyboard: None,
+        };
+
+        if scope.colors || scope.fonts {
+            match run_update(&self.cfg_dir, &self.dotfiles_dir, &[]) {
+                Ok(result) => {
+                    results.rendered = result.rendered;
+                    results.reloaded = result.reloaded;
+                    if let Some(leds) = result.leds {
+                        results.keyboard = Some(leds);
+                    }
+                }
+                Err(e) => {
+                    results.rendered.push(RenderResult {
+                        name: "update".to_string(),
+                        output: Err(e),
+                    });
+                }
+            }
+        }
+
+        if scope.wallpaper {
+            let config = Config::load(&self.config_path).unwrap_or_default();
+            results.wallpaper = Some(wallpaper::apply(&config, &self.cfg_dir));
+        }
+
+        if scope.keyboard && results.keyboard.is_none() {
+            results.keyboard = Some(match load_config_and_palette(&self.cfg_dir) {
+                Ok((config, palette)) => {
+                    leds::apply_theme(&config, &palette, false, None, None).map(|_| ())
+                }
+                Err(e) => Err(e),
+            });
+        }
+
+        results
+    }
+
     pub fn run(mut self) -> io::Result<Outcome> {
         let mut terminal = init()?;
+        let mut pending_outcome = Outcome::Cancelled;
 
         loop {
             // Refresh font picker config (in case scratchpad changed it)
@@ -381,17 +623,12 @@ impl App {
             if event::poll(std::time::Duration::from_millis(100))? {
                 let event = event::read()?;
                 if !self.handle_event(event)? {
+                    if self.apply_results.is_some() {
+                        continue;
+                    }
                     break;
                 }
             }
-        }
-
-        restore()?;
-
-        // Revert any leftover desktop preview before returning
-        if let Some(p) = self.wallpaper_picker.as_mut() {
-            // no-op if not active
-            let _ = p;
         }
 
         // Check if any picker has pending apply
@@ -415,17 +652,76 @@ impl App {
             keyboard: self.keyboard_picker.wants_apply(),
         };
         if scope.any() {
-            Ok(Outcome::Apply(scope))
+            let results = self.run_apply(scope);
+            self.apply_results = Some(results);
+            pending_outcome = Outcome::Apply(scope.with_color_side_effects());
+
+            loop {
+                terminal.draw(|f| self.render(f))?;
+
+                if event::poll(std::time::Duration::from_millis(100))? {
+                    let event = event::read()?;
+                    if !self.handle_event(event)? {
+                        break;
+                    }
+                }
+            }
         } else if self.color_picker.was_saved()
             || self.font_picker.was_saved()
             || wallpaper_saved
             || self.keyboard_picker.was_saved()
         {
-            Ok(Outcome::SavedOnly)
-        } else {
-            Ok(Outcome::Cancelled)
+            pending_outcome = Outcome::SavedOnly;
         }
+
+        restore()?;
+
+        Ok(pending_outcome)
     }
+}
+
+fn format_scope(scope: ApplyScope) -> String {
+    let mut parts = Vec::new();
+    if scope.colors {
+        parts.push("colors");
+    }
+    if scope.fonts {
+        parts.push("fonts");
+    }
+    if scope.wallpaper {
+        parts.push("wallpaper");
+    }
+    if scope.keyboard {
+        parts.push("keyboard");
+    }
+    parts.join(", ")
+}
+
+fn result_line<'a>(
+    label: &'a str,
+    result: &'a Result<(), String>,
+    text: Color,
+    subtext: Color,
+) -> Line<'a> {
+    let (mark, status, style) = match result {
+        Ok(()) => ("ok", String::new(), Style::default().fg(Color::Green)),
+        Err(e) => ("fail", e.clone(), Style::default().fg(Color::Red)),
+    };
+
+    Line::from(vec![
+        Span::styled(format!("  {:<4} ", mark), style),
+        Span::styled(label, Style::default().fg(text)),
+        Span::styled("  ", Style::default()),
+        Span::styled(status, Style::default().fg(subtext)),
+    ])
+}
+
+fn load_config_and_palette(cfg_dir: &str) -> Result<(Config, Palette), String> {
+    let config = Config::load(&format!("{}/config.toml", cfg_dir)).unwrap_or_default();
+    let palette_path = format!("{}/palettes/{}.toml", cfg_dir, config.flavor);
+    let palette =
+        Palette::load(&palette_path).map_err(|e| format!("Error loading palette: {}", e))?;
+    Ok((config, palette))
 }
 
 /// Run the unified settings TUI
@@ -458,6 +754,19 @@ mod tests {
         };
 
         assert!(scope.any());
+    }
+
+    #[test]
+    fn colors_apply_also_refreshes_wallpaper_and_keyboard() {
+        let scope = ApplyScope {
+            colors: true,
+            ..ApplyScope::default()
+        }
+        .with_color_side_effects();
+
+        assert!(scope.colors);
+        assert!(scope.wallpaper);
+        assert!(scope.keyboard);
     }
 
     #[test]
