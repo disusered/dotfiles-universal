@@ -22,9 +22,9 @@ Prepare clean, logical git commits from the current repository state.
    - Run the most relevant project checks from repo docs or task context.
    - If a full suite fails on unrelated pre-existing files, run targeted checks against changed files and report both facts exactly.
 5. Check recent commit style before choosing commit messages.
-6. If the user explicitly asked to commit, stage only the intended files and commit. Otherwise, prepare the commit plan and ask before creating commits.
+6. If the user explicitly asked to commit, stage only the intended files and create signed commits with `git commit -S ...`. Otherwise, prepare the commit plan and ask before creating commits.
 7. Do not pull, rebase, push, amend, or otherwise rewrite history unless the user explicitly asks for that separate operation.
-8. After committing, verify with `git status --short`, `git log --oneline -5`, and `git diff HEAD --stat`.
+8. After committing, verify with `git verify-commit HEAD`, `git status --short`, `git log --oneline -5`, and `git diff HEAD --stat`.
 
 ## Pitfalls
 
@@ -32,3 +32,4 @@ Prepare clean, logical git commits from the current repository state.
 - Do not claim a check passed if only a narrower command passed.
 - Do not mix unrelated changes into one commit for convenience.
 - Do not push as part of this skill unless the user explicitly requests it.
+- Do not use `--no-gpg-sign`, `commit.gpgsign=false`, or any other signing bypass. If signing fails, report the exact failure instead of creating an unsigned commit.

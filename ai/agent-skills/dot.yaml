@@ -13,3 +13,8 @@ global:
       - ~/.hermes/skills/software-development/slop-clean/SKILL.md
       - ~/.config/opencode/commands/slop-clean.md
       - ~/.claude/commands/slop-clean.md
+    grill-me: ~/.agents/skills/grill-me
+    grill-me/commands/grill-me.md:
+      - ~/.hermes/skills/software-development/grill-me/SKILL.md
+      - ~/.config/opencode/commands/grill-me.md
+      - ~/.claude/commands/grill-me.md
