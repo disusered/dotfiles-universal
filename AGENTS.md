@@ -22,6 +22,14 @@ bd close <id>         # Complete work
 
 Do not run `git pull`, `git pull --rebase`, or `git push` as a session-completion routine. Only run remote git operations when the user explicitly asks.
 
+## Git Commit Signing
+
+- **NEVER create unsigned commits.** All agent-created commits must be GPG-signed.
+- Use `git commit -S ...` for every commit. Do not rely only on ambient git config.
+- **NEVER use `--no-gpg-sign`, `commit.gpgsign=false`, or any other signing bypass.**
+- If signing fails, stop and report the exact error. Do not retry with signing disabled.
+- After every agent-created commit, run `git verify-commit HEAD`. Treat verification failure as a failed commit task until the commit is replaced with a signed, verifiable commit.
+
 ## Repository Overview
 
 This is a universal dotfiles repository managed by [Rotz](https://github.com/volllly/rotz), a cross-platform dotfile manager. It supports **Linux (Fedora & Arch)**, **macOS**, and **Windows** environments with platform-specific configurations.

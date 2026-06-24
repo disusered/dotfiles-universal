@@ -3,7 +3,7 @@ approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 commit_attribution = ""
 model = "gpt-5.5"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "medium"
 plan_mode_reasoning_effort = "xhigh"
 service_tier = "default"
 
@@ -105,11 +105,6 @@ approval_mode = "approve"
 [plugins."openviking-memory@openviking-plugins-local".mcp_servers.openviking-memory.tools.find]
 approval_mode = "approve"
 
-[mcp_servers.atlassian]
-url = "https://mcp.atlassian.com/v1/mcp/authv2"
-startup_timeout_sec = 30.0
-tool_timeout_sec = 120.0
-
 [marketplaces.openviking-plugins-local]
 last_updated = "2026-06-13T03:18:32Z"
 source_type = "local"
@@ -129,3 +124,6 @@ trusted_hash = "sha256:8dead3af127ed2391ebb0e12d8d5ce61d9b1eec0909a3d94425dfb129
 
 [hooks.state."openviking-memory@openviking-plugins-local:hooks/hooks.json:stop:0:0"]
 trusted_hash = "sha256:c730def8275e2e74d51898cb02c62be67f1905fa5cb8813883b41a39140c2c20"
+
+[mcp_servers.atlassian]
+url = "https://mcp.atlassian.com/v1/sse"

@@ -340,7 +340,24 @@ prefix_rule(pattern=["gh", "api"], decision="allow")
 prefix_rule(pattern=["uv", "run"], decision="allow")
 prefix_rule(pattern=["uv", "lock"], decision="allow")
 prefix_rule(pattern=["lsusb"], decision="allow")
-prefix_rule(pattern=["git", "commit"], decision="allow")
+prefix_rule(
+    pattern = ["git", "commit", "--no-gpg-sign"],
+    decision = "forbidden",
+    justification = "Agent-created commits must be GPG-signed; do not bypass signing.",
+    match = [
+        "git commit --no-gpg-sign -m msg",
+    ],
+)
+prefix_rule(
+    pattern = ["git", "-c", "commit.gpgsign=false"],
+    decision = "forbidden",
+    justification = "Agent-created commits must be GPG-signed; do not disable commit.gpgsign.",
+    match = [
+        "git -c commit.gpgsign=false commit -m msg",
+    ],
+)
+prefix_rule(pattern=["git", "commit", "-S"], decision="allow")
+prefix_rule(pattern=["git", "verify-commit"], decision="allow")
 prefix_rule(pattern=["cargo", "run"], decision="allow")
 prefix_rule(pattern=["journalctl", "--user"], decision="allow")
 prefix_rule(pattern=["pypr-client"], decision="allow")
