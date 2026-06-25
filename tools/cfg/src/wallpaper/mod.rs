@@ -157,6 +157,7 @@ mod tests {
             gravity: "Center".to_string(),
             cache_dir: String::new(),
             source_dir: String::new(),
+            sources: Vec::new(),
         };
         assert_eq!(resolve_cache_dir(&cfg), "/home/test/.cache/wallpapers");
     }
@@ -170,6 +171,7 @@ mod tests {
             gravity: "Center".to_string(),
             cache_dir: "~/scratch".to_string(),
             source_dir: String::new(),
+            sources: Vec::new(),
         };
         assert_eq!(resolve_cache_dir(&cfg), "/home/test/scratch");
     }
@@ -189,6 +191,7 @@ mod tests {
             gravity: "Center".to_string(),
             cache_dir: "/tmp".to_string(),
             source_dir: String::new(),
+            sources: Vec::new(),
         });
         let err = apply(&cfg, "/tmp").unwrap_err();
         assert!(
@@ -206,6 +209,7 @@ mod tests {
             gravity: "Center".to_string(),
             cache_dir: "/tmp".to_string(),
             source_dir: String::new(),
+            sources: Vec::new(),
         });
         let err = apply(&cfg, "/tmp").unwrap_err();
         assert!(
@@ -223,6 +227,7 @@ mod tests {
             gravity: "Center".to_string(),
             cache_dir: "/tmp".to_string(),
             source_dir: String::new(),
+            sources: Vec::new(),
         });
         let err = apply(&cfg, "/tmp").unwrap_err();
         assert!(
@@ -240,6 +245,7 @@ mod tests {
             gravity: "Center".to_string(),
             cache_dir: "/tmp".to_string(),
             source_dir: String::new(),
+            sources: Vec::new(),
         });
         let err = apply(&cfg, "/tmp").unwrap_err();
         assert!(

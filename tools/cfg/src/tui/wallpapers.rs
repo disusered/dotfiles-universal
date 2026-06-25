@@ -33,6 +33,7 @@ enum Mode {
 struct Entry {
     path: PathBuf,
     name: String,
+    source_name: String,
     score: Option<f32>,
     best_dominant: Option<RgbColor>,
 }
@@ -71,6 +72,8 @@ pub struct WallpaperPicker {
     search: FuzzyInputState,
     mode: Mode,
     match_only: bool,
+    source_filter: Option<String>,
+    source_names: Vec<String>,
     picker: Option<Picker>,
     protocols: HashMap<PathBuf, StatefulProtocol>,
     decode_failures: HashMap<PathBuf, String>,
@@ -93,17 +96,15 @@ impl WallpaperPicker {
         config_path: String,
         cfg_dir: String,
     ) -> Result<Self, String> {
-        let source_dir = config.wallpaper.source_dir.trim().to_string();
-        if source_dir.is_empty() {
+        if config.wallpaper.configured_sources().is_empty() {
             return Err(
-                "wallpaper.source_dir not set; run: cfg wallpaper --set source_dir=<dir>"
+                "no wallpaper sources configured; set wallpaper.source_dir or wallpaper.sources"
                     .to_string(),
             );
         }
-        let expanded = expand_tilde(&source_dir);
-        let files = enumerate_wallpapers(&expanded)?;
+        let files = wallpaper::picker::enumerate_configured_wallpapers(&config)?;
         if files.is_empty() {
-            return Err(format!("no wallpapers in {}", expanded));
+            return Err("no wallpapers in configured sources".to_string());
         }
 
         let primary_color = palette.get(&config.primary).copied();
@@ -113,13 +114,14 @@ impl WallpaperPicker {
 
         let mut entries: Vec<Entry> = files
             .into_iter()
-            .map(|path| {
+            .map(|file| {
+                let path = PathBuf::from(&file.path);
                 let name = path
                     .file_name()
                     .and_then(|s| s.to_str())
                     .unwrap_or("?")
                     .to_string();
-                let path_str = path.to_string_lossy().into_owned();
+                let path_str = file.path;
                 let (score, best_dominant) = match (&primary_color, cache.get_fresh(&path_str)) {
                     (Some(target), Some(entry)) => {
                         let mut best: Option<(RgbColor, f32)> = None;
@@ -139,6 +141,7 @@ impl WallpaperPicker {
                 Entry {
                     path,
                     name,
+                    source_name: file.source_name,
                     score,
                     best_dominant,
                 }
@@ -151,6 +154,10 @@ impl WallpaperPicker {
             (None, Some(_)) => std::cmp::Ordering::Greater,
             (None, None) => a.name.cmp(&b.name),
         });
+
+        let mut source_names: Vec<String> = entries.iter().map(|e| e.source_name.clone()).collect();
+        source_names.sort();
+        source_names.dedup();
 
         let filtered: Vec<usize> = (0..entries.len()).collect();
         let mut list_state = ListState::default();
@@ -168,6 +175,8 @@ impl WallpaperPicker {
             search: FuzzyInputState::new(),
             mode: Mode::Normal,
             match_only: false,
+            source_filter: None,
+            source_names,
             picker,
             protocols: HashMap::new(),
             decode_failures: HashMap::new(),
@@ -203,6 +212,12 @@ impl WallpaperPicker {
 
     fn update_filter(&mut self) {
         let ranked = self.search.filter(&self.entries, |e| e.name.as_str());
+        let source_filter = self.source_filter.as_deref();
+        let ranked = ranked.into_iter().filter(|(i, _)| {
+            source_filter
+                .and_then(|name| self.entries.get(*i).map(|e| e.source_name == name))
+                .unwrap_or(true)
+        });
         let indexes: Vec<usize> = if self.match_only {
             ranked
                 .into_iter()
@@ -224,6 +239,25 @@ impl WallpaperPicker {
         } else {
             Some(0)
         });
+    }
+
+    fn cycle_source_filter(&mut self) {
+        if self.source_names.is_empty() {
+            self.source_filter = None;
+            return;
+        }
+
+        self.source_filter = match self.source_filter.as_deref() {
+            None => self.source_names.first().cloned(),
+            Some(current) => self
+                .source_names
+                .iter()
+                .position(|name| name == current)
+                .and_then(|i| self.source_names.get(i + 1).cloned()),
+        };
+        self.update_filter();
+        let label = self.source_filter.as_deref().unwrap_or("All");
+        self.flash = Some(format!("source: {}", label));
     }
 
     fn ensure_protocol(&mut self, path: &Path) {
@@ -307,9 +341,14 @@ impl WallpaperPicker {
         } else {
             ""
         };
+        let source_tag = self
+            .source_filter
+            .as_deref()
+            .map(|name| format!(" · {}", name))
+            .unwrap_or_default();
         format!(
-            " cfg wallpaper -i · {}/{}{}{} ",
-            count, total, match_tag, preview_tag
+            " cfg wallpaper -i · {}/{}{}{}{} ",
+            count, total, source_tag, match_tag, preview_tag
         )
     }
 
@@ -350,6 +389,10 @@ impl WallpaperPicker {
                     Span::styled("● ", Style::default().fg(swatch_color)),
                     Span::styled(badge_text, badge_style),
                     Span::raw(" "),
+                    Span::styled(
+                        format!("[{}] ", e.source_name),
+                        Style::default().fg(self.theme.subtext0),
+                    ),
                     Span::styled(e.name.clone(), name_style),
                 ]))
             })
@@ -422,8 +465,9 @@ impl WallpaperPicker {
                 .map(|_| self.config.primary.as_str())
                 .unwrap_or("—");
             format!(
-                "↑/↓ nav  p preview  space scratchpad  r revert  m match-only  / search  enter apply  q quit  · primary={}",
-                primary
+                "↑/↓ nav  p preview  space scratchpad  r revert  s source  m match-only  / search  enter apply  q quit  · primary={} source={}",
+                primary,
+                self.source_filter.as_deref().unwrap_or("All")
             )
         };
         let style = Style::default()
@@ -558,6 +602,9 @@ impl WallpaperPicker {
                 self.update_filter();
                 self.flash = None;
             }
+            (Mode::Normal, KeyCode::Char('s')) => {
+                self.cycle_source_filter();
+            }
             (Mode::Normal, KeyCode::Char('p')) => {
                 if let Some(p) = self.selected_path().map(|p| p.to_path_buf()) {
                     self.preview_wallpaper(&p);
@@ -650,25 +697,6 @@ fn expand_tilde(s: &str) -> String {
         }
     }
     s.to_string()
-}
-
-fn enumerate_wallpapers(dir: &str) -> Result<Vec<PathBuf>, String> {
-    let entries = std::fs::read_dir(dir).map_err(|e| format!("read_dir({}): {}", dir, e))?;
-    let mut out = Vec::new();
-    for entry in entries.flatten() {
-        let path = entry.path();
-        if !path.is_file() {
-            continue;
-        }
-        if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
-            let lc = ext.to_ascii_lowercase();
-            if matches!(lc.as_str(), "jpg" | "jpeg" | "png") {
-                out.push(path);
-            }
-        }
-    }
-    out.sort();
-    Ok(out)
 }
 
 fn color_distance(a: &RgbColor, b: &RgbColor) -> f32 {

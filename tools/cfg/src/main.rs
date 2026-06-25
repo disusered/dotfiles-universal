@@ -102,7 +102,7 @@ enum Command {
     },
     /// Wallpaper configuration
     /// Manage wallpaper. Two modes: `pinned` uses a fixed `path`, `picker`
-    /// chooses from `source_dir` by palette match. Toggle with
+    /// chooses from configured sources by palette match. Toggle with
     /// `--set mode=pinned|picker`. Both `path` and `source_dir` stay stored
     /// regardless of mode so you can switch back.
     ///
@@ -117,7 +117,7 @@ enum Command {
         /// After --set, apply wallpaper. Standalone: re-apply current wallpaper.
         #[arg(long, conflicts_with_all = ["interactive", "scratchpad"])]
         apply: bool,
-        /// Re-analyze images in source_dir to (re)build the color-tag cache.
+        /// Re-analyze images in configured wallpaper sources to (re)build the color-tag cache.
         /// Combines with --apply to rescan then apply.
         #[arg(long, group = "mode")]
         rescan: bool,
@@ -159,10 +159,14 @@ enum Command {
 
 /// Get the cfg configuration directory
 fn get_cfg_dir() -> String {
-    // First try CFG_DIR env var, then default to ~/.dotfiles/cfg
     std::env::var("CFG_DIR").unwrap_or_else(|_| {
-        let home = std::env::var("HOME").expect("HOME not set");
-        format!("{}/.dotfiles/cfg", home)
+        std::env::var("XDG_CONFIG_HOME").map_or_else(
+            |_| {
+                let home = std::env::var("HOME").expect("HOME not set");
+                format!("{}/.config/cfg", home)
+            },
+            |xdg_config_home| format!("{}/cfg", xdg_config_home),
+        )
     })
 }
 
@@ -1043,10 +1047,10 @@ fn main() {
                     }
                 }
             } else if rescan {
-                if config.wallpaper.source_dir.trim().is_empty() {
+                if config.wallpaper.configured_sources().is_empty() {
                     eprintln!(
-                        "Error: wallpaper.source_dir not set; \
-                         run: cfg wallpaper --set source_dir=<dir>"
+                        "Error: no wallpaper sources configured; \
+                         set wallpaper.source_dir or wallpaper.sources"
                     );
                     std::process::exit(1);
                 }
@@ -1076,6 +1080,9 @@ fn main() {
                 println!("gravity={}", config.wallpaper.gravity);
                 println!("cache_dir={}", config.wallpaper.cache_dir);
                 println!("source_dir={}", config.wallpaper.source_dir);
+                for source in config.wallpaper.configured_sources() {
+                    println!("source={} ({})", source.name, source.path);
+                }
             }
         }
     }

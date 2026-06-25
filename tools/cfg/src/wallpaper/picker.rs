@@ -25,6 +25,12 @@ pub const MATCH_THRESHOLD: f32 = 60.0;
 /// most of the work.
 const SAVE_EVERY: usize = 50;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct WallpaperFile {
+    pub path: String,
+    pub source_name: String,
+}
+
 /// Minimum Euclidean RGB distance from any of `dominants` to `target`.
 ///
 /// Lower is a better match. Weight is intentionally ignored: we only care
@@ -68,7 +74,7 @@ pub fn tiebreak(pool: &[String], scores_by_secondary: &HashMap<String, f32>) -> 
     ranked.into_iter().map(|(p, _)| p).collect()
 }
 
-/// Pick a wallpaper from `config.wallpaper.source_dir` whose dominant colors
+/// Pick a wallpaper from the configured wallpaper source directories whose dominant colors
 /// best match the current `config.primary`, with `config.secondary` as
 /// tiebreaker and random choice within the matching pool.
 ///
@@ -82,10 +88,12 @@ pub fn pick(config: &Config, cfg_dir: &str) -> Result<String, String> {
         .ok_or_else(|| format!("primary color '{}' not found in palette", config.primary))?;
     let secondary_color = palette.get(&config.secondary).copied();
 
-    let source_dir = super::expand_tilde(&config.wallpaper.source_dir);
-    let files = enumerate_wallpapers(&source_dir)?;
+    let files: Vec<String> = enumerate_configured_wallpapers(config)?
+        .into_iter()
+        .map(|f| f.path)
+        .collect();
     if files.is_empty() {
-        return Err(format!("no wallpapers found in '{}'", source_dir));
+        return Err("no wallpapers found in configured sources".to_string());
     }
 
     let cache_dir = super::resolve_cache_dir(&config.wallpaper);
@@ -249,17 +257,15 @@ fn format_progress_line(n: usize, total: usize, path: &str) -> String {
     format!("[{}/{}] analyzing {}", n, total, basename)
 }
 
-/// Analyze every image in `config.wallpaper.source_dir` whose tag cache entry
+/// Analyze every image in the configured wallpaper sources whose tag cache entry
 /// is missing or stale. No-op when source_dir is empty, unreadable, or fully
 /// cached. Progress goes to stderr when it's a TTY (same convention as
 /// [`pick`]). Returns `Ok(n)` where `n` is the number of newly-analyzed files.
 pub fn prewarm_cache(config: &Config) -> Result<usize, String> {
-    let source_dir = config.wallpaper.source_dir.trim();
-    if source_dir.is_empty() {
+    if config.wallpaper.configured_sources().is_empty() {
         return Ok(0);
     }
-    let expanded = super::expand_tilde(source_dir);
-    let files = match enumerate_wallpapers(&expanded) {
+    let files = match enumerate_configured_wallpapers(config) {
         Ok(f) => f,
         Err(_) => return Ok(0), // dir missing/unreadable: nothing to warm
     };
@@ -271,6 +277,7 @@ pub fn prewarm_cache(config: &Config) -> Result<usize, String> {
     let cache = TagCache::load(&tags_path)?;
     let to_analyze: Vec<String> = files
         .into_iter()
+        .map(|file| file.path)
         .filter(|p| cache.get_fresh(p).is_none())
         .collect();
     if to_analyze.is_empty() {
@@ -281,7 +288,34 @@ pub fn prewarm_cache(config: &Config) -> Result<usize, String> {
     Ok(n)
 }
 
-fn enumerate_wallpapers(dir: &str) -> Result<Vec<String>, String> {
+pub fn enumerate_configured_wallpapers(config: &Config) -> Result<Vec<WallpaperFile>, String> {
+    let sources = config.wallpaper.configured_sources();
+    if sources.is_empty() {
+        return Ok(Vec::new());
+    }
+
+    let mut out = Vec::new();
+    let mut errors = Vec::new();
+    for source in sources {
+        let expanded = super::expand_tilde(&source.path);
+        match enumerate_wallpapers(&expanded) {
+            Ok(files) => out.extend(files.into_iter().map(|path| WallpaperFile {
+                path,
+                source_name: source.name.clone(),
+            })),
+            Err(e) => errors.push(e),
+        }
+    }
+
+    if out.is_empty() && !errors.is_empty() {
+        Err(errors.join("; "))
+    } else {
+        out.sort_by(|a, b| a.path.cmp(&b.path));
+        Ok(out)
+    }
+}
+
+pub fn enumerate_wallpapers(dir: &str) -> Result<Vec<String>, String> {
     let entries =
         fs::read_dir(dir).map_err(|e| format!("failed to read source_dir '{}': {}", dir, e))?;
     let mut out = Vec::new();
@@ -316,6 +350,21 @@ fn file_mtime_secs(path: &str) -> Option<u64> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn temp_path(name: &str) -> String {
+        let unique = format!(
+            "{}-{}",
+            name,
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        );
+        std::env::temp_dir()
+            .join(unique)
+            .to_string_lossy()
+            .into_owned()
+    }
 
     fn c(r: u8, g: u8, b: u8) -> Color {
         Color { r, g, b }
@@ -415,6 +464,54 @@ mod tests {
     fn format_progress_line_uses_basename() {
         let line = format_progress_line(42, 335, "/home/user/pics/catppuccin/foo.jpg");
         assert_eq!(line, "[42/335] analyzing foo.jpg");
+    }
+
+    #[test]
+    fn enumerate_configured_wallpapers_reads_legacy_source_dir() {
+        let dir = temp_path("cfg-wallpapers-legacy");
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(format!("{}/one.jpg", dir), b"jpg").unwrap();
+        fs::write(format!("{}/note.txt", dir), b"text").unwrap();
+
+        let mut config = Config::default();
+        config.wallpaper.source_dir = dir.clone();
+
+        let files = enumerate_configured_wallpapers(&config).unwrap();
+        assert_eq!(files.len(), 1);
+        assert_eq!(files[0].source_name, "Wallpapers");
+        assert!(files[0].path.ends_with("one.jpg"));
+
+        fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn enumerate_configured_wallpapers_merges_explicit_sources() {
+        let one = temp_path("cfg-wallpapers-apod");
+        let two = temp_path("cfg-wallpapers-eo");
+        fs::create_dir_all(&one).unwrap();
+        fs::create_dir_all(&two).unwrap();
+        fs::write(format!("{}/apod.jpg", one), b"jpg").unwrap();
+        fs::write(format!("{}/eo.png", two), b"png").unwrap();
+
+        let mut config = Config::default();
+        config.wallpaper.sources = vec![
+            crate::config::WallpaperSourceConfig {
+                name: "APOD".to_string(),
+                path: one.clone(),
+            },
+            crate::config::WallpaperSourceConfig {
+                name: "Earth Observatory".to_string(),
+                path: two.clone(),
+            },
+        ];
+
+        let files = enumerate_configured_wallpapers(&config).unwrap();
+        assert_eq!(files.len(), 2);
+        assert!(files.iter().any(|f| f.source_name == "APOD"));
+        assert!(files.iter().any(|f| f.source_name == "Earth Observatory"));
+
+        fs::remove_dir_all(&one).unwrap();
+        fs::remove_dir_all(&two).unwrap();
     }
 
     #[test]

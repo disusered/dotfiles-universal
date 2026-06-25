@@ -46,6 +46,14 @@ pub struct WallpaperConfig {
     pub cache_dir: String,
     #[serde(default = "default_wallpaper_source_dir")]
     pub source_dir: String,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub sources: Vec<WallpaperSourceConfig>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
+pub struct WallpaperSourceConfig {
+    pub name: String,
+    pub path: String,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -96,6 +104,25 @@ impl Default for WallpaperConfig {
             gravity: default_wallpaper_gravity(),
             cache_dir: default_wallpaper_cache_dir(),
             source_dir: default_wallpaper_source_dir(),
+            sources: Vec::new(),
+        }
+    }
+}
+
+impl WallpaperConfig {
+    pub fn configured_sources(&self) -> Vec<WallpaperSourceConfig> {
+        if !self.sources.is_empty() {
+            return self.sources.clone();
+        }
+
+        let source_dir = self.source_dir.trim();
+        if source_dir.is_empty() {
+            Vec::new()
+        } else {
+            vec![WallpaperSourceConfig {
+                name: "Wallpapers".to_string(),
+                path: source_dir.to_string(),
+            }]
         }
     }
 }
@@ -425,6 +452,43 @@ mod tests {
         assert_eq!(
             config.get("wallpaper.source_dir").unwrap(),
             "~/Pictures/Wallpapers/catppuccin-mocha"
+        );
+    }
+
+    #[test]
+    fn wallpaper_configured_sources_falls_back_to_legacy_source_dir() {
+        let mut config = Config::default();
+        config.wallpaper.source_dir = "~/Pictures/Wallpapers/APOD".to_string();
+
+        assert_eq!(
+            config.wallpaper.configured_sources(),
+            vec![WallpaperSourceConfig {
+                name: "Wallpapers".to_string(),
+                path: "~/Pictures/Wallpapers/APOD".to_string(),
+            }]
+        );
+    }
+
+    #[test]
+    fn wallpaper_configured_sources_prefers_explicit_sources() {
+        let mut config = Config::default();
+        config.wallpaper.source_dir = "~/Pictures/Wallpapers/APOD".to_string();
+        config.wallpaper.sources = vec![
+            WallpaperSourceConfig {
+                name: "APOD".to_string(),
+                path: "~/Pictures/Wallpapers/APOD".to_string(),
+            },
+            WallpaperSourceConfig {
+                name: "Earth Observatory".to_string(),
+                path: "~/Pictures/Wallpapers/EarthObservatory".to_string(),
+            },
+        ];
+
+        assert_eq!(config.wallpaper.configured_sources().len(), 2);
+        assert_eq!(config.wallpaper.configured_sources()[0].name, "APOD");
+        assert_eq!(
+            config.wallpaper.configured_sources()[1].path,
+            "~/Pictures/Wallpapers/EarthObservatory"
         );
     }
 }
