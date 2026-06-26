@@ -1,11 +1,14 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      if ! command -v cfg &>/dev/null; then
-        printf '%s\n' 'cfg is not installed. Build it from /home/carlos/Development/ME/herding-cats/utilities/cfg with: make release' >&2
+      cfg_src=/home/carlos/Development/ME/herding-cats/utilities/cfg
+      if [ ! -d "$cfg_src" ]; then
+        printf '%s\n' "cfg source is missing: $cfg_src" >&2
+        exit 1
       fi
+      cargo install --path "$cfg_src" --force
     depends:
-      - /cfg
+      - /languages/rust
   links:
     cfg.conf: {{ dirs.base.config }}/hypr/conf.d/cfg.conf
     cfg.desktop: ~/.local/share/applications/cfg.desktop

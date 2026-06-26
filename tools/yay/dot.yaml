@@ -9,7 +9,7 @@ linux[whoami.distro^="Arch"]:
         fi
         cd ~/.yay && makepkg -si --noconfirm
       fi
-      yay --save --cleanafter
+      yay -Y --save --cleanafter
     depends:
       - /lib/arch
       - /tools/git
