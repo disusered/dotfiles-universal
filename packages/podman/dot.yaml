@@ -3,10 +3,15 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       if ! pacman -Qi podman &>/dev/null; then
         sudo pacman -S --noconfirm --needed podman podman-desktop podman-compose netavark aardvark-dns
-        systemctl --user enable --now podman.socket
       fi
+      ~/.rotz/bin/rotz link /packages/podman -f
+      systemctl --user daemon-reload
+      systemctl --user enable --now podman.socket
+      systemctl --user enable --now podman-system-prune.timer
   links:
     registries.conf: ~/.config/containers/registries.conf
     podman.zsh: ~/.config/zsh/0700_podman.zsh
     docker.sh: ~/.local/bin/docker
     storage.conf: ~/.config/containers/storage.conf
+    systemd/podman-system-prune.service: ~/.config/systemd/user/podman-system-prune.service
+    systemd/podman-system-prune.timer: ~/.config/systemd/user/podman-system-prune.timer

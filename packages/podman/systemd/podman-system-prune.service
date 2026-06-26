@@ -1,0 +1,8 @@
+[Unit]
+Description=Prune unused rootless Podman containers and images
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/podman container prune --force --filter until=168h
+ExecStart=/usr/bin/podman image prune --force --all --external --filter until=168h
+IOSchedulingClass=idle

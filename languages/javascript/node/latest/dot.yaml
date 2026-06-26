@@ -5,3 +5,15 @@ global:
       ~/.local/bin/mise which node &>/dev/null || ~/.local/bin/mise install node
     depends:
       - /tools/mise
+
+linux:
+  installs:
+    cmd: |
+      ~/.rotz/bin/rotz link /languages/javascript/node/latest -f
+      systemctl --user daemon-reload
+      systemctl --user enable --now npm-cache-verify.timer
+    depends:
+      - /tools/mise
+  links:
+    systemd/npm-cache-verify.service: ~/.config/systemd/user/npm-cache-verify.service
+    systemd/npm-cache-verify.timer: ~/.config/systemd/user/npm-cache-verify.timer

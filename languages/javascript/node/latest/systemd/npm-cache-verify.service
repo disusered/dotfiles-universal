@@ -1,0 +1,7 @@
+[Unit]
+Description=Verify and garbage collect npm cache entries
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/share/mise/shims/npm cache verify
+IOSchedulingClass=idle
