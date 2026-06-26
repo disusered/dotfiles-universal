@@ -1,0 +1,9 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      sudo pacman -S --noconfirm --needed google-cloud-cli
+      if command -v gcloud &>/dev/null; then
+        gcloud config set core/max_log_days 7
+      fi
+    depends:
+      - /lib/arch

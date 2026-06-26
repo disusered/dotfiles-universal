@@ -6,4 +6,5 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
+Environment=CLOUDSDK_CORE_DISABLE_FILE_LOGGING=true
 ExecStart=%h/.local/bin/xbol-gcp-log-fetch --once

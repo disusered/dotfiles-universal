@@ -55,6 +55,8 @@ User systemd units:
 - `xbol-gcp-log-fetch.service`
   - one-shot host-side fetch of narrowly scoped GCP logs
   - runs `~/.local/bin/xbol-gcp-log-fetch --once`
+  - disables Cloud SDK file logging with `CLOUDSDK_CORE_DISABLE_FILE_LOGGING=true`
+    so the frequent timer does not fill `~/.config/gcloud/logs`
 - `xbol-gcp-log-fetch.timer`
   - periodic fetch every ~2 minutes
   - enabled and started by this module's Rotz install path
@@ -173,6 +175,11 @@ Default locations:
 
 - State: `~/.local/share/xbol-observability/log-fetch/state.json`
 - Spool: `~/.local/share/xbol-observability/log-spool/cloudlogging/YYYY-MM-DD.ndjson`
+
+Spool retention is managed by the rotz `/arch/disk-cleanup` module through
+`systemd-tmpfiles --user`. The current policy removes Cloud Logging spool files
+older than 14 days; the fetcher itself only writes current NDJSON files and does
+not implement its own cleanup loop.
 
 Useful overrides:
 

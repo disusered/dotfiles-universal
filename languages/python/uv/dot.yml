@@ -12,7 +12,13 @@ linux[whoami.distro^="Fedora"]:
     uv.zsh: ~/.config/zsh/0300_uv.zsh
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm --needed uv
+    cmd: |
+      sudo pacman -S --noconfirm --needed uv
+      mkdir -p ~/.config/systemd/user
+      ~/.rotz/bin/rotz link /languages/python/uv -f
+      systemctl --user daemon-reload
+      systemctl --user enable --now uv-cache-prune.timer
   links:
     uv.zsh: ~/.config/zsh/0300_uv.zsh
-
+    systemd/uv-cache-prune.service: ~/.config/systemd/user/uv-cache-prune.service
+    systemd/uv-cache-prune.timer: ~/.config/systemd/user/uv-cache-prune.timer

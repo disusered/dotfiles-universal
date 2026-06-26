@@ -1,0 +1,7 @@
+[Unit]
+Description=Prune unreachable uv cache entries
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/uv cache prune
+IOSchedulingClass=idle

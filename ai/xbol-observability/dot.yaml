@@ -32,6 +32,8 @@ linux[whoami.distro^="Arch"]:
       systemctl --user try-restart hermes-gateway-xbol.service
     depends:
       - /packages/podman
+      - /tools/gcloud
+      - /arch/disk-cleanup
   links:
     alloy/config.alloy: ~/.config/xbol-observability/alloy/config.alloy
     loki/config.yaml: ~/.config/xbol-observability/loki/config.yaml

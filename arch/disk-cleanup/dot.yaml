@@ -1,0 +1,29 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -euo pipefail
+      sudo pacman -S --noconfirm --needed pacman-contrib logrotate
+
+      sudo install -Dm644 ~/.dotfiles/arch/disk-cleanup/journald/10-disk-cleanup.conf \
+        /etc/systemd/journald.conf.d/10-disk-cleanup.conf
+
+      sudo mkdir -p /etc/systemd/system/paccache.service.d
+      sudo install -m 644 -o root -g root \
+        ~/.dotfiles/arch/disk-cleanup/systemd/paccache-cleanup.conf \
+        /etc/systemd/system/paccache.service.d/10-disk-cleanup.conf
+
+      sudo systemctl daemon-reload
+      sudo systemctl enable --now paccache.timer
+
+      mkdir -p ~/.config/systemd/user
+      mkdir -p ~/.config/user-tmpfiles.d
+      ~/.rotz/bin/rotz link /arch/disk-cleanup -f
+      systemctl --user daemon-reload
+      systemctl --user enable --now systemd-tmpfiles-clean.timer
+
+      sudo systemd-tmpfiles --create
+      systemd-tmpfiles --user --create
+    depends:
+      - /lib/arch
+  links:
+    tmpfiles/user-disk-cleanup.conf: ~/.config/user-tmpfiles.d/10-disk-cleanup.conf
