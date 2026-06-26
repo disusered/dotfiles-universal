@@ -406,3 +406,5 @@ prefix_rule(pattern=["gcloud", "secrets", "versions", "access", "latest", "--sec
 prefix_rule(pattern=["npm", "run", "test:admin:headless"], decision="allow")
 prefix_rule(pattern=["soffice"], decision="allow")
 prefix_rule(pattern=["npm", "run", "test:headless"], decision="allow")
+prefix_rule(pattern=["npm", "run", "test:client:headless"], decision="allow")
+prefix_rule(pattern=["opencode", "run"], decision="allow")

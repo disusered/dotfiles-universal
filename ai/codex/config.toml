@@ -5,7 +5,7 @@ commit_attribution = ""
 model = "gpt-5.5"
 model_reasoning_effort = "medium"
 plan_mode_reasoning_effort = "xhigh"
-service_tier = "default"
+service_tier = "fast"
 
 [features]
 codex_git_commit = false
@@ -17,11 +17,25 @@ goals = true
 [shell_environment_policy]
 inherit = "core"
 
+[agents]
+max_threads = 8
+max_depth = 2
+
 [tui]
 notifications = ["agent-turn-complete", "approval-requested"]
 notification_method = "osc9"
 notification_condition = "unfocused"
-status_line = ["model-with-reasoning", "current-dir", "git-branch", "branch-changes", "run-state", "context-used", "five-hour-limit", "used-tokens", "task-progress"]
+status_line = [
+  "model-with-reasoning",
+  "current-dir",
+  "git-branch",
+  "branch-changes",
+  "run-state",
+  "context-used",
+  "five-hour-limit",
+  "used-tokens",
+  "task-progress",
+]
 status_line_use_colors = true
 
 [tui.model_availability_nux]
@@ -90,6 +104,12 @@ trust_level = "trusted"
 [projects."/home/carlos/Development/XBOL/workshop"]
 trust_level = "trusted"
 
+[projects."/home/carlos/Development/XBOL/workshop/xbol"]
+trust_level = "trusted"
+
+[projects."/home/carlos/Development/ME/herding-cats/workshop/skunkworks/email-ynab-updater"]
+trust_level = "trusted"
+
 [plugins."codex-security@openai-curated"]
 enabled = true
 
@@ -127,6 +147,3 @@ trusted_hash = "sha256:8dead3af127ed2391ebb0e12d8d5ce61d9b1eec0909a3d94425dfb129
 
 [hooks.state."openviking-memory@openviking-plugins-local:hooks/hooks.json:stop:0:0"]
 trusted_hash = "sha256:c730def8275e2e74d51898cb02c62be67f1905fa5cb8813883b41a39140c2c20"
-
-[mcp_servers.atlassian]
-url = "https://mcp.atlassian.com/v1/sse"
