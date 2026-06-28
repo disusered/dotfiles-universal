@@ -52,21 +52,6 @@ prefix_rule(
 )
 
 prefix_rule(
-    pattern = ["git", ["pull", "push"]],
-    decision = "forbidden",
-    justification = "Do not pull or push git remotes from Codex.",
-    match = [
-        "git pull",
-        "git pull --rebase",
-        "git push",
-    ],
-    not_match = [
-        "git status --short",
-        "git log --oneline -5",
-    ],
-)
-
-prefix_rule(
     pattern = ["gh", ["pr", "issue"], ["view", "list", "status"]],
     decision = "allow",
     justification = "Read-only GitHub inspection through gh is allowed.",
