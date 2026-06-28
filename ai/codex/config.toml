@@ -121,5 +121,20 @@ last_updated = "2026-06-28T17:27:01Z"
 source_type = "local"
 source = "/home/carlos/.codex/openviking-plugins-local-marketplace"
 
+[hooks.state]
+
+[hooks.state."openviking-memory@openviking-plugins-local:hooks/hooks.json:pre_compact:0:0"]
+trusted_hash = "sha256:d3fc3fcf2f33e95a329f56092131b3cda841fde4f8c429ac11e22e5ab9749b00"
+enabled = true
+
+[hooks.state."openviking-memory@openviking-plugins-local:hooks/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:4bf9b7b8262ee16fb1664918be57052c88c2cba8dda9acd395f11e6a4df22185"
+
+[hooks.state."openviking-memory@openviking-plugins-local:hooks/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:7817838b681108b8c301216f2fc536fe371a0ae1e5fe6e4959d5e678994a7a41"
+
+[hooks.state."openviking-memory@openviking-plugins-local:hooks/hooks.json:stop:0:0"]
+trusted_hash = "sha256:c730def8275e2e74d51898cb02c62be67f1905fa5cb8813883b41a39140c2c20"
+
 [plugins."openviking-memory@openviking-plugins-local"]
 enabled = true
