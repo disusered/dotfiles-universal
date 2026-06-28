@@ -10,19 +10,26 @@ linux[whoami.distro^="Arch"]:
         echo "OpenViking linked. Run openviking-render-config, then enable openviking.service."
       fi
 
-      # OpenCode
-      git clone https://github.com/volcengine/OpenViking.git /tmp/OpenViking
+      # Clone upstream OpenViking repo (shared by opencode + codex)
+      if [ -d ~/.openviking/openviking-repo/.git ]; then
+        git -C ~/.openviking/openviking-repo pull --ff-only
+      else
+        git clone https://github.com/volcengine/OpenViking.git ~/.openviking/openviking-repo
+      fi
+      OV_REPO=~/.openviking/openviking-repo
+
+      # OpenCode plugin
       mkdir -p ~/.config/opencode/plugins/openviking
-      cp /tmp/OpenViking/examples/opencode-plugin/wrappers/openviking.mjs ~/.config/opencode/plugins/openviking.mjs
-      cp /tmp/OpenViking/examples/opencode-plugin/index.mjs /tmp/OpenViking/examples/opencode-plugin/package.json ~/.config/opencode/plugins/openviking/
-      cp -r /tmp/OpenViking/examples/opencode-plugin/lib ~/.config/opencode/plugins/openviking/
+      cp $OV_REPO/examples/opencode-plugin/wrappers/openviking.mjs ~/.config/opencode/plugins/openviking.mjs
+      cp $OV_REPO/examples/opencode-plugin/index.mjs $OV_REPO/examples/opencode-plugin/package.json ~/.config/opencode/plugins/openviking/
+      cp -r $OV_REPO/examples/opencode-plugin/lib ~/.config/opencode/plugins/openviking/
       npm --prefix ~/.config/opencode/plugins/openviking install
 
-      # Codex
-      if command -v codex >/dev/null 2>&1 && command -v openviking-codex-plugin-install >/dev/null 2>&1; then
-        openviking-codex-plugin-install
+      # Codex plugin (upstream canonical — no fork)
+      if command -v codex >/dev/null 2>&1; then
+        bash $OV_REPO/examples/codex-memory-plugin/setup-helper/install.sh
       else
-        echo "OpenViking Codex plugin linked. Run openviking-codex-plugin-install after Codex is installed."
+        echo "Codex not found. Run after Codex is installed: bash ~/.openviking/openviking-repo/examples/codex-memory-plugin/setup-helper/install.sh"
       fi
     depends:
       - /ai/codex
@@ -37,7 +44,4 @@ linux[whoami.distro^="Arch"]:
     scripts/openviking-render-config: ~/.local/bin/openviking-render-config
     scripts/openviking-server-wrapper: ~/.local/bin/openviking-server-wrapper
     openviking-config.json: ~/.config/opencode/plugins/openviking-config.json
-    codex-memory-plugin: ~/.openviking/codex-memory-plugin
     openviking-codex.zsh: ~/.config/zsh/5003_openviking_codex.zsh
-    scripts/openviking-codex-plugin-install: ~/.local/bin/openviking-codex-plugin-install
-    scripts/openviking-codex-plugin-render-cache: ~/.local/bin/openviking-codex-plugin-render-cache

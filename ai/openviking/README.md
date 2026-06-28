@@ -63,50 +63,15 @@ OpenCode is configured with the same default identity through
 
 ## Codex Memory
 
-Codex uses a local copy of OpenViking's Codex memory plugin. The checked-in
-plugin is rendered into a local Codex marketplace/cache entry by:
+Codex uses the upstream canonical OpenViking Codex memory plugin, installed
+from `~/.openviking/openviking-repo/examples/codex-memory-plugin` via the
+upstream installer (`setup-helper/install.sh`). The installer handles
+marketplace registration, cache rendering, MCP wiring, and shell wrapper.
 
-```bash
-openviking-codex-plugin-install
-```
+Codex native `memories` is disabled (`config.toml`: `memories = false`).
+OpenViking is the sole memory system — recall on `UserPromptSubmit`, capture
+on `Stop`, commit on `PreCompact`, and sweep on `SessionStart`.
 
-The shell wrapper in `openviking-codex.zsh` reads `~/.openviking/ovcli.conf`
-before launching `codex`, exports the resolved OpenViking URL and identity for
-the MCP endpoint, and keeps Codex's cached `.mcp.json` pointed at the local
-`/mcp` endpoint. Lifecycle hooks select their read/write identity from
-`codex-memory-plugin/scope-map.json`.
-
-Unmapped Codex work uses a separate general identity:
-
-- `OPENVIKING_ACCOUNT=general`
-- `OPENVIKING_USER=carlos`
-- `OPENVIKING_AGENT_ID=general`
-
-Project-specific memory is selected by `codex-memory-plugin/scope-map.json`.
-The dotfiles repo maps `/home/carlos/.dotfiles` to its own isolated memory:
-
-- `OPENVIKING_ACCOUNT=dotfiles`
-- `OPENVIKING_USER=carlos`
-- `OPENVIKING_AGENT_ID=dotfiles`
-- `generalFallback=false`
-
-The XBOL scope maps paths under `/home/carlos/Development/XBOL` to:
-
-- `OPENVIKING_ACCOUNT=xbol`
-- `OPENVIKING_USER=carlos`
-- `OPENVIKING_AGENT_ID=xbol`
-- `generalFallback=false`
-
-The Herding Cats scope maps `/home/carlos/Development/ME/herding-cats` to the
-legacy local development bank:
-
-- `OPENVIKING_ACCOUNT=local-dev`
-- `OPENVIKING_USER=carlos`
-- `OPENVIKING_AGENT_ID=local-dev`
-- `generalFallback=false`
-
-Codex recall searches the active project scope first. Scopes can opt into
-general memory fallback, but XBOL, dotfiles, and Herding Cats are intentionally
-isolated so unrelated project memories do not cross workspaces. Codex capture
-writes only to the active scope. This is OpenViking shared memory; it is not a
+All repos share a single OpenViking account (`local-dev`), matching the
+opencode plugin's identity. This is OpenViking shared memory; it is not a
 sync layer for Codex's native memory feature.
