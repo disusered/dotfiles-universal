@@ -2,8 +2,7 @@
 """Fetch narrowly scoped XBOL GCP logs into local NDJSON spool files.
 
 This script is intentionally host-side. It uses the host user's gcloud auth and
-writes local files for Alloy to tail into Loki. Do not run it from the XBOL
-Hermes sandbox and do not mount Google credentials into XBOT for log access.
+writes local files for Alloy to tail into Loki.
 """
 
 from __future__ import annotations

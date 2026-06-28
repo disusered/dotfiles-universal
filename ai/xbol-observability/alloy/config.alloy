@@ -6,7 +6,6 @@ logging {
 // GCP Cloud Monitoring collector for XBOL.
 // Auth: this container receives only Carlos' ADC JSON file at
 // /var/lib/alloy/gcloud/application_default_credentials.json via Quadlet.
-// Hermes/XBOT and Grafana do not receive GCP credentials.
 prometheus.exporter.gcp "xbol_gcp" {
 	project_ids = ["boletera-qa"]
 

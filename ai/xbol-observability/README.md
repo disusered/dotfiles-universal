@@ -9,7 +9,6 @@ GCP Cloud Monitoring metrics
   -> Grafana Alloy prometheus.exporter.gcp
   -> VictoriaMetrics single-node
   -> Grafana Prometheus datasource
-  -> Hermes/XBOT access through Grafana MCP in the `xbol` profile
 
 GCP Cloud Logging entries
   -> host-side xbol-gcp-log-fetch using Carlos' existing gcloud auth
@@ -17,7 +16,6 @@ GCP Cloud Logging entries
   -> Grafana Alloy loki.source.file
   -> local Loki single-node
   -> Grafana Loki datasource and log panels
-  -> Hermes/XBOT access through Grafana MCP in the `xbol` profile
 ```
 
 The log path intentionally uses a host-side fetcher instead of putting Google credentials into XBOT, Grafana, Loki, or the XBOL sandbox.
@@ -72,7 +70,7 @@ The metrics path still mounts Carlos' ADC JSON into Alloy only:
   -> /tmp/gcloud_adc.json:ro
 ```
 
-Grafana, VictoriaMetrics, Loki, Hermes, and the XBOL sandbox do not receive GCP credentials.
+Grafana, VictoriaMetrics, Loki, and the XBOL sandbox do not receive GCP credentials.
 
 The logs path does not add any new Google credential mount. `xbol-gcp-log-fetch` runs on the host as Carlos and uses existing `gcloud` auth, then writes raw local NDJSON spool files for Alloy to tail.
 
@@ -129,12 +127,10 @@ Then run:
 xbol-observability-smoke
 ```
 
-The install path runs `xbol-grafana-bootstrap apply` after restarting Grafana, runs `hermes-init xbol` so the XBOL Hermes profile receives `GRAFANA_SERVICE_ACCOUNT_TOKEN` from 1Password, and then try-restarts `hermes-gateway-xbol.service` if it is active. If the stored agent token no longer authenticates, rotate it explicitly:
+The install path runs `xbol-grafana-bootstrap apply` after restarting Grafana. If the stored agent token no longer authenticates, rotate it explicitly:
 
 ```bash
 xbol-grafana-bootstrap apply --rotate-agent-token
-hermes-init xbol
-systemctl --user try-restart hermes-gateway-xbol.service
 ```
 
 Useful URLs:
@@ -192,24 +188,6 @@ Useful overrides:
 - `XBOL_GCP_LOG_MAX_STATE_AGE_MINUTES`
 - `XBOL_LOG_FETCH_STATE_DIR`
 - `XBOL_LOG_SPOOL_DIR`
-
-## Hermes/XBOT access
-
-The managed XBOL Hermes profile configures the Grafana MCP server against local Grafana:
-
-```yaml
-mcp_servers:
-  grafana:
-    command: uvx
-    args:
-    - mcp-grafana
-    env:
-      GRAFANA_URL: http://127.0.0.1:43000
-      GRAFANA_SERVICE_ACCOUNT_TOKEN: ${GRAFANA_SERVICE_ACCOUNT_TOKEN}
-      GRAFANA_ORG_ID: '1'
-```
-
-The MCP server talks to Grafana with the `xbol-agent` service-account token. Grafana talks to VictoriaMetrics and Loki. Neither Hermes/XBOT nor the XBOL sandbox receives GCP credentials.
 
 ## Notes
 

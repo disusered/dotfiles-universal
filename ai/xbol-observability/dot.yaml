@@ -28,8 +28,6 @@ linux[whoami.distro^="Arch"]:
       systemctl --user enable --now xbol-gcp-log-fetch.timer
       systemctl --user restart xbol-victoriametrics.service xbol-loki.service xbol-alloy.service xbol-grafana.service
       ~/.local/bin/xbol-grafana-bootstrap apply --wait-seconds 60
-      ~/.local/bin/hermes-init xbol
-      systemctl --user try-restart hermes-gateway-xbol.service
     depends:
       - /packages/podman
       - /tools/gcloud
