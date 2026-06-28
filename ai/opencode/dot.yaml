@@ -10,3 +10,4 @@ linux[whoami.distro^="Arch"]:
     opencode.json: ~/.config/opencode/opencode.json
     opencode.zsh: ~/.config/zsh/5100_opencode.zsh
     catppuccin.json: ~/.config/opencode/themes/catppuccin.json
+    plugins/hyprland-focus-notifier.mjs: ~/.config/opencode/plugins/hyprland-focus-notifier.mjs

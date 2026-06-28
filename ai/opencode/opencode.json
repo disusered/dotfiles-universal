@@ -3,7 +3,7 @@
   "plugin": [
     "opencode-snip@latest",
     "opencode-antigravity-auth@latest",
-    "@mohak34/opencode-notifier@latest",
+    "./plugins/hyprland-focus-notifier.mjs",
     "opencode-pty",
     "@franlol/opencode-md-table-formatter@latest",
     "opencode-websearch-cited@1.2.0",
