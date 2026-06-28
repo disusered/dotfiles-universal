@@ -4,4 +4,4 @@
 #
 # The op:// reference is not itself a secret; it only resolves through
 # the authenticated `op` session of the launching user.
-STITCH_API_KEY=op://Personal/Stitch API Key/password
+STITCH_API_KEY=op://Odasoft/Stitch API Key/password
