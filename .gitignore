@@ -35,9 +35,7 @@ ai/claude/.cache/
 # Rust build artifacts
 **/target/
 
-# Dolt database files (added by bd init)
-.dolt/
-.beads/.beads-credential-key
+# Generic database files (sqlite, etc.) should not be committed
 *.db
 /ai/opencode/catppuccin.json
 

@@ -1,7 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "opencode-beads",
     "opencode-snip@latest",
     "opencode-antigravity-auth@latest",
     "@mohak34/opencode-notifier@latest",

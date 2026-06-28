@@ -1,7 +1,6 @@
 {
   "effortLevel": "xhigh",
   "enabledPlugins": {
-    "beads@beads-marketplace": true,
     "claude-code-setup@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
@@ -37,15 +36,6 @@
       {
         "hooks": [],
         "matcher": ""
-      },
-      {
-        "hooks": [
-          {
-            "command": "bd prime",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
       }
     ],
     "PreToolUse": [
@@ -66,15 +56,6 @@
       },
       {
         "hooks": [],
-        "matcher": ""
-      },
-      {
-        "hooks": [
-          {
-            "command": "bd prime",
-            "type": "command"
-          }
-        ],
         "matcher": ""
       }
     ]

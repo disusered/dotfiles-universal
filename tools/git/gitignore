@@ -24,8 +24,7 @@ bv
 
 AGENTS.md
 
-# Dolt database files (added by bd init)
-.dolt/
+# Generic database files (sqlite, etc.) should not be committed
 *.db
 
 # skills

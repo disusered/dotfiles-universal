@@ -67,72 +67,6 @@ prefix_rule(
 )
 
 prefix_rule(
-    pattern = ["bd", ["onboard", "prime", "ready", "show"]],
-    decision = "allow",
-    justification = "Read-only beads commands provide issue-tracking context.",
-    match = [
-        "bd onboard --json",
-        "bd prime",
-        "bd ready --json",
-        "bd show bd-123 --json",
-    ],
-)
-
-prefix_rule(
-    pattern = ["bd", ["create", "update", "dep", "search"]],
-    decision = "allow",
-    justification = "Creating and updating beads issues is part of the local issue-tracking workflow.",
-    match = [
-        "bd create \"Follow-up task\" --type task --priority 2 --json",
-        "bd update bd-123 --status in_progress --json",
-        "bd update bd-123 --claim --json",
-        "bd dep add XBOL-mgo.9 XBOL-mgo.2 --json",
-        "bd search \"registration finished email\" --json"
-    ],
-    not_match = [
-        "bd push",
-        "bd sync",
-        "bd dolt push",
-    ],
-)
-
-prefix_rule(
-    pattern = ["bd", "push"],
-    decision = "forbidden",
-    justification = "Do not push beads directly. Beads state must not be pushed or synced from Codex.",
-    match = [
-        "bd push",
-    ],
-    not_match = [
-        "bd ready --json",
-    ],
-)
-
-prefix_rule(
-    pattern = ["bd", "sync"],
-    decision = "forbidden",
-    justification = "Do not sync beads from Codex because bd sync pushes beads state.",
-    match = [
-        "bd sync",
-    ],
-    not_match = [
-        "bd ready --json",
-    ],
-)
-
-prefix_rule(
-    pattern = ["bd", "dolt", "push"],
-    decision = "forbidden",
-    justification = "Do not push the beads Dolt database directly. Beads state must not be pushed or synced from Codex.",
-    match = [
-        "bd dolt push",
-    ],
-    not_match = [
-        "bd dolt pull",
-    ],
-)
-
-prefix_rule(
     pattern = ["gh", ["pr", "issue"], ["view", "list", "status"]],
     decision = "allow",
     justification = "Read-only GitHub inspection through gh is allowed.",
@@ -366,7 +300,6 @@ prefix_rule(pattern=["git", "add"], decision="allow")
 prefix_rule(pattern=["gh", "repo", "view"], decision="allow")
 prefix_rule(pattern=["gh", "secret", "list"], decision="allow")
 prefix_rule(pattern=["gh", "variable", "list"], decision="allow")
-prefix_rule(pattern=["bd", "close"], decision="allow")
 prefix_rule(pattern=["uv", "build"], decision="allow")
 prefix_rule(pattern=["systemctl", "show"], decision="allow")
 prefix_rule(pattern=["systemctl", "status"], decision="allow")
@@ -378,7 +311,6 @@ prefix_rule(pattern=["systemctl", "--user"], decision="allow")
 prefix_rule(pattern=["systemctl", "cat"], decision="allow")
 prefix_rule(pattern=["systemd-analyze"], decision="allow")
 prefix_rule(pattern=["ss", "-ltnp"], decision="allow")
-prefix_rule(pattern=["bd"], decision="allow")
 prefix_rule(pattern=["git", "cherry-pick"], decision="allow")
 prefix_rule(pattern=["python", "-m", "unittest"], decision="allow")
 prefix_rule(pattern=["git", "spr", "status"], decision="allow")
