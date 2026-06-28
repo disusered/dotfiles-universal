@@ -39,6 +39,7 @@ linux[whoami.distro^="Arch"]:
     env.tpl: ~/.openviking/env.tpl
     ov.conf.tpl: ~/.openviking/ov.conf.tpl
     ovcli.conf: ~/.openviking/ovcli.conf
+    ovcli-xbol.conf: ~/.openviking/ovcli-xbol.conf
     openviking.zsh: ~/.config/zsh/5002_openviking.zsh
     systemd/openviking.service: ~/.config/systemd/user/openviking.service
     scripts/openviking-render-config: ~/.local/bin/openviking-render-config

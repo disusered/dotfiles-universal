@@ -72,6 +72,6 @@ Codex native `memories` is disabled (`config.toml`: `memories = false`).
 OpenViking is the sole memory system — recall on `UserPromptSubmit`, capture
 on `Stop`, commit on `PreCompact`, and sweep on `SessionStart`.
 
-All repos share a single OpenViking account (`local-dev`), matching the
-opencode plugin's identity. This is OpenViking shared memory; it is not a
-sync layer for Codex's native memory feature.
+Codex uses `local-dev` by default. Sessions launched from
+`~/Development/XBOL` or its children use `ovcli-xbol.conf` so XBOL recall and
+capture stay in the `xbol` account instead of the general memory bank.
