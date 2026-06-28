@@ -3,8 +3,6 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       npm i -g opencode-ai
       npx -y opencode-openai-codex-auth@latest
-      systemctl --user daemon-reload
-      systemctl --user enable --now opencode-serve.service
     depends:
       - /ai/agent-skills
       - /tools/tailscale
@@ -12,5 +10,3 @@ linux[whoami.distro^="Arch"]:
     opencode.json: ~/.config/opencode/opencode.json
     opencode.zsh: ~/.config/zsh/5100_opencode.zsh
     catppuccin.json: ~/.config/opencode/themes/catppuccin.json
-    opencode-serve.sh: ~/.local/bin/opencode-serve.sh
-    opencode-serve.service: ~/.config/systemd/user/opencode-serve.service

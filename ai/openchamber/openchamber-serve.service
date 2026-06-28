@@ -1,11 +1,11 @@
 [Unit]
-Description=OpenCode Web Server
+Description=OpenChamber Web Server
 BindsTo=graphical-session.target
 After=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=uwsm app -- /home/carlos/.local/bin/opencode-serve.sh
+ExecStart=uwsm app -- /home/carlos/.local/bin/openchamber-serve.sh
 Restart=on-failure
 RestartSec=5
 

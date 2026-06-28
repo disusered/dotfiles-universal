@@ -1,0 +1,15 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      npm i -g @openchamber/web
+      systemctl --user disable --now opencode-serve.service 2>/dev/null || true
+      rm -f ~/.config/systemd/user/opencode-serve.service ~/.local/bin/opencode-serve.sh
+      systemctl --user daemon-reload
+      systemctl --user enable openchamber-serve.service 2>/dev/null || true
+    depends:
+      - /ai/opencode
+      - /tools/tailscale
+  links:
+    openchamber.zsh: ~/.config/zsh/5110_openchamber.zsh
+    openchamber-serve.sh: ~/.local/bin/openchamber-serve.sh
+    openchamber-serve.service: ~/.config/systemd/user/openchamber-serve.service

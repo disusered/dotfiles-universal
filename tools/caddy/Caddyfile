@@ -4,7 +4,17 @@
 
 http://opencode.disusered.com {
 	bind {$CADDY_TAILSCALE_IP}
-	reverse_proxy localhost:3014
+	reverse_proxy 127.0.0.1:3014 {
+		flush_interval -1
+		header_up Host {host}
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		transport http {
+			read_timeout 3600s
+			write_timeout 3600s
+		}
+	}
 }
 
 http://search.disusered.com {
