@@ -1,0 +1,6 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      command -v reference-agent &>/dev/null || uv tool install "reference-agent @ git+https://github.com/GoogleCloudPlatform/knowledge-catalog.git#subdirectory=okf"
+    depends:
+      - /languages/python/uv
