@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd /home/carlos/Development/ME/herding-cats
+exec brain pi write "$@"
