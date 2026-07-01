@@ -1,5 +1,27 @@
 #!/bin/sh
 
+if [ "${SKIP_SIGNING_HOOKS:-}" = "1" ]; then
+  exit 0
+fi
+
+commit_is_mine() {
+  commit=$1
+  my_email=$(git config user.email || true)
+
+  if [ -z "$my_email" ]; then
+    return 1
+  fi
+
+  author_email=$(git show -s --format=%ae "$commit")
+  committer_email=$(git show -s --format=%ce "$commit")
+
+  [ "$author_email" = "$my_email" ] || [ "$committer_email" = "$my_email" ]
+}
+
+if ! commit_is_mine HEAD; then
+  exit 0
+fi
+
 if git verify-commit HEAD >/dev/null 2>&1; then
   exit 0
 fi

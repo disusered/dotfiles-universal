@@ -1,10 +1,32 @@
 #!/bin/sh
 
+if [ "${SKIP_SIGNING_HOOKS:-}" = "1" ]; then
+  exit 0
+fi
+
 zero_sha=0000000000000000000000000000000000000000
 failed=0
+my_email=$(git config user.email || true)
+
+commit_is_mine() {
+  commit=$1
+
+  if [ -z "$my_email" ]; then
+    return 1
+  fi
+
+  author_email=$(git show -s --format=%ae "$commit")
+  committer_email=$(git show -s --format=%ce "$commit")
+
+  [ "$author_email" = "$my_email" ] || [ "$committer_email" = "$my_email" ]
+}
 
 verify_commit() {
   commit=$1
+
+  if ! commit_is_mine "$commit"; then
+    return 0
+  fi
 
   if git verify-commit "$commit" >/dev/null 2>&1; then
     return 0
