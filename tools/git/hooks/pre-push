@@ -1,0 +1,38 @@
+#!/bin/sh
+
+zero_sha=0000000000000000000000000000000000000000
+failed=0
+
+verify_commit() {
+  commit=$1
+
+  if git verify-commit "$commit" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  echo "ERROR: commit $commit is not signed and verifiable." >&2
+  failed=1
+}
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ "$local_sha" = "$zero_sha" ]; then
+    continue
+  fi
+
+  if [ "$remote_sha" = "$zero_sha" ]; then
+    commits=$(git rev-list "$local_sha" --not --remotes)
+  else
+    commits=$(git rev-list "$remote_sha..$local_sha")
+  fi
+
+  for commit in $commits; do
+    verify_commit "$commit"
+  done
+done
+
+if [ "$failed" -ne 0 ]; then
+  echo "ERROR: push rejected because one or more commits are not signed and verifiable." >&2
+  exit 1
+fi
+
+exit 0

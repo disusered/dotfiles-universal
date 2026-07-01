@@ -22,6 +22,7 @@
   trustctime = false
   excludesfile = ~/.gitignore_global
   attributesFile = ~/.config/git/attributes
+  hooksPath = ~/.config/git/hooks
 [pretty]
   basic = %C({{ secondary_name | ansi }} bold)%h%C(reset) %C(auto)%d%C(reset) %s
   extended = %C({{ secondary_name | ansi }} bold)%h%C(reset) %C({{ primary_name | ansi }} bold)%aN%C(reset) %C(auto)%d%C(reset) %s %C(8)(%cr)%C(reset)

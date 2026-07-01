@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if git verify-commit HEAD >/dev/null 2>&1; then
+  exit 0
+fi
+
+echo "ERROR: HEAD is not a signed, verifiable commit. Rewinding it." >&2
+
+if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+  git reset --soft HEAD^
+else
+  git update-ref -d HEAD
+fi
+
+exit 1

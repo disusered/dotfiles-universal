@@ -22,6 +22,7 @@
 	trustctime = false
 	sshCommand = ssh.exe
 	excludesfile = ~/.gitignore_global
+	hooksPath = ~/.config/git/hooks
 [pretty]
 	basic = %C(magenta bold)%h%C(reset) %C(auto)%d%C(reset) %s
 	extended = %C(magenta bold)%h%C(reset) %C(blue bold)%aN%C(reset) %C(auto)%d%C(reset) %s %C(8)(%cr)%C(reset)

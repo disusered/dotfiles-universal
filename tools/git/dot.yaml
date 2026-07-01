@@ -1,6 +1,8 @@
 global:
   links:
     gitignore: ~/.gitignore_global
+    hooks/post-commit: ~/.config/git/hooks/post-commit
+    hooks/pre-push: ~/.config/git/hooks/pre-push
 windows:
   installs:
     cmd: >
