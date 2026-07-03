@@ -1,0 +1,10 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm --needed zotero
+  links:
+    zotero.conf: ~/.config/hypr/conf.d/zotero.conf
+    zotero.zsh: ~/.config/zsh/0200_zotero.zsh
+linux[whoami.distro^="Fedora"]:
+  installs: false
+windows:
+  installs: false
