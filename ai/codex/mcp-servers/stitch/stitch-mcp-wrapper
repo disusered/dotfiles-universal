@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+env_file="${CODEX_STITCH_MCP_ENV:-$HOME/.codex/mcp-servers/stitch/env.local}"
+
+if [ ! -f "$env_file" ]; then
+  echo "Missing $env_file. Run stitch-mcp-render-secrets first." >&2
+  exit 1
+fi
+
+set -a
+# shellcheck source=/dev/null
+source "$env_file"
+set +a
+
+exec npx @_davideast/stitch-mcp proxy

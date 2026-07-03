@@ -39,7 +39,7 @@ ai/claude/.cache/
 *.db
 /ai/opencode/catppuccin.json
 
-# Codex MCP server local env files (contain op:// refs, resolved per-machine)
+# Codex MCP server local env files (contain materialized secrets)
 /ai/codex/mcp-servers/**/env.local
 
 # Agent skills are centralized under /ai/agent-skills; do not re-add

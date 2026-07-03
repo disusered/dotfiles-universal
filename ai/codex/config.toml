@@ -110,6 +110,12 @@ trust_level = "trusted"
 [projects."/home/carlos/Development/ME/herding-cats/workshop/skunkworks/email-ynab-updater"]
 trust_level = "trusted"
 
+[projects."/home/carlos/Development/ME/herding-cats/utilities/brain"]
+trust_level = "trusted"
+
+[projects."/home/carlos/Development/XBOL/xbol-bastion"]
+trust_level = "trusted"
+
 [plugins."codex-security@openai-curated"]
 enabled = true
 
@@ -137,8 +143,22 @@ trusted_hash = "sha256:7817838b681108b8c301216f2fc536fe371a0ae1e5fe6e4959d5e6789
 trusted_hash = "sha256:c730def8275e2e74d51898cb02c62be67f1905fa5cb8813883b41a39140c2c20"
 
 [mcp_servers.stitch]
-command = "op"
-args = ["run", "--env-file=/home/carlos/.codex/mcp-servers/stitch/env.local", "--", "npx", "@_davideast/stitch-mcp", "proxy"]
+command = "/home/carlos/.local/bin/stitch-mcp-wrapper"
 
 [plugins."openviking-memory@openviking-plugins-local"]
 enabled = true
+
+[plugins."openviking-memory@openviking-plugins-local".mcp_servers.openviking-memory.tools.search]
+approval_mode = "approve"
+
+[plugins."openviking-memory@openviking-plugins-local".mcp_servers.openviking-memory.tools.grep]
+approval_mode = "approve"
+
+[plugins."openviking-memory@openviking-plugins-local".mcp_servers.openviking-memory.tools.read]
+approval_mode = "approve"
+
+[plugins."openviking-memory@openviking-plugins-local".mcp_servers.openviking-memory.tools.health]
+approval_mode = "approve"
+
+[plugins."openviking-memory@openviking-plugins-local".mcp_servers.openviking-memory.tools.remember]
+approval_mode = "approve"

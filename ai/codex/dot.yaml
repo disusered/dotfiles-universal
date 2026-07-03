@@ -9,3 +9,5 @@ linux|darwin:
     AGENTS.md: ~/.codex/AGENTS.md
     rules: ~/.codex/rules/
     mcp-servers/stitch/env.tpl: ~/.codex/mcp-servers/stitch/env.tpl
+    mcp-servers/stitch/stitch-mcp-render-secrets: ~/.local/bin/stitch-mcp-render-secrets
+    mcp-servers/stitch/stitch-mcp-wrapper: ~/.local/bin/stitch-mcp-wrapper
