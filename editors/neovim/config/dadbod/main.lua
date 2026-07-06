@@ -11,9 +11,28 @@ local function non_empty(s)
   return s ~= "" and s or nil
 end
 
+local git_editor_files = {
+  COMMIT_EDITMSG = true,
+  MERGE_MSG = true,
+  TAG_EDITMSG = true,
+  ["git-rebase-todo"] = true,
+}
+
+local function is_git_editor_buffer()
+  local name = vim.api.nvim_buf_get_name(0)
+  local tail = vim.fn.fnamemodify(name, ":t")
+  return git_editor_files[tail] == true
+    or vim.bo.filetype == "gitcommit"
+    or vim.bo.filetype == "gitrebase"
+end
+
 ---
 -- Main orchestrator function to detect and set up DB connections.
 local function setup_project_connections()
+  if is_git_editor_buffer() then
+    return
+  end
+
   local project_root_marker = non_empty(vim.fn.finddir(".git", ".;"))
     or non_empty(vim.fn.findfile("config/database.yml", ".;"))
     or non_empty(vim.fn.findfile("docker-compose.yml", ".;"))
@@ -71,7 +90,8 @@ function M.setup()
   vim.g.db_ui_use_nerd_fonts = 1
 
   local db_setup_group = vim.api.nvim_create_augroup("ProjectDbSetup", { clear = true })
-  vim.api.nvim_create_autocmd({ "VimEnter", "DirChanged" }, {
+  setup_project_connections()
+  vim.api.nvim_create_autocmd("DirChanged", {
     group = db_setup_group,
     pattern = "*",
     callback = setup_project_connections,

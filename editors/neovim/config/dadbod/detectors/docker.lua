@@ -81,16 +81,7 @@ function M.find()
   if not compose_path or compose_path == "" then
     compose_path = vim.fn.findfile("docker-compose.yaml", ".;")
   end
-  -- Also try finding environment-specific compose files
   if not compose_path or compose_path == "" then
-    local glob_result = vim.fn.glob("**/docker-compose.*.yml", false, true)
-    if #glob_result > 0 then
-      compose_path = glob_result[1]
-    end
-  end
-
-  if not compose_path or compose_path == "" then
-    print("  No docker-compose files found in current or parent directories.")
     return nil
   end
 
@@ -98,7 +89,6 @@ function M.find()
   local compose_files = find_compose_files(compose_dir)
 
   if #compose_files == 0 then
-    print("  No docker-compose files found.")
     return nil
   end
 
