@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S --noconfirm --needed handy-bin
+    depends:
+      - /tools/yay
