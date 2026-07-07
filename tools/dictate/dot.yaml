@@ -1,0 +1,19 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      sudo pacman -S --noconfirm --needed wtype cmake pkgconf
+      dictate_src=/home/carlos/Development/ME/herding-cats/utilities/dictate
+      if [ ! -f "$dictate_src/Cargo.toml" ]; then
+        dictate_src=/home/carlos/Development/ME/herding-cats/.worktrees/dictate-v1/utilities/dictate
+      fi
+      if [ ! -f "$dictate_src/Cargo.toml" ]; then
+        printf '%s\n' "dictate source is missing: $dictate_src" >&2
+        exit 1
+      fi
+      TRANSCRIBE_CMAKE_ARGS="-DTRANSCRIBE_USE_SYSTEM_BLAS=OFF" cargo install --path "$dictate_src" --force
+    depends:
+      - /arch/hyprland
+      - /languages/rust
+      - /lib/wl-clipboard
+  links:
+    dictate.conf: {{ dirs.base.config }}/hypr/conf.d/dictate.conf
