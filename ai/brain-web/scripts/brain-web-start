@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+app_dir="${BRAIN_WEB_APP_DIR:-/home/carlos/Development/ME/herding-cats/workshop/spikes/pi-brain-web}"
+port="${PORT:-43110}"
+
+export PATH="/home/carlos/.local/bin:/home/carlos/.cargo/bin:$PATH"
+if [ -x /home/carlos/.local/bin/mise ]; then
+  eval "$(/home/carlos/.local/bin/mise activate bash)"
+fi
+
+export NODE_ENV=production
+export BRAIN_CONVERSATION_BACKEND="${BRAIN_CONVERSATION_BACKEND:-pi}"
+
+cd "$app_dir"
+
+command -v npm >/dev/null
+
+exec npm run start -- --port "$port"

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+port="${PORT:-43110}"
+url="http://127.0.0.1:${port}/"
+timeout_seconds="${BRAIN_WEB_SMOKE_TIMEOUT_SECONDS:-30}"
+deadline=$((SECONDS + timeout_seconds))
+
+systemctl --user is-active --quiet brain-web.service
+
+until curl -fsS -o /dev/null "$url" 2>/dev/null; do
+  if (( SECONDS >= deadline )); then
+    curl -fsS -o /dev/null "$url"
+  fi
+  sleep 1
+done
+
+echo "Brain Web is responding at $url"

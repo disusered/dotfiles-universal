@@ -1,0 +1,20 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -euo pipefail
+      mkdir -p ~/.config/systemd/user ~/.local/bin
+      ~/.rotz/bin/rotz link /ai/brain-web -f
+      systemctl --user daemon-reload
+      systemctl --user enable brain-web.service
+      echo "Brain Web linked. Run brain-web-deploy to build and start it."
+    depends:
+      - /languages/javascript/node/latest
+      - /tools/pi
+      - /tools/1password
+      - /tools/caddy
+      - /ai/openviking
+  links:
+    scripts/brain-web-start: ~/.local/bin/brain-web-start
+    scripts/brain-web-deploy: ~/.local/bin/brain-web-deploy
+    scripts/brain-web-smoke: ~/.local/bin/brain-web-smoke
+    systemd/brain-web.service: ~/.config/systemd/user/brain-web.service

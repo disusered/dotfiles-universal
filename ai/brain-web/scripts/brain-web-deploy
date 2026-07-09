@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+app_dir="${BRAIN_WEB_APP_DIR:-/home/carlos/Development/ME/herding-cats/workshop/spikes/pi-brain-web}"
+
+export PATH="/home/carlos/.local/bin:/home/carlos/.cargo/bin:$PATH"
+if [ -x /home/carlos/.local/bin/mise ]; then
+  eval "$(/home/carlos/.local/bin/mise activate bash)"
+fi
+
+cd "$app_dir"
+
+if [ -f package-lock.json ]; then
+  npm ci
+else
+  npm install
+fi
+npm run build
+
+systemctl --user daemon-reload
+systemctl --user enable brain-web.service
+systemctl --user restart brain-web.service
+brain-web-smoke

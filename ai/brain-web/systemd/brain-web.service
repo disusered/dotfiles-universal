@@ -1,0 +1,18 @@
+[Unit]
+Description=Brain Web production server
+Wants=network-online.target openviking.service
+After=network-online.target openviking.service
+
+[Service]
+Type=simple
+WorkingDirectory=/home/carlos/Development/ME/herding-cats/workshop/spikes/pi-brain-web
+Environment=PORT=43110
+Environment=BRAIN_WEB_APP_DIR=/home/carlos/Development/ME/herding-cats/workshop/spikes/pi-brain-web
+Environment=BRAIN_CONVERSATION_BACKEND=pi
+ExecStart=%h/.local/bin/brain-web-start
+Restart=on-failure
+RestartSec=5
+SyslogIdentifier=brain-web
+
+[Install]
+WantedBy=default.target
