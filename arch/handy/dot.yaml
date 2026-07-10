@@ -1,7 +1,0 @@
-linux[whoami.distro^="Arch"]:
-  installs:
-    cmd: |
-      sudo pacman -S --noconfirm --needed openblas
-      yay -S --noconfirm --needed handy-bin
-    depends:
-      - /tools/yay
