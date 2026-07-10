@@ -1,66 +1,13 @@
 {
-  "effortLevel": "xhigh",
-  "enabledPlugins": {
-    "claude-code-setup@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "csharp-lsp@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
-    "ouroboros@ouroboros": true,
-    "pyright-lsp@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true
+  "fileSuggestion": {
+    "type": "command",
+    "command": "~/.claude/file-suggestion.sh"
   },
   "env": {
     "API_TIMEOUT_MS": "3000000",
     "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "extraKnownMarketplaces": {
-    "ouroboros": {
-      "source": {
-        "repo": "Q00/ouroboros",
-        "source": "github"
-      }
-    }
-  },
-  "fileSuggestion": {
-    "command": "~/.claude/file-suggestion.sh",
-    "type": "command"
-  },
-  "hooks": {
-    "PreCompact": [
-      {
-        "hooks": [],
-        "matcher": ""
-      },
-      {
-        "hooks": [],
-        "matcher": ""
-      }
-    ],
-    "PreToolUse": [
-      {
-        "hooks": [
-          {
-            "command": "/home/carlos/go/bin/snip hook",
-            "type": "command"
-          }
-        ],
-        "matcher": "Bash"
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [],
-        "matcher": ""
-      },
-      {
-        "hooks": [],
-        "matcher": ""
-      }
-    ]
-  },
-  "model": "opus",
   "permissions": {
     "allow": [
       "Bash(git show-branch:*)",
@@ -73,15 +20,68 @@
       "Bash(sqlite3:*)"
     ]
   },
-  "skipAutoPermissionPrompt": true,
-  "skipDangerousModePermissionPrompt": false,
-  "statusLine": {
-    "command": "input=$(cat); model_name=$(echo \"$input\" | jq -r '.model.display_name'); current_dir=$(echo \"$input\" | jq -r '.workspace.current_dir'); project_dir=$(echo \"$input\" | jq -r '.workspace.project_dir'); output_style=$(echo \"$input\" | jq -r '.output_style.name'); version=$(echo \"$input\" | jq -r '.version'); git_branch=$(cd \"$current_dir\" 2\u003e/dev/null \u0026\u0026 git branch --show-current 2\u003e/dev/null); git_status=$(cd \"$current_dir\" 2\u003e/dev/null \u0026\u0026 git status --porcelain 2\u003e/dev/null | wc -l); pwd_display=$(echo \"$current_dir\" | sed \"s|^$HOME|~|\"); printf \"\\033[2m\\033[38;2;116;199;236m\\033[0m \\033[2m\\033[1m\\033[38;2;203;166;247m%s\\033[0m\" \"$model_name\"; printf \" \\033[2m\\033[38;2;180;190;254m%s\\033[0m\" \"$pwd_display\"; if [ -n \"$git_branch\" ]; then printf \" \\033[2m\\033[38;2;203;166;247m\\033[0m \\033[2m\\033[1m\\033[38;2;203;166;247m%s\\033[0m\" \"$git_branch\"; if [ \"$git_status\" -gt 0 ]; then printf \" \\033[2m\\033[38;2;249;226;175m+%s\\033[0m\" \"$git_status\"; fi; fi; if [ \"$output_style\" != \"default\" ]; then printf \" \\033[2m\\033[38;2;148;226;213m%s\\033[0m\" \"$output_style\"; fi; printf \" \\033[2m\\033[38;2;166;173;200mv%s\\033[0m\" \"$version\"",
-    "type": "command"
+  "model": "claude-fable-5",
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": []
+      },
+      {
+        "matcher": "",
+        "hooks": []
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/carlos/go/bin/snip hook"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": []
+      },
+      {
+        "matcher": "",
+        "hooks": []
+      }
+    ]
   },
+  "statusLine": {
+    "type": "command",
+    "command": "input=$(cat); model_name=$(echo \"$input\" | jq -r '.model.display_name'); current_dir=$(echo \"$input\" | jq -r '.workspace.current_dir'); project_dir=$(echo \"$input\" | jq -r '.workspace.project_dir'); output_style=$(echo \"$input\" | jq -r '.output_style.name'); version=$(echo \"$input\" | jq -r '.version'); git_branch=$(cd \"$current_dir\" 2>/dev/null && git branch --show-current 2>/dev/null); git_status=$(cd \"$current_dir\" 2>/dev/null && git status --porcelain 2>/dev/null | wc -l); pwd_display=$(echo \"$current_dir\" | sed \"s|^$HOME|~|\"); printf \"\\033[2m\\033[38;2;116;199;236m\\033[0m \\033[2m\\033[1m\\033[38;2;203;166;247m%s\\033[0m\" \"$model_name\"; printf \" \\033[2m\\033[38;2;180;190;254m%s\\033[0m\" \"$pwd_display\"; if [ -n \"$git_branch\" ]; then printf \" \\033[2m\\033[38;2;203;166;247m\\033[0m \\033[2m\\033[1m\\033[38;2;203;166;247m%s\\033[0m\" \"$git_branch\"; if [ \"$git_status\" -gt 0 ]; then printf \" \\033[2m\\033[38;2;249;226;175m+%s\\033[0m\" \"$git_status\"; fi; fi; if [ \"$output_style\" != \"default\" ]; then printf \" \\033[2m\\033[38;2;148;226;213m%s\\033[0m\" \"$output_style\"; fi; printf \" \\033[2m\\033[38;2;166;173;200mv%s\\033[0m\" \"$version\""
+  },
+  "enabledPlugins": {
+    "claude-code-setup@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "csharp-lsp@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "ouroboros@ouroboros": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "ouroboros": {
+      "source": {
+        "source": "github",
+        "repo": "Q00/ouroboros"
+      }
+    }
+  },
+  "effortLevel": "xhigh",
   "voice": {
     "enabled": true,
     "mode": "hold"
   },
+  "skipDangerousModePermissionPrompt": false,
+  "skipAutoPermissionPrompt": true,
   "voiceEnabled": true
 }

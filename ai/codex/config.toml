@@ -3,9 +3,9 @@ approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 commit_attribution = ""
 model = "gpt-5.5"
-model_reasoning_effort = "medium"
+model_reasoning_effort = "xhigh"
 plan_mode_reasoning_effort = "xhigh"
-service_tier = "default"
+service_tier = "fast"
 
 [features]
 codex_git_commit = false
@@ -116,6 +116,15 @@ trust_level = "trusted"
 [projects."/home/carlos/Development/XBOL/xbol-bastion"]
 trust_level = "trusted"
 
+[projects."/home/carlos/Development/ME/herding-cats/workshop/spikes/pi-brain-web"]
+trust_level = "trusted"
+
+[projects."/home/carlos/Documents/XBOL/Estimates"]
+trust_level = "trusted"
+
+[projects."/home/carlos/.openviking/openviking-repo"]
+trust_level = "trusted"
+
 [plugins."codex-security@openai-curated"]
 enabled = true
 
@@ -161,4 +170,7 @@ approval_mode = "approve"
 approval_mode = "approve"
 
 [plugins."openviking-memory@openviking-plugins-local".mcp_servers.openviking-memory.tools.remember]
+approval_mode = "approve"
+
+[plugins."openviking-memory@openviking-plugins-local".mcp_servers.openviking-memory.tools.glob]
 approval_mode = "approve"
