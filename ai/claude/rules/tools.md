@@ -11,3 +11,7 @@
 ## Code Search
 
 `ast-grep` is installed. Use it for structural code search (see skills/tools/searching-code/).
+
+## Search Defaults
+
+Use `rg` for file and text search before slower tools such as `grep` or `find`.

@@ -22,14 +22,86 @@
   },
   "model": "claude-fable-5",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $HOME/.openviking/openviking-repo/examples/claude-code-memory-plugin/scripts/session-start.mjs",
+            "timeout": 120
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $HOME/.openviking/openviking-repo/examples/claude-code-memory-plugin/scripts/auto-recall.mjs",
+            "timeout": 8
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $HOME/.openviking/openviking-repo/examples/claude-code-memory-plugin/scripts/auto-capture.mjs",
+            "timeout": 45
+          }
+        ]
+      }
+    ],
     "PreCompact": [
       {
         "matcher": "",
-        "hooks": []
-      },
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $HOME/.openviking/openviking-repo/examples/claude-code-memory-plugin/scripts/pre-compact.mjs",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
       {
         "matcher": "",
-        "hooks": []
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $HOME/.openviking/openviking-repo/examples/claude-code-memory-plugin/scripts/session-end.mjs",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $HOME/.openviking/openviking-repo/examples/claude-code-memory-plugin/scripts/subagent-start.mjs",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $HOME/.openviking/openviking-repo/examples/claude-code-memory-plugin/scripts/subagent-stop.mjs",
+            "timeout": 45
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -41,16 +113,6 @@
             "command": "/home/carlos/go/bin/snip hook"
           }
         ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "matcher": "",
-        "hooks": []
-      },
-      {
-        "matcher": "",
-        "hooks": []
       }
     ]
   },
@@ -64,17 +126,8 @@
     "code-simplifier@claude-plugins-official": true,
     "csharp-lsp@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
-    "ouroboros@ouroboros": true,
     "pyright-lsp@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true
-  },
-  "extraKnownMarketplaces": {
-    "ouroboros": {
-      "source": {
-        "source": "github",
-        "repo": "Q00/ouroboros"
-      }
-    }
   },
   "effortLevel": "xhigh",
   "voice": {

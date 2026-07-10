@@ -6,6 +6,8 @@
 - Limit to 80 characters
 - No footers, signatures, or tool attribution
 - Use imperative mood: "Add feature" not "Added feature"
+- Use `git commit -S` for agent-created commits
+- Verify agent-created commits with `git verify-commit HEAD`
 
 ## Branch Targeting (Gitflow)
 ```
@@ -26,3 +28,8 @@ Always confirm branch targets with user before creating PRs.
 - `git cherry-pick`
 - Branch deletion
 - Amending shared commits
+
+## Remote Operations
+
+- Do not run `git pull`, `git pull --rebase`, or `git push` as routine cleanup.
+- Run remote git operations only when the user explicitly asks.

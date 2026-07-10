@@ -46,3 +46,4 @@ linux[whoami.distro^="Arch"]:
     scripts/openviking-server-wrapper: ~/.local/bin/openviking-server-wrapper
     openviking-config.json: ~/.config/opencode/plugins/openviking-config.json
     openviking-codex.zsh: ~/.config/zsh/5003_openviking_codex.zsh
+    openviking-claude.zsh: ~/.config/zsh/5004_openviking_claude.zsh

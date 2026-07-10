@@ -3,6 +3,7 @@ set -euo pipefail
 
 repo_root=${0:A:h:h:h:h}
 source "$repo_root/ai/openviking/openviking-codex.zsh"
+source "$repo_root/ai/openviking/openviking-claude.zsh"
 unset OPENVIKING_CLI_CONFIG_FILE
 
 assert_eq() {
@@ -24,5 +25,8 @@ xbol_conf="$HOME/.openviking/ovcli-xbol.conf"
 assert_eq "$xbol_conf" "$(_openviking_codex_cli_config /home/carlos/Development/XBOL)" "XBOL root uses XBOL OpenViking profile"
 assert_eq "$xbol_conf" "$(_openviking_codex_cli_config /home/carlos/Development/XBOL/xbol-api-admin)" "XBOL child uses XBOL OpenViking profile"
 assert_eq "$default_conf" "$(_openviking_codex_cli_config /home/carlos/.dotfiles)" "non-XBOL path uses default OpenViking profile"
+assert_eq "$xbol_conf" "$(_openviking_claude_cli_config /home/carlos/Development/XBOL)" "Claude XBOL root uses XBOL OpenViking profile"
+assert_eq "$xbol_conf" "$(_openviking_claude_cli_config /home/carlos/Development/XBOL/xbol-api-admin)" "Claude XBOL child uses XBOL OpenViking profile"
+assert_eq "$default_conf" "$(_openviking_claude_cli_config /home/carlos/.dotfiles)" "Claude non-XBOL path uses default OpenViking profile"
 
 print "ok"

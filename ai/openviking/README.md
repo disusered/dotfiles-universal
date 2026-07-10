@@ -75,3 +75,19 @@ on `Stop`, commit on `PreCompact`, and sweep on `SessionStart`.
 Codex uses `local-dev` by default. Sessions launched from
 `~/Development/XBOL` or its children use `ovcli-xbol.conf` so XBOL recall and
 capture stay in the `xbol` account instead of the general memory bank.
+
+## Claude Memory
+
+Claude Code uses the upstream OpenViking Claude hook scripts directly from
+`~/.openviking/openviking-repo/examples/claude-code-memory-plugin`, but it does
+not install the Claude plugin or expose the OpenViking MCP tools. This keeps
+Claude in a raw hook-only setup:
+
+- recall: `UserPromptSubmit`
+- capture: `Stop`
+- commit: `PreCompact`, `SessionEnd`
+- resume/subagents: `SessionStart`, `SubagentStart`, `SubagentStop`
+
+The shell wrapper linked to `~/.config/zsh/5004_openviking_claude.zsh` selects
+the same OpenViking profiles as Codex: `local-dev` by default and `xbol` under
+`~/Development/XBOL`.
