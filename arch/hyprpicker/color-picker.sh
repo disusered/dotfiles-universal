@@ -7,6 +7,7 @@ if pgrep -x hyprpicker >/dev/null; then
 fi
 
 # 2. Turn off shader for color accuracy
+active_shader="$(hyprshade current 2>/dev/null || true)"
 hyprshade off
 
 # 3. Launch the picker
@@ -15,5 +16,7 @@ hyprpicker --autocopy --format=hex
 
 # 4. Restore the shader
 # This runs regardless of whether you picked a color or cancelled,
-# ensuring you aren't left with the blue light filter stuck off.
-hyprshade auto
+# ensuring you aren't left with a manually enabled filter stuck off.
+if [ -n "$active_shader" ]; then
+  hyprshade on "$active_shader"
+fi

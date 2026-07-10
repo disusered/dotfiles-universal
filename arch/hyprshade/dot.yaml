@@ -3,9 +3,8 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       if ! command -v hyprshade &>/dev/null; then
         yay -S --noconfirm --needed hyprshade
-        hyprshade install
       fi
-      systemctl --user enable --now hyprshade.timer
+      systemctl --user disable --now hyprshade.timer || true
   links:
     hyprshade.conf: {{ dirs.base.config }}/hypr/conf.d/hyprshade.conf
     config.toml: {{ dirs.base.config }}/hypr/hyprshade.toml
