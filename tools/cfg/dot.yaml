@@ -9,6 +9,7 @@ linux[whoami.distro^="Arch"]:
       cargo install --path "$cfg_src" --force
     depends:
       - /languages/rust
+      - /tools/fzf
   links:
     cfg.conf: {{ dirs.base.config }}/hypr/conf.d/cfg.conf
     cfg.desktop: ~/.local/share/applications/cfg.desktop

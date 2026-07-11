@@ -1,0 +1,4 @@
+interface:
+  display_name: "CFG Project Tasks"
+  short_description: "Discover and run the right project tasks"
+  default_prompt: "Use $cfg-project-tasks to discover and run the correct project task."

@@ -12,6 +12,7 @@ global:
       - ~/.config/opencode/commands/slop-clean.md
       - ~/.claude/commands/slop-clean.md
     grill-me: ~/.agents/skills/grill-me
+    cfg-project-tasks: ~/.agents/skills/cfg-project-tasks
     grill-me/commands/grill-me.md:
       - ~/.config/opencode/commands/grill-me.md
       - ~/.claude/commands/grill-me.md
