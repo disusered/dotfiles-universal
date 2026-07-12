@@ -5,14 +5,16 @@ global:
     git-commit: ~/.agents/skills/git-commit
     slop-clean: ~/.agents/skills/slop-clean
     thermo-nuclear-code-quality-review: ~/.agents/skills/thermo-nuclear-code-quality-review
+    grill-with-docs: ~/.agents/skills/grill-with-docs
+    grilling: ~/.agents/skills/grilling
+    domain-modeling: ~/.agents/skills/domain-modeling
+    cfg-project-tasks: ~/.agents/skills/cfg-project-tasks
     git-commit/commands/git-commit.md:
       - ~/.config/opencode/commands/git-commit.md
       - ~/.claude/commands/git-commit.md
     slop-clean/commands/slop-clean.md:
       - ~/.config/opencode/commands/slop-clean.md
       - ~/.claude/commands/slop-clean.md
-    grill-me: ~/.agents/skills/grill-me
-    cfg-project-tasks: ~/.agents/skills/cfg-project-tasks
-    grill-me/commands/grill-me.md:
-      - ~/.config/opencode/commands/grill-me.md
-      - ~/.claude/commands/grill-me.md
+    grill-with-docs/commands/grill-with-docs.md:
+      - ~/.config/opencode/commands/grill-with-docs.md
+      - ~/.claude/commands/grill-with-docs.md
