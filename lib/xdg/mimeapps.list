@@ -1,19 +1,13 @@
 [Added Associations]
 application/json=nvim.desktop;firefox.desktop;vim.desktop;libreoffice-writer.desktop;
-application/x-extension-htm=firefox.desktop;
-application/x-extension-html=firefox.desktop;
-application/x-extension-shtml=firefox.desktop;
-application/x-extension-xht=firefox.desktop;
-application/x-extension-xhtml=firefox.desktop;
-application/xhtml+xml=firefox.desktop;
 image/jpeg=swappy.desktop;firefox.desktop;chrome-dev.desktop;com.github.PintaProject.Pinta.desktop;com.google.Chrome.desktop;org.pwmt.zathura-pdf-mupdf.desktop;google-chrome.desktop;chromium.desktop;
 image/png=swappy.desktop;chromium.desktop;firefox.desktop;com.google.Chrome.desktop;google-chrome.desktop;
 text/html=firefox.desktop;
 text/markdown=nvim.desktop;vim.desktop;
 text/plain=nvim.desktop;vim.desktop;
-x-scheme-handler/chrome=firefox.desktop;
 x-scheme-handler/http=firefox.desktop;
 x-scheme-handler/https=firefox.desktop;
+x-scheme-handler/chrome=firefox.desktop;
 
 [Default Applications]
 application/json=nvim.desktop;
@@ -26,13 +20,13 @@ application/xhtml+xml=firefox.desktop
 image/jpeg=swappy.desktop;
 image/png=swappy.desktop;
 inode/directory=org.kde.dolphin.desktop
-text/html=google-chrome.desktop
+text/html=firefox.desktop
 text/markdown=nvim.desktop;
 text/plain=nvim.desktop;
 x-scheme-handler/chrome=firefox.desktop
 x-scheme-handler/discord=vesktop.desktop
-x-scheme-handler/http=google-chrome.desktop
-x-scheme-handler/https=google-chrome.desktop
+x-scheme-handler/http=firefox.desktop
+x-scheme-handler/https=firefox.desktop
 x-scheme-handler/bruno=bruno.desktop
 x-scheme-handler/antigravity=antigravity.desktop
 x-scheme-handler/about=google-chrome.desktop
