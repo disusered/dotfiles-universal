@@ -2,14 +2,13 @@ personality = "pragmatic"
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 commit_attribution = ""
-model = "gpt-5.5"
-model_reasoning_effort = "xhigh"
-plan_mode_reasoning_effort = "xhigh"
-service_tier = "fast"
+model = "gpt-5.6-sol"
+model_reasoning_effort = "medium"
+plan_mode_reasoning_effort = "ultra"
+service_tier = "default"
 
 [features]
 codex_git_commit = false
-memories = false
 plugin_hooks = true
 terminal_resize_reflow = true
 goals = true
@@ -40,6 +39,7 @@ status_line_use_colors = true
 
 [tui.model_availability_nux]
 "gpt-5.5" = 4
+"gpt-5.6-sol" = 4
 
 [projects."/home/carlos/.dotfiles"]
 trust_level = "trusted"

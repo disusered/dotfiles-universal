@@ -20,7 +20,7 @@
       "Bash(sqlite3:*)"
     ]
   },
-  "model": "claude-fable-5",
+  "model": "opus[1m]",
   "hooks": {
     "SessionStart": [
       {
@@ -130,11 +130,13 @@
     "superpowers@claude-plugins-official": true
   },
   "effortLevel": "xhigh",
+  "advisorModel": "fable",
   "voice": {
     "enabled": true,
     "mode": "hold"
   },
   "skipDangerousModePermissionPrompt": false,
+  "skipWorkflowUsageWarning": true,
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": true
 }
