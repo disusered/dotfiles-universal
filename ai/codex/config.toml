@@ -3,6 +3,7 @@ approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 commit_attribution = ""
 model = "gpt-5.6-sol"
+model_verbosity = "low"
 model_reasoning_effort = "ultra"
 plan_mode_reasoning_effort = "ultra"
 service_tier = "default"
@@ -123,6 +124,12 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/home/carlos/.openviking/openviking-repo"]
+trust_level = "trusted"
+
+[projects."/home/carlos/Development/XBOL/xbol-api-client/Odasoft.XBOL.ClientAPI/Odasoft.XBOL.ClientAPI"]
+trust_level = "trusted"
+
+[projects."/home/carlos/Development/XBOL/xbol-app-handheld"]
 trust_level = "trusted"
 
 [plugins."codex-security@openai-curated"]
