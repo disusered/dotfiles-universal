@@ -1,0 +1,17 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -euo pipefail
+      yay -S --noconfirm --needed cli-proxy-api-bin
+      ~/.rotz/bin/rotz link /ai/cliproxyapi -f
+      ~/.local/bin/cliproxyapi-render-config
+      systemctl --user daemon-reload
+      systemctl --user enable cli-proxy-api.service
+      systemctl --user restart cli-proxy-api.service
+    depends:
+      - /tools/yay
+      - /ai/claude
+  links:
+    config.yaml.tpl: ~/.config/cliproxyapi/config.yaml.tpl
+    scripts/cliproxyapi-render-config: ~/.local/bin/cliproxyapi-render-config
+    cliproxyapi.zsh: ~/.config/zsh/5005_cliproxyapi.zsh

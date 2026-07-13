@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+umask 077
+
+readonly token_placeholder='__CLIPROXYAPI_CLIENT_TOKEN__'
+readonly config_dir="$HOME/.cli-proxy-api"
+readonly config_file="$config_dir/config.yaml"
+readonly config_template="${CLIPROXYAPI_CONFIG_TEMPLATE:-$HOME/.config/cliproxyapi/config.yaml.tpl}"
+readonly state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/cliproxyapi"
+readonly token_file="$state_dir/client-token"
+
+token_tmp=''
+config_tmp=''
+
+cleanup() {
+  if [[ -n "$token_tmp" ]]; then
+    rm -f -- "$token_tmp"
+  fi
+  if [[ -n "$config_tmp" ]]; then
+    rm -f -- "$config_tmp"
+  fi
+}
+trap cleanup EXIT
+
+die() {
+  printf 'cliproxyapi-render-config: %s\n' "$1" >&2
+  exit 1
+}
+
+valid_token() {
+  [[ $1 =~ ^sk-local-[0-9a-f]{64}$ ]]
+}
+
+mkdir -p -- "$config_dir" "$state_dir"
+chmod 700 -- "$config_dir" "$state_dir"
+
+[[ -f "$config_template" ]] || die "template is not a regular file: $config_template"
+
+if [[ -e "$token_file" || -L "$token_file" ]]; then
+  [[ -f "$token_file" && ! -L "$token_file" ]] || die "token path is not a regular file"
+else
+  random_hex=$(od -An -N32 -tx1 /dev/urandom | tr -d '[:space:]')
+  generated_token="sk-local-$random_hex"
+  valid_token "$generated_token" || die "failed to generate a valid client token"
+
+  token_tmp=$(mktemp "$state_dir/.client-token.tmp.XXXXXX")
+  printf '%s\n' "$generated_token" >"$token_tmp"
+  chmod 600 -- "$token_tmp"
+
+  if ln -T -- "$token_tmp" "$token_file" 2>/dev/null; then
+    rm -f -- "$token_tmp"
+    token_tmp=''
+  else
+    rm -f -- "$token_tmp"
+    token_tmp=''
+    [[ -f "$token_file" && ! -L "$token_file" ]] || die "token path is not a regular file"
+  fi
+fi
+
+client_token=$(<"$token_file")
+valid_token "$client_token" || die "existing client token has an invalid format"
+chmod 600 -- "$token_file"
+
+grep -Fq -- "$token_placeholder" "$config_template" ||
+  die "template must contain the client token placeholder exactly once"
+placeholder_count=$(grep -Fo -- "$token_placeholder" "$config_template" | wc -l)
+[[ $placeholder_count -eq 1 ]] ||
+  die "template must contain the client token placeholder exactly once"
+
+template_contents=$(<"$config_template")
+rendered_config=${template_contents/__CLIPROXYAPI_CLIENT_TOKEN__/$client_token}
+[[ $rendered_config != *"$token_placeholder"* ]] || die "client token placeholder was not replaced"
+
+config_tmp=$(mktemp "$config_dir/.config.yaml.tmp.XXXXXX")
+printf '%s\n' "$rendered_config" >"$config_tmp"
+chmod 600 -- "$config_tmp"
+mv -fT -- "$config_tmp" "$config_file"
+config_tmp=''
+
+printf 'Rendered %s\n' "$config_file"
