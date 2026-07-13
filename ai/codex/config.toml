@@ -3,7 +3,7 @@ approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 commit_attribution = ""
 model = "gpt-5.6-sol"
-model_reasoning_effort = "medium"
+model_reasoning_effort = "ultra"
 plan_mode_reasoning_effort = "ultra"
 service_tier = "default"
 
