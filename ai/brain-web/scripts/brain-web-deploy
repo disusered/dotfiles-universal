@@ -20,4 +20,16 @@ npm run build
 systemctl --user daemon-reload
 systemctl --user enable brain-web.service
 systemctl --user restart brain-web.service
-brain-web-smoke
+env \
+  -u OPENVIKING_CLI_CONFIG_FILE \
+  -u OPENVIKING_URL \
+  -u OPENVIKING_BASE_URL \
+  -u OPENVIKING_API_KEY \
+  -u OPENVIKING_BEARER_TOKEN \
+  -u OPENVIKING_ACCOUNT \
+  -u OPENVIKING_USER \
+  -u OPENVIKING_PEER_ID \
+  -u OPENVIKING_ACTOR_PEER_ID \
+  -u OPENVIKING_TIMEOUT_MS \
+  -u OPENVIKING_TIMEOUT \
+  brain-web-smoke

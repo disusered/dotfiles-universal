@@ -12,6 +12,7 @@ linux[whoami.distro^="Arch"]:
       - /tools/pi
       - /tools/1password
       - /tools/caddy
+      - /tools/jq
       - /ai/openviking
   links:
     scripts/brain-web-start: ~/.local/bin/brain-web-start
