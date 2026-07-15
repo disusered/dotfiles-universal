@@ -4,6 +4,7 @@ linux|darwin:
     depends:
       - /tools/antidote
       - /ai/agent-skills
+      - /ai/agents
   links:
     config.toml: ~/.codex/config.toml
     AGENTS.md: ~/.codex/AGENTS.md

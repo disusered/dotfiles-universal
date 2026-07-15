@@ -9,6 +9,7 @@ global:
     grilling: ~/.agents/skills/grilling
     domain-modeling: ~/.agents/skills/domain-modeling
     cfg-project-tasks: ~/.agents/skills/cfg-project-tasks
+    brain-knowledge-ops: ~/.agents/skills/brain-knowledge-ops
     git-commit/commands/git-commit.md:
       - ~/.config/opencode/commands/git-commit.md
       - ~/.claude/commands/git-commit.md

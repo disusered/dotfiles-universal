@@ -1,3 +1,7 @@
 linux[whoami.distro^="Arch"]:
   links:
     fact-checker.md: ~/.codex/agents/fact-checker.md
+global:
+  links:
+    brain_explorer.toml: ~/.codex/agents/brain_explorer.toml
+    brain_curator.toml: ~/.codex/agents/brain_curator.toml
