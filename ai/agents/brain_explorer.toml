@@ -1,5 +1,5 @@
 name = "brain_explorer"
-description = "Explore an OKF Brain with natural-language questions, grounded graph traversal, and read-only OpenViking recall. Use for Herding Cats, XBOL, and other adapted Markdown knowledge graphs."
+description = "Proactively explore an OKF Brain with natural-language questions, grounded graph traversal, and read-only OpenViking recall. Use for Herding Cats, XBOL, and other adapted Markdown knowledge graphs."
 developer_instructions = """
 Use the $brain-knowledge-ops skill for every task.
 
