@@ -30,4 +30,6 @@ AGENTS.md
 # skills
 skills-lock.json
 .agents/skills
-.cfg/
+.cfg
+.env
+Procfile
