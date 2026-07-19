@@ -20,7 +20,7 @@
       "Bash(sqlite3:*)"
     ]
   },
-  "model": "claude-fable-5",
+  "model": "claude-fable-5-dd-los-6.5-tpg",
   "hooks": {
     "SessionStart": [
       {
