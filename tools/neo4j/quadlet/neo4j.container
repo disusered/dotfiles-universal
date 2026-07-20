@@ -1,0 +1,21 @@
+[Unit]
+Description=Neo4j local graph database
+
+[Container]
+ContainerName=neo4j
+Image=docker.io/library/neo4j:5.26.28
+Pull=never
+EnvironmentFile=%h/.config/neo4j/neo4j.env
+PublishPort=127.0.0.1:7474:7474
+PublishPort=127.0.0.1:7687:7687
+Volume=neo4j-data:/data
+Volume=neo4j-logs:/logs
+NoNewPrivileges=true
+
+[Service]
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

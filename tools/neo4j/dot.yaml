@@ -1,0 +1,20 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -euo pipefail
+      yay -S --noconfirm --needed aur/neo4j-desktop
+      podman pull docker.io/library/neo4j:5.26.28
+      mkdir -p ~/.config/containers/systemd
+      mkdir -p ~/.config/neo4j
+      ~/.rotz/bin/rotz link /tools/neo4j -f
+      ~/.dotfiles/tools/neo4j/scripts/neo4j-init
+      systemctl --user daemon-reload
+      systemctl --user restart neo4j.service
+    depends:
+      - /packages/podman
+      - /tools/1password
+  links:
+    env.tpl: ~/.config/neo4j/env.tpl
+    scripts/neo4j-init: ~/.local/bin/neo4j-init
+    scripts/neo4j-smoke: ~/.local/bin/neo4j-smoke
+    quadlet/neo4j.container: ~/.config/containers/systemd/neo4j.container

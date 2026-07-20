@@ -1,0 +1,126 @@
+#!/usr/bin/env python3
+import json
+from pathlib import Path
+import secrets
+import subprocess
+
+
+OP_VAULT = "Personal"
+OP_ITEM_TITLE = "Neo4j Local"
+NEO4J_HOME = Path.home() / ".config" / "neo4j"
+ENV_TEMPLATE = NEO4J_HOME / "env.tpl"
+ENV_FILE = NEO4J_HOME / "neo4j.env"
+
+
+class BootstrapError(Exception):
+    pass
+
+
+class CommandError(BootstrapError):
+    def __init__(self, args, returncode, stdout, stderr):
+        super().__init__(f"{args[0]} exited {returncode}")
+        self.args_list = list(args)
+        self.returncode = returncode
+        self.stdout = stdout
+        self.stderr = stderr
+
+
+class CommandRunner:
+    def run(self, args, *, input_text=None, check=True):
+        completed = subprocess.run(
+            args,
+            input=input_text,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+        if check and completed.returncode != 0:
+            raise CommandError(args, completed.returncode, completed.stdout, completed.stderr)
+        return completed.stdout
+
+
+def field_value(item, label):
+    for field in item.get("fields", []):
+        if field.get("label") == label or field.get("id") == label:
+            return field.get("value") or ""
+    return ""
+
+
+def set_field(item, label, value, field_type):
+    for field in item.setdefault("fields", []):
+        if field.get("label") == label or field.get("id") == label:
+            field.update({"id": field.get("id") or label, "label": label, "type": field_type, "value": value})
+            return
+    item["fields"].append({"id": label, "label": label, "type": field_type, "value": value})
+
+
+def is_not_found(error):
+    text = f"{error.stdout}\n{error.stderr}".lower()
+    return "not found" in text or "isn't an item" in text or "couldn't find" in text or "could not find" in text
+
+
+def make_item(password_factory=lambda: secrets.token_urlsafe(36)):
+    item = {
+        "title": OP_ITEM_TITLE,
+        "category": "LOGIN",
+        "urls": [{"label": "primary", "primary": True, "href": "http://127.0.0.1:7474"}],
+        "fields": [],
+    }
+    set_field(item, "username", "neo4j", "STRING")
+    set_field(item, "password", password_factory(), "CONCEALED")
+    return item
+
+
+def ensure_item(runner, password_factory=lambda: secrets.token_urlsafe(36)):
+    try:
+        item = json.loads(
+            runner.run(
+                ["op", "item", "get", OP_ITEM_TITLE, "--vault", OP_VAULT, "--format", "json", "--reveal"]
+            )
+        )
+    except CommandError as error:
+        if not is_not_found(error):
+            raise BootstrapError("Unable to read the Neo4j 1Password item") from error
+        item = make_item(password_factory)
+        runner.run(
+            ["op", "item", "create", "--vault", OP_VAULT, "-"],
+            input_text=json.dumps(item, sort_keys=True),
+        )
+        return item
+
+    changed = False
+    if field_value(item, "username") != "neo4j":
+        set_field(item, "username", "neo4j", "STRING")
+        changed = True
+    if not field_value(item, "password"):
+        set_field(item, "password", password_factory(), "CONCEALED")
+        changed = True
+    expected_url = "http://127.0.0.1:7474"
+    if not item.get("urls") or item["urls"][0].get("href") != expected_url:
+        item["urls"] = [{"label": "primary", "primary": True, "href": expected_url}]
+        changed = True
+    if changed:
+        runner.run(
+            ["op", "item", "edit", item.get("id") or OP_ITEM_TITLE, "--vault", OP_VAULT],
+            input_text=json.dumps(item, sort_keys=True),
+        )
+    return item
+
+
+def render_env_file(runner, template_path=ENV_TEMPLATE, output_path=ENV_FILE):
+    rendered = runner.run(["op", "inject", "--force", "-i", str(template_path)])
+    output_path.write_text(rendered, encoding="utf-8")
+    output_path.chmod(0o600)
+
+
+def main():
+    NEO4J_HOME.mkdir(parents=True, exist_ok=True)
+    runner = CommandRunner()
+    ensure_item(runner)
+    render_env_file(runner)
+    print(f"Rendered {ENV_FILE}")
+
+
+if __name__ == "__main__":
+    main()
