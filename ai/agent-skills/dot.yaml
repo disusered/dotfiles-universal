@@ -10,6 +10,9 @@ global:
     domain-modeling: ~/.agents/skills/domain-modeling
     cfg-project-tasks: ~/.agents/skills/cfg-project-tasks
     brain-knowledge-ops: ~/.agents/skills/brain-knowledge-ops
+    financial-planning:
+      - ~/.agents/skills/financial-planning
+      - ~/.config/opencode/skills/financial-planning
     git-commit/commands/git-commit.md:
       - ~/.config/opencode/commands/git-commit.md
       - ~/.claude/commands/git-commit.md
