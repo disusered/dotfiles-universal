@@ -5,7 +5,6 @@
   },
   "env": {
     "API_TIMEOUT_MS": "3000000",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "permissions": {
@@ -20,7 +19,7 @@
       "Bash(sqlite3:*)"
     ]
   },
-  "model": "claude-fable-5-dd-los-6.5-tpg",
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "SessionStart": [
       {
@@ -138,5 +137,6 @@
   "skipDangerousModePermissionPrompt": false,
   "skipWorkflowUsageWarning": true,
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": true
+  "voiceEnabled": true,
+  "tui": "fullscreen"
 }
