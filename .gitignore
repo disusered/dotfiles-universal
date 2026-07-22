@@ -45,6 +45,7 @@ ai/claude/.cache/
 # Agent skills are centralized under /ai/agent-skills; do not re-add
 # per-app copies/symlinks for shared skills.
 /ai/codex/skills/
+/ai/claude/skills/brain-portal
 /ai/claude/skills/git-commit/
 /ai/opencode/skills/
 /ai/opencode/commands/git-commit.md
