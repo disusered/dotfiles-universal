@@ -9,9 +9,9 @@ capture boundary, post-write validation, and expected OpenViking profile.
 - Aliases: `Herding Cats`, `herding-cats`, `HC`.
 - Repository: `/home/carlos/Development/ME/herding-cats`.
 - OKF root and entrypoint: `brain/` and `brain/index.md`.
-- Authority: read repository `AGENTS.md`, `.pi/SYSTEM.md`,
-  `.pi/skills/okf-brain/SKILL.md`, and relevant pages under `brain/schema/` and
-  `brain/decisions/`.
+- Authority: read repository `AGENTS.md`,
+  `brain/decisions/0017-detach-brain-from-pi-harness.md`, and relevant pages
+  under `brain/schema/` and `brain/decisions/`.
 - Writable scope: authored Markdown under `brain/`, plus documented generated
   Brain projections during refresh.
 - Query: `brainctl search brain "<query>"`, then `rg` and direct reads.
@@ -19,6 +19,8 @@ capture boundary, post-write validation, and expected OpenViking profile.
   do not reorganize it unless explicitly requested. Use the existing
   `brainctl zotero` commands; do not duplicate that adapter globally.
 - OpenViking profile: `local-dev` via `~/.openviking/ovcli.conf`.
+- Operator boundary: Codex, Claude, and OpenCode invoke `brainctl` and this skill
+  directly. Do not recreate a Brain chatbot, Pi harness, or Brain Web.
 - After an authored change:
   1. `brainctl log brain --message "<concise maintenance event>"`
   2. `brainctl refresh brain`
