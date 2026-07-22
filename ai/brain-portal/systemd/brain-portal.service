@@ -1,0 +1,36 @@
+[Unit]
+Description=Private Herding Cats Brain Portal
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Development/ME/herding-cats/projects/brain-portal
+Environment=NODE_ENV=production
+Environment=PORT=43110
+Environment=HOSTNAME=127.0.0.1
+EnvironmentFile=%h/.config/brain-portal/env
+ExecStart=%h/.local/bin/mise exec node@24 -- pnpm --filter @brain-portal/web start --hostname 127.0.0.1 --port 43110
+Restart=on-failure
+RestartSec=3s
+TimeoutStopSec=15s
+UMask=0077
+
+LockPersonality=true
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=read-only
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+ReadWritePaths=%h/.local/share/herding-cats/brain-portal %h/Development/ME/herding-cats/projects/brain-portal/apps/web/.next/cache
+RestrictRealtime=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=default.target

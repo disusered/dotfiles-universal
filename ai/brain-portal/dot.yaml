@@ -1,0 +1,14 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      mkdir -p ~/.config/brain-portal ~/.local/share/herding-cats/brain-portal/receipts
+      systemctl --user daemon-reload
+      if [ -f ~/.config/brain-portal/env ]; then
+        systemctl --user enable --now brain-portal.service
+      else
+        echo "Brain Portal linked. Create ~/.config/brain-portal/env, then enable brain-portal.service."
+      fi
+    depends:
+      - /languages/javascript/node/latest
+  links:
+    systemd/brain-portal.service: ~/.config/systemd/user/brain-portal.service

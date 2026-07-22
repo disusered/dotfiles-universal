@@ -31,3 +31,8 @@ http://xbol.disusered.com {
 	bind {$CADDY_TAILSCALE_IP}
 	reverse_proxy localhost:43000
 }
+
+http://brain.disusered.com {
+	bind {$CADDY_TAILSCALE_IP}
+	reverse_proxy 127.0.0.1:43110
+}
