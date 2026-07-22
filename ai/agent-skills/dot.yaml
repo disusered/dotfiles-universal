@@ -1,6 +1,8 @@
 global:
   installs:
-    cmd: "true"
+    cmd: command -v cocoindex &>/dev/null || uv tool install "cocoindex>=1,<2"
+    depends:
+      - /languages/python/uv
   links:
     git-commit: ~/.agents/skills/git-commit
     slop-clean: ~/.agents/skills/slop-clean
@@ -24,3 +26,10 @@ global:
     grill-with-docs/commands/grill-with-docs.md:
       - ~/.config/opencode/commands/grill-with-docs.md
       - ~/.claude/commands/grill-with-docs.md
+linux:
+  links:
+    cocoindex:
+      - ~/Development/XBOL/.agents/skills/cocoindex
+      - ~/Development/XBOL/.claude/skills/cocoindex
+      - ~/Development/ME/herding-cats/.agents/skills/cocoindex
+      - ~/Development/ME/herding-cats/.claude/skills/cocoindex

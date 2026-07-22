@@ -1,0 +1,5 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: command -v docling &>/dev/null || uv tool install --torch-backend auto docling
+    depends:
+      - /languages/python/uv
