@@ -1,0 +1,4 @@
+interface:
+  display_name: "Brain Portal"
+  short_description: "Publish portal artifacts and bounded workspace updates"
+  default_prompt: "Use $brain-portal to publish a sourced artifact or make a bounded portal workspace update."

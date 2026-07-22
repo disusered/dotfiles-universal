@@ -17,6 +17,10 @@ global:
     financial-planning:
       - ~/.agents/skills/financial-planning
       - ~/.config/opencode/skills/financial-planning
+    brain-portal:
+      - ~/.agents/skills/brain-portal
+      - ~/.claude/skills/brain-portal
+      - ~/.config/opencode/skills/brain-portal
     git-commit/commands/git-commit.md:
       - ~/.config/opencode/commands/git-commit.md
       - ~/.claude/commands/git-commit.md
