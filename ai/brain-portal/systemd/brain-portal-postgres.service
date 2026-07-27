@@ -1,0 +1,23 @@
+[Unit]
+Description=PostgreSQL for the Herding Cats Brain Portal
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+WorkingDirectory=%h/Development/ME/herding-cats/projects/brain-portal
+EnvironmentFile=%h/.config/brain-portal/env
+ExecStart=/usr/bin/podman-compose up -d postgres
+ExecStop=/usr/bin/podman-compose stop postgres
+TimeoutStartSec=120s
+TimeoutStopSec=60s
+UMask=0077
+
+LockPersonality=true
+NoNewPrivileges=true
+# Rootless Podman cannot rejoin its existing user namespace from a private
+# temporary-filesystem namespace after a reboot.
+
+[Install]
+WantedBy=default.target
