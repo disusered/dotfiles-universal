@@ -54,6 +54,7 @@ window#waybar {
 #mpris,
 #wireplumber,
 #privacy,
+#idle_inhibitor,
 #custom-weather,
 #custom-powermenu {
   background-color: #{{ surface0 | hex }};
@@ -61,6 +62,15 @@ window#waybar {
   padding: 0px 15px;
   margin: 5px;
   border-radius: 10px;
+}
+
+#idle_inhibitor {
+  padding: 0px 10px;
+}
+
+#idle_inhibitor.activated {
+  background-color: #{{ yellow | hex }};
+  color: #{{ base | hex }};
 }
 
 #privacy {
