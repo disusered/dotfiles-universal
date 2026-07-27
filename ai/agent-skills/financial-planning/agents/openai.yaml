@@ -1,4 +1,4 @@
 interface:
   display_name: "Financial Planning"
-  short_description: "Inspect a private hledger journal and staged YNAB evidence"
-  default_prompt: "Use $financial-planning to inspect my funding envelopes and source-labelled quotes."
+  short_description: "Track purchase envelopes, actuals, and spending"
+  default_prompt: "Use $financial-planning to update my purchase envelopes from confirmed contributions and review YNAB only for spending patterns."
