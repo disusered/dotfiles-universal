@@ -1,0 +1,11 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      polychrome_src=/home/carlos/Development/ME/herding-cats/utilities/polychrome
+      if [ ! -d "$polychrome_src" ]; then
+        printf '%s\n' "polychrome source is missing: $polychrome_src" >&2
+        exit 1
+      fi
+      cargo install --path "$polychrome_src" --bin polychromectl --force
+    depends:
+      - /languages/rust
