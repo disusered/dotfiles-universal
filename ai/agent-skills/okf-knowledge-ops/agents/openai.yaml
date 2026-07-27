@@ -1,0 +1,4 @@
+interface:
+  display_name: "OKF Knowledge Operations"
+  short_description: "Explore and curate governed OKF knowledge"
+  default_prompt: "Use $okf-knowledge-ops to explore this knowledge bundle and answer with grounded citations."

@@ -11,9 +11,12 @@ global:
     grilling: ~/.agents/skills/grilling
     domain-modeling: ~/.agents/skills/domain-modeling
     cfg-project-tasks: ~/.agents/skills/cfg-project-tasks
-    brain-knowledge-ops:
-      - ~/.agents/skills/brain-knowledge-ops
-      - ~/.config/opencode/skills/brain-knowledge-ops
+    okf-knowledge-ops:
+      - ~/.agents/skills/okf-knowledge-ops
+      - ~/.config/opencode/skills/okf-knowledge-ops
+    polychrome-journal-ops:
+      - ~/.agents/skills/polychrome-journal-ops
+      - ~/.config/opencode/skills/polychrome-journal-ops
     financial-planning:
       - ~/.agents/skills/financial-planning
       - ~/.config/opencode/skills/financial-planning

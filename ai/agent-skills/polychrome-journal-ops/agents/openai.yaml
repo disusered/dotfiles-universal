@@ -1,0 +1,4 @@
+interface:
+  display_name: "Polychrome Journal Operations"
+  short_description: "Process Black entries without rewriting them"
+  default_prompt: "Use $polychrome-journal-ops to process revised Black entries into attributed connection proposals."

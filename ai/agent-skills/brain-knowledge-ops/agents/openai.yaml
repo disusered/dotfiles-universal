@@ -1,4 +1,0 @@
-interface:
-  display_name: "Brain Knowledge Operations"
-  short_description: "Explore and curate OKF knowledge graphs"
-  default_prompt: "Use $brain-knowledge-ops to explore this Brain and answer with grounded citations."
