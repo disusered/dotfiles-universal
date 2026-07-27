@@ -5,6 +5,7 @@ return {
       { "benlubas/neorg-interim-ls", lazy = true },
       { "nvim-neorg/tree-sitter-norg", lazy = true },
       { "nvim-neorg/tree-sitter-norg-meta", lazy = true },
+      { dir = vim.fn.expand("~/.dotfiles/editors/neovim/plugins/neorg/polychrome"), lazy = true },
     },
     ft = "norg",
     cmd = "Neorg",
@@ -66,13 +67,20 @@ return {
           ["core.dirman"] = {
             config = {
               workspaces = {
-                notes = "~/Documents/notes",
+                black = "~/Development/ME/herding-cats/black",
                 study = "~/Documents/study",
                 projects = "~/Documents/projects",
                 blog = "~/Documents/blog",
                 work = "~/Documents/work",
               },
-              default_workspace = "notes",
+              default_workspace = "black",
+            },
+          },
+          ["external.polychrome"] = {
+            config = {
+              workspace = "black",
+              black_root = "~/Development/ME/herding-cats/black",
+              author = "carlos",
             },
           },
           ["core.completion"] = {
@@ -175,6 +183,11 @@ return {
           })
         end,
         desc = "Search notes (current workspace)",
+      },
+      {
+        "<leader>ob",
+        "<cmd>Neorg polychrome black new<cr>",
+        desc = "New Black fragment",
       },
       -- Export to markdown
       {
