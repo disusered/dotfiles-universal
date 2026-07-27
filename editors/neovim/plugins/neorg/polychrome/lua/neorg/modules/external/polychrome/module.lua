@@ -7,6 +7,19 @@ local BODY_START = "%polychrome:black-body:start%"
 local BODY_END = "%polychrome:black-body:end%"
 local CONNECTIONS_START = "%polychrome:connections:start%"
 local CONNECTIONS_END = "%polychrome:connections:end%"
+local PRIVATE_DIRECTORY_MODE = 448
+local PRIVATE_FILE_MODE = 384
+local PERMISSION_MASK = 511
+
+local function absolute_path(path)
+  local expanded = vim.fn.fnamemodify(vim.fn.expand(path), ":p")
+
+  if expanded ~= "/" then
+    expanded = expanded:gsub("/+$", "")
+  end
+
+  return expanded
+end
 
 local function canonical_path(path, label)
   local uv = vim.uv or vim.loop
@@ -27,6 +40,82 @@ local function is_within(root, target)
   return target:sub(1, #root + 1) == root .. "/"
 end
 
+local function same_node(left, right)
+  return left
+    and right
+    and left.dev == right.dev
+    and left.ino == right.ino
+    and left.type == right.type
+end
+
+local function harden_private_directory(path, label, workspace_root)
+  local uv = vim.uv or vim.loop
+  local named, lstat_error = uv.fs_lstat(path)
+
+  if not named then
+    error(("unable to inspect %s %q: %s"):format(label, path, lstat_error or "unknown error"))
+  end
+
+  if named.type == "link" then
+    error(("%s must not be a symlink: %q"):format(label, path))
+  end
+
+  if named.type ~= "directory" then
+    error(("%s is not a directory: %q"):format(label, path))
+  end
+
+  local resolved = canonical_path(path, label)
+
+  if workspace_root and not is_within(workspace_root, resolved) then
+    error(("%s escapes configured workspace: %q resolves to %q"):format(label, path, resolved))
+  end
+
+  local fd, open_error = uv.fs_open(path, "r", 0)
+
+  if not fd then
+    error(("unable to open %s %q securely: %s"):format(label, path, open_error or "unknown error"))
+  end
+
+  local opened, fstat_error = uv.fs_fstat(fd)
+
+  if not opened or not same_node(named, opened) then
+    uv.fs_close(fd)
+    error(("%s changed while it was being opened: %q (%s)"):format(label, path, fstat_error or "identity mismatch"))
+  end
+
+  local chmod_ok, chmod_error = uv.fs_fchmod(fd, PRIVATE_DIRECTORY_MODE)
+  local hardened, hardened_error = uv.fs_fstat(fd)
+  local close_ok, close_error = uv.fs_close(fd)
+
+  if not chmod_ok then
+    error(("unable to restrict %s %q to 0700: %s"):format(label, path, chmod_error or "unknown error"))
+  end
+
+  if not hardened or bit.band(hardened.mode, PERMISSION_MASK) ~= PRIVATE_DIRECTORY_MODE then
+    error(("%s did not retain mode 0700: %q (%s)"):format(label, path, hardened_error or "unsafe mode"))
+  end
+
+  if not close_ok then
+    error(("unable to close %s %q after permission hardening: %s"):format(label, path, close_error or "unknown error"))
+  end
+
+  local final_named, final_error = uv.fs_lstat(path)
+
+  if not final_named or final_named.type == "link" or not same_node(named, final_named) then
+    error(("%s changed while permissions were hardened: %q (%s)"):format(label, path, final_error or "identity mismatch"))
+  end
+
+  if bit.band(final_named.mode, PERMISSION_MASK) ~= PRIVATE_DIRECTORY_MODE then
+    error(("%s must have mode 0700: %q"):format(label, path))
+  end
+
+  if canonical_path(path, label) ~= resolved then
+    error(("%s changed canonical identity while permissions were hardened: %q"):format(label, path))
+  end
+
+  return resolved
+end
+
 local function ensure_private_directory(parent, name, workspace_root)
   local uv = vim.uv or vim.loop
   local path = parent .. "/" .. name
@@ -41,7 +130,7 @@ local function ensure_private_directory(parent, name, workspace_root)
       error(("Black entry directory component is not a directory: %q"):format(path))
     end
   elseif lstat_error_name == "ENOENT" or tostring(lstat_error):find("ENOENT", 1, true) then
-    local created, mkdir_error = uv.fs_mkdir(path, 448)
+    local created, mkdir_error = uv.fs_mkdir(path, PRIVATE_DIRECTORY_MODE)
 
     if not created then
       error(("unable to create private Black entry directory %q: %s"):format(path, mkdir_error or "unknown error"))
@@ -50,24 +139,7 @@ local function ensure_private_directory(parent, name, workspace_root)
     error(("unable to inspect Black entry directory %q: %s"):format(path, lstat_error or "unknown error"))
   end
 
-  local node, node_error = uv.fs_lstat(path)
-
-  if not node or node.type ~= "directory" then
-    error(("Black entry directory component changed unexpectedly %q: %s"):format(path, node_error or "not a directory"))
-  end
-
-  local resolved = canonical_path(path, "Black entry directory")
-  local stat, stat_error = uv.fs_stat(resolved)
-
-  if not stat or stat.type ~= "directory" then
-    error(("Black entry path %q is not a directory: %s"):format(path, stat_error or stat and stat.type or "missing"))
-  end
-
-  if not is_within(workspace_root, resolved) then
-    error(("Black entry directory escapes configured workspace: %q resolves to %q"):format(path, resolved))
-  end
-
-  return resolved
+  return harden_private_directory(path, "Black entry directory component", workspace_root)
 end
 
 local function validate_author(author)
@@ -119,7 +191,7 @@ end
 
 local function write_exclusive(path, lines, workspace_root)
   local uv = vim.uv or vim.loop
-  local fd, open_error, open_error_name = uv.fs_open(path, "wx", 384)
+  local fd, open_error, open_error_name = uv.fs_open(path, "wx", PRIVATE_FILE_MODE)
 
   if not fd then
     if open_error_name == "EEXIST" or tostring(open_error):find("EEXIST", 1, true) then
@@ -129,21 +201,46 @@ local function write_exclusive(path, lines, workspace_root)
     return false, open_error or "unable to create entry"
   end
 
+  local chmod_ok, chmod_error = uv.fs_fchmod(fd, PRIVATE_FILE_MODE)
+
+  if not chmod_ok then
+    uv.fs_close(fd)
+    uv.fs_unlink(path)
+    return false, chmod_error or "unable to restrict new Black entry to 0600"
+  end
+
   local content = table.concat(lines, "\n")
   local bytes_written, write_error = uv.fs_write(fd, content, 0)
   local sync_ok, sync_error = uv.fs_fsync(fd)
+  local opened, fstat_error = uv.fs_fstat(fd)
   local close_ok, close_error = uv.fs_close(fd)
 
-  if bytes_written ~= #content or not sync_ok or not close_ok then
+  if
+    bytes_written ~= #content
+    or not sync_ok
+    or not opened
+    or opened.type ~= "file"
+    or bit.band(opened.mode, PERMISSION_MASK) ~= PRIVATE_FILE_MODE
+    or not close_ok
+  then
     uv.fs_unlink(path)
-    return false, write_error or sync_error or close_error or "short write"
+    return false, write_error
+      or sync_error
+      or fstat_error
+      or close_error
+      or "new Black entry did not retain mode 0600"
   end
 
   local node, node_error = uv.fs_lstat(path)
 
-  if not node or node.type ~= "file" then
+  if
+    not node
+    or node.type ~= "file"
+    or not same_node(opened, node)
+    or bit.band(node.mode, PERMISSION_MASK) ~= PRIVATE_FILE_MODE
+  then
     uv.fs_unlink(path)
-    return false, node_error or "new Black entry is not a regular file"
+    return false, node_error or "new Black entry is not the private regular file that was created"
   end
 
   local resolved, resolve_error = uv.fs_realpath(path)
@@ -196,15 +293,12 @@ module.public.new_black_fragment = function()
     error(("Neorg workspace %q is not configured"):format(module.config.public.workspace))
   end
 
-  if not dirman.set_workspace(module.config.public.workspace) then
-    error(("unable to activate Neorg workspace %q"):format(module.config.public.workspace))
-  end
-
   validate_author(module.config.public.author)
 
-  local configured_root = vim.fn.fnamemodify(vim.fn.expand(module.config.public.black_root), ":p")
-  local workspace_root = canonical_path(tostring(workspace), "Neorg Black workspace")
-  local expected_root = canonical_path(configured_root, "configured Black root")
+  local configured_root = absolute_path(module.config.public.black_root)
+  local workspace_path = absolute_path(tostring(workspace))
+  local expected_root = harden_private_directory(configured_root, "configured Black root")
+  local workspace_root = harden_private_directory(workspace_path, "Neorg Black workspace")
 
   if workspace_root ~= expected_root then
     error(
@@ -214,6 +308,16 @@ module.public.new_black_fragment = function()
         expected_root
       )
     )
+  end
+
+  if not dirman.set_workspace(module.config.public.workspace) then
+    error(("unable to activate Neorg workspace %q"):format(module.config.public.workspace))
+  end
+
+  workspace_root = harden_private_directory(workspace_path, "Neorg Black workspace")
+
+  if workspace_root ~= expected_root then
+    error(("Neorg Black workspace changed while it was activated: %q"):format(workspace_path))
   end
 
   local parts = timestamp_parts(module.config.public.clock())

@@ -28,6 +28,7 @@ assert_truthy(second.path:match("/black/entries/2026/07/26/123456%-01%.norg$"), 
 assert_truthy(vim.uv.fs_stat(first.path), "first entry exists")
 assert_truthy(vim.uv.fs_stat(second.path), "second entry exists")
 assert_equal("rw-------", vim.fn.getfperm(first.path), "Black entries are private")
+assert_equal("rwx------", vim.fn.getfperm(test_root .. "/black"), "Black workspace root is private")
 
 for _, directory in ipairs({
   test_root .. "/black/entries",
@@ -108,7 +109,7 @@ local function configure_workspace(name, root)
 end
 
 local existing_root = test_root .. "/black-existing-modes"
-mkdir_private(existing_root)
+mkdir_with_mode(existing_root, 493)
 local existing_directory = existing_root
 
 for _, component in ipairs({ "entries", "2026", "07", "26" }) do
@@ -119,7 +120,30 @@ end
 configure_workspace("black_existing_modes", existing_root)
 local existing_modes_entry = module.new_black_fragment()
 assert_equal("rw-------", vim.fn.getfperm(existing_modes_entry.path), "entry in existing chronology is private")
-assert_equal("rwxr-xr-x", vim.fn.getfperm(existing_directory), "pre-existing directory mode is preserved")
+
+local hardened_directory = existing_root
+
+for _, component in ipairs({ "entries", "2026", "07", "26" }) do
+  assert_equal("rwx------", vim.fn.getfperm(hardened_directory), "pre-existing Black directory is restricted")
+  hardened_directory = hardened_directory .. "/" .. component
+end
+
+assert_equal("rwx------", vim.fn.getfperm(existing_directory), "pre-existing chronology leaf is restricted")
+
+local symlink_root_target = test_root .. "/black-root-target"
+local symlink_root = test_root .. "/black-root-link"
+mkdir_private(symlink_root_target)
+local linked_root, linked_root_error = uv.fs_symlink(symlink_root_target, symlink_root, { dir = true })
+assert_truthy(linked_root, "create Black root symlink: " .. tostring(linked_root_error))
+configure_workspace("black_root_symlink", symlink_root)
+
+local symlink_root_ok, symlink_root_capture_error = pcall(module.new_black_fragment)
+assert_truthy(not symlink_root_ok, "symlinked Black root is rejected")
+assert_truthy(
+  tostring(symlink_root_capture_error):find("must not be a symlink", 1, true),
+  "symlinked Black root reports the privacy boundary"
+)
+assert_truthy(not uv.fs_stat(symlink_root_target .. "/entries"), "symlinked Black root creates nothing in its target")
 
 local entries_root = test_root .. "/black-entries-escape"
 local entries_outside = test_root .. "/entries-outside"

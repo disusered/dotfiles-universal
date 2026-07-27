@@ -20,11 +20,13 @@ black/entries/YYYY/MM/DD/HHMMSS[-NN].norg
 ```
 
 Creation uses an exclusive libuv open (`wx`) with mode `0600`, so an existing
-entry cannot be overwritten. New chronology directories use `0700`; existing
-directories are not chmodded. Every created path is resolved against the
-configured canonical Black root, and symlinked chronology components are
-rejected. The new buffer opens with the cursor on the blank line between the
-human-body sentinels. `<leader>ob` invokes the same command.
+entry cannot be overwritten. The configured Black root and every chronology
+directory are verified as real non-symlink directories and restricted through
+their opened file descriptors to `0700`; new files are similarly restricted to
+`0600`. Every created path is resolved against the configured canonical Black
+root, and symlinked roots or chronology components are rejected. The new buffer
+opens with the cursor on the blank line between the human-body sentinels.
+`<leader>ob` invokes the same command.
 
 The outer `@document.meta` uses `polychrome_id`, `authors`, `categories`,
 `created`, `updated`, `visibility`, and `version`. The exact standalone comment
@@ -39,9 +41,10 @@ sh tests/run.sh
 ```
 
 The test fixes the clock, creates three same-second entries, checks suffixing,
-metadata and exact sentinels, exercises the actual `:Neorg` command, and parses
-the result with the installed Norg and Norg-meta Tree-sitter parsers. Its
-writable state is confined to a temporary directory.
+metadata, exact sentinels, private root/directory/file modes, and symlink
+rejection; it exercises the actual `:Neorg` command and parses the result with
+the installed Norg and Norg-meta Tree-sitter parsers. Its writable state is
+confined to a temporary directory.
 
 Set `POLYCHROME_NEORG_SEED_ENTRY` to a migrated entry to additionally verify
 that an imported document containing nested original `@document.meta` parses

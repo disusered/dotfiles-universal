@@ -13,12 +13,10 @@ export XDG_STATE_HOME="$test_root/xdg/state"
 
 nvim --headless --clean -i NONE \
   -u "$module_root/tests/minimal_init.lua" \
-  -c "luafile $module_root/tests/capture_spec.lua" \
-  -c "qa!"
+  -l "$module_root/tests/capture_spec.lua"
 
 if [ -n "${POLYCHROME_NEORG_SEED_ENTRY:-}" ]; then
   nvim --headless --clean -i NONE \
     -u "$module_root/tests/minimal_init.lua" \
-    -c "luafile $module_root/tests/seed_import_spec.lua" \
-    -c "qa!"
+    -l "$module_root/tests/seed_import_spec.lua"
 fi
