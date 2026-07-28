@@ -1,4 +1,4 @@
 interface:
   display_name: "Polychrome Journal Operations"
-  short_description: "Process Black entries without rewriting them"
-  default_prompt: "Use $polychrome-journal-ops to process revised Black entries into attributed connection proposals."
+  short_description: "Process selected Black entries safely"
+  default_prompt: "Use $polychrome-journal-ops to process my newest unprocessed Black entry, capture its URLs in Zotero, and propose Polychrome connections without accepting anything."
