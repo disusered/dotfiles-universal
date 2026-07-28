@@ -4,12 +4,14 @@ linux[whoami.distro^="Arch"]:
       mkdir -p ~/.config/brain-portal ~/.local/share/herding-cats/brain-portal/receipts
       systemctl --user daemon-reload
       if [ -f ~/.config/brain-portal/env ]; then
-        systemctl --user enable --now brain-portal-postgres.service brain-portal.service
+        systemctl --user enable --now brain-portal-postgres.service brain-portal.service brain-portal-price-check.timer
       else
-        echo "Brain Portal linked. Create ~/.config/brain-portal/env, then enable brain-portal-postgres.service and brain-portal.service."
+        echo "Brain Portal linked. Create ~/.config/brain-portal/env, then enable brain-portal-postgres.service, brain-portal.service, and brain-portal-price-check.timer."
       fi
     depends:
       - /languages/javascript/node/latest
   links:
     systemd/brain-portal-postgres.service: ~/.config/systemd/user/brain-portal-postgres.service
+    systemd/brain-portal-price-check.service: ~/.config/systemd/user/brain-portal-price-check.service
+    systemd/brain-portal-price-check.timer: ~/.config/systemd/user/brain-portal-price-check.timer
     systemd/brain-portal.service: ~/.config/systemd/user/brain-portal.service

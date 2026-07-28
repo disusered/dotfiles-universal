@@ -1,0 +1,10 @@
+[Unit]
+Description=Brain Portal purchase price due-check sweep
+
+[Timer]
+OnCalendar=*:0/30
+Persistent=true
+Unit=brain-portal-price-check.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,30 @@
+[Unit]
+Description=Refresh Brain Portal purchase prices
+After=network-online.target brain-portal-postgres.service
+Requires=brain-portal-postgres.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/Development/ME/herding-cats/projects/brain-portal
+Environment=NODE_ENV=production
+EnvironmentFile=%h/.config/brain-portal/env
+ExecStartPre=%h/.local/bin/mise exec node@24 -- pnpm db:wait
+ExecStart=%h/.local/bin/mise exec node@24 -- pnpm portalctl purchase watch check --due --refresh-fx-if-due
+TimeoutStartSec=300s
+UMask=0077
+
+LockPersonality=true
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=read-only
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+RestrictRealtime=true
+RestrictSUIDSGID=true
