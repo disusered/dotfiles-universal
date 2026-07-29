@@ -46,6 +46,7 @@ ai/claude/.cache/
 # per-app copies/symlinks for shared skills.
 /ai/codex/skills/
 /ai/claude/skills/brain-portal
+/ai/claude/skills/manage-course-notebooks
 /ai/claude/skills/git-commit/
 /ai/opencode/skills/
 /ai/opencode/commands/git-commit.md

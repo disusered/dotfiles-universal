@@ -11,6 +11,10 @@ global:
     grilling: ~/.agents/skills/grilling
     domain-modeling: ~/.agents/skills/domain-modeling
     cfg-project-tasks: ~/.agents/skills/cfg-project-tasks
+    manage-course-notebooks:
+      - ~/.agents/skills/manage-course-notebooks
+      - ~/.claude/skills/manage-course-notebooks
+      - ~/.config/opencode/skills/manage-course-notebooks
     okf-knowledge-ops:
       - ~/.agents/skills/okf-knowledge-ops
       - ~/.config/opencode/skills/okf-knowledge-ops

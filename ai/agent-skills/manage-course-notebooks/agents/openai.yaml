@@ -1,0 +1,4 @@
+interface:
+  display_name: "Manage Course Notebooks"
+  short_description: "Create and maintain uv-backed course notebooks"
+  default_prompt: "Use $manage-course-notebooks to set up or repair this course notebook workspace."
