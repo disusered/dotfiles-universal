@@ -1,0 +1,9 @@
+linux:
+  links:
+    nvim-notebook: ~/.local/bin/nvim-notebook
+    init.lua: ~/.config/nvim-notebook/init.lua
+    lua/config/lazy.lua: ~/.config/nvim-notebook/lua/config/lazy.lua
+    lua/config/options.lua: ~/.config/nvim-notebook/lua/config/options.lua
+    lua/config/keymaps.lua: ~/.config/nvim-notebook/lua/config/keymaps.lua
+    lua/config/autocmds.lua: ~/.config/nvim-notebook/lua/config/autocmds.lua
+    lua/plugins/notebook.lua: ~/.config/nvim-notebook/lua/plugins/notebook.lua

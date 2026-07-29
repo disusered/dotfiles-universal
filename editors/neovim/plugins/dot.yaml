@@ -2,7 +2,9 @@ global:
   links:
     abolish.lua: ~/.config/nvim/lua/plugins/abolish.lua
     blink.lua: ~/.config/nvim/lua/plugins/blink.lua
-    catppuccin.lua: ~/.config/nvim/lua/plugins/catppuccin.lua
+    catppuccin.lua:
+      - ~/.config/nvim/lua/plugins/catppuccin.lua
+      - ~/.config/nvim-notebook/lua/plugins/catppuccin.lua
     claude.lua: ~/.config/nvim/lua/plugins/claude.lua
     coffee.lua: ~/.config/nvim/lua/plugins/coffee.lua
     colors.lua: ~/.config/nvim/lua/plugins/colors.lua
@@ -13,11 +15,15 @@ global:
     diffview.lua: ~/.config/nvim/lua/plugins/diffview.lua
     disabled.lua: ~/.config/nvim/lua/plugins/disabled.lua
     eunuch.lua: ~/.config/nvim/lua/plugins/eunuch.lua
-    files.lua: ~/.config/nvim/lua/plugins/files.lua
+    files.lua:
+      - ~/.config/nvim/lua/plugins/files.lua
+      - ~/.config/nvim-notebook/lua/plugins/files.lua
     gitconflict.lua: ~/.config/nvim/lua/plugins/gitconflict.lua
     gitsigns.lua: ~/.config/nvim/lua/plugins/gitsigns.lua
     hipatterns.lua: ~/.config/nvim/lua/plugins/hipatterns.lua
-    hop.lua: ~/.config/nvim/lua/plugins/hop.lua
+    hop.lua:
+      - ~/.config/nvim/lua/plugins/hop.lua
+      - ~/.config/nvim-notebook/lua/plugins/hop.lua
     icons.lua: ~/.config/nvim/lua/plugins/icons.lua
     indentscope.lua: ~/.config/nvim/lua/plugins/indentscope.lua
     kulala.lua: ~/.config/nvim/lua/plugins/kulala.lua
@@ -35,12 +41,18 @@ global:
     rails.lua: ~/.config/nvim/lua/plugins/rails.lua
     razor.lua: ~/.config/nvim/lua/plugins/razor.lua
     snacks.lua: ~/.config/nvim/lua/plugins/snacks.lua
-    splits.lua: ~/.config/nvim/lua/plugins/splits.lua
+    splits.lua:
+      - ~/.config/nvim/lua/plugins/splits.lua
+      - ~/.config/nvim-notebook/lua/plugins/splits.lua
     strudel.lua: ~/.config/nvim/lua/plugins/strudel.lua
-    surround.lua: ~/.config/nvim/lua/plugins/surround.lua
+    surround.lua:
+      - ~/.config/nvim/lua/plugins/surround.lua
+      - ~/.config/nvim-notebook/lua/plugins/surround.lua
     treesitter.lua: ~/.config/nvim/lua/plugins/treesitter.lua
     vimtex.lua: ~/.config/nvim/lua/plugins/vimtex.lua
-    whichkey.lua: ~/.config/nvim/lua/plugins/whichkey.lua
+    whichkey.lua:
+      - ~/.config/nvim/lua/plugins/whichkey.lua
+      - ~/.config/nvim-notebook/lua/plugins/whichkey.lua
     venv-selector.lua: ~/.config/nvim/lua/plugins/venv-selector.lua
     custom-zen.lua: ~/.config/nvim/lua/plugins/zen.lua
     table-mode.lua: ~/.config/nvim/lua/plugins/table-mode.lua

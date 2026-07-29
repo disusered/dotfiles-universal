@@ -6,4 +6,6 @@ linux[whoami.distro^="Arch"]:
     depends:
       - /editors/neovim/plugins/molten
   links:
-    quarto.lua: ~/.config/nvim/lua/plugins/quarto.lua
+    quarto.lua:
+      - ~/.config/nvim/lua/plugins/quarto.lua
+      - ~/.config/nvim-notebook/lua/plugins/quarto.lua
