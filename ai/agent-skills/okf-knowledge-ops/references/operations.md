@@ -58,3 +58,21 @@ path, revision or checksum, capture context, and missing fields when available.
 Synthesize durable claims into the locally prescribed page type. Do not ingest
 a transcript, document dump, or artifact tree into an authored wiki merely for
 retrieval convenience.
+
+## Zotero Intake
+
+When the selected adapter provides `polychromectl zotero`, do not treat a move
+from Inbox to Reading List as processing or reading. For PDF attachments:
+
+1. Run `zotero prepare-pdf` into an exact private temporary directory.
+2. Inspect the prepared Markdown and distinguish full extraction from actual
+   review coverage.
+3. Run `zotero enrich` with an evidenced title and a small additive subject-tag
+   set; preserve existing tags and complete Zotero full text.
+4. Verify through `zotero show` and attachment-inclusive `zotero search`.
+5. Curate durable synthesis selectively, then move a successfully enriched
+   Inbox item to Reading List.
+
+Leave failures in Inbox. Report extraction, indexing, review, and curation as
+separate states. Never copy prepared full text into the authored OKF corpus for
+retrieval convenience.

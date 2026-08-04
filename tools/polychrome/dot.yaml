@@ -8,4 +8,5 @@ linux[whoami.distro^="Arch"]:
       fi
       cargo install --path "$polychrome_src" --bin polychromectl --force
     depends:
-      - /languages/rust
+      - /tools/docling
+      - /tools/pdf-inspector

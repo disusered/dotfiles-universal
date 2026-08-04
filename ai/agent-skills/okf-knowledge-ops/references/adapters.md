@@ -19,7 +19,9 @@ and expected OpenViking profile.
 - Query: `polychromectl search polychrome "<query>"`, then `rg` and direct
   reads.
 - Capture: Zotero is the preferred external capture layer. Inspect before
-  promotion and use existing `polychromectl zotero` adapters.
+  promotion and use existing `polychromectl zotero` adapters. Prepare and
+  enrich PDF attachments before Reading List triage; a collection move does
+  not establish extraction, review, or curation.
 - Journal: use `polychrome-journal-ops` only after an explicit request to
   process Black.
 - OpenViking: `local-dev` via `~/.openviking/ovcli.conf`.
