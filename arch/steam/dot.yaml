@@ -4,7 +4,7 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       if ! pacman -Qi steam &>/dev/null; then
         sudo locale-gen
-        sudo pacman -S --noconfirm --needed ttf-liberation steam gamemode lib32-gamemode gamescope
+        sudo pacman -S --noconfirm --needed ttf-liberation steam gamemode lib32-gamemode gamescope vulkan-intel lib32-vulkan-intel
         sudo gpasswd -a $USER gamemode
       fi
     depends:

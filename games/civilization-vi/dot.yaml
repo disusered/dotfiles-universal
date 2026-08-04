@@ -1,0 +1,24 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -e
+
+      # Civilization VI's native Linux port does not support Intel GPUs.
+      # Force the Windows build through Proton instead.
+      "$HOME/.dotfiles/games/lib/steam-set-compat-tool.sh" \
+        289070 \
+        proton_experimental \
+        "Sid Meier's Civilization VI"
+
+      # Keep Civ's XWayland surface at a stable 1:1 size inside a fullscreen
+      # gamescope session. ScopeBuddy supplies the focused monitor resolution;
+      # the AppID config forces cursor capture and normalizes Civ to borderless.
+      "$HOME/.dotfiles/games/lib/steam-set-launch-options.sh" \
+        289070 \
+        'scb -- %command%' \
+        "Sid Meier's Civilization VI"
+    depends:
+      - /tools/scopebuddy
+  links:
+    configure-display.sh: ~/.local/bin/civ6-configure-display
+    scopebuddy.conf: ~/.config/scopebuddy/AppID/289070.conf
