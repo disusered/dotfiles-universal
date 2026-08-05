@@ -1,0 +1,8 @@
+[Unit]
+Description=Wait for NetworkManager connectivity before rootless Podman services
+Documentation=man:nm-online(1)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/nm-online --quiet --timeout=90
+RemainAfterExit=yes

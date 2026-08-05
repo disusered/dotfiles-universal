@@ -15,3 +15,4 @@ linux[whoami.distro^="Arch"]:
     storage.conf: ~/.config/containers/storage.conf
     systemd/podman-system-prune.service: ~/.config/systemd/user/podman-system-prune.service
     systemd/podman-system-prune.timer: ~/.config/systemd/user/podman-system-prune.timer
+    systemd/podman-user-wait-network-online.service: ~/.config/systemd/user/podman-user-wait-network-online.service
