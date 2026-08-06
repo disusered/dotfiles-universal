@@ -57,6 +57,34 @@ and expected OpenViking profile.
 Do not add Polychrome stores, `polychromectl`, or a custom knowledge CLI to
 XBOL.
 
+## Iteramind
+
+- Aliases: `Iteramind`, `ITERAMIND`.
+- Repository: `/home/carlos/Development/ITERAMIND`.
+- Private OKF root and index: `knowledge/private/` and
+  `knowledge/private/index.md`.
+- Shared OKF root and index: `knowledge/shared/` and
+  `knowledge/shared/index.md`.
+- Authority: repository `AGENTS.md`, `CONTEXT.md`, and the relevant decision
+  and runbook in the selected bundle.
+- Writable scope: one exact bundle per operation. The private bundle is
+  Carlos-only; the shared bundle accepts stable, reviewed, bot-safe knowledge
+  only. Promotion is an explicit content change, never a synchronization job.
+- Query: start at the selected bundle index, then use `rg` and direct reads.
+- Capture: keep client-specific context in its Project Repository. Treat
+  Polychrome and XBOL as read-through references and do not copy their memories
+  into Iteramind.
+- OpenViking: `iteramind-dev` via
+  `~/.openviking/ovcli-iteramind.conf`. Resource ingestion remains a separate
+  explicit request.
+- After authored changes:
+  1. `uv run python scripts/validate_okf.py knowledge/private knowledge/shared`
+  2. `uv run python -m unittest discover -s tests`
+
+The Shared Bot consumes only `knowledge/shared/` and separate bot memory. It
+must never receive the Control Repository checkout or Carlos's development
+memory.
+
 ## Unknown Bundle
 
 Read local instructions and establish every adapter field. If authority,

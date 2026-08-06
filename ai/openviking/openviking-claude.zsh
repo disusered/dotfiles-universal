@@ -1,6 +1,7 @@
 _openviking_claude_cli_config() {
   local _ov_pwd="${1:-$PWD}"
   local _ov_xbol_root="$HOME/Development/XBOL"
+  local _ov_iteramind_root="$HOME/Development/ITERAMIND"
 
   if [ -n "${OPENVIKING_CLI_CONFIG_FILE:-}" ]; then
     print -r -- "$OPENVIKING_CLI_CONFIG_FILE"
@@ -8,6 +9,9 @@ _openviking_claude_cli_config() {
   fi
 
   case "$_ov_pwd" in
+    "$_ov_iteramind_root"| "$_ov_iteramind_root"/*)
+      print -r -- "$HOME/.openviking/ovcli-iteramind.conf"
+      ;;
     "$_ov_xbol_root"| "$_ov_xbol_root"/*)
       print -r -- "$HOME/.openviking/ovcli-xbol.conf"
       ;;

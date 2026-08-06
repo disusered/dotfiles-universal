@@ -48,8 +48,8 @@ the legacy Herding Cats/Hermes memory:
 - `OPENVIKING_AGENT=local-dev`
 - `OPENVIKING_AGENT_ID=local-dev`
 
-This bank is intentionally scoped to `/home/carlos/Development/ME/herding-cats`
-for Codex recall. It is not the general Codex fallback.
+This bank is the legacy Herding Cats/Hermes memory and remains the fallback for
+paths without a dedicated profile. It is not authoritative for those paths.
 
 The XBOL profile uses a separate memory:
 
@@ -58,8 +58,18 @@ The XBOL profile uses a separate memory:
 - `OPENVIKING_AGENT=xbol`
 - `OPENVIKING_AGENT_ID=xbol`
 
-OpenCode is configured with the same default identity through
-`openviking-config.json`.
+The Iteramind profile uses a separate trusted-development memory:
+
+- `OPENVIKING_ACCOUNT=iteramind-dev`
+- `OPENVIKING_USER=carlos`
+- `OPENVIKING_AGENT=iteramind-dev`
+- `OPENVIKING_AGENT_ID=iteramind-dev`
+
+It applies to `~/Development/ITERAMIND` and descendants. Existing `local-dev`
+memory is not migrated into this account.
+
+OpenCode's global configuration uses the default identity. Its shell wrapper
+overrides the identity for XBOL and Iteramind based on the launch directory.
 
 ## Codex Memory
 
@@ -73,8 +83,10 @@ OpenViking is the sole memory system — recall on `UserPromptSubmit`, capture
 on `Stop`, commit on `PreCompact`, and sweep on `SessionStart`.
 
 Codex uses `local-dev` by default. Sessions launched from
-`~/Development/XBOL` or its children use `ovcli-xbol.conf` so XBOL recall and
-capture stay in the `xbol` account instead of the general memory bank.
+`~/Development/XBOL` use `ovcli-xbol.conf`; sessions launched from
+`~/Development/ITERAMIND` use `ovcli-iteramind.conf`. Start a fresh session
+after changing directories because an already-running MCP connection does not
+switch accounts.
 
 ## Claude Memory
 
@@ -89,5 +101,5 @@ Claude in a raw hook-only setup:
 - resume/subagents: `SessionStart`, `SubagentStart`, `SubagentStop`
 
 The shell wrapper linked to `~/.config/zsh/5004_openviking_claude.zsh` selects
-the same OpenViking profiles as Codex: `local-dev` by default and `xbol` under
-`~/Development/XBOL`.
+the same OpenViking profiles as Codex: `local-dev` by default, `xbol` under
+`~/Development/XBOL`, and `iteramind-dev` under `~/Development/ITERAMIND`.
