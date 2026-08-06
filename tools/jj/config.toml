@@ -19,6 +19,9 @@ sign-on-push = true
 [working-copy]
 eol-conversion = "input"
 
+[fsmonitor]
+backend = "watchman"
+
 [signing]
 behavior = "drop"
 backend = "ssh"
@@ -81,6 +84,16 @@ rest = "#6c7086"
 "diff added" = { fg = "#a6e3a1" }
 "diff removed token" = { bg = "#53394d", bold = true, underline = false }
 "diff added token" = { bg = "#404f4b", bold = true, underline = false }
+
+# Builtin aliases already cover the short verbs: b, ci, desc, st, op.
+# Only genuinely long, genuinely daily commands get an alias here.
+[aliases]
+f = ["git", "fetch"]
+p = ["git", "push"]
+pc = ["git", "push", "--change", "@"]
+pd = ["git", "push", "--dry-run"]
+tug = ["bookmark", "advance", "--to", "@-"]
+la = ["log", "-r", "all()"]
 
 [[--scope]]
 --when.repositories = ["~/Development/ITERAMIND"]

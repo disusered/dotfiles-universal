@@ -7,6 +7,7 @@ linux[whoami.distro^="Arch"]:
     cmd: sudo pacman -S --noconfirm --needed jujutsu
     depends:
       - /tools/delta
+      - /tools/watchman
 linux[whoami.distro^="Fedora"]:
   installs:
     cmd: brew install jj
