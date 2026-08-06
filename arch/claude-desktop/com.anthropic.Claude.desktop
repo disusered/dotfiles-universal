@@ -1,0 +1,23 @@
+[Desktop Entry]
+Name=Claude
+Comment=Claude Desktop
+GenericName=AI Assistant
+Keywords=AI;Chat;Assistant;Claude;Code;LLM;
+Exec=claude-desktop --password-store=kwallet6 --disable-features=Vulkan --disable-gpu %U
+Icon=claude-desktop
+Terminal=false
+Type=Application
+StartupNotify=true
+StartupWMClass=com.anthropic.Claude
+SingleMainWindow=true
+Categories=Development;
+MimeType=x-scheme-handler/claude;
+Actions=NewChat;NewCode;
+
+[Desktop Action NewChat]
+Name=New chat
+Exec=claude-desktop --password-store=kwallet6 --disable-features=Vulkan --disable-gpu claude://claude.ai/new
+
+[Desktop Action NewCode]
+Name=New Claude Code session
+Exec=claude-desktop --password-store=kwallet6 --disable-features=Vulkan --disable-gpu claude://code/new

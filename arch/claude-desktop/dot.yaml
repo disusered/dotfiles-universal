@@ -1,0 +1,8 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: yay -S --noconfirm --needed claude-desktop
+    depends:
+      - /tools/yay
+      - /arch/kwallet
+  links:
+    com.anthropic.Claude.desktop: ~/.local/share/applications/com.anthropic.Claude.desktop
