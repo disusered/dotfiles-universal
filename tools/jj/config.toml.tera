@@ -53,34 +53,34 @@ separate(
 '''
 
 [colors]
-jj = { fg = "#cba6f7", bold = true }
-change_id = "#cba6f7"
-commit_id = "#f38ba8"
-author = "#f9e2af"
-timestamp = "#94e2d5"
-bookmark = "#cba6f7"
-bookmarks = "#cba6f7"
-local_bookmarks = "#cba6f7"
-remote_bookmarks = "#89b4fa"
-tag = "#fab387"
-tags = "#fab387"
-git_ref = "#a6e3a1"
-git_refs = "#a6e3a1"
-working_copies = "#a6e3a1"
-divergent = "#eba0ac"
-"mutable divergent" = { fg = "#f38ba8", bold = true }
-conflict = { fg = "#f38ba8", bold = true }
-empty = "#a6e3a1"
-separator = "#6c7086"
-elided = "#6c7086"
-rest = "#6c7086"
-"node working_copy" = { fg = "#a6e3a1", bold = true }
-"node immutable" = { fg = "#74c7ec", bold = true }
-"node conflicted" = { fg = "#f38ba8", bold = true }
-"diff removed" = { fg = "#f38ba8" }
-"diff added" = { fg = "#a6e3a1" }
-"diff removed token" = { bg = "#53394d", bold = true, underline = false }
-"diff added token" = { bg = "#404f4b", bold = true, underline = false }
+jj = { fg = "#{{ primary | hex }}", bold = true }
+change_id = "#{{ primary | hex }}"
+commit_id = "#{{ secondary | hex }}"
+author = "#{{ yellow | hex }}"
+timestamp = "#{{ teal | hex }}"
+bookmark = "#{{ primary | hex }}"
+bookmarks = "#{{ primary | hex }}"
+local_bookmarks = "#{{ primary | hex }}"
+remote_bookmarks = "#{{ blue | hex }}"
+tag = "#{{ peach | hex }}"
+tags = "#{{ peach | hex }}"
+git_ref = "#{{ green | hex }}"
+git_refs = "#{{ green | hex }}"
+working_copies = "#{{ green | hex }}"
+divergent = "#{{ maroon | hex }}"
+"mutable divergent" = { fg = "#{{ red | hex }}", bold = true }
+conflict = { fg = "#{{ red | hex }}", bold = true }
+empty = "#{{ green | hex }}"
+separator = "#{{ overlay0 | hex }}"
+elided = "#{{ overlay0 | hex }}"
+rest = "#{{ overlay0 | hex }}"
+"node working_copy" = { fg = "#{{ green | hex }}", bold = true }
+"node immutable" = { fg = "#{{ sapphire | hex }}", bold = true }
+"node conflicted" = { fg = "#{{ red | hex }}", bold = true }
+"diff removed" = { fg = "#{{ red | hex }}" }
+"diff added" = { fg = "#{{ green | hex }}" }
+"diff removed token" = { bg = "#{{ red | blend(base=base, amount=25) | hex }}", bold = true, underline = false }
+"diff added token" = { bg = "#{{ green | blend(base=base, amount=25) | hex }}", bold = true, underline = false }
 
 [[--scope]]
 --when.repositories = ["~/Development/ITERAMIND"]

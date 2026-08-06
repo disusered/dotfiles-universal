@@ -118,3 +118,5 @@
 # Should match the name of the bat theme
 # bat --list-themes
   syntax-theme = Catppuccin {{ flavor | capitalize }}
+[includeIf "gitdir:~/Development/ITERAMIND/"]
+  path = ~/.dotfiles/tools/git/gitconfig-iteramind

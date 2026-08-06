@@ -9,9 +9,8 @@ format = """
 $shell\
 $sudo\
 $directory\
-$git_branch\
-$git_metrics\
-$git_state\
+${custom.vcs_unix}\
+${custom.vcs_windows}\
 $cmd_duration\
 $line_break\
 $character"""
@@ -78,6 +77,41 @@ format = '([+$added]($added_style) )([-$deleted]($deleted_style) )'
 added_style = "bold green"
 deleted_style = "bold red"
 only_nonzero_diffs = true
+
+[vcs]
+git_modules = "$git_branch$git_metrics$git_state"
+
+[custom.vcs_unix]
+command = '''
+if ! jj log --revisions '@' --limit 1 --ignore-working-copy --no-graph --color always --template 'format_starship(self, diff.stat())' 2>/dev/null; then
+  starship module vcs
+fi
+'''
+when = true
+require_repo = true
+shell = ["sh"]
+os = "unix"
+format = "$output "
+style = ""
+description = "Jujutsu state, falling back to Git"
+
+[custom.vcs_windows]
+command = '''
+if (Get-Command jj -ErrorAction SilentlyContinue) {
+  jj log --revisions '@' --limit 1 --ignore-working-copy --no-graph --color always --template 'format_starship(self, diff.stat())' 2>$null
+  if ($LASTEXITCODE -eq 0) {
+    exit 0
+  }
+}
+starship module vcs
+'''
+when = true
+require_repo = true
+shell = ["pwsh.exe", "-NoProfile", "-Command", "-"]
+os = "windows"
+format = "$output "
+style = ""
+description = "Jujutsu state, falling back to Git"
 
 [cmd_duration]
 format = "[$duration]($style) "
