@@ -23,7 +23,7 @@ eol-conversion = "input"
 backend = "watchman"
 
 [signing]
-behavior = "drop"
+behavior = "own"
 backend = "ssh"
 key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN0ymLThQeG/B8GhYqrOUdjr2yydERDzP94yU9LT9o+N"
 backends.ssh.allowed-signers = "~/.ssh/allowed_signers"
