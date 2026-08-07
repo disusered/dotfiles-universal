@@ -9,13 +9,27 @@ config_file="$openviking_home/ov.conf"
 
 mkdir -p "$openviking_home" "$HOME/.local/share/openviking"
 
-op inject -i "$env_template" -o "$env_file"
+op inject -f -i "$env_template" -o "$env_file"
 chmod 600 "$env_file"
 
 set -a
 # shellcheck source=/dev/null
 source "$env_file"
 set +a
+
+# op inject exits 0 and writes an empty value when a referenced field is missing
+# or blank, so check before rendering — otherwise ov.conf silently gets an empty
+# api_key and the provider fails auth at runtime instead of here.
+missing=()
+while IFS='=' read -r name _; do
+  case "$name" in ''|\#*) continue ;; esac
+  [ -n "${!name:-}" ] || missing+=("$name")
+done < "$env_file"
+if [ ${#missing[@]} -gt 0 ]; then
+  printf 'ERROR: empty secret(s), refusing to render %s: %s\n' \
+    "$config_file" "${missing[*]}" >&2
+  exit 1
+fi
 
 envsubst < "$config_template" > "$config_file"
 chmod 600 "$config_file"

@@ -11,10 +11,10 @@
     }
   },
   "vlm": {
-    "provider": "glm",
-    "api_base": "https://api.z.ai/api/coding/paas/v4",
-    "api_key": "${OPENVIKING_GLM_API_KEY}",
-    "model": "glm-4.6v"
+    "provider": "openai",
+    "api_base": "https://openrouter.ai/api/v1",
+    "api_key": "${OPENVIKING_OPENROUTER_API_KEY}",
+    "model": "qwen/qwen3.7-flash"
   },
   "server": {
     "host": "127.0.0.1",
