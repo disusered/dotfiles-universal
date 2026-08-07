@@ -2,7 +2,7 @@ personality = "pragmatic"
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 commit_attribution = ""
-model = "gpt-5.6-sol"
+model = "gpt-5.3-codex-spark"
 model_verbosity = "low"
 model_reasoning_effort = "xhigh"
 plan_mode_reasoning_effort = "max"
@@ -152,6 +152,9 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/home/carlos/Development/ITERAMIND"]
+trust_level = "trusted"
+
+[projects."/home/carlos/Development/ITERAMIND/projects/iteramind-discord"]
 trust_level = "trusted"
 
 [plugins."codex-security@openai-curated"]
