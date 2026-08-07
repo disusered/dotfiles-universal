@@ -1,0 +1,44 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -e
+
+      # Resolve the library holding Skyrim SE — it is not on the same drive on
+      # every machine, and the Proton prefix lives beside the install.
+      LIB=$("$HOME/.dotfiles/games/lib/steam-find-app-path.sh" 489830)
+      GAME_DIR="$LIB/steamapps/common/Skyrim Special Edition"
+
+      # Force the Windows build through Proton. Skyrim SE has no native Linux
+      # port, and leaving the mapping unset means whatever Steam's global
+      # default happens to be that week.
+      "$HOME/.dotfiles/games/lib/steam-set-compat-tool.sh" \
+        489830 \
+        proton_experimental \
+        'The Elder Scrolls V: Skyrim Special Edition'
+
+      # Wrap in ScopeBuddy. The per-AppID conf caps the frame rate at 60 (Havok
+      # physics breaks above it) and regenerates the INIs for whichever monitor
+      # and GPU this machine has.
+      "$HOME/.dotfiles/games/lib/steam-set-launch-options.sh" \
+        489830 \
+        'scb -- %command%' \
+        'The Elder Scrolls V: Skyrim Special Edition'
+
+      # The game creates this on first run; the pre-launch hook writes into it
+      # before that has necessarily happened.
+      mkdir -p "$LIB/steamapps/compatdata/489830/pfx/drive_c/users/steamuser/Documents/My Games/Skyrim Special Edition"
+
+      # Skip the Bethesda logo on every launch. Reversible with a single mv,
+      # and Steam's verify-integrity puts it back.
+      LOGO="$GAME_DIR/Data/Video/BGS_Logo.bik"
+      if [ -f "$LOGO" ] && [ ! -f "$LOGO.bak" ]; then
+        mv "$LOGO" "$LOGO.bak"
+        echo "Intro video disabled (Data/Video/BGS_Logo.bik -> .bak)"
+      fi
+    depends:
+      - /arch/steam
+      - /tools/scopebuddy
+  links:
+    skyrim-configure-display.sh: ~/.local/bin/skyrim-configure-display
+    scopebuddy.conf: ~/.config/scopebuddy/AppID/489830.conf
+    skyrim.conf: ~/.config/hypr/conf.d/skyrim.conf
