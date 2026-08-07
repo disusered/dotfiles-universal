@@ -47,6 +47,7 @@ ai/claude/.cache/
 /ai/codex/skills/
 /ai/claude/skills/brain-portal
 /ai/claude/skills/manage-course-notebooks
+/ai/claude/skills/openviking-profiles
 /ai/claude/skills/git-commit/
 /ai/opencode/skills/
 /ai/opencode/commands/git-commit.md

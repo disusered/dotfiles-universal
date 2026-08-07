@@ -18,6 +18,10 @@ global:
     okf-knowledge-ops:
       - ~/.agents/skills/okf-knowledge-ops
       - ~/.config/opencode/skills/okf-knowledge-ops
+    openviking-profiles:
+      - ~/.agents/skills/openviking-profiles
+      - ~/.claude/skills/openviking-profiles
+      - ~/.config/opencode/skills/openviking-profiles
     polychrome-journal-ops:
       - ~/.agents/skills/polychrome-journal-ops
       - ~/.config/opencode/skills/polychrome-journal-ops
