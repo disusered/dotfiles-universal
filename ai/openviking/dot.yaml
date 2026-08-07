@@ -31,8 +31,30 @@ linux[whoami.distro^="Arch"]:
       else
         echo "Codex not found. Run after Codex is installed: bash ~/.openviking/openviking-repo/examples/codex-memory-plugin/setup-helper/install.sh"
       fi
+
+      # Claude plugin. The upstream installer is not used: it is interactive,
+      # appends a marker block to ~/.zshrc that defines a competing claude()
+      # function, and offers to overwrite statusLine. Run the two commands its
+      # non-interactive path would run instead. `marketplace add` on an existing
+      # entry does not re-read the source and `plugin install` does not upgrade,
+      # so an existing install takes the update branch.
+      if command -v claude >/dev/null 2>&1; then
+        if claude plugin marketplace list 2>/dev/null | grep -qF openviking-plugins-local; then
+          claude plugin marketplace update openviking-plugins-local || true
+        else
+          claude plugin marketplace add $OV_REPO/examples || true
+        fi
+        if claude plugin list 2>/dev/null | grep -qF claude-code-memory-plugin@openviking-plugins-local; then
+          claude plugin update claude-code-memory-plugin@openviking-plugins-local || true
+        else
+          claude plugin install claude-code-memory-plugin@openviking-plugins-local || true
+        fi
+      else
+        echo "Claude not found. Run after Claude Code is installed: claude plugin marketplace add ~/.openviking/openviking-repo/examples && claude plugin install claude-code-memory-plugin@openviking-plugins-local"
+      fi
     depends:
       - /ai/codex
+      - /ai/claude
       - /languages/python/uv
       - /tools/gh
   links:

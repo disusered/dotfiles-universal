@@ -16,93 +16,26 @@
       "Bash(ast-grep:*)",
       "Bash(docker compose logs:*)",
       "Bash(awk:*)",
-      "Bash(sqlite3:*)"
-    ]
+      "Bash(sqlite3:*)",
+      "mcp__plugin_openviking-memory_openviking__health",
+      "mcp__plugin_openviking-memory_openviking__find",
+      "mcp__plugin_openviking-memory_openviking__search",
+      "mcp__plugin_openviking-memory_openviking__read",
+      "mcp__plugin_openviking-memory_openviking__list",
+      "mcp__plugin_openviking-memory_openviking__grep",
+      "mcp__plugin_openviking-memory_openviking__glob",
+      "mcp__plugin_openviking-memory_openviking__code_outline",
+      "mcp__plugin_openviking-memory_openviking__code_search",
+      "mcp__plugin_openviking-memory_openviking__code_expand"
+    ],
+    "defaultMode": "auto"
   },
   "model": "opus[1m]",
+  "skillOverrides": {
+    "template": "off",
+    "frontend-design": "off"
+  },
   "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node $HOME/.openviking/openviking-repo/examples/claude-code-memory-plugin/scripts/session-start.mjs",
-            "timeout": 120
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node $HOME/.openviking/openviking-repo/examples/claude-code-memory-plugin/scripts/auto-recall.mjs",
-            "timeout": 8
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node $HOME/.openviking/openviking-repo/examples/claude-code-memory-plugin/scripts/auto-capture.mjs",
-            "timeout": 45
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node $HOME/.openviking/openviking-repo/examples/claude-code-memory-plugin/scripts/pre-compact.mjs",
-            "timeout": 30
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node $HOME/.openviking/openviking-repo/examples/claude-code-memory-plugin/scripts/session-end.mjs",
-            "timeout": 30
-          }
-        ]
-      }
-    ],
-    "SubagentStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node $HOME/.openviking/openviking-repo/examples/claude-code-memory-plugin/scripts/subagent-start.mjs",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node $HOME/.openviking/openviking-repo/examples/claude-code-memory-plugin/scripts/subagent-stop.mjs",
-            "timeout": 45
-          }
-        ]
-      }
-    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
@@ -120,13 +53,22 @@
     "command": "input=$(cat); model_name=$(echo \"$input\" | jq -r '.model.display_name'); current_dir=$(echo \"$input\" | jq -r '.workspace.current_dir'); project_dir=$(echo \"$input\" | jq -r '.workspace.project_dir'); output_style=$(echo \"$input\" | jq -r '.output_style.name'); version=$(echo \"$input\" | jq -r '.version'); git_branch=$(cd \"$current_dir\" 2>/dev/null && git branch --show-current 2>/dev/null); git_status=$(cd \"$current_dir\" 2>/dev/null && git status --porcelain 2>/dev/null | wc -l); pwd_display=$(echo \"$current_dir\" | sed \"s|^$HOME|~|\"); printf \"\\033[2m\\033[38;2;116;199;236m\\033[0m \\033[2m\\033[1m\\033[38;2;203;166;247m%s\\033[0m\" \"$model_name\"; printf \" \\033[2m\\033[38;2;180;190;254m%s\\033[0m\" \"$pwd_display\"; if [ -n \"$git_branch\" ]; then printf \" \\033[2m\\033[38;2;203;166;247m\\033[0m \\033[2m\\033[1m\\033[38;2;203;166;247m%s\\033[0m\" \"$git_branch\"; if [ \"$git_status\" -gt 0 ]; then printf \" \\033[2m\\033[38;2;249;226;175m+%s\\033[0m\" \"$git_status\"; fi; fi; if [ \"$output_style\" != \"default\" ]; then printf \" \\033[2m\\033[38;2;148;226;213m%s\\033[0m\" \"$output_style\"; fi; printf \" \\033[2m\\033[38;2;166;173;200mv%s\\033[0m\" \"$version\""
   },
   "enabledPlugins": {
-    "claude-code-setup@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
+    "claude-code-memory-plugin@openviking-plugins-local": true,
+    "claude-code-setup@claude-plugins-official": false,
+    "claude-md-management@claude-plugins-official": false,
+    "code-simplifier@claude-plugins-official": false,
     "csharp-lsp@claude-plugins-official": true,
-    "feature-dev@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": false,
     "pyright-lsp@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "openviking-plugins-local": {
+      "source": {
+        "source": "directory",
+        "path": "/home/carlos/.openviking/openviking-repo/examples"
+      }
+    }
   },
   "effortLevel": "xhigh",
   "advisorModel": "fable",

@@ -9,6 +9,7 @@ select candidates; `read` expands the content.
 | --- | --- | --- |
 | Herding Cats Polychrome | `~/.openviking/ovcli.conf` | `local-dev` |
 | XBOL | `~/.openviking/ovcli-xbol.conf` | `xbol` |
+| Iteramind | `~/.openviking/ovcli-iteramind.conf` | `iteramind-dev` |
 
 Before use, inspect `OPENVIKING_CLI_CONFIG_FILE` and the configured account. If
 the profile cannot be established or differs from the adapter, skip OpenViking

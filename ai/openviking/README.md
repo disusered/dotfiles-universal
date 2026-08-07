@@ -90,16 +90,55 @@ switch accounts.
 
 ## Claude Memory
 
-Claude Code uses the upstream OpenViking Claude hook scripts directly from
-`~/.openviking/openviking-repo/examples/claude-code-memory-plugin`, but it does
-not install the Claude plugin or expose the OpenViking MCP tools. This keeps
-Claude in a raw hook-only setup:
+Claude Code uses the upstream OpenViking Claude plugin,
+`claude-code-memory-plugin@openviking-plugins-local`, published by the
+marketplace at `~/.openviking/openviking-repo/examples`. The plugin supplies
+both the lifecycle hooks and the `openviking` MCP server:
 
 - recall: `UserPromptSubmit`
 - capture: `Stop`
 - commit: `PreCompact`, `SessionEnd`
 - resume/subagents: `SessionStart`, `SubagentStart`, `SubagentStop`
 
+`dot.yaml` registers the marketplace and installs the plugin; `settings.json`
+enables it. The upstream `setup-helper/install.sh` is deliberately not used —
+it is interactive, appends a `claude()` function to `~/.zshrc` that would
+compete with the wrapper below, and offers to replace `statusLine`.
+
+Before this, Claude ran the hook scripts hand-wired into `settings.json` with no
+MCP server. That was half of the installer's legacy path: recall and capture
+worked, but Claude could not open the `viking://` URIs its own recall block
+cited.
+
+Read-only MCP tools (`health`, `find`, `search`, `read`, `list`, `grep`, `glob`,
+`code_outline`, `code_search`, `code_expand`) are allowed in `settings.json`.
+The mutating ones prompt: `remember`, `add_resource`, `cancel_watch`, and
+`forget` — `forget` is irreversible and must never be allowlisted.
+
 The shell wrapper linked to `~/.config/zsh/5004_openviking_claude.zsh` selects
 the same OpenViking profiles as Codex: `local-dev` by default, `xbol` under
 `~/Development/XBOL`, and `iteramind-dev` under `~/Development/ITERAMIND`.
+
+The wrapper also exports the selected profile's `OPENVIKING_ACCOUNT`,
+`OPENVIKING_USER`, and `OPENVIKING_URL` into the `claude` process. The hooks
+read the config file directly, but the MCP server does not — the plugin's
+`.mcp.json` interpolates those variables into request headers. Without the
+export, hooks and MCP silently resolve different accounts. Empty fields are
+omitted rather than exported empty.
+
+Start a fresh session after changing directories, because an already-running
+MCP connection does not switch accounts.
+
+Claude launched without the wrapper (desktop launcher, IDE extension, a bare
+`command claude`) sends empty account headers. That degrades safely rather than
+silently: the MCP server resolves an empty account, so reads return "nothing
+found" instead of another account's memory. The hooks are unaffected — they read
+`ovcli.conf` directly. Treat an unexpectedly empty recall as a signal that the
+wrapper was bypassed.
+
+Hooks execute from the plugin cache under `~/.claude/plugins/cache`, not from
+the repo checkout. `dot.yaml` pulls the repo and then runs
+`claude plugin marketplace update` + `claude plugin update`; if those soft-fail,
+the checkout looks current while the hooks still run the cached older version.
+Check `claude plugin list` for the installed version when behavior disagrees
+with the source.

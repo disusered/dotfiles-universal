@@ -34,6 +34,21 @@ assert_eq "$xbol_conf" "$(_openviking_claude_cli_config /home/carlos/Development
 assert_eq "$iteramind_conf" "$(_openviking_claude_cli_config /home/carlos/Development/ITERAMIND)" "Claude Iteramind root uses Iteramind OpenViking profile"
 assert_eq "$iteramind_conf" "$(_openviking_claude_cli_config /home/carlos/Development/ITERAMIND/projects/example)" "Claude Iteramind child uses Iteramind OpenViking profile"
 assert_eq "$default_conf" "$(_openviking_claude_cli_config /home/carlos/.dotfiles)" "Claude non-XBOL path uses default OpenViking profile"
+
+# The Claude MCP server reads its account from the environment, not from the
+# config file, so the identity export must agree with the config selection
+# above. A mismatch is silent: hooks recall from one account, MCP from another.
+claude_account() {
+  _openviking_claude_identity "$1" | grep '^OPENVIKING_ACCOUNT=' || true
+}
+
+assert_eq "OPENVIKING_ACCOUNT=xbol" "$(claude_account "$xbol_conf")" "Claude identity exports XBOL account"
+assert_eq "OPENVIKING_ACCOUNT=iteramind-dev" "$(claude_account "$iteramind_conf")" "Claude identity exports Iteramind account"
+assert_eq "OPENVIKING_ACCOUNT=local-dev" "$(claude_account "$default_conf")" "Claude identity exports default account"
+assert_eq "OPENVIKING_USER=carlos" "$(_openviking_claude_identity "$xbol_conf" | grep '^OPENVIKING_USER=' || true)" "Claude identity exports user"
+assert_eq "" "$(_openviking_claude_identity "$xbol_conf" | grep '^OPENVIKING_API_KEY=' || true)" "Claude identity omits empty api_key"
+assert_eq "" "$(_openviking_claude_identity "$HOME/.openviking/does-not-exist.conf")" "Claude identity is empty for a missing config"
+
 assert_eq "xbol" "$(_openviking_opencode_account /home/carlos/Development/XBOL/xbol-api-admin)" "OpenCode XBOL child uses XBOL account"
 assert_eq "iteramind-dev" "$(_openviking_opencode_account /home/carlos/Development/ITERAMIND)" "OpenCode Iteramind root uses Iteramind account"
 assert_eq "iteramind-dev" "$(_openviking_opencode_account /home/carlos/Development/ITERAMIND/projects/example)" "OpenCode Iteramind child uses Iteramind account"
