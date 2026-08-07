@@ -33,11 +33,17 @@ hooks recall from the right account while the MCP tools read from an empty one.
 
 Every path below is relative to `~/.dotfiles`.
 
-**1. Choose the account id.** Lowercase, matches the project. Existing ones:
-`local-dev` (fallback), `xbol`, `iteramind-dev`. Accounts are created lazily on
-first write — a brand-new account reads as empty, which is expected, not a bug.
-Never migrate memory between accounts as a side effect; that is its own
-explicitly requested job.
+**1. Choose the account id and the file name — they are not the same string.**
+The file is `ovcli-<project>.conf`, named after the repository; the account id
+may carry a qualifier the file name omits. `ovcli-iteramind.conf` holds account
+`iteramind-dev`, while `ovcli-xbol.conf` holds account `xbol`. So a request for
+"account `bri-dev`" means file `ovcli-bri.conf`, not `ovcli-bri-dev.conf`. Pick
+both names up front and use them consistently; mixing the two produces a config
+that links to a path nothing resolves.
+
+Accounts are created lazily on first write — a brand-new account reads as empty,
+which is expected, not a bug. Never migrate memory between accounts as a side
+effect; that is its own explicitly requested job.
 
 **2. Create `ai/openviking/ovcli-<project>.conf`.** Copy an existing one.
 `account` and `agent_id` both take the account id. Add the repo's VCS metadata
