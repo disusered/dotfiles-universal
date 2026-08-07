@@ -6,9 +6,7 @@ global:
   links:
     git-commit: ~/.agents/skills/git-commit
     slop-clean: ~/.agents/skills/slop-clean
-    thermo-nuclear-code-quality-review: ~/.agents/skills/thermo-nuclear-code-quality-review
     grill-with-docs: ~/.agents/skills/grill-with-docs
-    grilling: ~/.agents/skills/grilling
     domain-modeling: ~/.agents/skills/domain-modeling
     cfg-project-tasks: ~/.agents/skills/cfg-project-tasks
     manage-course-notebooks:
