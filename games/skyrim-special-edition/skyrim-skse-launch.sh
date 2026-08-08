@@ -36,10 +36,19 @@ matched=0
 for i in "${!args[@]}"; do
   arg=${args[$i]}
 
-  # Match the game binary regardless of case; Wine paths are case-insensitive
-  # but this filesystem is not, and Steam's casing has changed before.
+  # Steam's registered executable for 489830 is SkyrimSELauncher.exe, not
+  # SkyrimSE.exe — the Bethesda launcher is what %command% ends with, and it
+  # spawns the game itself. Matching only SkyrimSE.exe meant this shim never
+  # fired: the launcher ran, SKSE never loaded, and SSE Engine Fixes' preloader
+  # (which the game loads on its own via the d3dx9_42.dll hijack) applied its
+  # memory patches into a process with no SKSE behind them, and it crashed on
+  # Play. Swapping the launcher is also what removes its oversized resolution
+  # dialog, since SKSE goes straight to the game.
+  #
+  # Matched case-insensitively: Wine is case-insensitive, this filesystem is
+  # not, and Steam's casing has changed before.
   case ${arg,,} in
-    *skyrimse.exe) ;;
+    *skyrimselauncher.exe | *skyrimse.exe) ;;
     *) continue ;;
   esac
 
@@ -57,7 +66,7 @@ for i in "${!args[@]}"; do
 done
 
 if [ "$matched" -eq 0 ]; then
-  echo "skyrim-skse-launch: SkyrimSE.exe not found in command; passing through" >&2
+  echo "skyrim-skse-launch: no Skyrim executable in command; passing through" >&2
 fi
 
 exec "${args[@]}"
