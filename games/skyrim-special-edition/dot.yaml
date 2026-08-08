@@ -34,6 +34,27 @@ linux[whoami.distro^="Arch"]:
       # before that has necessarily happened.
       mkdir -p "$LIB/steamapps/compatdata/489830/pfx/drive_c/users/steamuser/Documents/My Games/Skyrim Special Edition"
 
+      # Microsoft Visual C++ 2022 x64 runtime, into this game's prefix.
+      #
+      # Both SSE Engine Fixes and SSE Display Tweaks list it as an external
+      # requirement. On Windows it is usually already there; under Proton it is
+      # not, and without it those SKSE plugins fail to load and the game starts
+      # as though no mods were installed. SKSE's log says only that the plugin
+      # failed — it never mentions the runtime — so this is worth doing up front
+      # rather than diagnosing later.
+      if ! pacman -Qi protontricks &>/dev/null; then
+        sudo pacman -S --noconfirm --needed protontricks
+      fi
+
+      PFX="$LIB/steamapps/compatdata/489830/pfx"
+      if grep -qx 'vcrun2022' "$PFX/winetricks.log" 2>/dev/null; then
+        echo "vcrun2022 already present in the Skyrim prefix"
+      else
+        # bwrap containment breaks on some sandboxed setups; fall back to it off.
+        protontricks 489830 -q vcrun2022 \
+          || protontricks --no-bwrap 489830 -q vcrun2022
+      fi
+
       # Skip the Bethesda logo on every launch. Reversible with a single mv,
       # and Steam's verify-integrity puts it back.
       LOGO="$GAME_DIR/Data/Video/BGS_Logo.bik"

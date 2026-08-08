@@ -251,17 +251,21 @@ install — verified at <https://skse.silverlock.org/>. Re-check with
 ### The Windows runtime the mod pages ask for
 
 Both SSE Engine Fixes and SSE Display Tweaks list **Microsoft Visual C++
-Redistributable 2022 (x64)** as an external requirement. On Windows that is
-usually already present; under Proton it has to be installed *into this game's
-prefix*, or the SKSE plugins fail to load and the game starts as if no mods were
-installed:
+Redistributable 2022 (x64)** as an external requirement. On Windows it is usually
+already present; under Proton it is not, and without it those SKSE plugins fail
+to load and the game starts as though no mods were installed.
+
+`rotz install` handles it — it installs `protontricks` if missing and runs
+`vcrun2022` into this game's prefix, skipping the work when
+`compatdata/489830/pfx/winetricks.log` already lists it. To check by hand:
 
 ```sh
-protontricks 489830 vcrun2022
+grep -qx vcrun2022 ~/.local/share/Steam/steamapps/compatdata/489830/pfx/winetricks.log
 ```
 
-Nothing in the mod archives checks for it, and SKSE's own log does not say the
-runtime is missing — it simply reports the plugin failed to load.
+Worth knowing because the failure is silent: nothing in the mod archives checks
+for the runtime, and SKSE's log says only that the plugin failed to load — it
+never mentions the missing runtime.
 
 ### Still open after this phase
 
