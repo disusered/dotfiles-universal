@@ -202,37 +202,70 @@ Steam's verify-integrity also puts it back.
 
 ## Phase 2 — mods
 
-Nothing here is installed. This is the plan for when the vanilla itch shows up.
+The scaffolding is in place; no mod is installed yet. The scope is the community
+baseline — script extender, bugfix patch, engine fixes, the standard UI, and the
+frame-rate fix. Not an overhaul: no texture packs, no gameplay rebalance.
 
 **Before anything else**, set Steam to *Properties → Updates → Only update this game
 when I launch it*. Skyrim updates break SKSE, and an update that lands while you have
 a modded save is how a playthrough dies.
 
-- **SKSE** — <https://skse.silverlock.org/>. The build must match the game runtime,
-  currently **1.6.1170** (`strings SkyrimSE.exe | grep -m1 '^1\.6\.'` to re-check
-  after any update). Nearly every interesting mod depends on it.
-- **Mod manager** — two candidates:
-  - **[Limo](https://github.com/limo-app/limo)** (AUR `limo`): native Linux, Qt,
-    understands Proton prefixes. Simpler; smaller ecosystem.
-  - **Mod Organizer 2**: runs in the Proton prefix. The tool every Skyrim guide
-    assumes, at the cost of running a Windows app inside the game's prefix.
-- The two gaps phase 1 leaves in place on purpose, and what closes them:
-  - **[SSE Display Tweaks](https://www.nexusmods.com/skyrimspecialedition/mods/34705)**
-    decouples physics from frame rate — this is what makes the 60 cap above
-    removable, so it is worth installing first on the 144 Hz machine.
-  - A **widescreen UI mod** fixes the stretched 21:9 HUD and menus, replacing the
-    pillarbox workaround.
+### No mod manager
 
-When a mod manager is picked, it belongs in this module's `dot.yaml` rather than
-installed by hand.
+Neither Limo nor Mod Organizer 2 is used. Both keep their state outside this repo,
+which is the one thing a dotfiles module cannot accept — the other machine could not
+be reproduced from a checkout. Instead mods are **declared here and installed by
+script**, the same way every other config in this repo works.
+
+- [`mods/manifest.tsv`](./mods/manifest.tsv) — one row per archive: hash,
+  destination, load-order position, source URL.
+- [`skyrim-install-mods.sh`](./skyrim-install-mods.sh) — verifies each archive's
+  sha256, unpacks it to the game root or `Data/`, and rewrites `Plugins.txt`.
+  Refuses to install anything whose hash does not match.
+
+There is no Nexus Premium on this account, so nothing downloads unattended. Fetch
+the archives in a browser into `~/Downloads/skyrim-mods/`, then:
+
+```sh
+skyrim-install-mods --scan >> ~/.dotfiles/games/skyrim-special-edition/mods/manifest.tsv
+# edit the generated rows: real name, real source_url, load order
+skyrim-install-mods --dry-run
+skyrim-install-mods
+```
+
+Hashes come from the files that were actually installed and played, not copied off a
+mod page — which is the only claim this repo can honestly make about them.
+
+### SKSE
+
+Launched through [`skyrim-skse-launch.sh`](./skyrim-skse-launch.sh), which rewrites
+the `SkyrimSE.exe` argument in Steam's command to `skse64_loader.exe`. It runs
+*inside* ScopeBuddy rather than replacing it, so INI generation and resolution
+detection survive; and it passes the command through untouched when the loader is
+absent, so it is harmless before SKSE is installed.
+
+Build **2.2.6** ("Anniversary Edition", game version **1.6.1170**) matches this
+install — verified at <https://skse.silverlock.org/>. Re-check with
+`strings SkyrimSE.exe | grep -m1 '^1\.6\.'` after any update.
+
+### Still open after this phase
+
+- A **widescreen UI mod** for the stretched 21:9 HUD and menus, replacing the
+  pillarbox workaround.
+- Removing the 60 fps cap in [`scopebuddy.conf`](./scopebuddy.conf) once
+  **SSE Display Tweaks** is in — it decouples Havok from frame rate, which is the
+  whole reason the cap exists. Do not drop the cap before it is installed.
 
 ## Files
 
 | File | Links to |
 |---|---|
 | [`skyrim-configure-display.sh`](./skyrim-configure-display.sh) | `~/.local/bin/skyrim-configure-display` |
+| [`skyrim-skse-launch.sh`](./skyrim-skse-launch.sh) | `~/.local/bin/skyrim-skse-launch` |
+| [`skyrim-install-mods.sh`](./skyrim-install-mods.sh) | `~/.local/bin/skyrim-install-mods` |
 | [`scopebuddy.conf`](./scopebuddy.conf) | `~/.config/scopebuddy/AppID/489830.conf` |
 | [`skyrim.conf`](./skyrim.conf) | `~/.config/hypr/conf.d/skyrim.conf` |
+| [`mods/manifest.tsv`](./mods/manifest.tsv) | manifest — read by the install script, not linked |
 | [`Skyrim.ini`](./Skyrim.ini) | template — read by the script, not linked |
 | [`SkyrimPrefs.igpu.ini`](./SkyrimPrefs.igpu.ini) | template — read by the script, not linked |
 | [`SkyrimPrefs.dgpu.ini`](./SkyrimPrefs.dgpu.ini) | template — read by the script, not linked |

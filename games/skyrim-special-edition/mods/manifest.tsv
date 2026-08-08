@@ -1,0 +1,51 @@
+# Skyrim SE mod manifest — tab-separated, one row per archive.
+#
+# Columns: enabled  name  archive  sha256  destination  plugins  source_url
+#   enabled      yes | no
+#   archive      filename as downloaded, expected in ~/Downloads/skyrim-mods/
+#   sha256       of that exact file; install refuses on mismatch
+#   destination  root (beside SkyrimSE.exe) | data (into Data/)
+#   plugins      comma-separated .esp/.esm/.esl to enable, in load order
+#   source_url   where it came from, so a re-download finds the same file
+#
+# Rows are GENERATED, not hand-written. There is no Nexus Premium on this
+# account, so nothing downloads unattended: fetch the archives in a browser,
+# drop them here, then
+#
+#     skyrim-install-mods --scan >> games/skyrim-special-edition/mods/manifest.tsv
+#
+# and edit the generated rows (fix the name, paste the real source_url, set the
+# load order). The hashes are then taken from the files that were actually
+# installed and played on game buildid 13189953 — which is the only claim this
+# file can honestly make.
+#
+# ── What to download ──────────────────────────────────────────────────────
+# Order matters: 1 and 2 are prerequisites for 4 and 6.
+#
+#   1. SKSE64 — build 2.2.6, "Anniversary Edition" (game version 1.6.1170).
+#      File skse64_2_02_06.7z, from https://skse.silverlock.org/ (NOT Nexus).
+#      This one is verified: the site states 2.2.6 targets 1.6.1170 exactly,
+#      which is this install's runtime. destination=root.
+#   2. Address Library for SKSE Plugins — take the "All in one" / Anniversary
+#      Edition file, not the Special Edition one. destination=data.
+#   3. Unofficial Skyrim Special Edition Patch (USSEP). destination=data.
+#   4. SSE Engine Fixes — TWO downloads. Part 1 is the SKSE plugin
+#      (destination=data); Part 2 is a manual-install archive of dll + tbb
+#      libraries that belong beside SkyrimSE.exe (destination=root).
+#   5. SkyUI. destination=data.
+#   6. SSE Display Tweaks — https://www.nexusmods.com/skyrimspecialedition/mods/34705
+#      destination=data. This is the one that makes the 60 fps cap in
+#      scopebuddy.conf removable; do not drop the cap before it is installed.
+#
+# Nexus mod IDs for 2–5 are deliberately not written here. Every attempt to
+# read those pages returned HTTP 403 (Cloudflare), so the IDs could only have
+# come from recall, and a wrong ID sends the next person to the wrong mod.
+# Paste the real URL into source_url when the row is generated.
+#
+# ── After a game update ───────────────────────────────────────────────────
+# Steam updates orphan SKSE: the loader is locked to a runtime version, so a
+# Bethesda patch breaks it until a matching build ships. Keep Properties →
+# Updates → "Only update this game when I launch it" set, and re-check
+# skse.silverlock.org before updating. A game that suddenly starts vanilla with
+# no mods is usually this, not a broken install.
+enabled	name	archive	sha256	destination	plugins	source_url
