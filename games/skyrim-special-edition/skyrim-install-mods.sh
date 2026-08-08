@@ -36,6 +36,19 @@ esac
 die() { echo "Error: $*" >&2; exit 1; }
 note() { echo "  $*"; }
 
+# Many mods ship their payload inside a single named folder — SKSE's archive is
+# `skse64_2_02_06/` containing skse64_loader.exe, the runtime dll and Data/.
+# Copying that folder verbatim would put a directory named after the build into
+# the game root and leave the loader unfound, so descend through it. A lone
+# top-level Data/ is NOT a wrapper — that is the payload.
+strip_wrapper() {
+  local listing=$1 top
+  top=$(awk -F/ 'NF{print $1}' <<<"$listing" | sort -u)
+  [ "$(wc -l <<<"$top")" -eq 1 ] || { printf '%s' "$listing"; return; }
+  case ${top,,} in data) printf '%s' "$listing"; return ;; esac
+  grep -v "^$top\$" <<<"$listing" | sed "s|^$top/||"
+}
+
 command -v 7z >/dev/null || die "7z not found (pacman -S p7zip)"
 
 if ! LIB=$("$MODULE_DIR/../lib/steam-find-app-path.sh" "$APP_ID" 2>/dev/null); then
@@ -66,6 +79,7 @@ if [ "$MODE" = scan ]; then
     base=$(basename "$a")
     sum=$(sha256sum "$a" | cut -d' ' -f1)
     listing=$(7z l -ba -slt "$a" 2>/dev/null | sed -n 's/^Path = //p')
+    listing=$(strip_wrapper "$listing")
 
     # A top-level Data/ (or an .esp/.esm/.bsa at the root) means Data-relative;
     # a top-level .dll or skse64_loader.exe means it belongs beside the exe.
@@ -133,13 +147,24 @@ while IFS= read -r line || [ -n "$line" ]; do
       echo "SKIP  $name: could not unpack"
       rm -rf "$tmp"; skipped=$((skipped + 1)); continue
     fi
+    # Descend through a single named wrapper folder first (see strip_wrapper).
+    src=$tmp
+    shopt -s nullglob dotglob
+    entries=("$tmp"/*)
+    shopt -u nullglob dotglob
+    if [ ${#entries[@]} -eq 1 ] && [ -d "${entries[0]}" ]; then
+      case "$(basename "${entries[0]}")" in
+        [Dd]ata) ;;
+        *) src=${entries[0]} ;;
+      esac
+    fi
+
     # Unwrap a Data/ folder only for data-destined mods. Root-destined archives
     # (SKSE ships skse64_loader.exe *and* a Data/Scripts alongside it) must be
     # copied from their own root, or the loader is silently left behind — the
     # game then starts vanilla with no hint why.
-    src=$tmp
     if [ "$destination" = data ]; then
-      for d in "$tmp"/Data "$tmp"/data; do
+      for d in "$src"/Data "$src"/data; do
         [ -d "$d" ] && { src=$d; break; }
       done
     fi
