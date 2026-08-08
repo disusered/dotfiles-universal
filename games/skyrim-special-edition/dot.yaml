@@ -25,9 +25,16 @@ linux[whoami.distro^="Arch"]:
       # detection) keep working. It swaps SkyrimSE.exe for skse64_loader.exe
       # when the loader is present and passes the command straight through when
       # it is not, so this is safe to set before any mod is installed.
+      #
+      # Spell the shim's path in full. ScopeBuddy execs the game command with
+      # `env`, which resolves a bare name against PATH — and Steam's launch
+      # environment does not carry ~/.local/bin, so a bare `skyrim-skse-launch`
+      # dies with "No such file or directory" before the game ever starts.
+      # $HOME is expanded here, at install time, so the value written into
+      # localconfig.vdf is absolute on whichever machine ran the install.
       "$HOME/.dotfiles/games/lib/steam-set-launch-options.sh" \
         489830 \
-        'scb -- skyrim-skse-launch %command%' \
+        "scb -- $HOME/.local/bin/skyrim-skse-launch %command%" \
         'The Elder Scrolls V: Skyrim Special Edition'
 
       # The game creates this on first run; the pre-launch hook writes into it
