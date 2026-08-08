@@ -36,16 +36,22 @@ esac
 die() { echo "Error: $*" >&2; exit 1; }
 note() { echo "  $*"; }
 
-# Many mods ship their payload inside a single named folder — SKSE's archive is
-# `skse64_2_02_06/` containing skse64_loader.exe, the runtime dll and Data/.
-# Copying that folder verbatim would put a directory named after the build into
-# the game root and leave the loader unfound, so descend through it. A lone
-# top-level Data/ is NOT a wrapper — that is the payload.
+# Directory names that are part of the game's own layout. A single top-level
+# folder with one of these names is the payload, never a wrapper to descend
+# through — Address Library and SSE Display Tweaks both ship exactly one
+# top-level `SKSE/`, and stripping it puts their plugins in Data/Plugins/ where
+# SKSE will never look for them.
+IS_GAME_DIR='^(data|skse|interface|meshes|textures|scripts|sounds|music|video|seq|strings|shadersfx|lodsettings|source|grass|dyndolod|netscriptframework|tools|calientetools|bashtags|docs|fomod)$'
+
+# Other mods do wrap their payload in a named folder — SKSE's own archive is
+# `skse64_2_02_06/` holding skse64_loader.exe, the runtime dll and Data/.
+# Copying that verbatim would drop a build-named directory into the game root
+# and leave the loader unfound, so descend through it.
 strip_wrapper() {
   local listing=$1 top
   top=$(awk -F/ 'NF{print $1}' <<<"$listing" | sort -u)
   [ "$(wc -l <<<"$top")" -eq 1 ] || { printf '%s' "$listing"; return; }
-  case ${top,,} in data) printf '%s' "$listing"; return ;; esac
+  if [[ ${top,,} =~ $IS_GAME_DIR ]]; then printf '%s' "$listing"; return; fi
   grep -v "^$top\$" <<<"$listing" | sed "s|^$top/||"
 }
 
@@ -74,12 +80,12 @@ if [ "$MODE" = scan ]; then
   [ ${#archives[@]} -gt 0 ] || die "no archives in $STAGING"
 
   echo "# scanned $(date +%Y-%m-%d) against game buildid $BUILD_ID" >&2
-  printf 'enabled\tname\tarchive\tsha256\tdestination\tplugins\tsource_url\n'
+  printf 'enabled\tname\tarchive\tsha256\tdestination\tarchive_root\tplugins\tsource_url\n'
   for a in "${archives[@]}"; do
     base=$(basename "$a")
     sum=$(sha256sum "$a" | cut -d' ' -f1)
-    listing=$(7z l -ba -slt "$a" 2>/dev/null | sed -n 's/^Path = //p')
-    listing=$(strip_wrapper "$listing")
+    raw=$(7z l -ba -slt "$a" 2>/dev/null | sed -n 's/^Path = //p')
+    listing=$(strip_wrapper "$raw")
 
     # A top-level Data/ (or an .esp/.esm/.bsa at the root) means Data-relative;
     # a top-level .dll or skse64_loader.exe means it belongs beside the exe.
@@ -88,9 +94,20 @@ if [ "$MODE" = scan ]; then
       dest=root
     fi
 
+    # FOMOD archives are interactive installers: they carry several mutually
+    # exclusive variants (AE vs SE) plus a shared Required/ tree, and only a
+    # human can say which applies. Flag it rather than dumping all of them.
+    root_hint=
+    if grep -qiE '(^|/)fomod/' <<<"$raw"; then
+      root_hint="FOMOD-PICK-SUBDIRS"
+      echo "note: $base is a FOMOD installer — set archive_root to the subdirs to install," >&2
+      echo "      semicolon-separated. Candidates:" >&2
+      awk -F/ 'NF>1{print $1"/"$2}' <<<"$raw" | sort -u | sed 's/^/        /' >&2
+    fi
+
     plugins=$(grep -oiE '[^/]+\.(esp|esm|esl)$' <<<"$listing" | sort -u | paste -sd, -)
-    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-      yes "${base%.*}" "$base" "$sum" "$dest" "${plugins:-}" "TODO"
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+      yes "${base%.*}" "$base" "$sum" "$dest" "$root_hint" "${plugins:-}" "TODO"
   done
   exit 0
 fi
@@ -112,8 +129,13 @@ while IFS= read -r line || [ -n "$line" ]; do
   case "$line" in ''|'#'*|enabled$'\t'*) continue ;; esac
   mapfile -t -d $'\t' F < <(printf '%s' "$line")
   enabled=${F[0]-}   name=${F[1]-}     archive=${F[2]-}    sha256=${F[3]-}
-  destination=${F[4]-} plugins=${F[5]-} source_url=${F[6]-}
+  destination=${F[4]-} archive_root=${F[5]-} plugins=${F[6]-} source_url=${F[7]-}
   [ "$enabled" = no ] && continue
+  if [ "$archive_root" = FOMOD-PICK-SUBDIRS ]; then
+    echo "SKIP  $name: FOMOD archive with no archive_root chosen"
+    note "re-run --scan to list candidate subdirs, then set archive_root"
+    skipped=$((skipped + 1)); continue
+  fi
 
   path="$STAGING/$archive"
   if [ ! -f "$path" ]; then
@@ -147,29 +169,47 @@ while IFS= read -r line || [ -n "$line" ]; do
       echo "SKIP  $name: could not unpack"
       rm -rf "$tmp"; skipped=$((skipped + 1)); continue
     fi
-    # Descend through a single named wrapper folder first (see strip_wrapper).
-    src=$tmp
-    shopt -s nullglob dotglob
-    entries=("$tmp"/*)
-    shopt -u nullglob dotglob
-    if [ ${#entries[@]} -eq 1 ] && [ -d "${entries[0]}" ]; then
-      case "$(basename "${entries[0]}")" in
-        [Dd]ata) ;;
-        *) src=${entries[0]} ;;
-      esac
+    # Work out which directories inside the archive to copy from. An explicit
+    # archive_root wins (that is how a FOMOD's chosen variants are named, and
+    # more than one may apply — Engine Fixes needs Required/ *and* AE/).
+    roots=()
+    if [ -n "$archive_root" ]; then
+      IFS=';' read -ra rs <<<"$archive_root"
+      for r in "${rs[@]}"; do
+        r=${r#"${r%%[![:space:]]*}"}          # trim leading space
+        [ -n "$r" ] || continue
+        if [ -d "$tmp/$r" ]; then roots+=("$tmp/$r")
+        else echo "SKIP  $name: archive_root '$r' not in archive"; fi
+      done
+      [ ${#roots[@]} -gt 0 ] || { rm -rf "$tmp"; skipped=$((skipped+1)); continue; }
+    else
+      # Descend through a single named wrapper folder (see strip_wrapper), but
+      # never through one that is game structure in its own right.
+      src=$tmp
+      shopt -s nullglob dotglob
+      entries=("$tmp"/*)
+      shopt -u nullglob dotglob
+      if [ ${#entries[@]} -eq 1 ] && [ -d "${entries[0]}" ]; then
+        base=$(basename "${entries[0]}")
+        [[ ${base,,} =~ $IS_GAME_DIR ]] || src=${entries[0]}
+      fi
+      roots=("$src")
     fi
 
-    # Unwrap a Data/ folder only for data-destined mods. Root-destined archives
-    # (SKSE ships skse64_loader.exe *and* a Data/Scripts alongside it) must be
-    # copied from their own root, or the loader is silently left behind — the
-    # game then starts vanilla with no hint why.
-    if [ "$destination" = data ]; then
-      for d in "$src"/Data "$src"/data; do
-        [ -d "$d" ] && { src=$d; break; }
-      done
-    fi
     mkdir -p "$target"
-    cp -a "$src"/. "$target"/
+    for r in "${roots[@]}"; do
+      # Unwrap a Data/ folder only for data-destined mods. Root-destined
+      # archives (SKSE ships skse64_loader.exe *and* a Data/Scripts alongside
+      # it) must be copied from their own root, or the loader is silently left
+      # behind — the game then starts vanilla with no hint why.
+      s=$r
+      if [ "$destination" = data ]; then
+        for d in "$r"/Data "$r"/data; do
+          [ -d "$d" ] && { s=$d; break; }
+        done
+      fi
+      cp -a "$s"/. "$target"/
+    done
     rm -rf "$tmp"
     echo "INSTALLED  $name -> ${target#"$LIB"/}"
   fi

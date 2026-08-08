@@ -248,6 +248,21 @@ Build **2.2.6** ("Anniversary Edition", game version **1.6.1170**) matches this
 install — verified at <https://skse.silverlock.org/>. Re-check with
 `strings SkyrimSE.exe | grep -m1 '^1\.6\.'` after any update.
 
+### The Windows runtime the mod pages ask for
+
+Both SSE Engine Fixes and SSE Display Tweaks list **Microsoft Visual C++
+Redistributable 2022 (x64)** as an external requirement. On Windows that is
+usually already present; under Proton it has to be installed *into this game's
+prefix*, or the SKSE plugins fail to load and the game starts as if no mods were
+installed:
+
+```sh
+protontricks 489830 vcrun2022
+```
+
+Nothing in the mod archives checks for it, and SKSE's own log does not say the
+runtime is missing — it simply reports the plugin failed to load.
+
 ### Still open after this phase
 
 - A **widescreen UI mod** for the stretched 21:9 HUD and menus, replacing the

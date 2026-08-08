@@ -1,10 +1,13 @@
 # Skyrim SE mod manifest — tab-separated, one row per archive.
 #
-# Columns: enabled  name  archive  sha256  destination  plugins  source_url
+# Columns: enabled  name  archive  sha256  destination  archive_root  plugins  source_url
 #   enabled      yes | no
 #   archive      filename as downloaded, expected in ~/Downloads/skyrim-mods/
 #   sha256       of that exact file; install refuses on mismatch
 #   destination  root (beside SkyrimSE.exe) | data (into Data/)
+#   archive_root subdir(s) inside the archive to install, ";"-separated.
+#                Empty means the archive root. Needed for FOMOD installers,
+#                which ship several mutually exclusive variants.
 #   plugins      comma-separated .esp/.esm/.esl to enable, in load order
 #   source_url   where it came from, so a re-download finds the same file
 #
@@ -71,11 +74,11 @@
 # Updates → "Only update this game when I launch it" set, and re-check
 # skse.silverlock.org before updating. A game that suddenly starts vanilla with
 # no mods is usually this, not a broken install.
-enabled	name	archive	sha256	destination	plugins	source_url
-yes	SKSE64 2.2.6 (AE, game 1.6.1170)	skse64_2_02_06.7z	d7297f1a1d613e5265e1af4dbbfe8bd37a32719c1ccef363fc6187fa6eba0848	root		https://skse.silverlock.org/
-yes	Address Library for SKSE Plugins v11	All in one (all game versions)-32444-11-1770897704.zip	d345ccdac52c096fe9628a62ff3764bbf23111ba30e3d282cd3b1fb66968863a	data		https://www.nexusmods.com/skyrimspecialedition/mods/32444?tab=files
-yes	Unofficial Skyrim SE Patch (USSEP) v4.3.8a	Unofficial Skyrim Special Edition Patch-266-4-3-8a-1774132896.7z	5036e8b4abef7234a1f35d43e33780f529be8f85f449e41211ec4876d03e95d9	data	unofficial skyrim special edition patch.esp	https://www.nexusmods.com/skyrimspecialedition/mods/266?tab=files
-yes	SSE Engine Fixes - Main File v7.0.20	Engine Fixes - Main File-17230-7-0-20-1772078239.7z	21330c95011f41859139635b43ce95ffb5fbadd3cd375d2f4358abcc3cb99407	data		https://www.nexusmods.com/skyrimspecialedition/mods/17230?tab=files
-yes	SSE Engine Fixes - SKSE64 Preloader v7	Engine Fixes - SKSE64 Preloader-17230-7-1771936758.7z	35633dc2904521f35861dbb582e084a10e77bec5b8f08fb08963d7578b07452f	root		https://www.nexusmods.com/skyrimspecialedition/mods/17230?tab=files
-yes	SkyUI v6.11	SkyUI-12604-6-11-1778020881.zip	4eb0c9fc5241e5c3dd2fd773ee8a89627c924bf4445cf70373d3a4c7c4393ff1	data	SkyUI_SE.esp	https://www.nexusmods.com/skyrimspecialedition/mods/12604?tab=files
-yes	SSE Display Tweaks v0.5.16	SSE Display Tweaks-34705-0-5-16-1703410713.zip	08b8bc6f548cf12aa82a234166efe10851bfb994d02393f2e716754e6b3174e0	data		https://www.nexusmods.com/skyrimspecialedition/mods/34705?tab=files
+enabled	name	archive	sha256	destination	archive_root	plugins	source_url
+yes	SKSE64 2.2.6 (AE, game 1.6.1170)	skse64_2_02_06.7z	d7297f1a1d613e5265e1af4dbbfe8bd37a32719c1ccef363fc6187fa6eba0848	root			https://skse.silverlock.org/
+yes	Address Library for SKSE Plugins v11	All in one (all game versions)-32444-11-1770897704.zip	d345ccdac52c096fe9628a62ff3764bbf23111ba30e3d282cd3b1fb66968863a	data			https://www.nexusmods.com/skyrimspecialedition/mods/32444?tab=files
+yes	Unofficial Skyrim SE Patch (USSEP) v4.3.8a	Unofficial Skyrim Special Edition Patch-266-4-3-8a-1774132896.7z	5036e8b4abef7234a1f35d43e33780f529be8f85f449e41211ec4876d03e95d9	data		unofficial skyrim special edition patch.esp	https://www.nexusmods.com/skyrimspecialedition/mods/266?tab=files
+yes	SSE Engine Fixes - Main File v7.0.20	Engine Fixes - Main File-17230-7-0-20-1772078239.7z	21330c95011f41859139635b43ce95ffb5fbadd3cd375d2f4358abcc3cb99407	data	EngineFixes FOMOD Installer/Required;EngineFixes FOMOD Installer/AE		https://www.nexusmods.com/skyrimspecialedition/mods/17230?tab=files
+yes	SSE Engine Fixes - SKSE64 Preloader v7	Engine Fixes - SKSE64 Preloader-17230-7-1771936758.7z	35633dc2904521f35861dbb582e084a10e77bec5b8f08fb08963d7578b07452f	root			https://www.nexusmods.com/skyrimspecialedition/mods/17230?tab=files
+yes	SkyUI v6.11	SkyUI-12604-6-11-1778020881.zip	4eb0c9fc5241e5c3dd2fd773ee8a89627c924bf4445cf70373d3a4c7c4393ff1	data		SkyUI_SE.esp	https://www.nexusmods.com/skyrimspecialedition/mods/12604?tab=files
+yes	SSE Display Tweaks v0.5.16	SSE Display Tweaks-34705-0-5-16-1703410713.zip	08b8bc6f548cf12aa82a234166efe10851bfb994d02393f2e716754e6b3174e0	data			https://www.nexusmods.com/skyrimspecialedition/mods/34705?tab=files
