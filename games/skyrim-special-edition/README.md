@@ -83,6 +83,27 @@ templates in this directory are the only place settings live.
 Steam Cloud is not involved. For this title it syncs only `Saves/*.ess`, so the INIs
 are never uploaded, downloaded, or conflicted.
 
+### The cost of the lock: SkyrimPrefs.ini is a replacement, not an overlay
+
+Blocking rule 1 above has a consequence that cost the first evening of play
+(2026-08-07). `<gamedir>/Skyrim/SkyrimPrefs.ini` is not junk — it is the **only**
+file in the whole chain that carries `[Controls]` and `[Interface]`, including
+`fMouseHeadingSensitivity` (camera look) and `fMouseCursorSpeed` (in-game menu
+pointer). `Skyrim_Default.ini` has neither section, and there is no
+`SkyrimPrefs_Default.ini` at all.
+
+So locking the generated prefs does not merely pin the graphics settings — it
+guarantees the generated file is the complete and final word. The first version of
+these templates had no mouse section, and the result was a game with a dead mouse:
+camera would not turn, in-game menus had no pointer, the keyboard worked fine, and
+only the Bethesda launcher — which never reads these files — still had a cursor.
+The obvious suspects (gamescope's `--force-grab-cursor`, the ultrawide, the
+windowrules) were all innocent; Civilization VI shares every one of them and works.
+
+**Rule for anyone editing these templates: a key that is not in
+`SkyrimPrefs.*.ini` is not in the game.** When in doubt, diff against
+`<gamedir>/Skyrim/SkyrimPrefs.ini` and check what you are dropping.
+
 ## Install
 
 Skyrim SE must already be installed from Steam on this machine.
@@ -100,6 +121,18 @@ both VDF patchers refuse to run while it is up and only print what they would ha
 set.
 
 ## Tuning
+
+### Mouse
+
+`[Controls]` / `[Interface]` in both `SkyrimPrefs.*.ini` templates. Because the
+INIs are locked, the in-game Settings slider cannot save anything — sensitivity
+has to be changed here and the game relaunched.
+
+- `fMouseHeadingSensitivity` — camera look speed. Stock `0.0125`.
+- `fMouseCursorSpeed` — in-game menu pointer speed. Stock `1.0000`.
+- `bInvertYValues` — `1` to invert vertical look.
+
+Both templates currently hold stock values, so the feel is vanilla.
 
 ### Quality
 
