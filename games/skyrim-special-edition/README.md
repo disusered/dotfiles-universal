@@ -8,15 +8,18 @@ mod path, which is documented but deliberately not installed.
 
 - Forces **Proton Experimental** for AppID `489830`. Skyrim SE has no native Linux
   port, and an unset mapping means whatever Steam's global default happens to be.
-- Sets Steam launch options to `scb -- %command%`, wrapping the game in
-  [ScopeBuddy](../../tools/scopebuddy)/gamescope.
-- **Caps the frame rate at 60.** Skyrim's Havok physics is stepped off the frame
-  rate; above roughly 60 fps objects drift or launch themselves, carts and ladders
-  break, and water flows at the wrong speed. Both machines this repo serves run
-  faster than 60 Hz, so this is a correctness requirement, not a preference. The cap
-  is set two ways: `dxvk.maxFrameRate` (authoritative, survives dropping gamescope)
-  and gamescope's `-r 60` (so the compositor is not pacing a 60 fps stream against a
-  75 or 144 Hz cadence).
+- Sets Steam launch options to
+  `scb -- ~/.local/bin/skyrim-skse-launch %command%`, wrapping the game in
+  [ScopeBuddy](../../tools/scopebuddy)/gamescope and swapping the Bethesda
+  launcher for SKSE.
+- **Leaves the frame rate to SSE Display Tweaks.** Skyrim's Havok physics is
+  stepped off the frame rate; above roughly 60 fps vanilla makes objects drift or
+  launch themselves, carts and ladders break, and water flow at the wrong speed.
+  Every monitor this repo serves runs faster than that, so phase 1 capped at 60
+  twice over — `dxvk.maxFrameRate` and gamescope's `-r 60`. Display Tweaks
+  decouples the physics step instead, which is the real fix, so both caps were
+  removed once its log confirmed `[HAVOK] (DYNAMIC)`. Remove Display Tweaks and
+  the caps have to go back.
 - **Generates `Skyrim.ini` and `SkyrimPrefs.ini` on every launch**, sized for
   whichever monitor and GPU it finds — see below.
 - Symlinks a Hyprland window rule (`skyrim.conf`) marking the gamescope surface
@@ -297,9 +300,11 @@ never mentions the missing runtime.
 
 - A **widescreen UI mod** for the stretched 21:9 HUD and menus, replacing the
   pillarbox workaround.
-- Removing the 60 fps cap in [`scopebuddy.conf`](./scopebuddy.conf) once
-  **SSE Display Tweaks** is in — it decouples Havok from frame rate, which is the
-  whole reason the cap exists. Do not drop the cap before it is installed.
+- **Version-control `SSEDisplayTweaks.ini`.** The frame rate now lives in
+  `Data/SKSE/Plugins/SSEDisplayTweaks.ini`, which the mod ships and the installer
+  overwrites on every run — so tuning it does not survive a reinstall yet.
+- The stray uppercase `Skyrim.INI` still sitting beside the generated
+  `Skyrim.ini` in the prefix.
 
 ## Files
 
