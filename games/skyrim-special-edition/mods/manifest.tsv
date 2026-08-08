@@ -20,27 +20,50 @@
 # file can honestly make.
 #
 # ── What to download ──────────────────────────────────────────────────────
+# Every line below was read off the mod's own Files tab on 2026-08-07 against
+# game runtime 1.6.1170. Nexus requires a login to download, so these are
+# fetched by hand; the pages themselves confirm the version support quoted.
+#
 # Order matters: 1 and 2 are prerequisites for 4 and 6.
 #
 #   1. SKSE64 — build 2.2.6, "Anniversary Edition" (game version 1.6.1170).
-#      File skse64_2_02_06.7z, from https://skse.silverlock.org/ (NOT Nexus).
-#      This one is verified: the site states 2.2.6 targets 1.6.1170 exactly,
-#      which is this install's runtime. destination=root.
-#   2. Address Library for SKSE Plugins — take the "All in one" / Anniversary
-#      Edition file, not the Special Edition one. destination=data.
-#   3. Unofficial Skyrim Special Edition Patch (USSEP). destination=data.
-#   4. SSE Engine Fixes — TWO downloads. Part 1 is the SKSE plugin
-#      (destination=data); Part 2 is a manual-install archive of dll + tbb
-#      libraries that belong beside SkyrimSE.exe (destination=root).
-#   5. SkyUI. destination=data.
-#   6. SSE Display Tweaks — https://www.nexusmods.com/skyrimspecialedition/mods/34705
-#      destination=data. This is the one that makes the 60 fps cap in
-#      scopebuddy.conf removable; do not drop the cap before it is installed.
+#      skse64_2_02_06.7z, https://skse.silverlock.org/  (NOT Nexus)
+#      destination=root
 #
-# Nexus mod IDs for 2–5 are deliberately not written here. Every attempt to
-# read those pages returned HTTP 403 (Cloudflare), so the IDs could only have
-# come from recall, and a wrong ID sends the next person to the wrong mod.
-# Paste the real URL into source_url when the row is generated.
+#   2. Address Library for SKSE Plugins — v11
+#      https://www.nexusmods.com/skyrimspecialedition/mods/32444
+#      Main file "Address Library - All in one (all game versions)", 5.1 MB.
+#      Prefer it over the older optional "All in one (1.6.X)" (2.3 MB, built
+#      for 1.6.1179) — the main file carries every version's database.
+#      destination=data
+#
+#   3. Unofficial Skyrim Special Edition Patch (USSEP) — v4.3.8a
+#      https://www.nexusmods.com/skyrimspecialedition/mods/266
+#      destination=data
+#
+#   4. SSE Engine Fixes — TWO separate downloads from the same page:
+#      https://www.nexusmods.com/skyrimspecialedition/mods/17230
+#      a) "Engine Fixes - Main File", v7.0.20, 7.6 MB.
+#         Page: "Supports SE 1.5.97 and AE 1.6.1170+". destination=data
+#      b) "Engine Fixes - SKSE64 Preloader", v7, 24 KB.
+#         Page: "extract it to your main Skyrim folder ... This file does not
+#         go in your data folder." destination=root
+#      The main file does nothing without the preloader.
+#
+#   5. SkyUI — main file is **v6.11**, 2.6 MB
+#      https://www.nexusmods.com/skyrimspecialedition/mods/12604
+#      The page header still reads 6.9; the current main file is 6.11 and says
+#      "Supports 1.5.97 and 1.6.1170". Take the file version, not the header.
+#      destination=data
+#
+#   6. SSE Display Tweaks — v0.5.16, 182 KB
+#      https://www.nexusmods.com/skyrimspecialedition/mods/34705
+#      Page: "SE 1.5.23 - 1.5.97 / AE 1.6.xxx". destination=data
+#      This is what makes the 60 fps cap in scopebuddy.conf removable; do not
+#      drop the cap before it is installed.
+#      Skip its optional "High performance configuration" on the Iris Xe — the
+#      page says "for high refresh rate monitors and fast GPUs/CPUs. Don't use
+#      on low-end systems." It is a candidate for the RX 6700 XT machine only.
 #
 # ── After a game update ───────────────────────────────────────────────────
 # Steam updates orphan SKSE: the loader is locked to a runtime version, so a
