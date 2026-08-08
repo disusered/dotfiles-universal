@@ -202,9 +202,35 @@ Steam's verify-integrity also puts it back.
 
 ## Phase 2 — mods
 
-The scaffolding is in place; no mod is installed yet. The scope is the community
-baseline — script extender, bugfix patch, engine fixes, the standard UI, and the
-frame-rate fix. Not an overhaul: no texture packs, no gameplay rebalance.
+Installed and verified on 2026-08-08, game buildid 13189953. The scope is the
+community baseline — script extender, bugfix patch, engine fixes, the standard
+UI, and the frame-rate fix. Not an overhaul: no texture packs, no gameplay
+rebalance.
+
+| Mod | Version | Installs to |
+|---|---|---|
+| SKSE64 (AE build, runtime 1.6.1170) | 2.2.6 | game root |
+| Address Library for SKSE Plugins | 11 | `Data/SKSE/Plugins/` |
+| Unofficial Skyrim SE Patch (USSEP) | 4.3.8a | `Data/` |
+| SSE Engine Fixes — Main (FOMOD: `Required` + `AE`) | 7.0.20 | `Data/SKSE/Plugins/` |
+| SSE Engine Fixes — SKSE64 Preloader | 7 | game root |
+| SkyUI | 6.11 | `Data/` |
+| SSE Display Tweaks | 0.5.16 | `Data/SKSE/Plugins/` |
+
+Proof it is actually running, from `My Games/Skyrim Special Edition/SKSE/`:
+
+```
+skse64.log        SKSE64 runtime: initialize (version = 2.2.6 …)
+                  plugin EngineFixes.dll … loaded correctly (handle 1)
+                  plugin SSEDisplayTweaks.dll … loaded correctly (handle 2)
+EngineFixes.log   EngineFixes SKSE Load  /  time to main menu 8192
+```
+
+If `EngineFixes.log` stops after its PreLoad patch list and there is no
+`skse64.log`, SKSE did not load: the preloader hijacks `d3dx9_42.dll` and runs
+regardless, so its memory patches land in a process with no SKSE behind them and
+the game crashes on Play. That is the signature of the launch wrapper not firing,
+not of a bad mod install.
 
 **Before anything else**, set Steam to *Properties → Updates → Only update this game
 when I launch it*. Skyrim updates break SKSE, and an update that lands while you have
