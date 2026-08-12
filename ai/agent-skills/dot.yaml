@@ -9,6 +9,10 @@ global:
     grill-with-docs: ~/.agents/skills/grill-with-docs
     domain-modeling: ~/.agents/skills/domain-modeling
     cfg-project-tasks: ~/.agents/skills/cfg-project-tasks
+    bro:
+      - ~/.agents/skills/bro
+      - ~/.claude/skills/bro
+      - ~/.config/opencode/skills/bro
     manage-course-notebooks:
       - ~/.agents/skills/manage-course-notebooks
       - ~/.claude/skills/manage-course-notebooks
