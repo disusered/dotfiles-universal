@@ -18,6 +18,7 @@
     ],
     "modules-right": [
       "idle_inhibitor",
+      "custom/timer",
       "privacy",
       "mpris",
       "tray",
@@ -72,6 +73,15 @@
       "start-activated": false,
       "tooltip-format-activated": "Lock timeout disabled",
       "tooltip-format-deactivated": "Lock timeout enabled (5 min)"
+    },
+    "custom/timer": {
+      "exec": "/home/carlos/.local/bin/timerbar watch",
+      "return-type": "json",
+      "restart-interval": 2,
+      "exec-on-event": true,
+      "on-click": "/home/carlos/.local/bin/timerbar toggle",
+      "on-click-middle": "/home/carlos/.local/bin/timerbar open",
+      "on-click-right": "/home/carlos/.local/bin/timerbar stop"
     },
     "privacy": {
       "icon-spacing": 4,
@@ -194,6 +204,7 @@
     ],
     "modules-right": [
       "idle_inhibitor",
+      "custom/timer",
       "privacy",
       "mpris",
       "tray",
@@ -223,6 +234,15 @@
       "start-activated": false,
       "tooltip-format-activated": "Lock timeout disabled",
       "tooltip-format-deactivated": "Lock timeout enabled (5 min)"
+    },
+    "custom/timer": {
+      "exec": "/home/carlos/.local/bin/timerbar watch",
+      "return-type": "json",
+      "restart-interval": 2,
+      "exec-on-event": true,
+      "on-click": "/home/carlos/.local/bin/timerbar toggle",
+      "on-click-middle": "/home/carlos/.local/bin/timerbar open",
+      "on-click-right": "/home/carlos/.local/bin/timerbar stop"
     },
     "privacy": {
       "icon-spacing": 4,

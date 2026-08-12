@@ -1,0 +1,9 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      timerbar_src=/home/carlos/Development/ME/herding-cats/utilities/timerbar/timerbar.py
+      if [ ! -f "$timerbar_src" ]; then
+        printf '%s\n' "timerbar source is missing: $timerbar_src" >&2
+        exit 1
+      fi
+      install -Dm755 "$timerbar_src" ~/.local/bin/timerbar

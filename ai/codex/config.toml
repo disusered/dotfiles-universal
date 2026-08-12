@@ -82,7 +82,7 @@ trust_level = "trusted"
 [projects."/home/carlos/Development/XBOL/scripts/secrets"]
 trust_level = "trusted"
 
-[projects."/home/carlos/Development/ME/tailscale"]
+[projects."/home/carlos/Development/ME/herding-cats/utilities/cat-infra"]
 trust_level = "trusted"
 
 [projects."/home/carlos"]
