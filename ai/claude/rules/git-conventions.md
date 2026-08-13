@@ -1,6 +1,7 @@
 # Git Conventions
 
 ## Commit Messages
+
 - Check and follow the existing commit style in the repository
 - If no existing style, use Conventional Commits
 - Limit to 80 characters
@@ -9,13 +10,16 @@
 - Use `git commit -S` for agent-created commits
 - Verify agent-created commits with `git verify-commit HEAD`
 
-## Branch Targeting (Gitflow)
-```
-hotfix/*    → main
-feature/*   → develop
-release/*   → main
-bugfix/*    → develop
-```
+## Branch Names and Targeting
+
+- Follow the repository's documented branch convention when one exists
+- Otherwise use GitFlow-style names in the form `<type>/<lowercase-kebab-case-description>`
+- Use only these fallback types: `feature`, `bugfix`, `hotfix`, and `release`
+- Never invent or add tool or agent identity prefixes such as `agent/`, `claude/`, `codex/`, or `copilot/`
+- Describe the work in the branch name, not the actor performing it
+- Inspect existing local and remote branches and identify the default branch before creating a branch or choosing a PR target
+- Target `develop` from `feature/*` and `bugfix/*` only when the repository actually has and uses `develop`; otherwise target the default branch
+- Target the production branch, usually `main`, from `hotfix/*` and `release/*`
 
 Always confirm branch targets with user before creating PRs.
 
