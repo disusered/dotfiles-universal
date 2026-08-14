@@ -1,0 +1,9 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      ~/.rotz/bin/rotz link /ai/deepseek-harness -f
+      ~/.local/bin/dsh --version
+    depends:
+      - /languages/javascript/node/latest
+  links:
+    scripts/dsh: ~/.local/bin/dsh
