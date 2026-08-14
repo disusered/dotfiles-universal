@@ -1,0 +1,35 @@
+[Unit]
+Description=DeepSeek Harness operator for Herding Cats
+After=network-online.target cli-proxy-api.service
+Wants=network-online.target cli-proxy-api.service
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Development/ME/herding-cats
+Environment=DSH_HOME=%h/.dsh
+Environment=DSH_PERMISSION_MODE=danger-full-access
+ExecStart=%h/.local/bin/mise exec node@24 -- %h/.local/bin/dsh web --host 127.0.0.1 --port 43120 --trusted-host harness.disusered.com
+Restart=on-failure
+RestartSec=3s
+TimeoutStartSec=120s
+TimeoutStopSec=15s
+UMask=0077
+
+LockPersonality=true
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=read-only
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+ReadWritePaths=%h/.dsh %h/Development/ME/herding-cats
+RestrictRealtime=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=default.target

@@ -1,4 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-exec npx --yes @deepseek-ai/dsh "$@"
+readonly dsh_home="${DSH_HOME:-$HOME/.dsh}"
+readonly runtime_bin="$HOME/.local/share/deepseek-harness/runtime/node_modules/.bin/dsh"
+readonly token_file="${XDG_STATE_HOME:-$HOME/.local/state}/cliproxyapi/client-token"
+
+export DSH_HOME="$dsh_home"
+export npm_config_cache="$dsh_home/.npm-cache"
+export npm_config_store_dir="$dsh_home/.pnpm-store"
+
+if [[ -r "$token_file" ]]; then
+  cliproxyapi_api_key=$(<"$token_file")
+  export CLIPROXYAPI_API_KEY="$cliproxyapi_api_key"
+fi
+
+if [[ ! -x "$runtime_bin" ]]; then
+  printf 'dsh: pinned runtime is missing; run rotz install /ai/deepseek-harness\n' >&2
+  exit 1
+fi
+
+exec "$runtime_bin" "$@"

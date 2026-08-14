@@ -1,9 +1,16 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
+      mkdir -p ~/.dsh ~/.local/share/deepseek-harness/runtime
+      npm install --prefix ~/.local/share/deepseek-harness/runtime --no-audit --no-fund --save-exact @deepseek-ai/dsh@0.1.0-rc.6
       ~/.rotz/bin/rotz link /ai/deepseek-harness -f
+      systemctl --user daemon-reload
+      systemctl --user enable --now deepseek-harness.service
       ~/.local/bin/dsh --version
     depends:
       - /languages/javascript/node/latest
+      - /ai/cliproxyapi
   links:
+    profiles/web/cordis.patch.yml: ~/.dsh/profiles/web/cordis.patch.yml
     scripts/dsh: ~/.local/bin/dsh
+    systemd/deepseek-harness.service: ~/.config/systemd/user/deepseek-harness.service
