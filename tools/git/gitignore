@@ -13,7 +13,6 @@ pr
 opencode.jsonc
 .claude/
 CLAUDE.md
-!ai/claude/CLAUDE.md
 .mcp.json
 dev/active/
 dev/completed/
@@ -23,6 +22,9 @@ bv
 .op/
 
 AGENTS.md
+# The canonical global agent instructions. Both ~/.claude/CLAUDE.md and
+# ~/.codex/AGENTS.md are symlinks to this one file.
+!ai/agent-instructions/AGENTS.md
 
 # Generic database files (sqlite, etc.) should not be committed
 *.db

@@ -3,11 +3,11 @@ linux|darwin:
     cmd: command -v codex &>/dev/null || npm install -g @openai/codex
     depends:
       - /tools/antidote
+      - /ai/agent-instructions
       - /ai/agent-skills
       - /ai/agents
   links:
     config.toml: ~/.codex/config.toml
-    AGENTS.md: ~/.codex/AGENTS.md
     rules: ~/.codex/rules/
     mcp-servers/stitch/env.tpl: ~/.codex/mcp-servers/stitch/env.tpl
     mcp-servers/stitch/stitch-mcp-render-secrets: ~/.local/bin/stitch-mcp-render-secrets

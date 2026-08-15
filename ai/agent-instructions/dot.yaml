@@ -1,0 +1,5 @@
+global:
+  links:
+    AGENTS.md:
+      - ~/.claude/CLAUDE.md
+      - ~/.codex/AGENTS.md

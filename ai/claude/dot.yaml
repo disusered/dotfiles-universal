@@ -2,12 +2,11 @@ global:
   installs:
     cmd: command -v claude &>/dev/null || curl -fsSL https://claude.ai/install.sh | bash
     depends:
+      - /ai/agent-instructions
       - /ai/agent-skills
       - /tools/hyprspace
   links:
     skills: ~/.claude/skills/
-    rules: ~/.claude/rules/
-    CLAUDE.md: ~/.claude/CLAUDE.md
 linux|darwin:
   links:
     settings.json: ~/.claude/settings.json
