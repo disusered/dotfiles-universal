@@ -2,9 +2,9 @@ personality = "pragmatic"
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 commit_attribution = ""
-model = "gpt-5.3-codex-spark"
+model = "gpt-5.6-terra"
 model_verbosity = "low"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "medium"
 plan_mode_reasoning_effort = "max"
 service_tier = "default"
 
@@ -157,6 +157,9 @@ trust_level = "trusted"
 [projects."/home/carlos/Development/ITERAMIND/projects/iteramind-discord"]
 trust_level = "trusted"
 
+[projects."/home/carlos/Development/ITERAMIND/projects/impactod4130"]
+trust_level = "trusted"
+
 [plugins."codex-security@openai-curated"]
 enabled = true
 
@@ -185,6 +188,9 @@ trusted_hash = "sha256:c730def8275e2e74d51898cb02c62be67f1905fa5cb8813883b41a391
 
 [mcp_servers.stitch]
 command = "/home/carlos/.local/bin/stitch-mcp-wrapper"
+
+[apps.connector_76869538009648d5b282a4bb21c3d157.tools."github.create_pull_request"]
+approval_mode = "approve"
 
 [plugins."openviking-memory@openviking-plugins-local"]
 enabled = true
