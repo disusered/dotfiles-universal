@@ -60,13 +60,21 @@
     "csharp-lsp@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": false,
     "pyright-lsp@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true
+    "superpowers@claude-plugins-official": true,
+    "mcp-server-dev@claude-plugins-official": true,
+    "okf-local@carlos-local": true
   },
   "extraKnownMarketplaces": {
     "openviking-plugins-local": {
       "source": {
         "source": "directory",
         "path": "/home/carlos/.openviking/openviking-repo/examples"
+      }
+    },
+    "carlos-local": {
+      "source": {
+        "source": "directory",
+        "path": "/home/carlos/.dotfiles/ai"
       }
     }
   },
@@ -80,5 +88,14 @@
   "skipDangerousModePermissionPrompt": false,
   "skipWorkflowUsageWarning": true,
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": true
+  "voiceEnabled": true,
+  "pluginConfigs": {
+    "okf-local@carlos-local": {
+      "options": {
+        "uv_executable": "/usr/bin/uv",
+        "mcp_project_root": "/home/carlos/Development/ITERAMIND/projects/okf-mcp",
+        "repository_root": "/home/carlos/Development/ITERAMIND"
+      }
+    }
+  }
 }

@@ -1,0 +1,21 @@
+{
+  "name": "carlos-local",
+  "owner": {
+    "name": "Carlos Rosquillas"
+  },
+  "description": "Local-first agent plugins managed by the dotfiles repository.",
+  "plugins": [
+    {
+      "name": "okf-local",
+      "source": "./claude-plugins/okf-local",
+      "displayName": "Local OKF",
+      "version": "0.1.1",
+      "description": "Explore and safely curate a root-local governed OKF knowledge graph.",
+      "author": {
+        "name": "Carlos Rosquillas"
+      },
+      "category": "productivity",
+      "tags": ["knowledge", "okf", "local", "mcp"]
+    }
+  ]
+}

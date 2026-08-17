@@ -1,0 +1,34 @@
+{
+  "name": "okf-local",
+  "displayName": "Local OKF",
+  "version": "0.1.1",
+  "description": "Install governed OKF operating instructions and launch the local MCP server in Claude Code.",
+  "author": {
+    "name": "Carlos Rosquillas"
+  },
+  "keywords": ["knowledge", "okf", "local", "mcp"],
+  "mcpServers": "./.mcp.json",
+  "userConfig": {
+    "uv_executable": {
+      "type": "file",
+      "title": "uv executable",
+      "description": "Absolute path to uv for launching the Python MCP project.",
+      "required": true,
+      "default": "/usr/bin/uv"
+    },
+    "mcp_project_root": {
+      "type": "directory",
+      "title": "OKF MCP project",
+      "description": "Directory containing the reusable okf-mcp Python project.",
+      "required": true,
+      "default": "/home/carlos/Development/ITERAMIND/projects/okf-mcp"
+    },
+    "repository_root": {
+      "type": "directory",
+      "title": "Governed repository",
+      "description": "Repository whose .agents/okf.yaml adapter should be loaded.",
+      "required": true,
+      "default": "/home/carlos/Development/ITERAMIND"
+    }
+  }
+}
