@@ -148,7 +148,9 @@
     "modules-center": [
       "hyprland/window"
     ],
-    "modules-right": [],
+    "modules-right": [
+      "mpris",
+    ],
     "hyprland/workspaces": {
       "format": "{icon}",
       "format-icons": {
@@ -163,6 +165,19 @@
     "hyprland/window": {
       "format": "{}",
       "separate-outputs": true
+    },
+    "mpris": {
+      "format": "{player_icon}  {dynamic}",
+      "format-paused": "{status_icon}  <i>{dynamic}</i>",
+      "player-icons": {
+        "default": "▶",
+        "mpv": "🎵"
+      },
+      "status-icons": {
+        "paused": "⏸"
+      },
+      "interval": 15,
+      "dynamic-len": 60
     },
     "clock": {
       "format": "{:%H:%M}",
@@ -206,7 +221,6 @@
       "idle_inhibitor",
       "custom/timer",
       "privacy",
-      "mpris",
       "tray",
       "wireplumber"
     ],
@@ -262,19 +276,6 @@
       ],
       "ignore-monitor": true,
       "ignore": []
-    },
-    "mpris": {
-      "format": "{player_icon}  {dynamic}",
-      "format-paused": "{status_icon}  <i>{dynamic}</i>",
-      "player-icons": {
-        "default": "▶",
-        "mpv": "🎵"
-      },
-      "status-icons": {
-        "paused": "⏸"
-      },
-      "interval": 15,
-      "dynamic-len": 60
     },
     "tray": {
       "icon-size": 18,
