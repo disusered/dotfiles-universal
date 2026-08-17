@@ -21,6 +21,8 @@ require("lazy").setup({
         colorscheme = "catppuccin-mocha",
       },
     },
+    { import = "lazyvim.plugins.extras.ui.mini-indentscope" },
+    { import = "lazyvim.plugins.extras.ui.edgy" },
     { import = "lazyvim.plugins.extras.editor.mini-files" },
     { import = "lazyvim.plugins.extras.lang.python" },
     { import = "plugins" },
@@ -29,6 +31,7 @@ require("lazy").setup({
     lazy = false,
     version = false,
   },
+  ui = { border = "rounded" },
   install = { colorscheme = { "catppuccin-mocha" } },
   checker = {
     enabled = false,

@@ -6,4 +6,6 @@ linux:
     lua/config/options.lua: ~/.config/nvim-notebook/lua/config/options.lua
     lua/config/keymaps.lua: ~/.config/nvim-notebook/lua/config/keymaps.lua
     lua/config/autocmds.lua: ~/.config/nvim-notebook/lua/config/autocmds.lua
+    ../config/shared: ~/.config/nvim-notebook/lua/config/shared
     lua/plugins/notebook.lua: ~/.config/nvim-notebook/lua/plugins/notebook.lua
+    lua/plugins/python.lua: ~/.config/nvim-notebook/lua/plugins/python.lua

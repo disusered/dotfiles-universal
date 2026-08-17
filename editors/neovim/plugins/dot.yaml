@@ -1,7 +1,9 @@
 global:
   links:
     abolish.lua: ~/.config/nvim/lua/plugins/abolish.lua
-    blink.lua: ~/.config/nvim/lua/plugins/blink.lua
+    blink.lua:
+      - ~/.config/nvim/lua/plugins/blink.lua
+      - ~/.config/nvim-notebook/lua/plugins/blink.lua
     catppuccin.lua:
       - ~/.config/nvim/lua/plugins/catppuccin.lua
       - ~/.config/nvim-notebook/lua/plugins/catppuccin.lua
@@ -13,19 +15,27 @@ global:
     dadbod.lua: ~/.config/nvim/lua/plugins/dadbod.lua
     dap.lua: ~/.config/nvim/lua/plugins/dap.lua
     diffview.lua: ~/.config/nvim/lua/plugins/diffview.lua
-    disabled.lua: ~/.config/nvim/lua/plugins/disabled.lua
+    disabled.lua:
+      - ~/.config/nvim/lua/plugins/disabled.lua
+      - ~/.config/nvim-notebook/lua/plugins/disabled.lua
     eunuch.lua: ~/.config/nvim/lua/plugins/eunuch.lua
     files.lua:
       - ~/.config/nvim/lua/plugins/files.lua
       - ~/.config/nvim-notebook/lua/plugins/files.lua
     gitconflict.lua: ~/.config/nvim/lua/plugins/gitconflict.lua
-    gitsigns.lua: ~/.config/nvim/lua/plugins/gitsigns.lua
+    gitsigns.lua:
+      - ~/.config/nvim/lua/plugins/gitsigns.lua
+      - ~/.config/nvim-notebook/lua/plugins/gitsigns.lua
     hipatterns.lua: ~/.config/nvim/lua/plugins/hipatterns.lua
     hop.lua:
       - ~/.config/nvim/lua/plugins/hop.lua
       - ~/.config/nvim-notebook/lua/plugins/hop.lua
-    icons.lua: ~/.config/nvim/lua/plugins/icons.lua
-    indentscope.lua: ~/.config/nvim/lua/plugins/indentscope.lua
+    icons.lua:
+      - ~/.config/nvim/lua/plugins/icons.lua
+      - ~/.config/nvim-notebook/lua/plugins/icons.lua
+    indentscope.lua:
+      - ~/.config/nvim/lua/plugins/indentscope.lua
+      - ~/.config/nvim-notebook/lua/plugins/indentscope.lua
     kulala.lua: ~/.config/nvim/lua/plugins/kulala.lua
     lazydev.lua: ~/.config/nvim/lua/plugins/lazydev.lua
     lazygit.lua: ~/.config/nvim/lua/plugins/lazygit.lua
@@ -33,14 +43,20 @@ global:
     leetcode.lua: ~/.config/nvim/lua/plugins/leetcode.lua
     lsp-signature.lua: ~/.config/nvim/lua/plugins/lsp-signature.lua
     luadev.lua: ~/.config/nvim/lua/plugins/luadev.lua
-    lualine.lua: ~/.config/nvim/lua/plugins/lualine.lua
+    lualine.lua:
+      - ~/.config/nvim/lua/plugins/lualine.lua
+      - ~/.config/nvim-notebook/lua/plugins/lualine.lua
     markdown.lua: ~/.config/nvim/lua/plugins/markdown.lua
     mason.lua: ~/.config/nvim/lua/plugins/mason.lua
-    noice.lua: ~/.config/nvim/lua/plugins/noice.lua
+    noice.lua:
+      - ~/.config/nvim/lua/plugins/noice.lua
+      - ~/.config/nvim-notebook/lua/plugins/noice.lua
     quicker.lua: ~/.config/nvim/lua/plugins/quicker.lua
     rails.lua: ~/.config/nvim/lua/plugins/rails.lua
     razor.lua: ~/.config/nvim/lua/plugins/razor.lua
-    snacks.lua: ~/.config/nvim/lua/plugins/snacks.lua
+    snacks.lua:
+      - ~/.config/nvim/lua/plugins/snacks.lua
+      - ~/.config/nvim-notebook/lua/plugins/snacks.lua
     splits.lua:
       - ~/.config/nvim/lua/plugins/splits.lua
       - ~/.config/nvim-notebook/lua/plugins/splits.lua
@@ -56,5 +72,7 @@ global:
     venv-selector.lua: ~/.config/nvim/lua/plugins/venv-selector.lua
     custom-zen.lua: ~/.config/nvim/lua/plugins/zen.lua
     table-mode.lua: ~/.config/nvim/lua/plugins/table-mode.lua
-    edgy.lua: ~/.config/nvim/lua/plugins/edgy.lua
+    edgy.lua:
+      - ~/.config/nvim/lua/plugins/edgy.lua
+      - ~/.config/nvim-notebook/lua/plugins/edgy.lua
     tera.lua: ~/.config/nvim/lua/plugins/tera.lua
