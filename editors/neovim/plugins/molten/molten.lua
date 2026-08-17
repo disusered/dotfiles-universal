@@ -156,6 +156,12 @@ return {
         ft = "quarto",
       },
       {
+        "<leader>jK",
+        "<cmd>MoltenRestart<CR>",
+        desc = "Restart kernel",
+        ft = "quarto",
+      },
+      {
         "<leader>je",
         ":<C-u>MoltenEvaluateVisual<CR>gv",
         mode = "v",
