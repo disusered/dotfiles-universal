@@ -1,6 +1,6 @@
 ---
 name: okf-knowledge-ops
-description: Explore, investigate, query, collect, reference, organize, link, ingest, lint, and tidy governed Markdown knowledge graphs built with OKF and optional OpenViking recall. Prefer governed okf_* MCP tools when available, with repository CLI and filesystem fallbacks. Use for natural-language questions about an adapted knowledge bundle, evidence-backed wiki curation, graph maintenance, source promotion, broken-link or orphan audits, especially for Herding Cats Polychrome, Iteramind, and XBOL.
+description: Explore, investigate, query, collect, reference, organize, link, ingest, lint, and tidy governed OKF Markdown bundles that live as files in a repository, with optional OpenViking recall. Use for natural-language questions about an adapted knowledge bundle, evidence-backed wiki curation, graph maintenance, source promotion, broken-link or orphan audits, in Herding Cats Polychrome, XBOL, and Iteramind's local corpus. A corpus reached through a hosted MCP connector is covered by its own skill instead.
 ---
 
 # OKF Knowledge Operations
@@ -25,41 +25,20 @@ find context, never to overrule evidence.
 For a known adapter, read its named sources of truth instead of rescanning the
 filesystem for instructions. Run direct, single-purpose reads and searches.
 
-## Prefer the Governed MCP Surface Where One Exists
+## This Skill Covers File-Based Bundles
 
-A bundle is reached either by opening its files or by calling a hosted server.
-A server exists to reach files the surface cannot open for itself, so a bundle in
-the working repository normally has none. Check which case applies before
-choosing an approach; do not assume `okf_*` tools exist, and do not fall back to
-raw file reads for a bundle that is only reachable through a server.
+Every adapter here is read and written as files in a repository, with the
+adapter's own command and `rg`. None of them has a server, and none needs one:
+a server exists to reach files a surface cannot open for itself.
 
-When `okf_context` and the other `okf_*` tools are available for the target
-bundle:
+A corpus reached only through a hosted MCP connector is a different thing with
+its own instructions. Iteramind's shared corpus is the current example, covered
+by the `okf-shared-corpus` skill. Do not go looking for its files, and do not
+assume `okf_*` tools apply to the bundles here.
 
-1. If the bundle name is not already known, call `okf_list_bundles`; never guess
-   a bundle name or ask the user before using the discovery tool. A hosted
-   deployment usually serves exactly one bundle and refuses every other name.
-2. Call `okf_context` for the selected bundle before substantive work.
-3. Prefer `okf_list`, `okf_search`, `okf_read`, and `okf_links` to raw
-   filesystem traversal. Keep every call inside one named bundle.
-4. Use `okf_validate` for a read-only health check.
-5. For one-file creates or updates, call `okf_preview_change` first and show the
-   returned diff, then wait for explicit user authorization before saving. Two
-   save protocols exist, so use whichever the server exposes:
-   - `okf_apply_change` takes the same content and the `sha` from `okf_read`
-     again, and stores nothing between the two calls;
-   - `okf_apply_proposal` takes a `proposal_id` returned by the preview, which
-     expires.
-6. Do not bypass a failed preview, a stale sha, an expired proposal, a rejected
-   save, a post-write validator, or a rollback by editing the file another way.
-
-The MCP surface does not cover deletion, rename, bulk edit, promotion, commit,
-publication, or OpenViking operations. Use the adapter's established local
-workflow when the tools are absent or the authorized operation is outside that
-surface. Never treat tool availability as write authorization.
-
-When a bundle has no server, its governance is the adapter's validator. Run it
-before proposing a change and again after writing, and report what it said.
+Governance for the bundles here is the adapter's validator and post-write
+checks. Run them before proposing a change and again after writing, and report
+what they said.
 
 ## Apply Authority
 

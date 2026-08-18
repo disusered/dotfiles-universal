@@ -61,50 +61,25 @@ XBOL.
 
 - Aliases: `Iteramind`, `ITERAMIND`.
 - Repository: `/home/carlos/Development/ITERAMIND`.
-- Private OKF root and index: `knowledge/private/` and
-  `knowledge/private/index.md`.
-- Shared OKF corpus: Markdown objects in the `iteramind-okf` R2 bucket, under the
-  `shared/` key prefix with `shared/index.md` as its index. Reached only through
-  the hosted server; it is in no repository.
-- Authority: repository `AGENTS.md`, `CONTEXT.md`, and the relevant decision
-  and runbook in the selected bundle.
-- Writable scope: one exact bundle per operation. The private bundle is
-  Carlos-only; the shared bundle accepts stable, reviewed, bot-safe knowledge
-  only. Promotion is an explicit content change, never a synchronization job.
-- Reaching each bundle differs, and this is the point rather than an accident:
-  - Private: files in the working repository. There is no server. Read the index,
-    search with `rg`, and edit with ordinary file tools. In Claude Desktop this
-    requires the repository folder to be shared with Cowork.
-  - Shared: the hosted server `okf-shared` at `https://okf.iteramind.dev/mcp`,
-    behind Cloudflare Access. Call `okf_context` for the `shared` bundle and use
-    the bounded reads, search, and links. Its save tool is `okf_apply_change`,
-    which resends the content and the `sha` from `okf_read`; there is no
-    proposal to expire. Any bundle name other than `shared` is refused.
-  - There is no local copy of the shared corpus anywhere. `knowledge/shared/` and
-    `iteramind/okf-shared`'s `shared/` were both removed once the bucket became
-    the store. `iteramind/okf-shared` now holds only `scripts/validate_okf.py`,
-    which is the reference for the profile the server enforces in TypeScript.
+- OKF root and index: `knowledge/private/` and `knowledge/private/index.md`.
+- Authority: repository `AGENTS.md`, `CONTEXT.md`, and the relevant decision and
+  runbook in the bundle.
+- Writable scope: `knowledge/private/`, which is Carlos-only. Keep credentials
+  and raw client secrets out of it.
+- Query: start at the index, search with `rg`, then read directly.
 - Capture: keep client-specific context in its Project Repository. Treat
   Polychrome and XBOL as read-through references and do not copy their memories
   into Iteramind.
-- OpenViking: `iteramind-dev` via
-  `~/.openviking/ovcli-iteramind.conf`. Resource ingestion remains a separate
-  explicit request.
-- After authored private changes, from the repository root:
+- OpenViking: `iteramind-dev` via `~/.openviking/ovcli-iteramind.conf`. Resource
+  ingestion remains a separate explicit request.
+- After authored changes, from the repository root:
   1. `uv run python scripts/validate_okf.py knowledge/private`
   2. `uv run python -m unittest discover -s tests`
 
-  The shared corpus is validated by its own repository's CI, not from here.
-
-Nothing runs a local OKF server for this repository. `.agents/okf.yaml` remains
-as an adapter manifest, but no harness loads it, so the validator above is the
-whole of private-corpus governance: run it before proposing a change and again
-after writing. The hosted shared server runs its own checks and reports command
-receipts; do not rerun those merely for duplication.
-
-The Shared Bot consumes only `knowledge/shared/` and separate bot memory. It
-must never receive the Control Repository checkout or Carlos's development
-memory.
+Iteramind's shared corpus is not covered by this skill. It is not files: it is
+objects in an R2 bucket reached only through a hosted MCP connector, and the
+`okf-shared-corpus` skill covers it. Nothing in this repository is that corpus,
+so do not look for it here.
 
 ## Unknown Bundle
 
