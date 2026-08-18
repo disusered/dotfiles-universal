@@ -63,9 +63,9 @@ XBOL.
 - Repository: `/home/carlos/Development/ITERAMIND`.
 - Private OKF root and index: `knowledge/private/` and
   `knowledge/private/index.md`.
-- Shared OKF corpus: the `iteramind/okf-shared` repository, bundle root
-  `shared/` with `shared/index.md`. Reached through the hosted server, not from
-  this repository.
+- Shared OKF corpus: Markdown objects in the `iteramind-okf` R2 bucket, under the
+  `shared/` key prefix with `shared/index.md` as its index. Reached only through
+  the hosted server; it is in no repository.
 - Authority: repository `AGENTS.md`, `CONTEXT.md`, and the relevant decision
   and runbook in the selected bundle.
 - Writable scope: one exact bundle per operation. The private bundle is
@@ -80,10 +80,10 @@ XBOL.
     the bounded reads, search, and links. Its save tool is `okf_apply_change`,
     which resends the content and the `sha` from `okf_read`; there is no
     proposal to expire. Any bundle name other than `shared` is refused.
-  - `knowledge/shared/` may still exist in the working repository as a stale copy
-    from before the split. The hosted server reads `iteramind/okf-shared`, so
-    treat that repository as the shared corpus and never edit the local copy
-    expecting the server to see it.
+  - There is no local copy of the shared corpus anywhere. `knowledge/shared/` and
+    `iteramind/okf-shared`'s `shared/` were both removed once the bucket became
+    the store. `iteramind/okf-shared` now holds only `scripts/validate_okf.py`,
+    which is the reference for the profile the server enforces in TypeScript.
 - Capture: keep client-specific context in its Project Repository. Treat
   Polychrome and XBOL as read-through references and do not copy their memories
   into Iteramind.
