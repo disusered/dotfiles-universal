@@ -40,7 +40,10 @@ global:
       - ~/.agents/skills/brain-portal
       - ~/.claude/skills/brain-portal
       - ~/.config/opencode/skills/brain-portal
-    plain-english: ~/.claude/skills/plain-english
+    plain-english:
+      - ~/.agents/skills/plain-english
+      - ~/.claude/skills/plain-english
+      - ~/.config/opencode/skills/plain-english
     git-commit/commands/git-commit.md:
       - ~/.config/opencode/commands/git-commit.md
       - ~/.claude/commands/git-commit.md
@@ -50,7 +53,6 @@ global:
     grill-with-docs/commands/grill-with-docs.md:
       - ~/.config/opencode/commands/grill-with-docs.md
       - ~/.claude/commands/grill-with-docs.md
-    plain-english/commands/plain-english.md: ~/.claude/commands/plain-english.md
 linux:
   links:
     cocoindex:
