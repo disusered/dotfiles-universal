@@ -3,6 +3,18 @@
 Neo4j Desktop plus a rootless, loopback-only Neo4j Community instance for local
 derived knowledge graphs.
 
+## Not installed
+
+Removed from the workstation on 2026-08-19. Its only consumer was
+`XBOL/scripts/xbol-index`, which pipes CocoIndex into this graph, and XBOL work
+is no longer hosted here. CocoIndex was also uninstalled; it never proved its
+value next to OKF and OpenViking.
+
+The module is kept so the service can be stood up elsewhere. Its Rotz recipe is
+held as `dot.yaml.disabled` so an install cannot bring it back by accident.
+Rename it to `dot.yaml` to deploy. The `Neo4j Local` 1Password item was left in
+place.
+
 The Rotz install creates or repairs a `Neo4j Local` login in the Personal
 1Password vault, renders `~/.config/neo4j/neo4j.env` with mode `0600`, and
 starts the `neo4j.service` user unit. Data and logs use persistent Podman named
