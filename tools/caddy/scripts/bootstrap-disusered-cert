@@ -1,0 +1,21 @@
+#!/bin/sh
+set -eu
+
+credentials_file=/etc/letsencrypt/cloudflare.ini
+
+if ! test -r "$credentials_file"; then
+	echo "Missing $credentials_file" >&2
+	exit 1
+fi
+
+certbot certonly \
+	--dns-cloudflare \
+	--dns-cloudflare-credentials "$credentials_file" \
+	--cert-name disusered.com \
+	--non-interactive \
+	--agree-tos \
+	--email crosquillas@gmail.com \
+	-d disusered.com \
+	-d '*.disusered.com'
+
+/usr/local/lib/caddy/deploy-disusered-cert

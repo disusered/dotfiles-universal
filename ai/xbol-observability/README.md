@@ -43,7 +43,7 @@ Quadlet units:
 - `xbol-grafana.service`
   - container: `xbol-grafana`
   - local URL: `http://127.0.0.1:43000`
-  - tailnet URL recorded in 1Password: `http://xbol.disusered.com`
+  - tailnet URL recorded in 1Password: `https://xbol.disusered.com`
   - datasources: `XBOL VictoriaMetrics`, `XBOL Loki`
   - runtime state: Podman named volume `xbol-grafana-data`
   - auth: anonymous disabled, `carlos` is Grafana admin, `xbol-agent` service account is Editor
@@ -136,7 +136,7 @@ xbol-grafana-bootstrap apply --rotate-agent-token
 Useful URLs:
 
 - Grafana: `http://127.0.0.1:43000`
-- Tailnet Grafana: `http://xbol.disusered.com`
+- Tailnet Grafana: `https://xbol.disusered.com`
 - VictoriaMetrics UI: `http://127.0.0.1:8428/vmui/`
 - Loki labels API: `http://127.0.0.1:3100/loki/api/v1/labels`
 - Alloy UI: `http://127.0.0.1:12345`

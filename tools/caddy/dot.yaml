@@ -1,15 +1,24 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      if ! pacman -Qi caddy &>/dev/null; then
-        sudo pacman -S --noconfirm --needed caddy
+      set -eu
+      if ! pacman -Qi caddy certbot certbot-dns-cloudflare &>/dev/null; then
+        sudo pacman -Syy --noconfirm --needed caddy certbot certbot-dns-cloudflare
       fi
       sudo mkdir -p /etc/caddy
-      sudo cp ~/.dotfiles/tools/caddy/Caddyfile /etc/caddy/Caddyfile
-      sudo chown root:root /etc/caddy/Caddyfile
-      sudo cp ~/.dotfiles/tools/caddy/caddy.service /etc/systemd/system/caddy.service
-      sudo chown root:root /etc/systemd/system/caddy.service
-      sudo rm -f /etc/systemd/system/caddy.service.d/tailscale.conf
+      sudo install -Dm0750 ~/.dotfiles/tools/caddy/scripts/deploy-disusered-cert /usr/local/lib/caddy/deploy-disusered-cert
+      sudo install -Dm0750 ~/.dotfiles/tools/caddy/scripts/bootstrap-disusered-cert /usr/local/lib/caddy/bootstrap-disusered-cert
+      sudo install -Dm0644 ~/.dotfiles/tools/caddy/systemd/caddy-acme-renew.service /etc/systemd/system/caddy-acme-renew.service
+      sudo install -Dm0644 ~/.dotfiles/tools/caddy/systemd/caddy-acme-renew.timer /etc/systemd/system/caddy-acme-renew.timer
       sudo systemctl daemon-reload
-      sudo systemctl enable caddy.service
-      sudo systemctl restart caddy.service
+      sudo systemctl enable --now caddy-acme-renew.timer
+      if sudo test -r /var/lib/caddy/tls/disusered.com/fullchain.pem && sudo test -r /var/lib/caddy/tls/disusered.com/privkey.pem; then
+        sudo install -Dm0644 ~/.dotfiles/tools/caddy/Caddyfile /etc/caddy/Caddyfile
+        sudo install -Dm0644 ~/.dotfiles/tools/caddy/caddy.service /etc/systemd/system/caddy.service
+        sudo rm -f /etc/systemd/system/caddy.service.d/tailscale.conf
+        sudo systemctl daemon-reload
+        sudo systemctl enable caddy.service
+        sudo systemctl restart caddy.service
+      else
+        echo 'TLS certificate is not staged; run /usr/local/lib/caddy/bootstrap-disusered-cert after provisioning /etc/letsencrypt/cloudflare.ini.'
+      fi

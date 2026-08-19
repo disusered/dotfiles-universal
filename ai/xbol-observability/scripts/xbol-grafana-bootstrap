@@ -11,7 +11,7 @@ from urllib import error, parse, request
 
 
 DEFAULT_GRAFANA_URL = "http://127.0.0.1:43000"
-PUBLIC_GRAFANA_URL = "http://xbol.disusered.com"
+PUBLIC_GRAFANA_URL = "https://xbol.disusered.com"
 OP_VAULT = "Personal"
 OP_ITEM_TITLE = "XBOL Grafana Local"
 ADMIN_LOGIN = "admin"

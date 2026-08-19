@@ -7,7 +7,7 @@ Rotz-managed local RomM stack.
 - App: `romm.service`, container `romm`, image `docker.io/rommapp/romm:latest`
 - Database: `romm-db.service`, container `romm-db`, image `docker.io/library/mariadb:latest`
 - Local URL: `http://127.0.0.1:47224`
-- Tailnet URL: `http://romm.disusered.com`
+- Tailnet URL: `https://romm.disusered.com`
 - 1Password item: `op://Personal/RomM Local`
 
 The app is exposed only on localhost. Caddy publishes the tailnet route.
@@ -62,5 +62,5 @@ Then check:
 romm-smoke
 ```
 
-On first boot, open `http://romm.disusered.com` and complete RomM's setup
+On first boot, open `https://romm.disusered.com` and complete RomM's setup
 wizard. The first user becomes the admin user.

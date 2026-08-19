@@ -80,7 +80,7 @@ class RommInitTests(unittest.TestCase):
 
         created_item = json.loads(create_call["input_text"])
         self.assertEqual(created_item["title"], "RomM Local")
-        self.assertEqual(created_item["urls"][0]["href"], "http://romm.disusered.com")
+        self.assertEqual(created_item["urls"][0]["href"], "https://romm.disusered.com")
         self.assertEqual(secrets.db_root_password, "db_root_password-generated-secret")
         self.assertEqual(secrets.db_password, "db_password-generated-secret")
         self.assertEqual(secrets.auth_secret_key, "auth_secret_key-generated-secret")
@@ -128,7 +128,7 @@ class RommInitTests(unittest.TestCase):
         self.assertNotIn("auth_secret_key-generated-secret", argv_text)
 
         edited_item = json.loads(edit_call["input_text"])
-        self.assertEqual(edited_item["urls"][0]["href"], "http://romm.disusered.com")
+        self.assertEqual(edited_item["urls"][0]["href"], "https://romm.disusered.com")
         self.assertEqual(secrets.db_password, "existing-db-password")
         self.assertEqual(secrets.db_root_password, "db_root_password-generated-secret")
         self.assertEqual(secrets.auth_secret_key, "auth_secret_key-generated-secret")

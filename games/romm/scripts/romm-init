@@ -8,7 +8,7 @@ import subprocess
 
 OP_VAULT = "Personal"
 OP_ITEM_TITLE = "RomM Local"
-PUBLIC_ROMM_URL = "http://romm.disusered.com"
+PUBLIC_ROMM_URL = "https://romm.disusered.com"
 ROMM_HOME = Path.home() / ".config" / "romm"
 ENV_TEMPLATE = ROMM_HOME / "env.tpl"
 ENV_FILE = ROMM_HOME / "romm.env"

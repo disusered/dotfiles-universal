@@ -66,7 +66,7 @@ class XbolGrafanaBootstrapTests(unittest.TestCase):
 
         created_item = json.loads(create_call["input_text"])
         self.assertEqual(created_item["title"], "XBOL Grafana Local")
-        self.assertEqual(created_item["urls"][0]["href"], "http://xbol.disusered.com")
+        self.assertEqual(created_item["urls"][0]["href"], "https://xbol.disusered.com")
         self.assertEqual(secrets.admin_password, "admin_password-generated-secret")
         self.assertEqual(secrets.carlos_password, "carlos_password-generated-secret")
         self.assertEqual(secrets.agent_service_account_token, "")
@@ -99,7 +99,7 @@ class XbolGrafanaBootstrapTests(unittest.TestCase):
         self.assertNotIn("admin-secret", " ".join(edit_call["args"]))
 
         edited_item = json.loads(edit_call["input_text"])
-        self.assertEqual(edited_item["urls"][0]["href"], "http://xbol.disusered.com")
+        self.assertEqual(edited_item["urls"][0]["href"], "https://xbol.disusered.com")
         self.assertEqual(secrets.admin_password, "admin-secret")
         self.assertEqual(secrets.carlos_password, "carlos_password-generated-secret")
 

@@ -1,4 +1,4 @@
-ROMM_BASE_URL=http://romm.disusered.com
+ROMM_BASE_URL=https://romm.disusered.com
 ROMM_PORT=8080
 ROMM_DB_DRIVER=mariadb
 DB_HOST=romm-db

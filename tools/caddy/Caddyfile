@@ -2,8 +2,13 @@
 	admin off
 }
 
-http://opencode.disusered.com {
+(disusered_tls) {
+	tls /var/lib/caddy/tls/disusered.com/fullchain.pem /var/lib/caddy/tls/disusered.com/privkey.pem
+}
+
+opencode.disusered.com {
 	bind {$CADDY_TAILSCALE_IP}
+	import disusered_tls
 	reverse_proxy 127.0.0.1:3014 {
 		flush_interval -1
 		header_up Host {host}
@@ -17,28 +22,33 @@ http://opencode.disusered.com {
 	}
 }
 
-http://search.disusered.com {
+search.disusered.com {
 	bind {$CADDY_TAILSCALE_IP}
+	import disusered_tls
 	reverse_proxy localhost:47123
 }
 
-http://romm.disusered.com {
+romm.disusered.com {
 	bind {$CADDY_TAILSCALE_IP}
+	import disusered_tls
 	reverse_proxy localhost:47224
 }
 
-http://xbol.disusered.com {
+xbol.disusered.com {
 	bind {$CADDY_TAILSCALE_IP}
+	import disusered_tls
 	reverse_proxy localhost:43000
 }
 
-http://brain.disusered.com {
+brain.disusered.com {
 	bind {$CADDY_TAILSCALE_IP}
+	import disusered_tls
 	reverse_proxy 127.0.0.1:43110
 }
 
-http://harness.disusered.com {
+harness.disusered.com {
 	bind {$CADDY_TAILSCALE_IP}
+	import disusered_tls
 	reverse_proxy 127.0.0.1:43120 {
 		flush_interval -1
 		header_up Host {host}

@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+
+source_dir=/etc/letsencrypt/live/disusered.com
+destination_dir=/var/lib/caddy/tls/disusered.com
+
+test -r "$source_dir/fullchain.pem"
+test -r "$source_dir/privkey.pem"
+
+install -d -o root -g caddy -m 0750 "$destination_dir"
+install -o root -g caddy -m 0640 "$source_dir/fullchain.pem" "$destination_dir/fullchain.pem"
+install -o root -g caddy -m 0640 "$source_dir/privkey.pem" "$destination_dir/privkey.pem"
+systemctl kill --signal=USR1 caddy.service
