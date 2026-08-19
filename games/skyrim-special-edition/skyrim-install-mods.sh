@@ -133,6 +133,23 @@ while IFS= read -r line || [ -n "$line" ]; do
   enabled=${F[0]-}   name=${F[1]-}     archive=${F[2]-}    sha256=${F[3]-}
   destination=${F[4]-} archive_root=${F[5]-} plugins=${F[6]-} source_url=${F[7]-}
   [ "$enabled" = no ] && continue
+
+  # Collect the load order from every enabled row, before any check that can
+  # skip the row.
+  #
+  # This used to happen only for rows that actually installed, which quietly
+  # made the load order depend on what happened to be sitting in the staging
+  # dir. Archives are transient — they get cleared out after an install — so a
+  # later run with an empty staging dir would rewrite Plugins.txt from the two
+  # or three mods still staged and *disable everything else*, USSEP included.
+  # The manifest is the declaration of what is installed; a missing archive
+  # says nothing about whether the mod is in Data/. Skyrim ignores entries for
+  # plugins that do not exist, so listing one costs nothing.
+  if [ -n "${plugins:-}" ]; then
+    IFS=',' read -ra ps <<<"$plugins"
+    for p in "${ps[@]}"; do [ -n "$p" ] && ORDERED_PLUGINS+=("$p"); done
+  fi
+
   if [ "$archive_root" = FOMOD-PICK-SUBDIRS ]; then
     echo "SKIP  $name: FOMOD archive with no archive_root chosen"
     note "re-run --scan to list candidate subdirs, then set archive_root"
@@ -230,11 +247,6 @@ while IFS= read -r line || [ -n "$line" ]; do
     echo "INSTALLED  $name -> ${target#"$LIB"/}"
   fi
   installed=$((installed + 1))
-
-  if [ -n "${plugins:-}" ]; then
-    IFS=',' read -ra ps <<<"$plugins"
-    for p in "${ps[@]}"; do [ -n "$p" ] && ORDERED_PLUGINS+=("$p"); done
-  fi
 done < "$MANIFEST"
 
 # ── config overlay ────────────────────────────────────────────────────────
