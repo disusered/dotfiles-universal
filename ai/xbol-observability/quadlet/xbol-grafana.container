@@ -6,7 +6,7 @@ Requires=xbol-victoriametrics.service xbol-loki.service
 [Container]
 ContainerName=xbol-grafana
 Image=docker.io/grafana/grafana-oss:latest
-Pull=never
+Pull=missing
 Network=xbol-observability.network
 PublishPort=127.0.0.1:43000:3000
 Volume=xbol-grafana-data:/var/lib/grafana

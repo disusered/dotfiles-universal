@@ -6,7 +6,7 @@ Requires=romm-db.service
 [Container]
 ContainerName=romm
 Image=docker.io/rommapp/romm:latest
-Pull=never
+Pull=missing
 Network=romm.network
 EnvironmentFile=%h/.config/romm/romm.env
 PublishPort=127.0.0.1:47224:8080

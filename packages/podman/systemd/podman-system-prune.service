@@ -4,5 +4,8 @@ Description=Prune unused rootless Podman containers and images
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/podman container prune --force --filter until=168h
-ExecStart=/usr/bin/podman image prune --force --all --external --filter until=168h
+# Dangling images only. --all removes every image without a running
+# container, which deletes the images quadlets name by tag; anything stopped
+# at prune time then cannot start again.
+ExecStart=/usr/bin/podman image prune --force --external --filter until=168h
 IOSchedulingClass=idle

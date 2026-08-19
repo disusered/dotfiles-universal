@@ -6,7 +6,7 @@ Wants=network-online.target
 [Container]
 ContainerName=xbol-loki
 Image=docker.io/grafana/loki:latest
-Pull=never
+Pull=missing
 Network=xbol-observability.network
 PublishPort=127.0.0.1:3100:3100
 Volume=%h/.dotfiles/ai/xbol-observability/loki/config.yaml:/etc/loki/config.yaml:ro

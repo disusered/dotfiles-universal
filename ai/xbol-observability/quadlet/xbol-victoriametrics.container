@@ -4,7 +4,7 @@ Description=XBOL VictoriaMetrics local TSDB
 [Container]
 ContainerName=xbol-victoriametrics
 Image=docker.io/victoriametrics/victoria-metrics:latest
-Pull=never
+Pull=missing
 Network=xbol-observability.network
 PublishPort=127.0.0.1:8428:8428
 Volume=%h/.local/share/xbol-observability/victoriametrics:/victoria-metrics-data:Z
