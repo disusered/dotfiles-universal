@@ -45,7 +45,13 @@ harness.disusered.com {
 	import disusered_tls
 	reverse_proxy 127.0.0.1:43120 {
 		flush_interval -1
-		header_up Host {host}
+		# The harness pins its settings, credential, and preset-editing methods to
+		# a loopback Host with a matching Origin, and ships no authentication to
+		# widen that. The tailnet bind is this deployment's trust boundary, so
+		# state that upstream. Never add a Sec-Fetch-Site header_up: the harness
+		# still uses it to refuse cross-site browser requests.
+		header_up Host 127.0.0.1:43120
+		header_up Origin http://127.0.0.1:43120
 		header_up X-Real-IP {remote_host}
 		header_up X-Forwarded-For {remote_host}
 		header_up X-Forwarded-Proto {scheme}
