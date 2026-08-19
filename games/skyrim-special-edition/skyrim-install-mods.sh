@@ -23,6 +23,8 @@ APP_ID=489830
 MODULE_DIR="${SKYRIM_MODULE_DIR:-$HOME/.dotfiles/games/skyrim-special-edition}"
 MANIFEST="${SKYRIM_MOD_MANIFEST:-$MODULE_DIR/mods/manifest.tsv}"
 STAGING="${SKYRIM_MOD_STAGING:-$HOME/Downloads/skyrim-mods}"
+CONFIG_DIR="${SKYRIM_MOD_CONFIG:-$MODULE_DIR/mods/config}"
+STATE_DIR="${SKYRIM_MOD_STATE:-$HOME/.local/state/skyrim-mods}"
 
 MODE=install
 case "${1:-}" in
@@ -197,6 +199,16 @@ while IFS= read -r line || [ -n "$line" ]; do
     fi
 
     mkdir -p "$target"
+
+    # Record which files this archive owns, before copying them.
+    #
+    # There is no mod manager here, so nothing else knows what belongs to what.
+    # Without this list, removing one mod means verifying the whole game through
+    # Steam and reinstalling every other mod on top — which is the wrong answer
+    # for a mod set that is now large enough to want individual mods gone.
+    mkdir -p "$STATE_DIR"
+    : > "$STATE_DIR/$archive.files"
+
     for r in "${roots[@]}"; do
       # Unwrap a Data/ folder only for data-destined mods. Root-destined
       # archives (SKSE ships skse64_loader.exe *and* a Data/Scripts alongside
@@ -208,6 +220,10 @@ while IFS= read -r line || [ -n "$line" ]; do
           [ -d "$d" ] && { s=$d; break; }
         done
       fi
+      # Paths are recorded destination-prefixed, so a remover knows whether a
+      # name is Data-relative or beside the exe without re-reading the manifest.
+      (cd "$s" && find . -type f -printf '%P\n') \
+        | sed "s|^|$destination/|" >> "$STATE_DIR/$archive.files"
       cp -a "$s"/. "$target"/
     done
     rm -rf "$tmp"
@@ -221,10 +237,46 @@ while IFS= read -r line || [ -n "$line" ]; do
   fi
 done < "$MANIFEST"
 
+# ── config overlay ────────────────────────────────────────────────────────
+# Mods ship their own .ini/.json/.toml defaults inside the archive, and the loop
+# above copies them verbatim — so every re-run silently reset whatever had been
+# tuned in game, and the other machine always started from mod defaults. The
+# repo owns these files instead: mods/config/ mirrors the two destinations,
+# mods/config/root/ landing beside SkyrimSE.exe and mods/config/data/ in Data/.
+#
+# Applied in one pass *after* every archive is unpacked, deliberately. Doing it
+# per mod would let an archive installed later in the manifest overwrite an
+# earlier mod's config, which is the whole bug being fixed here.
+configured=0
+for scope in root data; do
+  src="$CONFIG_DIR/$scope"
+  [ -d "$src" ] || continue
+  case "$scope" in root) target="$GAME_DIR" ;; data) target="$DATA_DIR" ;; esac
+  while IFS= read -r rel; do
+    [ -n "$rel" ] || continue
+    if [ "$MODE" = dryrun ]; then
+      echo "WOULD APPLY CONFIG  $scope/$rel"
+    else
+      mkdir -p "$target/$(dirname "$rel")"
+      cp -a "$src/$rel" "$target/$rel"
+    fi
+    configured=$((configured + 1))
+  done < <(cd "$src" && find . -type f -printf '%P\n' | sort)
+done
+[ "$configured" -eq 0 ] || echo "Config overlay: $configured file(s) from ${CONFIG_DIR#"$HOME"/}"
+
 # ── load order ────────────────────────────────────────────────────────────
 # Skyrim SE marks enabled plugins with a leading '*'. The file is Plugins.txt
 # with a capital P; the filesystem is case-sensitive even though Wine is not,
 # so the name is written exactly as the game creates it.
+#
+# Only .esp files need to be listed. Skyrim SE loads every ESM- and ESL-flagged
+# plugin it finds in Data/ whether or not Plugins.txt mentions it, which is why
+# writing only the manifest's plugins does not disable the DLC, _ResourcePack.esl
+# or the Creation Club content. Verified by reading the plugin list back out of a
+# save: all four cc* plugins and _ResourcePack.esl load while Plugins.txt names
+# nothing but USSEP and SkyUI. USSEP hard-masters all five, so this is load-
+# bearing — do not "fix" it by listing them here.
 PLUGINS_TXT="${SKYRIM_PLUGINS_TXT:-$LIB/steamapps/compatdata/$APP_ID/pfx/drive_c/users/steamuser/AppData/Local/Skyrim Special Edition/Plugins.txt}"
 if [ "$MODE" != dryrun ] && [ ${#ORDERED_PLUGINS[@]} -gt 0 ] && [ -d "$(dirname "$PLUGINS_TXT")" ]; then
   {

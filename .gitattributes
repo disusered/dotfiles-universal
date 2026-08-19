@@ -1,0 +1,7 @@
+# Windows-side configuration consumed by SKSE plugins under Proton.
+#
+# skyrim-install-mods copies mods/config/ verbatim into the game directory, so
+# these files must reach the game exactly as committed. This repo sets
+# core.autocrlf=input, which would rewrite their CRLF endings to LF on commit
+# and hand a Windows DLL a file it never shipped. -text disables all conversion.
+games/skyrim-special-edition/mods/config/** -text
