@@ -34,12 +34,6 @@ romm.disusered.com {
 	reverse_proxy localhost:47224
 }
 
-xbol.disusered.com {
-	bind {$CADDY_TAILSCALE_IP}
-	import disusered_tls
-	reverse_proxy localhost:43000
-}
-
 brain.disusered.com {
 	bind {$CADDY_TAILSCALE_IP}
 	import disusered_tls

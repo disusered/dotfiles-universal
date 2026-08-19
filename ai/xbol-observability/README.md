@@ -2,6 +2,23 @@
 
 Local, container-first metrics and logs stack for XBOL.
 
+## Not deployed
+
+This stack no longer runs on Carlos' workstation. Work services are not hosted
+there any more, and the stack was reclaiming roughly 1.1 GB of metrics, logs,
+and Cloud Logging spool for dashboards nobody opened.
+
+Everything needed to stand it up again is kept here: quadlets, Alloy and Loki
+configuration, Grafana provisioning and dashboards, the log fetcher, and its
+systemd units. Only the Rotz recipe is disabled, held as `dot.yaml.disabled`
+so `rotz install` cannot redeploy it by accident.
+
+To deploy it on a server, rename `dot.yaml.disabled` back to `dot.yaml` and run
+the module. Two things are workstation-specific and need revisiting first: the
+recipe reads Carlos' `~/.config/gcloud/application_default_credentials.json`,
+and the `xbol.disusered.com` Caddy route and DNS record were removed, so the
+Grafana host has to be published some other way.
+
 ## Shape
 
 ```text
