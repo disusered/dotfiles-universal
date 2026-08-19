@@ -21,6 +21,10 @@ global:
       - ~/.agents/skills/okf-knowledge-ops
       - ~/.claude/skills/okf-knowledge-ops
       - ~/.config/opencode/skills/okf-knowledge-ops
+    okf-shared-corpus:
+      - ~/.agents/skills/okf-shared-corpus
+      - ~/.claude/skills/okf-shared-corpus
+      - ~/.config/opencode/skills/okf-shared-corpus
     openviking-profiles:
       - ~/.agents/skills/openviking-profiles
       - ~/.claude/skills/openviking-profiles

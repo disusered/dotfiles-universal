@@ -1,0 +1,24 @@
+This module vendors two upstream works. Both are redistributed under their own
+licenses; neither is original to this repository.
+
+1. The Open Knowledge Format v0.2 specification
+   reference/SPEC.md
+   Copyright (c) Google LLC
+   Licensed under the Apache License, Version 2.0.
+   Full text: reference/LICENSE-APACHE-2.0.txt
+   Source: https://github.com/GoogleCloudPlatform/knowledge-catalog
+           okf/SPEC.md at commit 3fcbb9f828c2f23d109c855ee403c3a4c81f3a96
+   Included verbatim. This is the normative reference for every OKF bundle here.
+
+2. The OKF conformance checker and graph visualizer
+   bin/okf_validate.py, bin/okf_visualize.py, tests/test_okf_validate.py
+   Copyright (c) Marco Boffo
+   Licensed under the MIT License.
+   Full text: LICENSE-MIT.txt
+   Source: https://github.com/scaccogatto/okf-skills
+           tag okf--v0.7.2, commit aa678799eb1018080bad42494fcaa83e77ff8fb5
+   The two scripts are unmodified. The test suite carries one local change: its
+   sys.path insert points at ../bin rather than upstream's directory layout.
+
+Google's upstream ships an authoring agent and an HTML viewer but no validator,
+which is why the checker comes from the second source rather than the first.

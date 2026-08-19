@@ -53,3 +53,4 @@ ai/claude/.cache/
 /ai/opencode/commands/git-commit.md
 /ai/claude/commands/git-commit.md
 /ai/xbol-observability/tests/__pycache__
+/ai/okf/bin/__pycache__

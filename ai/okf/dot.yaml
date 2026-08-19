@@ -1,0 +1,9 @@
+global:
+  installs:
+    cmd: uv run --no-project --with "pyyaml>=6" python -c "import yaml" >/dev/null
+    depends:
+      - /languages/python/uv
+  links:
+    reference: ~/.local/share/okf/reference
+    bin: ~/.local/share/okf/bin
+    tests: ~/.local/share/okf/tests

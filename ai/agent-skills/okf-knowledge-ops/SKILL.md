@@ -9,6 +9,13 @@ Treat an adapted OKF bundle as authored durable knowledge plus optional,
 profile-scoped OpenViking recall. Preserve authority boundaries; use recall to
 find context, never to overrule evidence.
 
+OKF v0.2 is specified at `~/.local/share/okf/reference/SPEC.md`. That file is the
+normative reference. Read it before authoring a new page type, changing
+frontmatter conventions, or judging whether a page conforms; do not work from
+memory of the format. A bundle conforms when every non-reserved Markdown file
+has parseable YAML frontmatter carrying a non-empty `type` (§11). Everything
+else the spec describes is guidance, so never reject a bundle over it.
+
 ## Resolve the Adapter
 
 1. Prefer a target path or alias stated by the user, then the repository that
@@ -94,7 +101,19 @@ unless the user explicitly authorized that exact operation.
 
 ## Finish
 
-Run the adapter's validation commands. Report durable evidence paths, checks
-actually run, unresolved conflicts or gaps, and OpenViking operations
-separately. Never claim an asynchronous memory write completed until retrieval
-verifies it.
+Run the adapter's validation commands and the shared conformance checker:
+
+```bash
+uv run ~/.local/share/okf/bin/okf_validate.py <bundle>
+```
+
+The two cover different ground and neither replaces the other. An adapter's
+validator enforces that bundle's domain rules — its type schema, its link
+conventions, its derived index. The shared checker enforces the specification,
+including the trust, lifecycle, provenance, and actor-convention rules no
+adapter checks today. Only its `ERROR` lines block; warnings are soft guidance,
+so fix them when cheap and report the rest.
+
+Report durable evidence paths, checks actually run, unresolved conflicts or
+gaps, and OpenViking operations separately. Never claim an asynchronous memory
+write completed until retrieval verifies it.

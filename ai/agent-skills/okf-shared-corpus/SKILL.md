@@ -77,6 +77,13 @@ Send whole page content, not a fragment — these tools replace a page rather th
 - Never add credentials, personal context, client-confidential material, or raw client data.
   If a page needs any of those to make sense, it does not belong here.
 
+The rules above are this corpus's profile, which is stricter than the format itself. OKF
+v0.2 is specified at `~/.local/share/okf/reference/SPEC.md`; read it before authoring a new
+page type or changing frontmatter conventions rather than working from memory. The server
+enforces the profile and refuses a non-conforming save, so the spec is for deciding what to
+write, not for second-guessing a refusal. You cannot run the shared conformance checker
+against this corpus — it is objects in a bucket, not files you can open.
+
 ## What this surface cannot do
 
 There is no delete, rename, or bulk edit. Those need a person with direct access, so ask
