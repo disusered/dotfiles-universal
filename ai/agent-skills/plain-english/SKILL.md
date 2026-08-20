@@ -10,9 +10,9 @@ wrote because it predates LLM prose. Use this skill when writing or repairing do
 `slop-clean` handles code slop — comments, defensive checks, casts. This handles prose. They
 do not overlap.
 
-The `Plain English` output style already enforces the core rules on every reply. Load this
-skill when you need the full word list, the document-formatting rules the output style omits,
-or a rewrite pass over existing text.
+The `Plain English` output style stays available but is not the active one — `Concise` is.
+Load this skill whenever you want these rules applied: the full word list, the
+document-formatting rules, or a rewrite pass over existing text.
 
 ## Apply the Rules
 

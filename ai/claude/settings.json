@@ -77,7 +77,7 @@
       }
     }
   },
-  "outputStyle": "Plain English",
+  "outputStyle": "Concise",
   "effortLevel": "xhigh",
   "advisorModel": "fable",
   "tui": "fullscreen",
