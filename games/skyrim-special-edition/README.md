@@ -107,6 +107,83 @@ windowrules) were all innocent; Civilization VI shares every one of them and wor
 `SkyrimPrefs.*.ini` is not in the game.** When in doubt, diff against
 `<gamedir>/Skyrim/SkyrimPrefs.ini` and check what you are dropping.
 
+## The game version is pinned to 1.6.1170
+
+**Do not let Steam update this game.** Every SKSE plugin is compiled against one
+runtime, so a Bethesda patch silently disables the entire mod set. This is not
+hypothetical — it happened on 2026-08-20 and cost an afternoon.
+
+Properties → Updates → *Only update this game when I launch it* is necessary but
+not sufficient: it defers the update to launch, it does not refuse it. Check for
+a pending download before launching, and if one is queued, do not launch through
+Steam.
+
+### Recovering when it updates anyway
+
+On 2026-08-20 a 2 GB patch moved the game to **1.7.99** (buildid 13189953 →
+24604991) and deleted `skse64_2_2_6.dll` outright. Everything under `Data/`
+survived; only the executable and the SKSE root files were affected.
+
+Staying current was tried first and does not work. SKSE 2.3.0 loads against
+1.7.99 and scans every plugin, but none initialise: they are built against a
+CommonLibSSE-NG that parses Address Library **format 4**, and the v12 library
+emits **format 5**. The failure is `REL/ID.h(166): Unsupported address library
+format: 5`, and `skse64.log` stops at `preinit complete` with zero successful
+loads. No combination works — v11 has no 1.7.99 database at all — so recovery
+means going back, not forward.
+
+Downgrade with the Steam client's own console. No third-party downgrade tool, no
+credentials handed to anything, and the files come from Valve:
+
+```sh
+steam -console      # adds a Console tab to the client
+```
+
+```
+download_depot 489830 489831 8442952117333549665
+download_depot 489830 489832 8042843504692938467
+download_depot 489830 489833 1914580699073641964
+```
+
+Those three manifest IDs are 1.6.1170. Depot 489833 is the 26 MB executable, the
+only one that decides the version. Files land in
+`~/.local/share/Steam/ubuntu12_32/steamapps/content/app_489830/` — note
+`ubuntu12_32`, not the `steamapps/content` path you would guess. Nothing is
+overwritten until you copy it yourself:
+
+```sh
+G="$(../lib/steam-find-app-path.sh 489830)/steamapps/common/Skyrim Special Edition"
+C=~/.local/share/Steam/ubuntu12_32/steamapps/content/app_489830
+for d in 489831 489832 489833; do cp -a "$C/depot_$d/." "$G/"; done
+strings "$G/SkyrimSE.exe" | grep -m1 '^1\.6\.'      # expect 1.6.1170.0
+```
+
+`cp` does not delete, so no mod file is touched — verified by diffing the depot
+file list against the per-archive lists in `~/.local/state/skyrim-mods/`. The
+copy does restore `Data/Video/BGS_Logo.bik`, so re-disable the intro afterwards.
+
+**Leave `appmanifest_489830.acf` alone.** It still reports buildid 24604991.
+Steam decides whether to update by comparing that number, not by hashing files,
+so a manifest claiming 1.7.99 over a 1.6.1170 install is what keeps Steam quiet.
+Correcting it invites the update straight back.
+
+Then restore SKSE 2.2.6. Silverlock has dropped it from the page — only the GOG
+2.2.6 build for 1.6.1179 is linked now — but the file is still served:
+
+```sh
+curl -O https://skse.silverlock.org/beta/skse64_2_02_06.7z
+```
+
+Drop it in `~/Downloads/skyrim-mods/` and run `skyrim-install-mods`; the manifest
+pins its hash, so a wrong or tampered file is refused. Address Library needs
+nothing: v12 only *adds* `versionlib-1-7-99-0.bin`, and the 1.6.1170 databases
+are still format 2. Delete that one file and `skse64_1_7_99.dll` if a v12 install
+left them behind.
+
+Moving to 1.7.99 becomes possible once every mod above ships a DLL rebuilt
+against a CommonLib that reads format 5. That is a wait on other authors, not on
+anything in this repo.
+
 ## Install
 
 Skyrim SE must already be installed from Steam on this machine.
