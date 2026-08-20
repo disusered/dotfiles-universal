@@ -95,3 +95,18 @@ yes	dMenu v1.2.1	dMenu-97221-1-2-1-1692833188.zip	9e85585d0a8839ed42a130d185bf45
 yes	dMenu NG - Patch v1.3 (after dMenu)	dMenu NG - Patch-166751-1-3-1773660820.zip	99b17d1ac46a96be6bba2375de7694ca1264faeca5abf1c833f94382fab9ac75	data			https://www.nexusmods.com/skyrimspecialedition/mods/166751?tab=files
 yes	Wheeler v1.2	Wheeler-97345-1-2-1692836360.zip	4a525e60d0e78de32b9183a244154ab655cbad65af8193282293a6945f815092	data			https://www.nexusmods.com/skyrimspecialedition/mods/97345?tab=files
 yes	Wheeler - Refined v1.3.3.0 (after Wheeler)	Wheeler - Refined-167380-1-3-3-0-1777485500.zip	6b93b8ddd48f2ad743b88f7366bc7c6c9f63ddac10894d80508ba4b43a402f24	data			https://www.nexusmods.com/skyrimspecialedition/mods/167380?tab=files
+yes	Compass Navigation Overhaul v2.2.0	Compass Navigation Overhaul-74484-2-2-0-1710712304.rar	a32ae6e0cc6d685ba114d1f415feda0d204cd792557fa106862b5bedb33f3473	data			https://www.nexusmods.com/skyrimspecialedition/mods/74484?tab=files
+#
+# Frameworks pulled in by the mods below, found on their Requirements tabs:
+# Scaleform Translation Plus Plus NG is required by Quest Journal Overhaul, and
+# MCM Helper by Junk It. Both are listed first so they land before their users.
+yes	Scaleform Translation Plus Plus NG v1.9	ScaleformTranslationPP 77359 1.9 2026-08-14T12-03Z hfH9s6iUY.zip	73ee7d4f2732de6dd22776b14e95f42205205926ee567a6029e566d1f4a9021c	data			https://www.nexusmods.com/skyrimspecialedition/mods/77359?tab=files
+# MCM Helper is a FOMOD. Variants chosen: SkyrimSE (not SkyrimVR) for the SKSE
+# plugin, ESL for the light-flagged plugin, Loose over BSA so nothing depends on
+# a BSA matching its plugin name, and Data for the MCM config tree. Each root is
+# named one level above the payload because the installer copies a root's
+# *contents* into Data/ — "SkyrimSE/SKSE" would put Plugins/ in Data/Plugins/.
+yes	MCM Helper v1.6.2	MCM Helper-53000-1-6-2-1777219181.7z	24b07dadc471f58929255b5c189847e5a0b2c883c1834887ca9cb558e521be30	data	SkyrimSE;ESL;Loose;Data	MCMHelper.esp	https://www.nexusmods.com/skyrimspecialedition/mods/53000?tab=files
+yes	QuickLoot IE v3.4.1	QuickLoot IE - A QuickLoot EE Fork-120075-3-4-1-1739389633.zip	635e2682e1ebe01d5fb292387b98ea517746171d4f921d120cdd8fde98a3ba78	data		QuickLootIE.esp	https://www.nexusmods.com/skyrimspecialedition/mods/120075?tab=files
+yes	Junk It v1.2.7	Junk-It-112282-1-2-7-1712107992.zip	e0c44c7c80aa42cd2d7f971998c48ab91ca1866d04597d3918bc5c3b79884eb8	data		JunkIt.esp	https://www.nexusmods.com/skyrimspecialedition/mods/112282?tab=files
+yes	Quest Journal Overhaul v1.3	Quest Journal Overhaul-141295-1-3-1742568550.zip	b61da8af16f23ffe128363aac777718d68252a7a81c9d1fc0699090b640ff32c	data			https://www.nexusmods.com/skyrimspecialedition/mods/141295?tab=files

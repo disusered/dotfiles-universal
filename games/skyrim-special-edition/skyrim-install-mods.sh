@@ -57,6 +57,41 @@ strip_wrapper() {
   grep -v "^$top\$" <<<"$listing" | sed "s|^$top/||"
 }
 
+# Rename directories inside $1 to match the casing of directories that already
+# exist under $2.
+#
+# Mod authors package for Windows, where the filesystem is case-insensitive and
+# Interface/ and interface/ are the same folder. Here they are not. Quest Journal
+# Overhaul ships lowercase `interface/` while every other mod ships `Interface/`,
+# so a plain copy produced *both* — and Wine resolves an exact match before it
+# falls back to a case-insensitive search, so a lookup for Interface\questjournal.swf
+# found the capitalised directory, missed the file, and the mod silently did
+# nothing. Same story one level down for translations/ against Translations/.
+#
+# Loop until stable rather than in one pass: renaming a parent invalidates the
+# paths already collected for its children.
+align_case() {
+  local src=$1 dst=$2 changed=1
+  while [ "$changed" = 1 ]; do
+    changed=0
+    while IFS= read -r rel; do
+      local parent name dstparent existing
+      parent=${rel%/*}; [ "$parent" = "$rel" ] && parent=""
+      name=${rel##*/}
+      dstparent="$dst${parent:+/$parent}"
+      [ -d "$dstparent" ] || continue
+      [ -e "$dstparent/$name" ] && continue
+      existing=$(find "$dstparent" -mindepth 1 -maxdepth 1 -type d -iname "$name" \
+                   -printf '%f\n' 2>/dev/null | head -1)
+      [ -n "$existing" ] && [ "$existing" != "$name" ] || continue
+      mv "$src/$rel" "$src${parent:+/$parent}/$existing"
+      note "case: $rel -> ${parent:+$parent/}$existing (matching Data/)"
+      changed=1
+      break
+    done < <(cd "$src" && find . -mindepth 1 -type d -printf '%P\n' | sort)
+  done
+}
+
 command -v 7z >/dev/null || die "7z not found (pacman -S p7zip)"
 
 if ! LIB=$("$MODULE_DIR/../lib/steam-find-app-path.sh" "$APP_ID" 2>/dev/null); then
@@ -239,6 +274,7 @@ while IFS= read -r line || [ -n "$line" ]; do
       fi
       # Paths are recorded destination-prefixed, so a remover knows whether a
       # name is Data-relative or beside the exe without re-reading the manifest.
+      align_case "$s" "$target"
       (cd "$s" && find . -type f -printf '%P\n') \
         | sed "s|^|$destination/|" >> "$STATE_DIR/$archive.files"
       cp -a "$s"/. "$target"/
