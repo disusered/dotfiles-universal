@@ -75,8 +75,8 @@
 # skse.silverlock.org before updating. A game that suddenly starts vanilla with
 # no mods is usually this, not a broken install.
 enabled	name	archive	sha256	destination	archive_root	plugins	source_url
-yes	SKSE64 2.2.6 (AE, game 1.6.1170)	skse64_2_02_06.7z	d7297f1a1d613e5265e1af4dbbfe8bd37a32719c1ccef363fc6187fa6eba0848	root			https://skse.silverlock.org/
-yes	Address Library for SKSE Plugins v11	All in one (all game versions)-32444-11-1770897704.zip	d345ccdac52c096fe9628a62ff3764bbf23111ba30e3d282cd3b1fb66968863a	data			https://www.nexusmods.com/skyrimspecialedition/mods/32444?tab=files
+yes	SKSE64 2.3.0 (game 1.7.99)	Skyrim Script Extender (SKSE64) Steam 30379 2.3.0 2026-08-20T15-09Z pQ0AZ3hhL.7z	03dba906bf4c47c1b9c6cf9a5de730e04eaf3997ca64842240590e602a0ec968	root			https://www.nexusmods.com/skyrimspecialedition/mods/30379?tab=files
+yes	Address Library for SKSE Plugins v12 (up to 1.7.99.0)	Address Library All in One (1.7.99.0) v12 32444 12 2026-08-20T16-14Z 4t2yDcMnG.zip	628434e6ecbf18ffeffd1d58106b3d8ea25e6991e4f18130824025c93dc64076	data			https://www.nexusmods.com/skyrimspecialedition/mods/32444?tab=files
 yes	Unofficial Skyrim SE Patch (USSEP) v4.3.8a	Unofficial Skyrim Special Edition Patch-266-4-3-8a-1774132896.7z	5036e8b4abef7234a1f35d43e33780f529be8f85f449e41211ec4876d03e95d9	data		unofficial skyrim special edition patch.esp	https://www.nexusmods.com/skyrimspecialedition/mods/266?tab=files
 yes	SSE Engine Fixes - Main File v7.0.20	Engine Fixes - Main File-17230-7-0-20-1772078239.7z	21330c95011f41859139635b43ce95ffb5fbadd3cd375d2f4358abcc3cb99407	data	EngineFixes FOMOD Installer/Required;EngineFixes FOMOD Installer/AE		https://www.nexusmods.com/skyrimspecialedition/mods/17230?tab=files
 yes	SSE Engine Fixes - SKSE64 Preloader v7	Engine Fixes - SKSE64 Preloader-17230-7-1771936758.7z	35633dc2904521f35861dbb582e084a10e77bec5b8f08fb08963d7578b07452f	root			https://www.nexusmods.com/skyrimspecialedition/mods/17230?tab=files
