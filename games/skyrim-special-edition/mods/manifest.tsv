@@ -110,3 +110,17 @@ yes	MCM Helper v1.6.2	MCM Helper-53000-1-6-2-1777219181.7z	24b07dadc471f58929255
 yes	QuickLoot IE v3.4.1	QuickLoot IE - A QuickLoot EE Fork-120075-3-4-1-1739389633.zip	635e2682e1ebe01d5fb292387b98ea517746171d4f921d120cdd8fde98a3ba78	data		QuickLootIE.esp	https://www.nexusmods.com/skyrimspecialedition/mods/120075?tab=files
 yes	Junk It v1.2.7	Junk-It-112282-1-2-7-1712107992.zip	e0c44c7c80aa42cd2d7f971998c48ab91ca1866d04597d3918bc5c3b79884eb8	data		JunkIt.esp	https://www.nexusmods.com/skyrimspecialedition/mods/112282?tab=files
 yes	Quest Journal Overhaul v1.3	Quest Journal Overhaul-141295-1-3-1742568550.zip	b61da8af16f23ffe128363aac777718d68252a7a81c9d1fc0699090b640ff32c	data			https://www.nexusmods.com/skyrimspecialedition/mods/141295?tab=files
+#
+# ── Quest objective text ──────────────────────────────────────────────────
+# Two mods on the same records, so order is load-bearing. EBQO rewrites vanilla
+# objective descriptions; Dungeon Quests are not Miscellaneous promotes misc
+# dungeon quests to side quests. Its BQO Patch is an ESP replacer built to
+# forward EBQO's changes, so it goes last and overwrites the plugin the row
+# above it installed — which also puts DQanM after EBQO in the load order.
+#
+# EBQO is a FOMOD offering "000 Core Files" plus 84 per-mod patch folders. Only
+# the core is taken: every patch targets a quest mod that is not installed here.
+# Its plugin is BetterQuestObjectives.esp, not an "EvenBetter" name.
+yes	Even Better Quest Objectives SE v1.11.1	Even Better Quest Objectives SE v1.11.1-159-1-11-1-1778002321.7z	e1af591369cb732e21dc292e13e404fc384150e3e4fcfadfb5623325f30aa4ae	data	000 Core Files	BetterQuestObjectives.esp	https://www.nexusmods.com/skyrimspecialedition/mods/159?tab=files
+yes	Dungeon Quests are not Miscellaneous v1.0.0	Dungeon Quests are not Miscellaneous-123559-1-0-0-1720298455.zip	44daf7747bd1329dd6b2426184a7b68e6a0b70da5acb8e7a16c8cc9e1d76625d	data		Dungeon Quests are not Miscellaneous.esp	https://www.nexusmods.com/skyrimspecialedition/mods/123559?tab=files
+yes	DQanM - BQO Patch (after DQanM; ESP replacer for EBQO)	Dungeon Quests are not Miscellaneous - BQO Patch-123559-1-0-0-BQO-1720359485.zip	6fe364432657bab68e02c80a86f0821c91af60e2847b8b2bb113c51c2ac0e1f1	data			https://www.nexusmods.com/skyrimspecialedition/mods/123559?tab=files
