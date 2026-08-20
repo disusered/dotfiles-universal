@@ -37,8 +37,10 @@ and expected OpenViking profile.
 - `polychromectl lint` parses frontmatter with a hand-rolled line splitter, not a
   YAML parser, so it cannot detect malformed YAML. Step 4 is what catches that,
   and it is the only check here that reads the spec's trust and lifecycle rules.
-  This bundle still authors v0.1 `timestamp` fields and a domain `status`
-  vocabulary, so expect warnings; treat only `ERROR` as blocking.
+- This bundle reports clean under `--strict`, so treat any new warning as a
+  regression rather than background noise. `status` carries only the three spec
+  values; editorial state lives in `lifecycle` and study progress in
+  `pathway_state`.
 
 ## XBOL
 
@@ -60,11 +62,12 @@ and expected OpenViking profile.
 - After authored changes, run every check in
   `docs/runbooks/maintain-okf-bundle.md`, then
   `uv run ~/.local/share/okf/bin/okf_validate.py docs`.
-- The runbook's only frontmatter check is a human scanning the rendered graph for
+- The runbook's old frontmatter check was a human scanning the rendered graph for
   `Unknown` type nodes, because `reference-agent visualize` degrades silently
-  instead of validating. The shared checker replaces that eyeball pass. This
-  bundle's profile still declares OKF 0.1, so expect `timestamp` and `status`
-  warnings; treat only `ERROR` as blocking.
+  instead of validating. The shared checker replaced that eyeball pass.
+- This bundle reports clean under `--strict`, so treat any new warning as a
+  regression. `status` carries only the three spec values, editorial state lives
+  in `lifecycle`, and `verified` holds what the profile used to call `timestamp`.
 
 Do not add Polychrome stores, `polychromectl`, or a custom knowledge CLI to
 XBOL.
@@ -88,10 +91,11 @@ XBOL.
   1. `uv run python scripts/validate_okf.py knowledge/private`
   2. `uv run python -m unittest discover -s tests`
   3. `uv run ~/.local/share/okf/bin/okf_validate.py knowledge/private`
-- This is the only bundle already declaring `okf_version: "0.2"`. Step 1 enforces
-  the repository's own profile, which is stricter than the spec in places and
-  reports everything as an error; step 3 adds the trust, lifecycle, and
+- Step 1 enforces the repository's own profile, which is stricter than the spec in
+  places and reports everything as an error; step 3 adds the trust, lifecycle, and
   actor-convention rules step 1 does not implement.
+- This bundle reports clean under `--strict`, so treat any new warning as a
+  regression.
 
 Iteramind's shared corpus is not covered by this skill. It is not files: it is
 objects in an R2 bucket reached only through a hosted MCP connector, and the
