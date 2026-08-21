@@ -52,5 +52,8 @@ ai/claude/.cache/
 /ai/opencode/skills/
 /ai/opencode/commands/git-commit.md
 /ai/claude/commands/git-commit.md
+# Installer-owned TWG CLI skills; managed by `twg skills install`, not rotz.
+/ai/claude/skills/twg
+/ai/claude/skills/twg-*
 /ai/xbol-observability/tests/__pycache__
 /ai/okf/bin/__pycache__

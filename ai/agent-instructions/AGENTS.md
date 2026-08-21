@@ -152,3 +152,12 @@ communication conventions. No footers, signatures, or tool attribution.
 - `gh` is installed — always use it for GitHub operations.
 - `ast-grep` is installed — use it for structural code search.
 - Use `rg` for file and text search before slower tools such as `grep` or `find`.
+- `twg` is installed — the Atlassian Teamwork Graph CLI. Use it for Jira,
+  Confluence, Bitbucket, goals, and cross-product search. Its `twg-*` agent
+  skills carry the command grammar; load the narrowest one rather than guessing
+  flags.
+- Atlassian accounts are per-repository. Read the project's own `AGENTS.md` for
+  the `TWG_CONFIG_DIR` and site to use, and pass both on every `twg` call. Never
+  run `twg` against Atlassian from a repository that does not name an account.
+- Never run `twg setup`, `twg login`, `twg update`, or `twg uninstall` unless
+  asked to. Never request, echo, log, or pass an Atlassian token as a flag.

@@ -1,0 +1,14 @@
+linux|darwin:
+  installs:
+    cmd: |
+      # ~/.local/bin must already be on PATH: the installer appends an
+      # `export PATH=...` line to ~/.zshrc when its install dir is missing from
+      # PATH, and ~/.zshrc is a rotz symlink into tools/zsh/zshrc.
+      export PATH="$HOME/.local/bin:$PATH"
+      if ! command -v twg &>/dev/null; then
+        curl -fsSL --retry 2 https://teamwork-graph.atlassian.com/cli/install \
+          | bash -s -- --version 1.2.5 --yes --skip-login --skip-skills
+      fi
+    depends:
+      - /tools/curl
+      - /languages/python/uv
