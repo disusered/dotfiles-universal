@@ -69,32 +69,9 @@ if [ "$matched" -eq 0 ]; then
   echo "skyrim-skse-launch: no Skyrim executable in command; passing through" >&2
 fi
 
-gaming_session="$HOME/.local/bin/gaming-session"
-host_policy=${SKYRIM_HOST_WORKLOAD_POLICY:-normal}
-
-case $host_policy in
-  normal)
-    # run-if-armed quiesces nothing unless a profile was explicitly armed, so
-    # ordinary play is a pass-through. It used to hang here: gaming-session took
-    # its session lock before checking the armed flag, and a descriptor leaked
-    # into podman's surviving helpers had left that lock held forever, so Proton
-    # never started. That path now takes no lock when nothing is armed, waits a
-    # bounded time when something is, and launches the game regardless.
-    if [ -x "$gaming_session" ]; then
-      exec "$gaming_session" run-if-armed --profile co-located -- "${args[@]}"
-    fi
-    ;;
-  quiesced)
-    if [ ! -x "$gaming_session" ]; then
-      echo "skyrim-skse-launch: quiesced host policy requires $gaming_session" >&2
-      exit 1
-    fi
-    exec "$gaming_session" run --profile co-located -- "${args[@]}"
-    ;;
-  *)
-    echo "skyrim-skse-launch: invalid SKYRIM_HOST_WORKLOAD_POLICY=$host_policy" >&2
-    exit 2
-    ;;
-esac
-
+# Host workload quiescing is deliberately not wired in here. It used to be,
+# and a descriptor leaked into podman's surviving helpers left the session lock
+# held, so this wrapper blocked before Proton ever started. Turning the dev
+# stack off is now an explicit thing you do, never a side effect of launching a
+# game, so nothing in the play path can block it.
 exec "${args[@]}"

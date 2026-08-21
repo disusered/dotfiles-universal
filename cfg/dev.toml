@@ -1,0 +1,33 @@
+# Host-wide development workloads for `cfg dev on|off`. Order is
+# dependents-first: stopping follows this list, restoring reverses it, so a
+# database is running again before whatever talks to it.
+#
+# Deliberately NOT listed, do not add without a reason:
+#   cli-proxy-api.service  keeps twg-upkeep's auth keepalive and every proxied
+#                          agent path alive; deepseek-harness needs it at runtime
+#   openviking.service     agent memory; stopping it makes recall silently empty
+#                          in any editor or agent session left open
+#   watchman.service       Requires=watchman.socket, so it stops with the socket
+#                          and returns by socket activation
+units = [
+  "brain-portal-worker.service",
+  "brain-portal.service",
+  "brain-portal-postgres.service",
+  "deepseek-harness.service",
+  "watchman.socket",
+  "romm.service",
+  "romm-db.service",
+  "searxng.service",
+]
+containers = [
+  "xbol-smtp4dev",
+  "xbol-db-develop_postgres_1",
+  "supabase_studio_gxaprqniktzkmrzpwrsj",
+  "supabase_kong_gxaprqniktzkmrzpwrsj",
+  "supabase_pg_meta_gxaprqniktzkmrzpwrsj",
+  "supabase_rest_gxaprqniktzkmrzpwrsj",
+  "supabase_realtime_gxaprqniktzkmrzpwrsj",
+  "supabase_inbucket_gxaprqniktzkmrzpwrsj",
+  "supabase_auth_gxaprqniktzkmrzpwrsj",
+  "supabase_db_gxaprqniktzkmrzpwrsj",
+]

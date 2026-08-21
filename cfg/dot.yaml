@@ -2,4 +2,5 @@ global:
   links:
     config.toml: ~/.config/cfg/config.toml
     templates.toml: ~/.config/cfg/templates.toml
+    dev.toml: ~/.config/cfg/dev.toml
     palettes: ~/.config/cfg/palettes
