@@ -11,6 +11,5 @@ linux[whoami.distro^="Arch"]:
       - /arch/steam
   links:
     hotline-autoscale.sh: ~/.local/bin/hotline-autoscale
-    hotline-miami.conf: ~/.config/hypr/conf.d/hotline-miami.conf
     hotline.cfg: ~/.local/share/Steam/steamapps/compatdata/219150/pfx/drive_c/users/steamuser/Documents/My Games/HotlineMiami/hotline.cfg
     alsoftrc: ~/.alsoftrc

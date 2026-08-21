@@ -1,0 +1,24 @@
+# Stop order is application/worker first and database last. Restoration is the
+# reverse of this file and includes only entries that were active at start.
+unit	brain-portal-worker.service
+unit	brain-portal.service
+unit	brain-portal-postgres.service
+unit	cli-proxy-api.service
+unit	deepseek-harness.service
+unit	openchamber-serve.service
+unit	openviking.service
+unit	watchman.socket
+unit	watchman.service
+unit	romm.service
+unit	romm-db.service
+unit	searxng.service
+container	xbol-smtp4dev
+container	xbol-db-develop_postgres_1
+container	supabase_studio_gxaprqniktzkmrzpwrsj
+container	supabase_kong_gxaprqniktzkmrzpwrsj
+container	supabase_pg_meta_gxaprqniktzkmrzpwrsj
+container	supabase_rest_gxaprqniktzkmrzpwrsj
+container	supabase_realtime_gxaprqniktzkmrzpwrsj
+container	supabase_inbucket_gxaprqniktzkmrzpwrsj
+container	supabase_auth_gxaprqniktzkmrzpwrsj
+container	supabase_db_gxaprqniktzkmrzpwrsj

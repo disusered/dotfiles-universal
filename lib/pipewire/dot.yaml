@@ -17,5 +17,5 @@ linux[whoami.distro^="Arch"]:
   # presets: {{ dirs.base.config }}/easyeffects/output/
   links:
     raop.conf: {{ dirs.base.config }}/pipewire/pipewire.conf.d/50-raop.conf
-    pipewire.toml: {{ dirs.base.config }}/pypr/conf.d/pipewire.toml
+    pipewire.service.d/override.conf: {{ dirs.base.config }}/systemd/user/pipewire.service.d/override.conf
     pipewire.conf: {{ dirs.base.config }}/hypr/conf.d/pipewire.conf

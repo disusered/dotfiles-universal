@@ -79,4 +79,3 @@ linux[whoami.distro^="Arch"]:
     skyrim-install-mods.sh: ~/.local/bin/skyrim-install-mods
     mangohud-benchmark.conf: ~/.config/MangoHud/skyrim-benchmark.conf
     scopebuddy.conf: ~/.config/scopebuddy/AppID/489830.conf
-    skyrim.conf: ~/.config/hypr/conf.d/skyrim.conf

@@ -21,5 +21,3 @@ linux[whoami.distro^="Arch"]:
     depends:
       - /arch/steam
       - /tools/scopebuddy
-  links:
-    three-kingdoms.conf: ~/.config/hypr/conf.d/three-kingdoms.conf

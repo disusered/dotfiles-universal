@@ -17,3 +17,5 @@ linux[whoami.distro^="Arch"]:
     steam.conf: ~/.config/hypr/conf.d/steam.conf
     steam_minimal.desktop: ~/.local/share/applications/steam_minimal.desktop
     gamemode.ini: ~/.config/gamemode.ini
+    gaming-session.sh: ~/.local/bin/gaming-session
+    gaming-session-co-located.tsv: ~/.config/gaming-session/profiles/co-located.tsv

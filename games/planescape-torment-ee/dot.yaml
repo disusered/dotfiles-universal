@@ -12,6 +12,5 @@ linux[whoami.distro^="Arch"]:
         'Planescape: Torment EE'
   links:
     pst-ee-launch.sh: ~/.local/bin/pst-ee-launch
-    planescape.conf: ~/.config/hypr/conf.d/planescape.conf
     baldur.lua: ~/.local/share/Beamdog/Planescape Torment Enhanced Edition/baldur.lua
     DMACH3.DLG: ~/.local/share/Steam/steamapps/common/Project P/override/DMACH3.DLG

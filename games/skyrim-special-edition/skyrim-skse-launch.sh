@@ -69,4 +69,26 @@ if [ "$matched" -eq 0 ]; then
   echo "skyrim-skse-launch: no Skyrim executable in command; passing through" >&2
 fi
 
+gaming_session="$HOME/.local/bin/gaming-session"
+host_policy=${SKYRIM_HOST_WORKLOAD_POLICY:-normal}
+
+case $host_policy in
+  normal)
+    if [ -x "$gaming_session" ]; then
+      exec "$gaming_session" run-if-armed --profile co-located -- "${args[@]}"
+    fi
+    ;;
+  quiesced)
+    if [ ! -x "$gaming_session" ]; then
+      echo "skyrim-skse-launch: quiesced host policy requires $gaming_session" >&2
+      exit 1
+    fi
+    exec "$gaming_session" run --profile co-located -- "${args[@]}"
+    ;;
+  *)
+    echo "skyrim-skse-launch: invalid SKYRIM_HOST_WORKLOAD_POLICY=$host_policy" >&2
+    exit 2
+    ;;
+esac
+
 exec "${args[@]}"

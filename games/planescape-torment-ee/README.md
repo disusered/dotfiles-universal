@@ -20,8 +20,8 @@ Hyprland/Wayland and gamescope.
   - Exports `LD_LIBRARY_PATH` to cover the libssl shim.
   - Detects the focused monitor via `hyprctl` and runs gamescope with
     integer scaling from 1920×1080 internal to native output.
-- Symlinks a Hyprland window rule (`planescape.conf`) that marks the
-  gamescope surface fullscreen + immediate.
+- Uses the Steam module's shared Hyprland rule for fullscreen Gamescope
+  surfaces with immediate presentation disabled.
 - Symlinks `baldur.lua` into
   `~/.local/share/Beamdog/Planescape Torment Enhanced Edition/` with:
   - 60 FPS cap
