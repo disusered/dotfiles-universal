@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+
+exec /home/carlos/Development/ME/herding-cats/utilities/polychrome/node_modules/.bin/okf "$@"

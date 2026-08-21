@@ -6,7 +6,11 @@ linux[whoami.distro^="Arch"]:
         printf '%s\n' "polychrome source is missing: $polychrome_src" >&2
         exit 1
       fi
+      npm --prefix "$polychrome_src" ci --ignore-scripts
       cargo install --path "$polychrome_src" --bin polychromectl --force
     depends:
+      - /languages/javascript/node/latest
       - /tools/docling
       - /tools/pdf-inspector
+  links:
+    okf: ~/.local/bin/okf
