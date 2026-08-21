@@ -1,0 +1,7 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm --needed betterbird-bin
+    depends:
+      - /lib/uwsm
+  links:
+    betterbird.conf: ~/.config/hypr/conf.d/betterbird.conf
