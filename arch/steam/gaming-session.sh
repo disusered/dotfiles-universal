@@ -8,6 +8,7 @@ STATE_HOME=${GAMING_SESSION_STATE_HOME:-${XDG_STATE_HOME:-$HOME/.local/state}/ga
 ACTIVE_DIR=$STATE_HOME/active
 ARMED_FILE=$STATE_HOME/armed
 LOCK_FILE=$STATE_HOME/lock
+LOCK_TIMEOUT=${GAMING_SESSION_LOCK_TIMEOUT:-10}
 SYSTEMCTL=${GAMING_SESSION_SYSTEMCTL:-systemctl}
 PODMAN=${GAMING_SESSION_PODMAN:-podman}
 
@@ -22,6 +23,7 @@ Usage:
   $PROGRAM arm PROFILE
   $PROGRAM status
   $PROGRAM restore
+  $PROGRAM unlock
   $PROGRAM run --profile PROFILE -- COMMAND [ARG...]
   $PROGRAM run-if-armed --profile PROFILE -- COMMAND [ARG...]
 EOF
@@ -36,10 +38,57 @@ validate_profile_name() {
     || die "invalid profile name: $1"
 }
 
+# A flock belongs to the open file description, not to the process, so it is
+# released only when the last descriptor referring to it closes -- including any
+# descriptor a child inherited. Two rules follow, and both are load-bearing:
+# every command spawned while the lock is held goes through nolock(), and the
+# wait is bounded so that a leak anywhere can never wedge a game launch.
+LOCK_HELD=0
+
 with_lock() {
   mkdir -p -- "$STATE_HOME"
   exec 9>"$LOCK_FILE"
-  flock -x 9
+  if flock -x -w "$LOCK_TIMEOUT" 9; then
+    LOCK_HELD=1
+    return 0
+  fi
+  exec 9>&-
+  LOCK_HELD=0
+  return 1
+}
+
+drop_lock() {
+  (( LOCK_HELD == 1 )) || return 0
+  exec 9>&-
+  LOCK_HELD=0
+}
+
+# podman and systemctl start processes that deliberately outlive them: conmon,
+# rootlessport and aardvark-dns for every rootless container, socket-activated
+# units for systemd. One of those inheriting fd 9 keeps this transaction's flock
+# after this script exits, and the next launch then blocks on it before Proton
+# ever starts. Closing the descriptor per command is what prevents that.
+nolock() {
+  "$@" 9>&-
+}
+
+lock_holders() {
+  command -v fuser >/dev/null 2>&1 || return 0
+  # fuser has no -- separator; $LOCK_FILE is repo-controlled, not user input.
+  nolock fuser -v "$LOCK_FILE" 2>&1 || true
+}
+
+report_lock_timeout() {
+  printf '%s: timed out after %ss waiting for %s\n' \
+    "$PROGRAM" "$LOCK_TIMEOUT" "$LOCK_FILE" >&2
+  lock_holders >&2
+}
+
+armed_for() {
+  local armed=""
+  [[ -f $ARMED_FILE ]] || return 1
+  read -r armed < "$ARMED_FILE" || return 1
+  [[ $armed == "$1" ]]
 }
 
 active_owner_alive() {
@@ -52,9 +101,9 @@ active_owner_alive() {
 reverse_file() {
   local file=$1
   if command -v tac >/dev/null 2>&1; then
-    tac -- "$file"
+    tac -- "$file" 9>&-
   else
-    awk '{ lines[NR]=$0 } END { for (i=NR; i>=1; i--) print lines[i] }' "$file"
+    awk '{ lines[NR]=$0 } END { for (i=NR; i>=1; i--) print lines[i] }' "$file" 9>&-
   fi
 }
 
@@ -65,7 +114,7 @@ restore_active() {
   if [[ -s $ACTIVE_DIR/containers.tsv ]]; then
     while IFS= read -r item; do
       [[ -n $item ]] || continue
-      if ! "$PODMAN" start "$item" >/dev/null; then
+      if ! nolock "$PODMAN" start "$item" >/dev/null; then
         printf '%s: failed to restore container %s\n' "$PROGRAM" "$item" >&2
         failed=1
       fi
@@ -75,7 +124,7 @@ restore_active() {
   if [[ -s $ACTIVE_DIR/units.tsv ]]; then
     while IFS= read -r item; do
       [[ -n $item ]] || continue
-      if ! "$SYSTEMCTL" --user start "$item"; then
+      if ! nolock "$SYSTEMCTL" --user start "$item"; then
         printf '%s: failed to restore user unit %s\n' "$PROGRAM" "$item" >&2
         failed=1
       fi
@@ -103,7 +152,7 @@ recover_stale() {
 report_remaining_high_cpu() {
   local report=$ACTIVE_DIR/unmatched-high-cpu.tsv
   printf 'pid\tcpu_percent\trss_kb\tcommand\n' > "$report"
-  ps -eo pid=,pcpu=,rss=,args= --sort=-pcpu | awk -v self="$$" '
+  ps -eo pid=,pcpu=,rss=,args= --sort=-pcpu 9>&- | awk -v self="$$" 9>&- '
     $1 != self && $2+0 >= 10 {
       pid=$1; cpu=$2; rss=$3
       $1=$2=$3=""; sub(/^[[:space:]]+/, "")
@@ -111,7 +160,7 @@ report_remaining_high_cpu() {
       printf "%s\t%s\t%s\t%s\n",pid,cpu,rss,$0
     }
   ' >> "$report"
-  if (( $(wc -l < "$report") > 1 )); then
+  if (( $(wc -l < "$report" 9>&-) > 1 )); then
     printf '%s: high-CPU processes outside the allowlist remain; see %s\n' "$PROGRAM" "$report" >&2
   fi
 }
@@ -137,16 +186,16 @@ begin_transaction() {
       || die "$file:$line_number must contain exactly TYPE<TAB>NAME"
     case $kind in
       unit)
-        if "$SYSTEMCTL" --user is-active --quiet "$name"; then
+        if nolock "$SYSTEMCTL" --user is-active --quiet "$name"; then
           printf '%s\n' "$name" >> "$ACTIVE_DIR/units.tsv"
-          "$SYSTEMCTL" --user stop "$name" \
+          nolock "$SYSTEMCTL" --user stop "$name" \
             || { restore_active; die "failed to stop user unit $name"; }
         fi
         ;;
       container)
-        if [[ $("$PODMAN" inspect --format '{{.State.Running}}' "$name" 2>/dev/null || true) == true ]]; then
+        if [[ $(nolock "$PODMAN" inspect --format '{{.State.Running}}' "$name" 2>/dev/null || true) == true ]]; then
           printf '%s\n' "$name" >> "$ACTIVE_DIR/containers.tsv"
-          "$PODMAN" stop --time 30 "$name" >/dev/null \
+          nolock "$PODMAN" stop --time 30 "$name" >/dev/null \
             || { restore_active; die "failed to stop container $name"; }
         fi
         ;;
@@ -173,23 +222,36 @@ parse_run() {
   (( $# > 0 )) || die "$mode requires a command"
   validate_profile_name "$profile"
 
-  with_lock
+  # Ordinary play arms nothing and has no transaction to recover, so it must
+  # not touch the session lock at all. Reading the flag unlocked races only with
+  # an arm landing in the same instant, and losing that race just means this one
+  # launch is not quiesced.
+  if [[ $mode == run-if-armed ]] && ! armed_for "$profile" && [[ ! -d $ACTIVE_DIR ]]; then
+    exec "$@"
+  fi
+
+  if ! with_lock; then
+    report_lock_timeout
+    # A launch wrapper must never be the reason a game fails to start.
+    if [[ $mode == run-if-armed ]]; then
+      printf '%s: launching without host quiescence\n' "$PROGRAM" >&2
+      exec "$@"
+    fi
+    die "if no gaming session is running, clear the lock with '$PROGRAM unlock'"
+  fi
+
   recover_stale
 
   if [[ $mode == run-if-armed ]]; then
-    local armed=""
-    if [[ -f $ARMED_FILE ]]; then
-      read -r armed < "$ARMED_FILE" || true
-    fi
-    if [[ $armed != "$profile" ]]; then
-      exec 9>&-
+    if ! armed_for "$profile"; then
+      drop_lock
       exec "$@"
     fi
     rm -f -- "$ARMED_FILE"
   fi
 
   begin_transaction "$profile"
-  exec 9>&-
+  drop_lock
 
   local restored=0 command_status=0 command_pid=0
   # Called indirectly by the EXIT trap.
@@ -197,13 +259,18 @@ parse_run() {
   restore_on_exit() {
     local status=$?
     if (( restored == 0 )); then
-      with_lock
+      # Leaving the co-located workloads stopped is worse than racing another
+      # session, so a lock timeout here degrades to an unlocked restore.
+      if ! with_lock; then
+        report_lock_timeout
+        printf '%s: restoring without the session lock\n' "$PROGRAM" >&2
+      fi
       if restore_active; then
         restored=1
       else
         status=1
       fi
-      exec 9>&-
+      drop_lock
     fi
     return "$status"
   }
@@ -237,7 +304,7 @@ case $command in
     (( $# == 1 )) || die "arm requires exactly one profile"
     validate_profile_name "$1"
     [[ -r $(profile_file "$1") ]] || die "profile not found: $(profile_file "$1")"
-    with_lock
+    with_lock || { report_lock_timeout; die "cannot arm while the session lock is held"; }
     [[ ! -d $ACTIVE_DIR ]] || die "cannot arm while a transaction exists"
     printf '%s\n' "$1" > "$ARMED_FILE"
     printf 'ARMED=%s\n' "$1"
@@ -262,11 +329,24 @@ case $command in
     ;;
   restore)
     (( $# == 0 )) || die "restore takes no arguments"
-    with_lock
+    with_lock \
+      || { report_lock_timeout; die "cannot restore while the session lock is held"; }
     [[ -d $ACTIVE_DIR ]] || { printf 'RESTORED=none\n'; exit 0; }
     active_owner_alive && die "cannot restore while session PID $(<"$ACTIVE_DIR/owner.pid") is active"
     restore_active || die "transaction could not be fully restored"
     printf 'RESTORED=complete\n'
+    ;;
+  unlock)
+    (( $# == 0 )) || die "unlock takes no arguments"
+    [[ ! -d $ACTIVE_DIR ]] \
+      || die "cannot unlock while a transaction exists; run '$PROGRAM restore' first"
+    [[ -e $LOCK_FILE ]] || { printf 'UNLOCKED=none\n'; exit 0; }
+    lock_holders >&2
+    # Unlinking orphans the inode: descriptors leaked into surviving processes
+    # keep locking a file nothing will ever open again, and the next session
+    # creates a fresh one. Nothing is killed to achieve this.
+    rm -f -- "$LOCK_FILE"
+    printf 'UNLOCKED=%s\n' "$LOCK_FILE"
     ;;
   run|run-if-armed)
     parse_run "$command" "$@"

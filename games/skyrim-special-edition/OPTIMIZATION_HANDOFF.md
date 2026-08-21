@@ -180,15 +180,18 @@ Ranked by expected return:
    tracked drop-in now unsets it. PipeWire, PipeWire Pulse, and WirePlumber were
    restarted; the audio graph, microphone source, and Bluetooth device remained
    present.
-2. **Co-located development workloads — opt-in gaming profile.** The running
-   allowlist accounted for about 2.0 GB in user-service cgroups. The active
-   Podman sample was about 1.6 GB and 7.2% CPU, with some containers already
-   represented by their owning units. `gaming-session arm co-located` makes the
-   next normal Skyrim launch stop only the named active workloads (including
-   Watchman's activation socket) and restore
-   exactly those workloads on exit. `gaming-session run --profile co-located --
-   COMMAND` provides an explicit one-shot route. Unknown high-CPU processes are
-   reported, never killed.
+2. **Co-located development workloads — reconnected.** The running allowlist
+   accounted for about 2.0 GB in user-service cgroups. The active Podman sample
+   was about 1.6 GB and 7.2% CPU, with some containers already represented by
+   their owning units. The transaction stops only named active workloads
+   (including Watchman's activation socket), then restores exactly those
+   workloads on command exit. Unknown high-CPU processes are reported, never
+   killed. Ordinary launches go through
+   `gaming-session run-if-armed --profile co-located`, which quiesces nothing
+   unless a profile was explicitly armed; an explicit run stays available as
+   `gaming-session run --profile co-located -- COMMAND`. The lock defect that
+   forced this off is resolved below, but the armed path still wants one
+   authorized real launch.
 3. **Samsung refresh selection — fixed.** Hyprland's preferred-mode selection
    left both capable displays at 60 Hz. EDID-specific rules now select 75 Hz and
    keep their left/right placement. The ultrawide remains automatic.
@@ -209,6 +212,91 @@ Ranked by expected return:
 
 The gaming profile is deliberately opt-in because this computer also hosts the
 development services. It does not disable or mask them persistently.
+
+### Resolved: the gaming-session lock leaked its file descriptor
+
+Commit `da4465b` bypassed `gaming-session` for `normal` policy after a Steam
+launch showed the game running with no Skyrim window, blocked at `flock -x 9`
+before Proton started. The cause was neither a live competing owner, stale state,
+nor launch-chain re-entry.
+
+`with_lock` opened fd 9 and took an exclusive `flock`. A `flock` belongs to the
+open file description, so it is released only when the *last* descriptor
+referring to it closes — including descriptors a child inherited. `restore_active`
+ran `podman start` while fd 9 was open and locked, and rootless podman leaves
+processes running on purpose: one `conmon` per container plus `rootlessport`,
+`rootlessport-child` and `aardvark-dns`. Every one of them inherited fd 9 and
+held the lock for as long as the containers ran, which on this machine meant
+indefinitely.
+
+Measured on 2026-08-21, before the fix:
+
+- `/proc/locks` carried `FLOCK ADVISORY WRITE 716762` on the lock file's inode,
+  owned by a PID that no longer existed.
+- `fuser -v ~/.local/state/gaming-session/lock` listed **22 live processes**
+  holding fd `9w` on it — 11 `conmon` (named for the `supabase_*` and `xbol-*`
+  containers), 7 `rootlessport`/`rootlessport-child`, and `aardvark-dns`, all
+  started during an earlier session's restore leg.
+- `gaming-session status` reported `TRANSACTION=none` throughout, which is why
+  nothing looked wrong. Stale-transaction recovery could never have helped.
+
+Two design faults turned the leak into a dead launch: `flock -x 9` had no
+timeout, and `run-if-armed` took the lock *before* checking whether anything was
+armed, so ordinary play — which quiesces nothing — still had to acquire it.
+
+The fix, in `arch/steam/gaming-session.sh`:
+
+- `nolock()` runs every `podman` and `systemctl` call with `9>&-`, and the pure
+  filters (`ps`, `awk`, `tac`, `wc`) close it directly. Nothing spawned under the
+  lock can inherit it. Note that bash marks neither numbered descriptors nor
+  `{var}`-allocated ones above 9 close-on-exec, so this has to be explicit.
+- The wait is bounded: `flock -x -w "$LOCK_TIMEOUT" 9`, default 10 s, overridable
+  with `GAMING_SESSION_LOCK_TIMEOUT`. A timeout prints the holders via `fuser`
+  instead of hanging.
+- Ordinary play takes no lock at all: `run-if-armed` reads the armed flag first
+  and `exec`s the command when nothing is armed and no transaction exists. This
+  path measured 6 ms against the real profile.
+- An armed run that cannot get the lock **fails open** — it warns and launches
+  the game unquiesced. A launch wrapper must never be why a game fails to start.
+  An explicit `run` still fails loudly.
+- `restore_on_exit` restores even if it cannot take the lock; leaving the
+  development services stopped is worse than racing another session.
+- New `gaming-session unlock` clears a lock pinned by processes it cannot reach.
+  It unlinks the file, which orphans the inode: leaked descriptors keep locking
+  a file nothing will open again and the next session creates a fresh one.
+  Nothing is killed. It refuses while a transaction exists.
+
+This host was recovered with `gaming-session unlock`: 22 holders to none, with
+all 14 containers left running.
+
+`arch/steam/gaming-session-self-test.sh` gained the regression this bug needed.
+Its podman stub now forks a child that survives the stub, the way `conmon` does,
+and the suite asserts that the lock is acquirable the instant a transaction ends,
+that a held lock cannot delay ordinary play, that an armed run fails open, that
+an explicit `run` fails loudly, and that `unlock` recovers a pinned lock and
+refuses during a transaction. The suite passes; it was already red before this
+work, at the assertion for the `run-if-armed` wiring `da4465b` removed.
+
+Still outstanding, and the reason this is not called finished: a **real armed
+launch** has not been run. The self-test's forking stub covers the `podman start`
+leak, and real `podman inspect`/`systemctl is-active` were verified against a
+throwaway profile, but only a genuine armed launch exercises `podman start` on
+this allowlist inside Steam's injected environment and the ScopeBuddy chain.
+
+Acceptance criteria for that launch:
+
+- An ordinary launch starts SKSE/Proton promptly and
+  `fuser -v ~/.local/state/gaming-session/lock` reports no holders afterwards.
+- An armed run stops only entries active in `gaming-session-co-located.tsv`,
+  records them, and restores precisely those after normal exit and after a
+  failure or signal exit — leaving no lock holders either time.
+- No unknown process is killed, no service is persistently disabled, and an
+  interrupted transaction recovers with `gaming-session restore`.
+
+Relevant state and code: `~/.local/state/gaming-session/{lock,armed,active/}`,
+`arch/steam/gaming-session.sh`,
+`arch/steam/gaming-session-co-located.tsv`, and
+`games/skyrim-special-edition/skyrim-skse-launch.sh`.
 
 ## Rules for the next optimization pass
 
@@ -238,6 +326,10 @@ hyprctl -j getoption general:allow_tearing
 hyprctl -j monitors all | jq '.[] | {name,width,height,refreshRate,activelyTearing}'
 hyprctl -j clients | jq '.[] | select(.class == "gamescope") | {address,pid,immediate}'
 skyrim-benchmark status
+gaming-session status
+# Must print nothing. Any holder means a child inherited the lock descriptor;
+# clear it with 'gaming-session unlock' and treat it as a regression.
+fuser -v ~/.local/state/gaming-session/lock
 ```
 
 Expected during play: global tearing `0`, the Gamescope client
