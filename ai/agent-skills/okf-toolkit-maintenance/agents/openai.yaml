@@ -1,0 +1,4 @@
+interface:
+  display_name: "OKF Toolkit Maintenance"
+  short_description: "Maintain and release the shared OKF Toolkit"
+  default_prompt: "Use $okf-toolkit-maintenance to maintain or release the shared OKF Toolkit safely."

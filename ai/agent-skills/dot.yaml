@@ -21,6 +21,10 @@ global:
       - ~/.agents/skills/okf-knowledge-ops
       - ~/.claude/skills/okf-knowledge-ops
       - ~/.config/opencode/skills/okf-knowledge-ops
+    okf-toolkit-maintenance:
+      - ~/.agents/skills/okf-toolkit-maintenance
+      - ~/.claude/skills/okf-toolkit-maintenance
+      - ~/.config/opencode/skills/okf-toolkit-maintenance
     okf-shared-corpus:
       - ~/.agents/skills/okf-shared-corpus
       - ~/.claude/skills/okf-shared-corpus
