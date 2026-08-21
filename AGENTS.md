@@ -4,7 +4,7 @@
 
 These rules are violated every session. They are NON-NEGOTIABLE:
 
-- **NEVER run `tofu`, `terraform`, `tofu init`, `tofu plan`, or `tofu apply` locally.** The tailscale-infra repo (`~/Development/ME/tailscale`) uses GitHub Actions CI: plan on PR, apply on merge to main. Commit and push. That's it. The README says "Never run `tofu init/plan/apply` locally." There are no credentials in the environment. It will fail. And you will have wasted everyone's time.
+- **NEVER run `tofu`, `terraform`, `tofu init`, `tofu plan`, or `tofu apply` locally.** The infra repo is `cat-infra` (`~/Development/ME/herding-cats/utilities/cat-infra`, its own git repo nested in herding-cats; it used to live at `~/Development/ME/tailscale`, which no longer exists). It uses GitHub Actions CI via `.github/workflows/tofu.yml`: plan on PR, apply on merge to main. Commit and push. That's it. Its README says "Never run `tofu init/plan/apply` locally (requires R2 + provider credentials)" and names `tofu fmt` as the only safe local command. There are no credentials in the environment. It will fail. And you will have wasted everyone's time.
 
 ## Git Remote Operations
 
