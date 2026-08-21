@@ -192,11 +192,14 @@ Ranked by expected return:
 3. **Samsung refresh selection — fixed.** Hyprland's preferred-mode selection
    left both capable displays at 60 Hz. EDID-specific rules now select 75 Hz and
    keep their left/right placement. The ultrawide remains automatic.
-4. **Hyprland render scheduling and direct scanout — leave at defaults.** These
-   are experimental presentation paths, not observed misconfigurations.
-   Direct scanout is blocked in the normal dual-monitor desktop and overlaps
-   the presentation area that caused the cursor-stall regression. They are not
-   persisted as optimizations.
+4. **Hyprland render scheduling and direct scanout — future A/B candidates.**
+   Test `render:new_render_scheduling=true` and `render:direct_scanout=auto`
+   independently during real gameplay. Both are reversible live Hyprland
+   options: apply one with `hyprctl keyword`, observe FPS, frame pacing, cursor
+   behavior and desktop transitions, then restore the default before testing
+   the other. For direct scanout, also confirm `directScanoutTo` becomes active;
+   merely enabling the option does not prove the fullscreen surface qualified.
+   Persist either option only after it improves this Intel/Gamescope setup.
 5. **Vulkan shader replay — investigate only if recurring.** A one-time
    `fossilize_replay` burst is expected after cache changes. Repeated full replay
    on unchanged launches would indicate cache invalidation and is the next
