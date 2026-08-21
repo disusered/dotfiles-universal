@@ -1,119 +1,83 @@
 ---
 name: okf-knowledge-ops
-description: Explore, investigate, query, collect, reference, organize, link, ingest, lint, and tidy governed OKF Markdown bundles that live as files in a repository, with optional OpenViking recall. Use for natural-language questions about an adapted knowledge bundle, evidence-backed wiki curation, graph maintenance, source promotion, broken-link or orphan audits, in Herding Cats Polychrome, XBOL, and Iteramind's local corpus. A corpus reached through a hosted MCP connector is covered by its own skill instead.
+description: Explore and curate exactly one governed OKF v0.2 Bundle through the versioned JSON `okf` CLI for local files or deployment-provided `okf_v1_*` MCP tools for hosted storage. Use for grounded questions, validation, source promotion, link and graph audits, and authorized knowledge changes in Polychrome, XBOL, or Iteramind. Do not use for Polychrome Black processing.
 ---
 
 # OKF Knowledge Operations
 
-Treat an adapted OKF bundle as authored durable knowledge plus optional,
-profile-scoped OpenViking recall. Preserve authority boundaries; use recall to
-find context, never to overrule evidence.
+Treat authored OKF Markdown as durable knowledge. Preserve the selected
+Bundle's authority and use generated views or optional OpenViking recall only
+to find candidates, never as source truth.
 
-OKF v0.2 is specified at `~/.local/share/okf/reference/SPEC.md`. That file is the
-normative reference. Read it before authoring a new page type, changing
-frontmatter conventions, or judging whether a page conforms; do not work from
-memory of the format. A bundle conforms when every non-reserved Markdown file
-has parseable YAML frontmatter carrying a non-empty `type` (§11). Everything
-else the spec describes is guidance, so never reject a bundle over it.
+## Select One Bundle
 
-## Resolve the Adapter
+1. Prefer the exact Bundle named by the user. Otherwise use the sole Bundle
+   declared for the current project or deployment. If more than one is
+   available, stop for a selection; never infer one from a link or search
+   result.
+2. Read applicable `AGENTS.md` files, then read
+   [references/adapters.md](references/adapters.md) for known consumer
+   boundaries.
+3. Establish the Bundle's authority, writable scope, capture boundary,
+   validation, and post-write commands before changing it. Remain read-only if
+   any required write contract is missing.
+4. Hold that selection fixed for the operation. Do not traverse, search, link,
+   graph, or mutate across Bundles. Do not consult or create a vault registry.
 
-1. Prefer a target path or alias stated by the user, then the repository that
-   contains the current working directory.
-2. Read all applicable `AGENTS.md` files.
-3. Read [references/adapters.md](references/adapters.md) and select the exact
-   known adapter. For an unknown bundle, locate its index, OKF profile,
-   authority rules, writable scope, capture boundary, validation commands, and
-   expected recall profile.
-4. Explore an unknown bundle read-only until those fields are established.
-5. Work in one governed bundle unless the user explicitly requests a
-   cross-bundle query.
+For an unknown target, use only an explicit local root or project
+`.agents/okf.yaml`, or the single Bundle documented by a hosted deployment.
+There is no Bundle-discovery tool in the v1 interface.
 
-For a known adapter, read its named sources of truth instead of rescanning the
-filesystem for instructions. Run direct, single-purpose reads and searches.
+## Choose the Transport
 
-## This Skill Covers File-Based Bundles
+- **Local Bundle:** use the versioned JSON `okf` CLI for Bundle context, reads,
+  search, links, inspection, validation, visualization, and changes. Do not
+  start or use a local OKF MCP server.
+- **Hosted Bundle:** use only the deployment-supplied `okf_v1_*` MCP tools. Do
+  not look for its files or fall back to unversioned `okf_*` tools.
 
-Every adapter here is read and written as files in a repository, with the
-adapter's own command and `rg`. None of them has a server, and none needs one:
-a server exists to reach files a surface cannot open for itself.
-
-A corpus reached only through a hosted MCP connector is a different thing with
-its own instructions. Iteramind's shared corpus is the current example, covered
-by the `okf-shared-corpus` skill. Do not go looking for its files, and do not
-assume `okf_*` tools apply to the bundles here.
-
-Governance for the bundles here is the adapter's validator and post-write
-checks. Run them before proposing a change and again after writing, and report
-what they said.
-
-## Apply Authority
-
-Use the adapter's local order. In its absence, prefer verified primary evidence,
-then accepted authored records, then archived or generated material, then
-OpenViking and conversation. Report unresolved conflicts.
-
-Never substitute an index, visualization, search database, projection, or
-OpenViking result for its authored source. Label `viking://` material as
-contextual.
+Read [references/transports.md](references/transports.md) before invoking either
+transport. It records the verified command and tool shapes, reviewed change
+contract, and unresolved release-installation seams.
 
 ## Explore
 
-1. Start at the bundle index and use descriptions for progressive disclosure.
-2. Search metadata and bodies with the adapter command and `rg`.
-3. Read the best pages, traverse relevant links, then check backlinks and
-   unlinked mentions.
-4. If recall is relevant and the active profile matches, follow
-   [references/openviking.md](references/openviking.md).
-5. Verify recalled or archived claims against higher-authority evidence.
-6. Answer directly with repository-relative citations, conflicts, uncertainty,
-   and missing knowledge.
+1. Load Bundle context and its index through the selected transport.
+2. Search, read the strongest pages, and inspect their links and backlinks.
+3. Follow primary evidence when a claim depends on current facts. Apply the
+   consumer's authority order and expose conflicts instead of silently choosing.
+4. If recall is relevant, follow
+   [references/openviking.md](references/openviking.md) without expanding the
+   operation to another Bundle.
+5. Answer with Bundle-relative page citations, material external sources,
+   uncertainties, and gaps.
 
 Read [references/operations.md](references/operations.md) before investigating,
-collecting, linking, or tidying rather than answering a focused query.
+collecting, curating, organizing, or tidying rather than answering a focused
+question.
 
 ## Curate
 
-Confirm that the active role and sandbox permit writes. A read-only role must
-not escalate or delegate around its boundary.
+Require an explicit content-change request and verify that the active role may
+write the selected Bundle. Preserve provenance, change the smallest suitable
+typed page, and add only relationships supported by its content.
 
-For an explicit collect, ingest, create, or content-change request:
+Use the transport's `okf.operations.v1` lifecycle: obtain the current opaque
+revision when required, preview the complete Change, inspect its diff and
+diagnostics, then apply the same Change with the reviewed `preview_id`. A hosted
+apply always requires the user's explicit authorization after preview. Stop on
+a failed preview, refused authorization, preview mismatch, stale revision,
+validation failure, or rejected apply; never bypass it through another
+transport or direct storage access. Read current state and produce a new
+preview before retrying a mismatched or stale Change.
 
-1. Preserve source identity and provenance.
-2. Verify durable claims against higher-authority evidence.
-3. Create or update the smallest appropriate typed page. When governed MCP
-   write tools are available, use their preview/apply protocol.
-4. Add only descriptive links supported by the page content.
-5. Record missing metadata as a gap.
-6. Run every post-write command in the adapter.
-
-For an open-ended tidy request, apply only unambiguous mechanical repairs:
-
-- repair a relative link when exactly one intended target exists;
-- restore an existing page to an index when local policy requires it;
-- normalize mechanically derivable frontmatter or Markdown formatting;
-- format an established citation or provenance link; and
-- refresh documented generated navigation or visualization.
-
+For an open-ended tidy request, apply only unambiguous mechanical repairs.
 Pause before a rename, merge, deletion, bulk move, page-type change, new
 semantic relationship, contradiction resolution, or meaning-changing rewrite
-unless the user explicitly authorized that exact operation.
+unless the request explicitly authorizes it.
 
 ## Finish
 
-Run the adapter's validation commands and the shared conformance checker:
-
-```bash
-uv run ~/.local/share/okf/bin/okf_validate.py <bundle>
-```
-
-The two cover different ground and neither replaces the other. An adapter's
-validator enforces that bundle's domain rules — its type schema, its link
-conventions, its derived index. The shared checker enforces the specification,
-including the trust, lifecycle, provenance, and actor-convention rules no
-adapter checks today. Only its `ERROR` lines block; warnings are soft guidance,
-so fix them when cheap and report the rest.
-
-Report durable evidence paths, checks actually run, unresolved conflicts or
-gaps, and OpenViking operations separately. Never claim an asynchronous memory
-write completed until retrieval verifies it.
+Validate through the selected transport and run every consumer-owned post-write
+check. Report pages and sources used, changes applied, checks actually run,
+unresolved gaps, and OpenViking activity separately.

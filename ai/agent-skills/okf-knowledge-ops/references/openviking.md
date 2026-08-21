@@ -28,6 +28,11 @@ Use only tools registered for the active role:
 Treat every result as a lead. Corroborate durable claims and label
 `viking://` citations as contextual.
 
+Keep recall subordinate to the selected OKF Bundle. Do not use an OpenViking
+result to traverse, graph, link, or mutate another Bundle in the same operation.
+An external or reference corpus may supply evidence only through its own
+authority and workflow.
+
 ## Additive Curation
 
 Only a write-capable curator may use additive operations, and policy must
