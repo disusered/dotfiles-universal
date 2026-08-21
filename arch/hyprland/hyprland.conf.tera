@@ -74,7 +74,9 @@ general {
     col.nogroup_border_active = $accent
     col.nogroup_border = $surface0
     resize_on_border = true
-    allow_tearing = true
+    # Gamescope surfaces share generic class rules across titles. Keep the
+    # experimental tearing path off globally unless a uniquely matched test proves it safe.
+    allow_tearing = false
     layout = dwindle
 }
 
@@ -133,7 +135,7 @@ misc {
 }
 
 debug {
-    vfr = false
+    vfr = true
 }
 
 
@@ -179,7 +181,8 @@ bind = $mainMod SHIFT CONTROL, L, movewindoworgroup, r
 bind = $mainMod SHIFT CONTROL, K, movewindoworgroup, u
 bind = $mainMod SHIFT CONTROL, J, movewindoworgroup, d
 
-bind = ,F11, exec, hyprctl activewindow -j | jq -e '.pinned' && hyprctl dispatch pin; hyprctl dispatch fullscreen 0
+bindl = $mainMod SHIFT, F12, exec, ~/.local/bin/skyrim-benchmark mark stall-recovered
+bindp = ,F11, exec, hyprctl activewindow -j | jq -e '.pinned' && hyprctl dispatch pin; hyprctl dispatch fullscreen 0
 bind = $mainMod, F, fullscreen, 1
 
 bind = $mainMod, Z, exec, app2unit -- pypr-client zoom

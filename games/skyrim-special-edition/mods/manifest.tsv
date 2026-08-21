@@ -66,7 +66,7 @@
 #      drop the cap before it is installed.
 #      Skip its optional "High performance configuration" on the Iris Xe — the
 #      page says "for high refresh rate monitors and fast GPUs/CPUs. Don't use
-#      on low-end systems." It is a candidate for the RX 6700 XT machine only.
+#      on low-end systems." It is not a candidate for this Iris Xe computer.
 #
 # ── After a game update ───────────────────────────────────────────────────
 # Steam updates orphan SKSE: the loader is locked to a runtime version, so a

@@ -16,9 +16,9 @@ linux[whoami.distro^="Arch"]:
         proton_experimental \
         'The Elder Scrolls V: Skyrim Special Edition'
 
-      # Wrap in ScopeBuddy. The per-AppID conf caps the frame rate at 60 (Havok
-      # physics breaks above it) and regenerates the INIs for whichever monitor
-      # and GPU this machine has.
+      # Wrap in ScopeBuddy and request GameMode for the game process. The
+      # per-AppID conf regenerates the INIs for whichever monitor and GPU are
+      # attached and leaves frame limiting to SSE Display Tweaks.
       #
       # skyrim-skse-launch sits *inside* scb rather than replacing it, so
       # SCB_PRE_COMMAND (INI generation) and SCB_AUTO_RES (resolution
@@ -34,7 +34,7 @@ linux[whoami.distro^="Arch"]:
       # localconfig.vdf is absolute on whichever machine ran the install.
       "$HOME/.dotfiles/games/lib/steam-set-launch-options.sh" \
         489830 \
-        "scb -- $HOME/.local/bin/skyrim-skse-launch %command%" \
+        "scb -- gamemoderun $HOME/.local/bin/skyrim-skse-launch %command%" \
         'The Elder Scrolls V: Skyrim Special Edition'
 
       # The game creates this on first run; the pre-launch hook writes into it
@@ -74,7 +74,9 @@ linux[whoami.distro^="Arch"]:
       - /tools/scopebuddy
   links:
     skyrim-configure-display.sh: ~/.local/bin/skyrim-configure-display
+    skyrim-benchmark.sh: ~/.local/bin/skyrim-benchmark
     skyrim-skse-launch.sh: ~/.local/bin/skyrim-skse-launch
     skyrim-install-mods.sh: ~/.local/bin/skyrim-install-mods
+    mangohud-benchmark.conf: ~/.config/MangoHud/skyrim-benchmark.conf
     scopebuddy.conf: ~/.config/scopebuddy/AppID/489830.conf
     skyrim.conf: ~/.config/hypr/conf.d/skyrim.conf

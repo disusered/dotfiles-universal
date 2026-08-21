@@ -1,0 +1,5 @@
+profile	game_width	game_height	output_width	output_height	explicit_nested	scaler	filter	connector	refresh_hz
+native	1920	1080	1920	1080	0	none	none	focused	60
+scaled-linear	1600	900	1920	1080	1	fit	linear	focused	60
+fsr-900	1600	900	1920	1080	1	fit	fsr	focused	60
+ultrawide-native	3440	1440	3440	1440	0	none	none	DP-1	144

@@ -2,7 +2,7 @@
 # Swap SkyrimSE.exe for skse64_loader.exe in the command Steam hands over.
 #
 # Usage (as a Steam launch-option wrapper):
-#   scb -- skyrim-skse-launch %command%
+#   scb -- gamemoderun skyrim-skse-launch %command%
 #
 # SKSE runs by launching its own loader instead of the game binary. The two
 # usual ways to arrange that are both bad here:

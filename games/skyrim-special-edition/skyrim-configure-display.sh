@@ -1,20 +1,19 @@
 #!/usr/bin/env bash
-# Render Skyrim SE's INIs into its Proton prefix, sized for whichever machine
-# and monitor the game is being launched on.
+# Render Skyrim SE's INIs into its Proton prefix, sized for the focused monitor
+# when the game is launched.
 #
 # Usage: skyrim-configure-display <width> <height>
 #
 # Called from ScopeBuddy's SCB_PRE_COMMAND, which supplies the focused
 # monitor's resolution via SCB_AUTO_RES. The INIs are *generated*, not
-# symlinked, because the two machines this repo serves disagree about
-# resolution, aspect ratio and GPU class — a committed SkyrimPrefs.ini would
-# be wrong on one of them by construction. Regenerating also means the Skyrim
-# launcher's hardware detection can clobber the files as much as it likes.
+# symlinked, because this one Iris Xe computer has dual-monitor and ultrawide
+# configurations — a committed SkyrimPrefs.ini would be wrong for one of them
+# by construction. Regenerating also means the Skyrim launcher's hardware
+# detection can clobber the files as much as it likes.
 #
 # Overrides:
 #   SKYRIM_FOV    force a field of view instead of deriving one from the
 #                 aspect ratio, e.g. SKYRIM_FOV=90
-#   SKYRIM_TIER   force `igpu` or `dgpu` instead of detecting the GPU
 
 set -euo pipefail
 
@@ -38,17 +37,9 @@ fi
 
 INI_DIR="$LIB/steamapps/compatdata/$APP_ID/pfx/drive_c/users/steamuser/Documents/My Games/Skyrim Special Edition"
 
-# Pick the quality tier. Anything with a discrete AMD (1002) or NVIDIA (10de)
-# display controller gets the High-derived preset; everything else (Intel Iris
-# Xe on the work machine) gets the Medium-derived one.
-if [[ -n ${SKYRIM_TIER:-} ]]; then
-  TIER=$SKYRIM_TIER
-elif lspci -nn 2>/dev/null | grep -E 'VGA compatible controller|3D controller' \
-  | grep -qE '\[(1002|10de):'; then
-  TIER=dgpu
-else
-  TIER=igpu
-fi
+# This computer has one GPU: Intel Iris Xe. Monitor resolution changes between
+# configurations, but the quality tier does not.
+TIER=igpu
 
 PREFS_TEMPLATE="$TEMPLATE_DIR/SkyrimPrefs.$TIER.ini"
 SKYRIM_TEMPLATE="$TEMPLATE_DIR/Skyrim.ini"

@@ -288,7 +288,7 @@ done < "$MANIFEST"
 # ── config overlay ────────────────────────────────────────────────────────
 # Mods ship their own .ini/.json/.toml defaults inside the archive, and the loop
 # above copies them verbatim — so every re-run silently reset whatever had been
-# tuned in game, and the other machine always started from mod defaults. The
+# tuned in game, and another attachment profile always started from defaults. The
 # repo owns these files instead: mods/config/ mirrors the two destinations,
 # mods/config/root/ landing beside SkyrimSE.exe and mods/config/data/ in Data/.
 #

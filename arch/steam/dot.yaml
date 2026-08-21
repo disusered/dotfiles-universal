@@ -1,12 +1,12 @@
-# Manual config: Add `gamemoderun %command%` to launch option of game
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       if ! pacman -Qi steam &>/dev/null; then
         sudo locale-gen
-        sudo pacman -S --noconfirm --needed ttf-liberation steam gamemode lib32-gamemode gamescope vulkan-intel lib32-vulkan-intel
-        sudo gpasswd -a $USER gamemode
       fi
+      # gamemode group membership is only needed for privileged features such
+      # as renicing/core parking; gamemode.ini deliberately enables neither.
+      sudo pacman -S --noconfirm --needed ttf-liberation steam gamemode lib32-gamemode gamescope vulkan-intel lib32-vulkan-intel mangohud lib32-mangohud
     depends:
       - /arch/hyprland
       - /arch/game-controller

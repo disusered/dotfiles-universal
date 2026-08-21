@@ -1,0 +1,10 @@
+profile	display_profile	gamescope_source	backend	overlay_policy	hypr_vfr	hypr_allow_tearing	client_immediate	fps_cap
+ultrawide-h0	ultrawide-native	system	wayland	game	true	true	true	0
+ultrawide-immediate-off	ultrawide-native	system	wayland	game	true	true	false	0
+ultrawide-tearing-off	ultrawide-native	system	wayland	game	true	false	true	0
+ultrawide-gamescope-3.16.25	ultrawide-native	cached:3.16.25-1	wayland	game	true	false	true	0
+ultrawide-sdl	ultrawide-native	system	sdl	game	true	false	true	0
+ultrawide-overlay-off	ultrawide-native	system	wayland	off	true	false	true	0
+ultrawide-cap-45	ultrawide-native	system	wayland	game	true	false	true	45
+ultrawide-gamescope-bypass	ultrawide-native	bypass	wayland	game	true	false	true	0
+ultrawide-combine-pending	ultrawide-native	system	wayland	game	true	false	true	0
