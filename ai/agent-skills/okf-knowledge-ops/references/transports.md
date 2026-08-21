@@ -6,22 +6,23 @@ not switch transports to work around a refusal.
 
 ## Release-installation seam
 
-The verified source contract is currently versioned `1.0.0-rc.0`, but the
-consumer repositories do not yet record one common released `okf-cli` pin or
-installation command. Before a local operation, verify that the consumer owns
-an exact package pin and exposes its binary as `okf`. If either is missing,
-report the release-installation seam and stop; do not improvise with `npx`, a
-toolkit source checkout, the retired Python conformance checker, or a local MCP
-server.
+The current coordinated local release is `1.0.0-rc.1`. Each migrated consumer
+owns an exact `@disusered/okf-cli` pin and a lockfile. Install it with the
+package-manager command documented by that consumer, then use its local binary
+or script. If the exact pin, lockfile, or documented command is missing, report
+the release-installation seam and stop; do not improvise with
+`npx`, a toolkit source checkout, the retired Python conformance checker, or a
+local MCP server.
 
 The hosted deployment must supply the `okf_v1_*` tools below and document its
 one Bundle name. If only unversioned `okf_*` tools are present, or the Bundle
 name is unknown, report the deployment cutover seam and stop. Do not substitute
 the older hosted skill or guess a name.
 
-For format-level decisions, read `spec/SPEC.md` from the exact pinned
-`okf-contracts` release. How each consumer exposes that installed file is also
-unresolved; do not fall back to an unrelated global copy.
+For format-level decisions, read `spec/SPEC.md` from the `okf-contracts`
+package in the consumer's lockfile-backed installation. npm exposes it under
+`node_modules/okf-contracts`; pnpm may keep the transitive package in its
+content-addressed installation. Do not fall back to an unrelated global copy.
 
 ## Local JSON CLI
 

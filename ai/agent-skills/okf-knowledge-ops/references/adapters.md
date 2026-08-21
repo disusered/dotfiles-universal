@@ -33,11 +33,10 @@ current repository instructions over these workstation paths.
   2. `polychromectl refresh polychrome`
   3. `polychromectl lint polychrome`
   4. `okf validate polychrome --strict`
-
-Polychrome does not yet declare `.agents/okf.yaml` or an exact installed
-`okf-cli` release. Until the coordinated consumer cutover records both, treat
-local CLI availability as the release-installation seam described in
-[transports.md](transports.md), not as permission to use a legacy validator.
+- `.agents/okf.yaml` declares exactly one `polychrome` Bundle. Install the
+  exact CLI pin with
+  `npm --prefix utilities/polychrome ci --ignore-scripts`. The Rotz-managed
+  `okf` wrapper and `polychromectl` both resolve that same installation.
 
 ## XBOL
 
@@ -51,12 +50,11 @@ local CLI availability as the release-installation seam described in
   `artifacts/`; promote only provenance and durable conclusions into `docs/`.
 - OpenViking uses the `xbol` profile and remains contextual recall.
 - After authored changes, run every check in the maintenance runbook, then
-  `okf validate docs --strict`.
+  `pnpm okf:validate`.
 - Do not add Polychrome stores, `polychromectl`, a custom general knowledge CLI,
   a local OKF MCP server, a reference agent, or a Brain/Pi harness to XBOL.
-
-XBOL does not yet declare `.agents/okf.yaml` or an exact installed `okf-cli`
-release. Apply the same release-installation stop condition as Polychrome.
+- `.agents/okf.yaml` declares exactly one `xbol` Bundle. Run
+  `pnpm install --frozen-lockfile`; the root scripts use the exact CLI pin.
 
 ## Iteramind Private
 
@@ -70,10 +68,10 @@ release. Apply the same release-installation stop condition as Polychrome.
   JSON `okf` CLI only.
 - OpenViking uses the `iteramind-dev` profile. Resource ingestion is a separate
   explicit request.
-- During the consumer cutover, run the repository's documented private profile
-  validation and tests after `okf validate`. The consumer-owned toolkit profile
-  module and exact CLI release pin are not installed yet; report that seam and
-  do not claim generic validation replaces the private profile.
+- Run `pnpm install --frozen-lockfile` and `pnpm check`. The root scripts use
+  the exact CLI pin and `.agents/okf-private-profile.mjs`; the Python validator
+  remains a parity oracle during the migration rather than a second generic
+  implementation.
 
 ## Iteramind Shared
 

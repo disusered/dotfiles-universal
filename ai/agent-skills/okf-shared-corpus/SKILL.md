@@ -1,100 +1,74 @@
 ---
 name: okf-shared-corpus
-description: Read and curate the Iteramind shared knowledge corpus through the hosted okf_* tools. Use when asked what the company has decided or documented, to look something up in team knowledge, or to add or correct a page in it. Covers authority order, what makes a page valid, how a change is saved, and what to do when a save is refused.
+description: Read and curate Iteramind's Shared Corpus through the hosted versioned OKF tools. Use when asked what the company has decided or documented, to look up team knowledge, or to create, correct, move, or delete a reviewed shared page. Adds Iteramind's authority and content policy to the common single-Bundle OKF workflow.
 ---
 
-# Iteramind shared knowledge
+# Iteramind Shared Corpus
 
-The shared corpus is the company's reviewed knowledge: decisions, policies, runbooks, and
-concepts that anyone on the team may read. It is reached only through the hosted `okf_*` tools
-on this connector. There is no checkout of it and no file on disk to open.
+Use the common transport and change contract instead of maintaining a second
+OKF procedure:
 
-It is one bundle, named `shared`. Any other bundle name is refused, and that refusal is
-correct rather than a misconfiguration — this connector serves exactly one corpus.
+- Read [the transport contract](../okf-knowledge-ops/references/transports.md).
+- Read the **Iteramind Shared** section of
+  [the consumer adapter notes](../okf-knowledge-ops/references/adapters.md).
 
-## Start with context
+The hosted deployment serves exactly one Bundle, named `shared`. It is the
+company's reviewed knowledge and is reached only through its `okf_v1_*` MCP
+tools. Do not start a local server, read the R2 bucket directly, use the retired
+unversioned `okf_*` tools, or add the Private Corpus as another Bundle.
 
-Call `okf_context` for the `shared` bundle before substantive work. It returns the instruction
-documents and the index, which together say what is authoritative. Skipping it means guessing
-at rules that are written down.
+## Establish context and authority
 
-The index is the entry point. Its descriptions exist so you can find the right page without
-reading every page, so read it before searching.
+Call `okf_v1_context` with `bundle: "shared"` before substantive work. Read
+its instruction documents and index. Authored Markdown pages are authoritative;
+the index, search snippets, inspection output, and visualization are generated
+views.
 
-## Reading
+Open the relevant page before relying on a claim and cite its Bundle-relative
+path. Retain its opaque `revision` if the page may change. Use links and search
+to find related pages inside this Bundle only.
 
-- `okf_list` shows the pages and the folders they sit in.
-- `okf_search` ranks whole pages against a natural-language question. It is not a literal
-  text match, so ask the question in your own words rather than guessing keywords.
-- `okf_read` returns one page and an `etag`. Keep that etag if you might edit the page.
-- `okf_links` shows what a page points to and what points back at it. Use it to find related
-  material the index does not surface, and to see whether a page is orphaned.
-- `okf_visualize` returns a URL for a rendered graph of the corpus. It is a generated view,
-  regenerated from the pages; never treat it as the source, and never edit it.
+The visualization is a deterministic projection rebuilt from the current
+Bundle after R2 source events. Never edit it or treat it as authored knowledge.
 
-## Authority
+## Enforce Shared Corpus policy
 
-Authored pages are the authority. An index entry, a search snippet, a graph, or a summary is a
-view of a page, never a substitute for it. When something matters, open the page and cite its
-path.
+- Store stable, reviewed, bot-safe company knowledge only.
+- Require non-empty `type`, `title`, and `description` frontmatter and
+  `status: stable`.
+- Keep internal links inside the Shared Bundle and require them to resolve.
+- Record external provenance as HTTPS resources in `sources`.
+- Never add credentials, personal context, private drafts, raw client data, or
+  client-confidential material.
+- Treat promotion from Private to Shared as an explicit reviewed content
+  change. Never synchronize or cross-link the corpora.
 
-Prefer verified evidence and the corpus over recollection. If the corpus contradicts what you
-believe, the corpus is what the company decided; report the conflict rather than quietly
-resolving it.
+## Change content
 
-## Writing
+Writing requires both an explicit user request and deployment author access.
+Use the common full-page Change contract:
 
-Confirm the person actually asked for a content change. Reading is always fine; writing is not
-implied by having the tools.
+1. Read the current page and retain its `revision`; a new page has no prior
+   revision.
+2. Preview one complete create, update, delete, or move Change with
+   `okf_v1_preview_change`.
+3. Show the returned diff, affected paths, and diagnostics. Wait for explicit
+   approval.
+4. Apply the unchanged request and exact `preview_id` with
+   `okf_v1_apply_change`.
+5. Read the affected paths and validate the Bundle after a successful apply.
 
-1. `okf_read` the page to get its current content and `etag`. Skip this only when creating a
-   page that does not exist.
-2. `okf_preview_change` with the full new content and that `etag`. This stores nothing. It
-   returns a diff and either passes or lists what is wrong.
-3. Show the diff to the person and get their agreement.
-4. `okf_apply_change` with the same content and etag to save it.
+A stale revision or preview, failed validation, Bundle-name refusal, or author
+refusal stops the write. Read current state and obtain a new preview when the
+content changed underneath the request. Never bypass a refusal, reuse an old
+preview for different content, blank a page to imitate deletion, or switch
+transports.
 
-Send whole page content, not a fragment — these tools replace a page rather than patching it.
+When adding or moving a page, include any required index update as a separately
+previewed and approved Change. There is no implicit bulk-edit authorization.
 
-### When a save is refused
+## Finish
 
-- **The etag does not match.** Someone changed the page after you read it. Read it again, redo
-  the preview against the new content, and check your change still makes sense. Never work
-  around this.
-- **Validation failed.** The diagnostics name the page and the rule. Fix the content; do not
-  try another route.
-- **You are not an author.** Reading is open to everyone the access policy admits; saving is
-  limited to a shorter list. Report it and stop.
-
-## What makes a page valid
-
-- Frontmatter carries `type`, `title`, and `description`, all non-empty.
-- Every page in this corpus is `status: stable`. A draft does not belong here — this corpus is
-  read by people and by agents as settled knowledge.
-- Links to other pages stay inside the corpus and must resolve. A link pointing outside it
-  fails validation.
-- External provenance goes in `sources` with an HTTPS URL.
-- Never add credentials, personal context, client-confidential material, or raw client data.
-  If a page needs any of those to make sense, it does not belong here.
-
-The rules above are this corpus's profile, which is stricter than the format itself. OKF
-v0.2 is specified at `~/.local/share/okf/reference/SPEC.md`; read it before authoring a new
-page type or changing frontmatter conventions rather than working from memory. The server
-enforces the profile and refuses a non-conforming save, so the spec is for deciding what to
-write, not for second-guessing a refusal. You cannot run the shared conformance checker
-against this corpus — it is objects in a bucket, not files you can open.
-
-## What this surface cannot do
-
-There is no delete, rename, or bulk edit. Those need a person with direct access, so ask
-rather than improvising an equivalent — for example, do not blank a page to simulate deleting
-it.
-
-Adding a page also usually means adding it to the index, or nobody will find it. Treat that as
-part of the change, not a follow-up.
-
-## Finishing
-
-Say which pages you read or changed, by path. If you changed anything, say what the validator
-reported. If you found a gap, a contradiction, or a page that looks stale, say so plainly
-instead of filing it silently.
+Report the paths read or changed. For a write, report the apply outcome,
+resulting revisions, and post-write validation. State any gap, contradiction,
+or stale page plainly; do not file or repair it without authorization.
