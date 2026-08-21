@@ -74,9 +74,10 @@ host_policy=${SKYRIM_HOST_WORKLOAD_POLICY:-normal}
 
 case $host_policy in
   normal)
-    if [ -x "$gaming_session" ]; then
-      exec "$gaming_session" run-if-armed --profile co-located -- "${args[@]}"
-    fi
+    # Temporary isolation after the gaming-session integration regressed
+    # ordinary launches by blocking on its session lock before Proton starts.
+    # Keep the quiesced benchmark path below intact while normal play executes
+    # Steam's rewritten SKSE command directly.
     ;;
   quiesced)
     if [ ! -x "$gaming_session" ]; then
