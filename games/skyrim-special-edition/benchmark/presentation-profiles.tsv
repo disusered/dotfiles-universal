@@ -1,10 +1,21 @@
-profile	display_profile	gamescope_source	backend	overlay_policy	hypr_vfr	hypr_allow_tearing	client_immediate	fps_cap
-ultrawide-h0	ultrawide-native	system	wayland	game	true	true	true	0
-ultrawide-immediate-off	ultrawide-native	system	wayland	game	true	true	false	0
-ultrawide-tearing-off	ultrawide-native	system	wayland	game	true	false	true	0
-ultrawide-gamescope-3.16.25	ultrawide-native	cached:3.16.25-1	wayland	game	true	false	true	0
-ultrawide-sdl	ultrawide-native	system	sdl	game	true	false	true	0
-ultrawide-overlay-off	ultrawide-native	system	wayland	off	true	false	true	0
-ultrawide-cap-45	ultrawide-native	system	wayland	game	true	false	true	45
-ultrawide-gamescope-bypass	ultrawide-native	bypass	wayland	game	true	false	true	0
-ultrawide-combine-pending	ultrawide-native	system	wayland	game	true	false	true	0
+profile	display_profile	gamescope_source	backend	overlay_policy	hypr_vfr	hypr_allow_tearing	hypr_new_render_scheduling	hypr_direct_scanout	client_immediate	fps_cap	nested_refresh	host_workload_policy
+ultrawide-h0	ultrawide-native	system	wayland	game	true	true	false	0	true	0	auto	normal
+ultrawide-immediate-off	ultrawide-native	system	wayland	game	true	true	false	0	false	0	auto	normal
+ultrawide-postfix	ultrawide-native	system	wayland	game	true	false	false	0	false	0	auto	normal
+dual-60-postfix	dual-1080-60	system	wayland	game	true	false	false	0	false	0	auto	normal
+dual-75-postfix	dual-1080-75	system	wayland	game	true	false	false	0	false	0	auto	normal
+ultrawide-new-scheduling	ultrawide-native	system	wayland	game	true	false	true	0	false	0	auto	normal
+ultrawide-direct-scanout-auto	ultrawide-native	system	wayland	game	true	false	false	2	false	0	auto	normal
+ultrawide-quiesced	ultrawide-native	system	wayland	game	true	false	false	0	false	0	auto	quiesced
+ultrawide-refresh-144	ultrawide-native	system	wayland	game	true	false	false	0	false	0	144	normal
+dual-75-new-scheduling	dual-1080-75	system	wayland	game	true	false	true	0	false	0	auto	normal
+dual-75-direct-scanout-auto	dual-1080-75	system	wayland	game	true	false	false	2	false	0	auto	normal
+dual-75-quiesced	dual-1080-75	system	wayland	game	true	false	false	0	false	0	auto	quiesced
+dual-75-refresh-75	dual-1080-75	system	wayland	game	true	false	false	0	false	0	75	normal
+ultrawide-gamescope-3.16.25	ultrawide-native	cached:3.16.25-1	wayland	game	true	false	false	0	false	0	auto	normal
+ultrawide-sdl	ultrawide-native	system	sdl	game	true	false	false	0	false	0	auto	normal
+ultrawide-overlay-off	ultrawide-native	system	wayland	off	true	false	false	0	false	0	auto	normal
+ultrawide-cap-45	ultrawide-native	system	wayland	game	true	false	false	0	false	45	auto	normal
+ultrawide-gamescope-bypass	ultrawide-native	bypass	wayland	game	true	false	false	0	false	0	auto	normal
+dual-75-gamescope-bypass	dual-1080-75	bypass	wayland	game	true	false	false	0	false	0	auto	normal
+ultrawide-combine-pending	ultrawide-native	system	wayland	game	true	false	false	0	false	0	auto	normal

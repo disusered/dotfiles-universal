@@ -270,8 +270,11 @@ append_runtime_drift_states() {
 }
 
 write_runtime_receipts() {
-  local run_dir=$1 game_overlay=$2 sample timestamp gamescope_pid=0 xwayland_pid=0 address=""
+  local run_dir=$1 game_overlay=$2 sample timestamp refresh topology scanout_target="" gamescope_pid=0 xwayland_pid=0 address=""
+  wait_for_file "$run_dir/hypr-state.ndjson"
   timestamp=$(date +%s%N)
+  refresh=$(jq -r '.[0].refreshRate' "$run_dir/prepared-monitor-topology.json")
+  topology=$(jq -cS . "$run_dir/prepared-monitor-topology.json")
   sample=$(tail -n 1 "$run_dir/samples.tsv")
   [[ $sample != timestamp_ns$'\t'* ]] || fail "runtime fixture has no trace sample"
   if [[ ${GAMESCOPE_MODE:-enabled} == enabled ]]; then
@@ -279,9 +282,10 @@ write_runtime_receipts() {
     xwayland_pid=103
     address=0xabc
   fi
+  (( HYPR_DIRECT_SCANOUT > 0 )) && scanout_target=0xabc
   awk -F '\t' -v OFS='\t' \
     -v timestamp="$timestamp" -v gamescope_pid="$gamescope_pid" -v xwayland_pid="$xwayland_pid" '
-      {$1=timestamp; $13=101; $22=gamescope_pid; $31=xwayland_pid; $40=104; print}
+      {$1=timestamp; $2=sprintf("%.2f",$2+0.25); $13=101; $22=gamescope_pid; $31=xwayland_pid; $40=104; print}
     ' <<< "$sample" >> "$run_dir/samples.tsv"
   printf '%s\n' \
     "$timestamp"$'\t101\thyprland\t/mock/Hyprland\t/mock/Hyprland' \
@@ -308,18 +312,25 @@ write_runtime_receipts() {
     --arg connector "$CONNECTOR" \
     --argjson width "$OUTPUT_WIDTH" \
     --argjson height "$OUTPUT_HEIGHT" \
-    --argjson refresh "$REFRESH_HZ" \
+    --argjson refresh "$refresh" \
+    --argjson topology "$topology" \
     --argjson vfr "$HYPR_VFR" \
     --argjson tearing "$HYPR_ALLOW_TEARING" \
+    --argjson scheduling "$HYPR_NEW_RENDER_SCHEDULING" \
+    --argjson scanout "$HYPR_DIRECT_SCANOUT" \
     --argjson immediate "$HYPR_IMMEDIATE" \
     --argjson gamescope_pid "$gamescope_pid" \
-    --arg address "$address" '
+    --arg address "$address" \
+    --arg scanout_target "$scanout_target" '
       {timestamp_ns:$timestamp_ns,
        monitors:[{name:$connector,width:$width,height:$height,refreshRate:$refresh,
-         focused:true,activelyTearing:false}],
+         focused:true,activelyTearing:false,directScanoutTo:$scanout_target}],
        gamescope_client:(if $gamescope_pid > 0 then {address:$address,pid:$gamescope_pid} else null end),
        gamescope_property:{address:$address,pid:$gamescope_pid,immediate:$immediate},
-       hypr_options:{vfr:$vfr,allow_tearing:$tearing},
+       launch:{skyrim_pid:104},
+       monitor_topology:$topology,
+       hypr_options:{vfr:$vfr,allow_tearing:$tearing,
+         new_render_scheduling:$scheduling,direct_scanout:$scanout},
        activewindow:{address:$address,class:"gamescope",title:"Skyrim Special Edition"}}
     ' >> "$run_dir/hypr-state.ndjson"
   printf '%s\n' \
@@ -342,11 +353,14 @@ export SKYRIM_BENCHMARK_MONITORS_JSON=$TEST_ROOT/monitors.json
 export SKYRIM_BENCHMARK_BOOT_ID_FILE=$TEST_CONTROL/boot-id
 export SKYRIM_BENCHMARK_MANGOHUD_CONFIG=$TEST_HOME/.config/MangoHud/skyrim-benchmark.conf
 export SKYRIM_BENCHMARK_PREFS_INI=$TEST_ROOT/SkyrimPrefs.ini
+export SKYRIM_BENCHMARK_SKYRIM_INI=$TEST_ROOT/Skyrim.ini
 export SKYRIM_BENCHMARK_SCOPE_LOG=$TEST_ROOT/scopebuddy.log
 export SKYRIM_BENCHMARK_STEAM_BUILD=24604991
 export SKYRIM_BENCHMARK_SKIP_PROCESS_CHECK=1
 export SKYRIM_TEST_CONTROL_DIR=$TEST_CONTROL
 export SKYRIM_TEST_GAMESCOPE_BIN=$TEST_GAMESCOPE_BIN
+export SKYRIM_TEST_PREFS_TEMPLATE=$MODULE_DIR/SkyrimPrefs.igpu.ini
+export SKYRIM_TEST_INI_TEMPLATE=$MODULE_DIR/Skyrim.ini
 
 mkdir -p \
   "$TEST_HOME/.local/bin" \
@@ -365,14 +379,14 @@ cp "$MODULE_DIR/mangohud-benchmark.conf" "$SKYRIM_BENCHMARK_MANGOHUD_CONFIG"
 ln -s "$CONTROLLER" "$TEST_HOME/.local/bin/skyrim-benchmark"
 
 printf '%s\n' \
-  $'bad-two-factors\tultrawide-native\tsystem\tsdl\tgame\ttrue\tfalse\ttrue\t0' \
+  $'bad-two-factors\tultrawide-native\tsystem\tsdl\tgame\ttrue\tfalse\tfalse\t0\tfalse\t0\tauto\tnormal' \
   >> "$SKYRIM_BENCHMARK_PRESENTATION_PROFILES"
 printf '%s\n' \
   $'BAD-TWO\tplanned\tH0\tbad-two-factors\thypr_allow_tearing\ttrue\tfalse\tindoor-v1\t0\t120\tfalse\tshort-1\trequired\tpending\tpending\tNA\tNA\tNA\tNA\tpending\tSynthetic invalid two-factor cell.' \
-  $'BAD-REPEAT\tplanned\tH0\tultrawide-tearing-off\treplicate\tultrawide-h0\tultrawide-h0\tindoor-v1\t0\t120\tfalse\tshort-2\trequired\tpending\tpending\tNA\tNA\tNA\tNA\tpending\tSynthetic invalid repeat.' \
-  $'CANCEL-TEST\tplanned\tH1-S\tultrawide-tearing-off\treplicate\tultrawide-tearing-off\tultrawide-tearing-off\tindoor-v1\t0\t120\tfalse\tshort-1\trequired\tpending\tpending\tNA\tNA\tNA\tNA\tpending\tSynthetic active-cancel restoration path.' \
-  $'STATE-DRIFT\tplanned\tH1-S\tultrawide-tearing-off\treplicate\tultrawide-tearing-off\tultrawide-tearing-off\tindoor-v1\t0\t120\tfalse\tshort-1\trequired\tpending\tpending\tNA\tNA\tNA\tNA\tpending\tSynthetic client Hypr and topology drift path.' \
-  $'INI-DRIFT\tplanned\tH1-S\tultrawide-tearing-off\treplicate\tultrawide-tearing-off\tultrawide-tearing-off\tindoor-v1\t0\t120\tfalse\tshort-1\trequired\tpending\tpending\tNA\tNA\tNA\tNA\tpending\tSynthetic generated INI drift path.' \
+  $'BAD-REPEAT\tplanned\tH0\tultrawide-postfix\treplicate\tultrawide-h0\tultrawide-h0\tindoor-v1\t0\t120\tfalse\tshort-2\trequired\tpending\tpending\tNA\tNA\tNA\tNA\tpending\tSynthetic invalid repeat.' \
+  $'CANCEL-TEST\tplanned\tB0-S\tultrawide-postfix\treplicate\tultrawide-postfix\tultrawide-postfix\tindoor-v1\t0\t120\tfalse\tshort-1\trequired\tpending\tpending\tNA\tNA\tNA\tNA\tpending\tSynthetic active-cancel restoration path.' \
+  $'STATE-DRIFT\tplanned\tB0-S\tultrawide-postfix\treplicate\tultrawide-postfix\tultrawide-postfix\tindoor-v1\t0\t120\tfalse\tshort-1\trequired\tpending\tpending\tNA\tNA\tNA\tNA\tpending\tSynthetic client Hypr and topology drift path.' \
+  $'INI-DRIFT\tplanned\tB0-S\tultrawide-postfix\treplicate\tultrawide-postfix\tultrawide-postfix\tindoor-v1\t0\t120\tfalse\tshort-1\trequired\tpending\tpending\tNA\tNA\tNA\tNA\tpending\tSynthetic generated INI drift path.' \
   >> "$SKYRIM_BENCHMARK_PRESENTATION_MATRIX"
 
 printf '%s\n' \
@@ -380,13 +394,13 @@ printf '%s\n' \
   >> "$SKYRIM_BENCHMARK_MATRIX"
 
 awk -F '\t' '
-  $1 ~ /^(ultrawide-tearing-off|ultrawide-gamescope-3[.]16[.]25|ultrawide-sdl|ultrawide-overlay-off|ultrawide-cap-45|ultrawide-gamescope-bypass|ultrawide-combine-pending)$/ {
-    seen++; if ($7 != "false") bad=1
+  $1 ~ /^(ultrawide-postfix|ultrawide-gamescope-3[.]16[.]25|ultrawide-sdl|ultrawide-overlay-off|ultrawide-cap-45|ultrawide-gamescope-bypass|ultrawide-combine-pending)$/ {
+    seen++; if ($7 != "false" || $10 != "false") bad=1
   }
   END {exit !(seen == 7 && !bad)}
 ' "$SKYRIM_BENCHMARK_PRESENTATION_PROFILES"
 awk -F '\t' '
-  $1 ~ /^(H2|H3|H4|H5|F1|C1)-1$/ {seen++; if ($3 != "H1-S") bad=1}
+  $1 ~ /^(H2|H3|H4|H5|F1|C1)-1$/ {seen++; if ($3 != "B0-S") bad=1}
   END {exit !(seen == 6 && !bad)}
 ' "$SKYRIM_BENCHMARK_PRESENTATION_MATRIX"
 
@@ -453,6 +467,12 @@ case " $* " in
   *' -j getoption general:allow_tearing '*)
     bool_json "$control/hypr-tearing"
     ;;
+  *' -j getoption render:new_render_scheduling '*)
+    bool_json "$control/hypr-new-scheduling"
+    ;;
+  *' -j getoption render:direct_scanout '*)
+    printf '{"int":%s,"set":true}\n' "$(<"$control/hypr-direct-scanout")"
+    ;;
   *' -j version '*)
     printf '{"tag":"v0.55.2","commit":"mock"}\n'
     ;;
@@ -461,7 +481,9 @@ case " $* " in
   *' -j monitors all '*|*' -j monitors '*)
     tearing=false
     [[ $(<"$control/hypr-tearing") == true ]] && tearing=true
-    printf '[{"id":0,"name":"DP-1","width":3440,"height":1440,"refreshRate":143.975,"focused":true,"activelyTearing":%s,"hardwareCursorsInUse":true,"directScanoutTo":"","directScanoutBlockedBy":""}]\n' "$tearing"
+    scanout=""
+    [[ $(<"$control/hypr-direct-scanout") == 0 ]] || scanout=0xabc
+    printf '[{"id":0,"name":"DP-1","width":3440,"height":1440,"refreshRate":143.975,"focused":true,"activelyTearing":%s,"hardwareCursorsInUse":true,"directScanoutTo":"%s","directScanoutBlockedBy":""}]\n' "$tearing" "$scanout"
     ;;
   *' -j clients '*)
     printf '[{"address":"0xabc","class":"gamescope","title":"Skyrim Special Edition","xwayland":false,"fullscreen":2}]\n'
@@ -490,6 +512,14 @@ case " $* " in
     set_bool "$control/hypr-tearing" "${3:?}"
     printf 'ok\n'
     ;;
+  *' keyword render:new_render_scheduling '*)
+    set_bool "$control/hypr-new-scheduling" "${3:?}"
+    printf 'ok\n'
+    ;;
+  *' keyword render:direct_scanout '*)
+    printf '%s\n' "${3:?}" > "$control/hypr-direct-scanout"
+    printf 'ok\n'
+    ;;
   *' setprop '*' immediate '*)
     set_bool "$control/hypr-immediate" "${4:?}"
     printf 'ok\n'
@@ -503,7 +533,18 @@ cat > "$TEST_HOME/.local/bin/skyrim-configure-display" <<'EOF'
 #!/usr/bin/env bash
 set +x
 set -euo pipefail
-printf 'iSize W=%s\niSize H=%s\nbBorderless=1\n' "$1" "$2" > "$SKYRIM_BENCHMARK_PREFS_INI"
+width=$1
+height=$2
+fov=$(awk -v w="$width" -v h="$height" 'BEGIN {
+  pi=atan2(0,-1); base=80; half=(base/2)*pi/180
+  value=2*atan2(sin(half)/cos(half)*(w/h)/(16/9),1)*180/pi
+  if (value<base) value=base
+  if (value>110) value=110
+  printf "%.4f",value
+}')
+sed -e "s/@WIDTH@/$width/g" -e "s/@HEIGHT@/$height/g" \
+  "$SKYRIM_TEST_PREFS_TEMPLATE" > "$SKYRIM_BENCHMARK_PREFS_INI"
+sed -e "s/@FOV@/$fov/g" "$SKYRIM_TEST_INI_TEMPLATE" > "$SKYRIM_BENCHMARK_SKYRIM_INI"
 EOF
 chmod +x \
   "$TEST_GAMESCOPE_BIN" \
@@ -517,6 +558,8 @@ export PATH="$TEST_GAMESCOPE_ROOT/bin:$TEST_BIN:$TEST_HOME/.local/bin:$PATH"
 
 printf '%s\n' true > "$TEST_CONTROL/hypr-vfr"
 printf '%s\n' false > "$TEST_CONTROL/hypr-tearing"
+printf '%s\n' false > "$TEST_CONTROL/hypr-new-scheduling"
+printf '%s\n' 0 > "$TEST_CONTROL/hypr-direct-scanout"
 printf '%s\n' true > "$TEST_CONTROL/hypr-immediate"
 printf '%s\n' boot-a > "$SKYRIM_BENCHMARK_BOOT_ID_FILE"
 printf '%s\n' \
@@ -537,33 +580,33 @@ expect_failure_matching \
   'replicate.*changes|changes.*replicate' \
   "$CONTROLLER" queue BAD-REPEAT
 
-$CONTROLLER queue H1-1 > "$TEST_ROOT/h1-waiting.receipt"
-grep -Fxq 'STATE=WAITING_FOR_REBOOT' "$TEST_ROOT/h1-waiting.receipt"
-grep -Fxq 'RUN_KIND=presentation' "$TEST_ROOT/h1-waiting.receipt"
-grep -Fxq 'OUTPUT=3440x1440@144 DP-1' "$TEST_ROOT/h1-waiting.receipt"
-grep -Fxq 'HUD=enabled' "$TEST_ROOT/h1-waiting.receipt"
-grep -Fxq 'SYSTEM_TRACE=automatic' "$TEST_ROOT/h1-waiting.receipt"
-grep -Fxq 'MANGOHUD_RECORDING=manual Left Shift+F2' "$TEST_ROOT/h1-waiting.receipt"
+$CONTROLLER queue B0-1 > "$TEST_ROOT/b0-waiting.receipt"
+grep -Fxq 'STATE=WAITING_FOR_REBOOT' "$TEST_ROOT/b0-waiting.receipt"
+grep -Fxq 'RUN_KIND=presentation' "$TEST_ROOT/b0-waiting.receipt"
+grep -Fxq 'OUTPUT=3440x1440@144 DP-1' "$TEST_ROOT/b0-waiting.receipt"
+grep -Fxq 'HUD=enabled' "$TEST_ROOT/b0-waiting.receipt"
+grep -Fxq 'SYSTEM_TRACE=automatic' "$TEST_ROOT/b0-waiting.receipt"
+grep -Fxq 'MANGOHUD_RECORDING=manual Left Shift+F2' "$TEST_ROOT/b0-waiting.receipt"
 
-H1_RUN_DIR=$SKYRIM_PERF_STATE_DIR/runs/H1-1
+B0_RUN_DIR=$SKYRIM_PERF_STATE_DIR/runs/B0-1
 # shellcheck disable=SC1090,SC1091
-source "$H1_RUN_DIR/prepared.env"
+source "$B0_RUN_DIR/prepared.env"
 [[ $GAMESCOPE_SOURCE == system ]]
 [[ $GAMESCOPE_BIN == "$TEST_GAMESCOPE_BIN" ]]
 [[ $GAMESCOPE_BIN_DIR == "$TEST_GAMESCOPE_ROOT/bin" ]]
 [[ $GAMESCOPE_SCRIPT_PATH == "$TEST_GAMESCOPE_ROOT/share/gamescope/scripts" ]]
 [[ $GAMESCOPE_BACKEND == wayland ]]
 [[ $OVERLAY_POLICY == game ]]
-[[ $HYPR_VFR == true && $HYPR_ALLOW_TEARING == false && $HYPR_IMMEDIATE == true ]]
+[[ $HYPR_VFR == true && $HYPR_ALLOW_TEARING == false && $HYPR_IMMEDIATE == false ]]
 [[ $GAMESCOPE_ARGS == '-f --grab --backend wayland --prefer-output DP-1 --force-windows-fullscreen --mangoapp -W 3440 -H 1440' ]]
 
 expect_failure_matching \
   'launch before required reboot' \
   'reboot|WAITING' \
-  "$CONTROLLER" activate H1-1 "$GAMESCOPE_ARGS"
+  "$CONTROLLER" activate B0-1 "$GAMESCOPE_ARGS"
 
 printf '%s\n' boot-b > "$SKYRIM_BENCHMARK_BOOT_ID_FILE"
-assert_ready h1-first
+assert_ready b0-first
 
 printf '%s\n' false > "$TEST_CONTROL/hypr-vfr"
 expect_failure_matching \
@@ -594,52 +637,52 @@ source "$MODULE_DIR/scopebuddy.conf"
 [[ $PATH == "$GAMESCOPE_BIN_DIR":* ]]
 [[ $GAMESCOPE_SCRIPT_PATH == "$TEST_GAMESCOPE_ROOT/share/gamescope/scripts" ]]
 [[ $(<"$TEST_CONTROL/hypr-tearing") == false ]]
-wait_for_lines "$H1_RUN_DIR/samples.tsv" 2
-wait_for_file "$H1_RUN_DIR/hypr-state.ndjson"
-[[ $(<"$H1_RUN_DIR/trace-status") == running ]]
-write_runtime_receipts "$H1_RUN_DIR" true
+wait_for_lines "$B0_RUN_DIR/samples.tsv" 2
+wait_for_file "$B0_RUN_DIR/hypr-state.ndjson"
+[[ $(<"$B0_RUN_DIR/trace-status") == running ]]
+write_runtime_receipts "$B0_RUN_DIR" true
 
-$CONTROLLER post-launch H1-1
-[[ $(<"$H1_RUN_DIR/trace-status") == stopped ]]
+$CONTROLLER post-launch B0-1
+[[ $(<"$B0_RUN_DIR/trace-status") == stopped ]]
 [[ $(<"$TEST_CONTROL/hypr-vfr") == true ]]
 [[ $(<"$TEST_CONTROL/hypr-tearing") == false ]]
-jq -e '.passed == true' "$H1_RUN_DIR/runtime-verification.json" >/dev/null
-write_dense_trace_span "$H1_RUN_DIR" 199
+jq -e '.passed == true' "$B0_RUN_DIR/runtime-verification.json" >/dev/null
+write_dense_trace_span "$B0_RUN_DIR" 199
 
 expect_failure_matching \
   'accepted short run without MangoHud data' \
   'MangoHud|summary|recording' \
-  "$CONTROLLER" complete H1-1 \
+  "$CONTROLLER" complete B0-1 \
     --game-cursor good \
     --desktop-cursor good \
     --verdict accepted \
     --notes 'Missing MangoHud must fail.'
 
-write_mangohud_recording "$H1_RUN_DIR" 109000000000
+write_mangohud_recording "$B0_RUN_DIR" 109000000000
 expect_failure_matching \
   'short MangoHud recording below tolerance' \
   'recording lasted.*expected.*120' \
-  "$CONTROLLER" complete H1-1 \
+  "$CONTROLLER" complete B0-1 \
     --game-cursor good \
     --desktop-cursor good \
     --verdict accepted \
     --notes 'Short recording must fail.'
 
-write_mangohud_recording "$H1_RUN_DIR" 131000000000
+write_mangohud_recording "$B0_RUN_DIR" 131000000000
 expect_failure_matching \
   'short MangoHud recording above tolerance' \
   'recording lasted.*expected.*120' \
-  "$CONTROLLER" complete H1-1 \
+  "$CONTROLLER" complete B0-1 \
     --game-cursor good \
     --desktop-cursor good \
     --verdict accepted \
     --notes 'Long recording must fail.'
 
-write_mangohud_recording "$H1_RUN_DIR"
+write_mangohud_recording "$B0_RUN_DIR"
 expect_failure_matching \
   'accepted short run without desktop observation' \
   'good game and desktop cursor' \
-  "$CONTROLLER" complete H1-1 \
+  "$CONTROLLER" complete B0-1 \
     --game-cursor good \
     --desktop-cursor not-tested \
     --verdict accepted \
@@ -647,154 +690,154 @@ expect_failure_matching \
 expect_failure_matching \
   'accepted short run without full automatic trace' \
   'automatic trace lasted.*expected at least 200' \
-  "$CONTROLLER" complete H1-1 \
+  "$CONTROLLER" complete B0-1 \
     --game-cursor good \
     --desktop-cursor good \
     --verdict accepted \
     --notes 'Short trace must fail.'
-write_gappy_trace_span "$H1_RUN_DIR" 210
+write_gappy_trace_span "$B0_RUN_DIR" 210
 expect_failure_matching \
   'accepted short run with a gappy automatic trace' \
   'trace.*(coverage|gap|continu)|sample.*coverage' \
-  "$CONTROLLER" complete H1-1 \
+  "$CONTROLLER" complete B0-1 \
     --game-cursor good \
     --desktop-cursor good \
     --verdict accepted \
     --notes 'Gappy short trace must fail.'
-write_dense_trace_span "$H1_RUN_DIR" 210
-$CONTROLLER complete H1-1 \
+write_dense_trace_span "$B0_RUN_DIR" 210
+$CONTROLLER complete B0-1 \
   --game-cursor good \
   --desktop-cursor good \
   --verdict accepted \
   --notes 'Synthetic accepted short presentation run.' \
-  > "$TEST_ROOT/h1-completed.receipt"
-grep -Fxq 'STATE=completed' "$TEST_ROOT/h1-completed.receipt"
-awk -F '\t' '$1 == "H1-1" { exit !($2 == "completed" && $14 == "good" && $15 == "good" && $16 == "0" && $20 == "accepted") }' \
+  > "$TEST_ROOT/b0-completed.receipt"
+grep -Fxq 'STATE=completed' "$TEST_ROOT/b0-completed.receipt"
+awk -F '\t' '$1 == "B0-1" { exit !($2 == "completed" && $14 == "good" && $15 == "good" && $16 == "0" && $20 == "accepted") }' \
   "$SKYRIM_BENCHMARK_PRESENTATION_MATRIX"
-awk -F '\t' '$1 == "H1-2" { exit !($2 == "planned") }' \
+awk -F '\t' '$1 == "B0-2" { exit !($2 == "planned") }' \
   "$SKYRIM_BENCHMARK_PRESENTATION_MATRIX"
 
 # An exact repeat is eligible only after the first short run is accepted.
 printf '%s\n' boot-b > "$SKYRIM_BENCHMARK_BOOT_ID_FILE"
-$CONTROLLER queue H1-2 > "$TEST_ROOT/h1-repeat-waiting.receipt"
-grep -Fxq 'STATE=WAITING_FOR_REBOOT' "$TEST_ROOT/h1-repeat-waiting.receipt"
+$CONTROLLER queue B0-2 > "$TEST_ROOT/b0-repeat-waiting.receipt"
+grep -Fxq 'STATE=WAITING_FOR_REBOOT' "$TEST_ROOT/b0-repeat-waiting.receipt"
 printf '%s\n' boot-c > "$SKYRIM_BENCHMARK_BOOT_ID_FILE"
-assert_ready h1-repeat
+assert_ready b0-repeat
 
 SCB_GAMESCOPE_ARGS='ambient repeat arguments'
 SCB_AUTO_RES=1
 # shellcheck disable=SC1091
 source "$MODULE_DIR/scopebuddy.conf"
-H1_REPEAT_DIR=$SKYRIM_PERF_STATE_DIR/runs/H1-2
-wait_for_lines "$H1_REPEAT_DIR/samples.tsv" 2
+B0_REPEAT_DIR=$SKYRIM_PERF_STATE_DIR/runs/B0-2
+wait_for_lines "$B0_REPEAT_DIR/samples.tsv" 2
 $CONTROLLER mark stall-recovered --scope desktop
-grep -q $'stall-recovered\tdesktop' "$H1_REPEAT_DIR/events.tsv"
-write_runtime_receipts "$H1_REPEAT_DIR" true
-$CONTROLLER post-launch H1-2
-[[ $(<"$H1_REPEAT_DIR/trace-status") == stopped ]]
+grep -q $'stall-recovered\tdesktop' "$B0_REPEAT_DIR/events.tsv"
+write_runtime_receipts "$B0_REPEAT_DIR" true
+$CONTROLLER post-launch B0-2
+[[ $(<"$B0_REPEAT_DIR/trace-status") == stopped ]]
 [[ $(<"$TEST_CONTROL/hypr-tearing") == false ]]
-jq -e '.passed == true' "$H1_REPEAT_DIR/runtime-verification.json" >/dev/null
-[[ ! -e $H1_REPEAT_DIR/mangohud.csv && ! -e $H1_REPEAT_DIR/mangohud_summary.csv ]]
+jq -e '.passed == true' "$B0_REPEAT_DIR/runtime-verification.json" >/dev/null
+[[ ! -e $B0_REPEAT_DIR/mangohud.csv && ! -e $B0_REPEAT_DIR/mangohud_summary.csv ]]
 
-$CONTROLLER complete H1-2 \
+$CONTROLLER complete B0-2 \
   --game-cursor bad \
   --desktop-cursor bad \
   --verdict rejected \
   --notes 'Synthetic cursor/compositor failure without MangoHud.' \
-  > "$TEST_ROOT/h1-repeat-completed.receipt"
-grep -Fxq 'STATE=completed' "$TEST_ROOT/h1-repeat-completed.receipt"
-awk -F '\t' '$1 == "H1-2" { exit !($2 == "completed" && $13 ~ /^automatic-trace/ && $14 == "bad" && $15 == "bad" && $16 == "1" && $20 == "rejected") }' \
+  > "$TEST_ROOT/b0-repeat-completed.receipt"
+grep -Fxq 'STATE=completed' "$TEST_ROOT/b0-repeat-completed.receipt"
+awk -F '\t' '$1 == "B0-2" { exit !($2 == "completed" && $13 ~ /^automatic-trace/ && $14 == "bad" && $15 == "bad" && $16 == "1" && $20 == "rejected") }' \
   "$SKYRIM_BENCHMARK_PRESENTATION_MATRIX"
 awk -F '\t' 'NR > 1 {count[$7]++} END {exit !(count["ambiguous"] == 1)}' \
-  "$H1_REPEAT_DIR/event-classifications.tsv"
+  "$B0_REPEAT_DIR/event-classifications.tsv"
 jq -e '.stall_classification == {frame_freeze:0,cursor_compositor_stall:0,ambiguous:1}' \
-  "$H1_REPEAT_DIR/observation.json" >/dev/null
+  "$B0_REPEAT_DIR/observation.json" >/dev/null
 
 # Preserve the cursor-failure branch, then prove a repeat that improves by more
 # than 5% is inconclusive instead of silently accepted as the same condition.
-mv -- "$H1_REPEAT_DIR" "$TEST_ROOT/h1-repeat-rejected"
-reset_presentation_run H1-2
-$CONTROLLER queue H1-2 > "$TEST_ROOT/h1-repeat-improved-waiting.receipt"
-grep -Fxq 'STATE=WAITING_FOR_REBOOT' "$TEST_ROOT/h1-repeat-improved-waiting.receipt"
+mv -- "$B0_REPEAT_DIR" "$TEST_ROOT/b0-repeat-rejected"
+reset_presentation_run B0-2
+$CONTROLLER queue B0-2 > "$TEST_ROOT/b0-repeat-improved-waiting.receipt"
+grep -Fxq 'STATE=WAITING_FOR_REBOOT' "$TEST_ROOT/b0-repeat-improved-waiting.receipt"
 printf '%s\n' boot-d > "$SKYRIM_BENCHMARK_BOOT_ID_FILE"
-assert_ready h1-repeat-improved
+assert_ready b0-repeat-improved
 SCB_GAMESCOPE_ARGS='ambient improved-repeat arguments'
 SCB_AUTO_RES=1
 # shellcheck disable=SC1091
 source "$MODULE_DIR/scopebuddy.conf"
-H1_REPEAT_DIR=$SKYRIM_PERF_STATE_DIR/runs/H1-2
-wait_for_lines "$H1_REPEAT_DIR/samples.tsv" 2
-write_runtime_receipts "$H1_REPEAT_DIR" true
-$CONTROLLER post-launch H1-2
-jq -e '.passed == true' "$H1_REPEAT_DIR/runtime-verification.json" >/dev/null
-write_dense_trace_span "$H1_REPEAT_DIR" 210
-write_mangohud_recording "$H1_REPEAT_DIR" 120000000000 70.0 50.0 35.0
+B0_REPEAT_DIR=$SKYRIM_PERF_STATE_DIR/runs/B0-2
+wait_for_lines "$B0_REPEAT_DIR/samples.tsv" 2
+write_runtime_receipts "$B0_REPEAT_DIR" true
+$CONTROLLER post-launch B0-2
+jq -e '.passed == true' "$B0_REPEAT_DIR/runtime-verification.json" >/dev/null
+write_dense_trace_span "$B0_REPEAT_DIR" 210
+write_mangohud_recording "$B0_REPEAT_DIR" 120000000000 70.0 50.0 35.0
 expect_failure_matching \
   'repeat with a greater-than-5-percent improvement' \
   '5%|5 percent|rerun|inconclusive|difference' \
-  "$CONTROLLER" complete H1-2 \
+  "$CONTROLLER" complete B0-2 \
     --game-cursor good \
     --desktop-cursor good \
     --verdict accepted \
     --notes 'Large repeat improvement must require another run.'
-$CONTROLLER complete H1-2 \
+$CONTROLLER complete B0-2 \
   --game-cursor good \
   --desktop-cursor good \
   --verdict inconclusive \
   --notes 'Synthetic improved repeat requires rerun.' \
   >/dev/null
-awk -F '\t' '$1 == "H1-2" {exit !($2 == "completed" && $20 == "inconclusive")}' \
+awk -F '\t' '$1 == "B0-2" {exit !($2 == "completed" && $20 == "inconclusive")}' \
   "$SKYRIM_BENCHMARK_PRESENTATION_MATRIX"
 
 # Rerun the exact repeat with metrics inside the symmetric tolerance so the
 # real chain can promote its soak and later candidates.
-mv -- "$H1_REPEAT_DIR" "$TEST_ROOT/h1-repeat-improved"
-reset_presentation_run H1-2
-$CONTROLLER queue H1-2 > "$TEST_ROOT/h1-repeat-accepted-waiting.receipt"
-grep -Fxq 'STATE=WAITING_FOR_REBOOT' "$TEST_ROOT/h1-repeat-accepted-waiting.receipt"
+mv -- "$B0_REPEAT_DIR" "$TEST_ROOT/b0-repeat-improved"
+reset_presentation_run B0-2
+$CONTROLLER queue B0-2 > "$TEST_ROOT/b0-repeat-accepted-waiting.receipt"
+grep -Fxq 'STATE=WAITING_FOR_REBOOT' "$TEST_ROOT/b0-repeat-accepted-waiting.receipt"
 printf '%s\n' boot-e > "$SKYRIM_BENCHMARK_BOOT_ID_FILE"
-assert_ready h1-repeat-accepted
+assert_ready b0-repeat-accepted
 SCB_GAMESCOPE_ARGS='ambient accepted-repeat arguments'
 SCB_AUTO_RES=1
 # shellcheck disable=SC1091
 source "$MODULE_DIR/scopebuddy.conf"
-H1_REPEAT_DIR=$SKYRIM_PERF_STATE_DIR/runs/H1-2
-wait_for_lines "$H1_REPEAT_DIR/samples.tsv" 2
-write_runtime_receipts "$H1_REPEAT_DIR" true
-$CONTROLLER post-launch H1-2
-jq -e '.passed == true' "$H1_REPEAT_DIR/runtime-verification.json" >/dev/null
-write_dense_trace_span "$H1_REPEAT_DIR" 210
-write_mangohud_recording "$H1_REPEAT_DIR"
-$CONTROLLER complete H1-2 \
+B0_REPEAT_DIR=$SKYRIM_PERF_STATE_DIR/runs/B0-2
+wait_for_lines "$B0_REPEAT_DIR/samples.tsv" 2
+write_runtime_receipts "$B0_REPEAT_DIR" true
+$CONTROLLER post-launch B0-2
+jq -e '.passed == true' "$B0_REPEAT_DIR/runtime-verification.json" >/dev/null
+write_dense_trace_span "$B0_REPEAT_DIR" 210
+write_mangohud_recording "$B0_REPEAT_DIR"
+$CONTROLLER complete B0-2 \
   --game-cursor good \
   --desktop-cursor good \
   --verdict accepted \
   --notes 'Synthetic accepted exact repeat.' \
   >/dev/null
-awk -F '\t' '$1 == "H1-S" {exit !($2 == "planned")}' \
+awk -F '\t' '$1 == "B0-S" {exit !($2 == "planned")}' \
   "$SKYRIM_BENCHMARK_PRESENTATION_MATRIX"
 
 # The promoted real soak is accepted from automatic system evidence alone. It
 # rejects one second below duration and does not require 4.5h of Mango data.
-$CONTROLLER queue H1-S > "$TEST_ROOT/h1-soak-waiting.receipt"
-grep -Fxq 'STATE=WAITING_FOR_REBOOT' "$TEST_ROOT/h1-soak-waiting.receipt"
+$CONTROLLER queue B0-S > "$TEST_ROOT/b0-soak-waiting.receipt"
+grep -Fxq 'STATE=WAITING_FOR_REBOOT' "$TEST_ROOT/b0-soak-waiting.receipt"
 printf '%s\n' boot-f > "$SKYRIM_BENCHMARK_BOOT_ID_FILE"
-assert_ready h1-soak
+assert_ready b0-soak
 SCB_GAMESCOPE_ARGS='ambient soak arguments'
 SCB_AUTO_RES=1
 # shellcheck disable=SC1091
 source "$MODULE_DIR/scopebuddy.conf"
-SOAK_RUN_DIR=$SKYRIM_PERF_STATE_DIR/runs/H1-S
+SOAK_RUN_DIR=$SKYRIM_PERF_STATE_DIR/runs/B0-S
 wait_for_lines "$SOAK_RUN_DIR/samples.tsv" 2
 write_runtime_receipts "$SOAK_RUN_DIR" true
-$CONTROLLER post-launch H1-S
+$CONTROLLER post-launch B0-S
 jq -e '.passed == true' "$SOAK_RUN_DIR/runtime-verification.json" >/dev/null
 [[ $(<"$TEST_CONTROL/hypr-tearing") == false ]]
 write_dense_trace_span "$SOAK_RUN_DIR" 16199
 expect_failure_matching \
   'soak shorter than its automatic-trace duration' \
   'soak trace lasted.*expected at least 16200' \
-  "$CONTROLLER" complete H1-S \
+  "$CONTROLLER" complete B0-S \
     --game-cursor good \
     --desktop-cursor good \
     --verdict accepted \
@@ -803,20 +846,20 @@ write_gappy_trace_span "$SOAK_RUN_DIR" 16200
 expect_failure_matching \
   'soak with a gappy automatic trace' \
   'trace.*(coverage|gap|continu)|sample.*coverage' \
-  "$CONTROLLER" complete H1-S \
+  "$CONTROLLER" complete B0-S \
     --game-cursor good \
     --desktop-cursor good \
     --verdict accepted \
     --notes 'Gappy soak trace must fail.'
 write_dense_trace_span "$SOAK_RUN_DIR" 16200
 [[ ! -e $SOAK_RUN_DIR/mangohud.csv && ! -e $SOAK_RUN_DIR/mangohud_summary.csv ]]
-$CONTROLLER complete H1-S \
+$CONTROLLER complete B0-S \
   --game-cursor good \
   --desktop-cursor good \
   --verdict accepted \
   --notes 'Synthetic automatic-trace-only soak.' \
   >/dev/null
-awk -F '\t' '$1 == "H1-S" {exit !($2 == "completed" && $13 ~ /mangohud-not-recorded/ && $20 == "accepted")}' \
+awk -F '\t' '$1 == "B0-S" {exit !($2 == "completed" && $13 ~ /mangohud-not-recorded/ && $20 == "accepted")}' \
   "$SKYRIM_BENCHMARK_PRESENTATION_MATRIX"
 
 # Once a client and display topology have been verified, every later

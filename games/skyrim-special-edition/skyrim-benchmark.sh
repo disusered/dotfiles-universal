@@ -60,10 +60,16 @@ GAMESCOPE_BACKEND=""
 OVERLAY_POLICY=""
 HYPR_VFR=""
 HYPR_ALLOW_TEARING=""
+HYPR_NEW_RENDER_SCHEDULING=""
+HYPR_DIRECT_SCANOUT=""
 HYPR_IMMEDIATE=""
 HYPR_VFR_AT_QUEUE=""
 HYPR_ALLOW_TEARING_AT_QUEUE=""
+HYPR_NEW_RENDER_SCHEDULING_AT_QUEUE=""
+HYPR_DIRECT_SCANOUT_AT_QUEUE=""
 FPS_CAP=""
+NESTED_REFRESH=""
+HOST_WORKLOAD_POLICY=""
 TRACE_STATUS_FILE=""
 HYPR_VERSION_HASH=""
 HYPR_VERSION_JSON=""
@@ -85,11 +91,7 @@ CONFIG_PATHS=(
 
 PRESENTATION_CONFIG_PATHS=(
   "$PRESENTATION_PROFILES_FILE"
-  "$MODULE_DIR/skyrim.conf"
   "$MODULE_DIR/skyrim-skse-launch.sh"
-  "$MODULE_DIR/../hotline-miami/hotline-miami.conf"
-  "$MODULE_DIR/../planescape-torment-ee/planescape.conf"
-  "$MODULE_DIR/../three-kingdoms/three-kingdoms.conf"
   "$MODULE_DIR/../../arch/steam/steam.conf"
   "$MODULE_DIR/../../tools/scopebuddy/scb.conf"
   "$MODULE_DIR/../../arch/hyprland/hyprland.conf.tera"
@@ -341,8 +343,12 @@ load_presentation_profile() {
   OVERLAY_POLICY=$(presentation_profile_field "$requested" overlay_policy)
   HYPR_VFR=$(presentation_profile_field "$requested" hypr_vfr)
   HYPR_ALLOW_TEARING=$(presentation_profile_field "$requested" hypr_allow_tearing)
+  HYPR_NEW_RENDER_SCHEDULING=$(presentation_profile_field "$requested" hypr_new_render_scheduling)
+  HYPR_DIRECT_SCANOUT=$(presentation_profile_field "$requested" hypr_direct_scanout)
   HYPR_IMMEDIATE=$(presentation_profile_field "$requested" client_immediate)
   FPS_CAP=$(presentation_profile_field "$requested" fps_cap)
+  NESTED_REFRESH=$(presentation_profile_field "$requested" nested_refresh)
+  HOST_WORKLOAD_POLICY=$(presentation_profile_field "$requested" host_workload_policy)
 
   [[ $PRESENTATION_PROFILE =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]] \
     || die "invalid presentation profile name: $PRESENTATION_PROFILE"
@@ -354,10 +360,15 @@ load_presentation_profile() {
     || die "backend must be wayland or sdl"
   [[ $OVERLAY_POLICY == game || $OVERLAY_POLICY == off ]] \
     || die "overlay_policy must be game or off"
-  for value in "$HYPR_VFR" "$HYPR_ALLOW_TEARING" "$HYPR_IMMEDIATE"; do
+  for value in "$HYPR_VFR" "$HYPR_ALLOW_TEARING" "$HYPR_NEW_RENDER_SCHEDULING" "$HYPR_IMMEDIATE"; do
     [[ $value == true || $value == false ]] || die "presentation booleans must be true or false"
   done
+  [[ $HYPR_DIRECT_SCANOUT =~ ^[012]$ ]] || die "hypr_direct_scanout must be 0, 1, or 2"
   [[ $FPS_CAP =~ ^[0-9]+$ ]] || die "fps_cap must be a non-negative integer"
+  [[ $NESTED_REFRESH == auto || $NESTED_REFRESH =~ ^[1-9][0-9]*$ ]] \
+    || die "nested_refresh must be auto or a positive integer"
+  [[ $HOST_WORKLOAD_POLICY == normal || $HOST_WORKLOAD_POLICY == quiesced ]] \
+    || die "host_workload_policy must be normal or quiesced"
   if [[ $GAMESCOPE_SOURCE == bypass ]]; then
     GAMESCOPE_MODE=bypass
   else
@@ -368,7 +379,8 @@ load_presentation_profile() {
 
 presentation_fields() {
   printf '%s\n' display_profile gamescope_source backend overlay_policy \
-    hypr_vfr hypr_allow_tearing client_immediate fps_cap
+    hypr_vfr hypr_allow_tearing hypr_new_render_scheduling hypr_direct_scanout \
+    client_immediate fps_cap nested_refresh host_workload_policy
 }
 
 independent_factor_accepted() {
@@ -456,21 +468,28 @@ verify_repetition_predecessor() {
   [[ $REPETITION != diagnostic ]] || return 0
   baseline=$(tsv_field "$PRESENTATION_MATRIX_FILE" "$run_id" baseline)
   factor=$(tsv_field "$PRESENTATION_MATRIX_FILE" "$run_id" factor)
-  status=$(tsv_field "$PRESENTATION_MATRIX_FILE" "$baseline" status)
-  verdict=$(tsv_field "$PRESENTATION_MATRIX_FILE" "$baseline" verdict)
-  if [[ $REPETITION == short-1 && $factor == hypr_allow_tearing && $status == reference ]]; then
+  if [[ $REPETITION == short-1 && $factor == baseline && $baseline == none ]]; then
     return 0
   fi
+  status=$(tsv_field "$PRESENTATION_MATRIX_FILE" "$baseline" status)
+  verdict=$(tsv_field "$PRESENTATION_MATRIX_FILE" "$baseline" verdict)
   [[ $status == completed && $verdict == accepted ]] \
     || die "$run_id requires accepted predecessor $baseline"
 }
 
-accepted_tearing_reference() {
-  local first second first_avg first_p1 second_avg second_p1
-  first=$(awk -F '\t' '
-    NR>1 && $2=="completed" && $5=="hypr_allow_tearing" && $7=="false" &&
-      $12=="short-1" && $20=="accepted" {print $1; exit}
-  ' "$PRESENTATION_MATRIX_FILE")
+accepted_controlled_reference() {
+  local candidate_id=$1 candidate_profile target_display
+  local first="" run_id status profile factor repetition verdict second first_avg first_p1 second_avg second_p1
+  candidate_profile=$(tsv_field "$PRESENTATION_MATRIX_FILE" "$candidate_id" profile)
+  target_display=$(presentation_profile_field "$candidate_profile" display_profile)
+  while IFS=$'\t' read -r run_id status _ profile factor _ _ _ _ _ _ repetition _ _ _ _ _ _ _ verdict _; do
+    [[ $run_id != run_id && $status == completed && $repetition == short-1 && $verdict == accepted ]] \
+      || continue
+    [[ $factor == baseline || $factor == display_profile ]] || continue
+    [[ $(presentation_profile_field "$profile" display_profile) == "$target_display" ]] || continue
+    first=$run_id
+    break
+  done < "$PRESENTATION_MATRIX_FILE"
   [[ -n $first ]] || return 1
   second=$(awk -F '\t' -v parent="$first" '
     NR>1 && $2=="completed" && $3==parent && $5=="replicate" &&
@@ -504,7 +523,7 @@ verify_fps_nonregression() {
     baseline_avg=$(tsv_field "$PRESENTATION_MATRIX_FILE" "$baseline" avg_fps)
     baseline_p1=$(tsv_field "$PRESENTATION_MATRIX_FILE" "$baseline" p1_fps)
     if [[ $baseline_avg =~ ^[0-9]+([.][0-9]+)?$ && $baseline_p1 =~ ^[0-9]+([.][0-9]+)?$ ]]; then
-      if [[ $repetition == short-2 && $baseline_factor == hypr_allow_tearing ]]; then
+      if [[ $repetition == short-2 && $baseline_factor == baseline ]]; then
         compare_fps_consistency "$current_avg" "$current_p1" "$baseline_avg" "$baseline_p1" "$baseline"
       else
         compare_fps "$current_avg" "$current_p1" "$baseline_avg" "$baseline_p1" "$baseline"
@@ -513,18 +532,18 @@ verify_fps_nonregression() {
     fi
   fi
 
-  if [[ $repetition == short-1 && $factor != hypr_allow_tearing ]]; then
+  if [[ $repetition == short-1 && $factor != baseline ]]; then
     needs_controlled_reference=true
   elif [[ $repetition == short-2 ]]; then
-    [[ $baseline_factor != hypr_allow_tearing ]] && needs_controlled_reference=true
+    [[ $baseline_factor != baseline ]] && needs_controlled_reference=true
   fi
   if [[ $needs_controlled_reference == true ]]; then
-    read -r reference_avg reference_p1 reference_label < <(accepted_tearing_reference) \
-      || die "$run_id has no accepted H1 short-1/short-2 controlled FPS reference"
+    read -r reference_avg reference_p1 reference_label < <(accepted_controlled_reference "$run_id") \
+      || die "$run_id has no accepted post-fix short-1/short-2 controlled FPS reference"
     compare_fps "$current_avg" "$current_p1" "$reference_avg" "$reference_p1" "$reference_label"
     compared=true
   fi
-  if [[ $compared != true && $factor != hypr_allow_tearing ]]; then
+  if [[ $compared != true && $factor != baseline ]]; then
     die "$run_id has no accepted controlled FPS reference"
   fi
 }
@@ -622,6 +641,15 @@ hypr_option_bool() {
   value=$(jq -r 'if has("int") then (.int != 0) elif has("set") then .set else error("no boolean value") end' \
     <<< "$data") || die "could not parse Hyprland option $option: $data"
   [[ $value == true || $value == false ]] || die "could not parse Hyprland option $option: $data"
+  printf '%s\n' "$value"
+}
+
+hypr_option_int() {
+  local option=$1 data value
+  data=$(hyprctl -j getoption "$option" 2>&1) || die "hyprctl getoption $option failed: $data"
+  value=$(jq -r 'if has("int") then .int else error("no integer value") end' <<< "$data") \
+    || die "could not parse Hyprland option $option: $data"
+  [[ $value =~ ^-?[0-9]+$ ]] || die "could not parse Hyprland option $option: $data"
   printf '%s\n' "$value"
 }
 
@@ -744,6 +772,9 @@ build_gamescope_args() {
     GAMESCOPE_ARGS+=" -w $GAME_WIDTH -h $GAME_HEIGHT -S $SCALER -F $FILTER"
   fi
   GAMESCOPE_ARGS+=" -W $OUTPUT_WIDTH -H $OUTPUT_HEIGHT"
+  if [[ $NESTED_REFRESH != auto ]]; then
+    GAMESCOPE_ARGS+=" -r $NESTED_REFRESH"
+  fi
   if (( FPS_CAP > 0 )); then
     GAMESCOPE_ARGS+=" --framerate-limit $FPS_CAP"
   fi
@@ -966,10 +997,16 @@ write_prepared_env() {
       printf 'OVERLAY_POLICY=%q\n' "$OVERLAY_POLICY"
       printf 'HYPR_VFR=%q\n' "$HYPR_VFR"
       printf 'HYPR_ALLOW_TEARING=%q\n' "$HYPR_ALLOW_TEARING"
+      printf 'HYPR_NEW_RENDER_SCHEDULING=%q\n' "$HYPR_NEW_RENDER_SCHEDULING"
+      printf 'HYPR_DIRECT_SCANOUT=%q\n' "$HYPR_DIRECT_SCANOUT"
       printf 'HYPR_IMMEDIATE=%q\n' "$HYPR_IMMEDIATE"
       printf 'HYPR_VFR_AT_QUEUE=%q\n' "$HYPR_VFR_AT_QUEUE"
       printf 'HYPR_ALLOW_TEARING_AT_QUEUE=%q\n' "$HYPR_ALLOW_TEARING_AT_QUEUE"
+      printf 'HYPR_NEW_RENDER_SCHEDULING_AT_QUEUE=%q\n' "$HYPR_NEW_RENDER_SCHEDULING_AT_QUEUE"
+      printf 'HYPR_DIRECT_SCANOUT_AT_QUEUE=%q\n' "$HYPR_DIRECT_SCANOUT_AT_QUEUE"
       printf 'FPS_CAP=%q\n' "$FPS_CAP"
+      printf 'NESTED_REFRESH=%q\n' "$NESTED_REFRESH"
+      printf 'HOST_WORKLOAD_POLICY=%q\n' "$HOST_WORKLOAD_POLICY"
       printf 'HYPR_VERSION_HASH=%q\n' "$HYPR_VERSION_HASH"
       printf 'KERNEL_RELEASE=%q\n' "$KERNEL_RELEASE"
       printf 'MONITOR_TOPOLOGY_HASH=%q\n' "$MONITOR_TOPOLOGY_HASH"
@@ -1038,6 +1075,10 @@ verify_prepared() {
       || die "live debug:vfr drifted from queue-time value $HYPR_VFR_AT_QUEUE"
     [[ $(hypr_option_bool general:allow_tearing) == "$HYPR_ALLOW_TEARING_AT_QUEUE" ]] \
       || die "live general:allow_tearing drifted from queue-time value $HYPR_ALLOW_TEARING_AT_QUEUE"
+    [[ $(hypr_option_bool render:new_render_scheduling) == "$HYPR_NEW_RENDER_SCHEDULING_AT_QUEUE" ]] \
+      || die "live render:new_render_scheduling drifted from queue-time value $HYPR_NEW_RENDER_SCHEDULING_AT_QUEUE"
+    [[ $(hypr_option_int render:direct_scanout) == "$HYPR_DIRECT_SCANOUT_AT_QUEUE" ]] \
+      || die "live render:direct_scanout drifted from queue-time value $HYPR_DIRECT_SCANOUT_AT_QUEUE"
     [[ $(normalized_hypr_version | sha256sum | awk '{print $1}') == "$HYPR_VERSION_HASH" ]] \
       || die "Hyprland/Aquamarine version changed after queueing"
     [[ $(uname -r) == "$KERNEL_RELEASE" ]] || die "kernel changed after queueing"
@@ -1103,11 +1144,17 @@ print_receipt() {
     printf 'HYPR_VFR_CURRENT=%s\n' "$(hypr_option_bool debug:vfr)"
     printf 'HYPR_ALLOW_TEARING_EXPECTED=%s\n' "$HYPR_ALLOW_TEARING"
     printf 'HYPR_ALLOW_TEARING_CURRENT=%s\n' "$(hypr_option_bool general:allow_tearing)"
+    printf 'HYPR_NEW_RENDER_SCHEDULING_EXPECTED=%s\n' "$HYPR_NEW_RENDER_SCHEDULING"
+    printf 'HYPR_NEW_RENDER_SCHEDULING_BASELINE=%s\n' "$(hypr_option_bool render:new_render_scheduling)"
+    printf 'HYPR_DIRECT_SCANOUT_EXPECTED=%s\n' "$HYPR_DIRECT_SCANOUT"
+    printf 'HYPR_DIRECT_SCANOUT_BASELINE=%s\n' "$(hypr_option_int render:direct_scanout)"
     printf 'HYPR_IMMEDIATE_EXPECTED=%s\n' "$HYPR_IMMEDIATE"
     printf 'HYPR_VERSION_HASH=%s\n' "$HYPR_VERSION_HASH"
     printf 'KERNEL_RELEASE=%s\n' "$KERNEL_RELEASE"
     printf 'MONITOR_TOPOLOGY_HASH=%s\n' "$MONITOR_TOPOLOGY_HASH"
     printf 'FPS_CAP=%s\n' "$FPS_CAP"
+    printf 'NESTED_REFRESH=%s\n' "$NESTED_REFRESH"
+    printf 'HOST_WORKLOAD_POLICY=%s\n' "$HOST_WORKLOAD_POLICY"
   fi
   printf 'ROUTE=%s\n' "$ROUTE"
   printf 'WARMUP=%ss\n' "$WARMUP_SECONDS"
@@ -1141,6 +1188,8 @@ queue_run() {
     verify_repetition_predecessor "$run_id"
     HYPR_VFR_AT_QUEUE=$(hypr_option_bool debug:vfr)
     HYPR_ALLOW_TEARING_AT_QUEUE=$(hypr_option_bool general:allow_tearing)
+    HYPR_NEW_RENDER_SCHEDULING_AT_QUEUE=$(hypr_option_bool render:new_render_scheduling)
+    HYPR_DIRECT_SCANOUT_AT_QUEUE=$(hypr_option_int render:direct_scanout)
     [[ $HYPR_VFR_AT_QUEUE == "$HYPR_VFR" ]] \
       || die "presentation profile expects VFR=$HYPR_VFR but queue-time state is $HYPR_VFR_AT_QUEUE"
     if [[ $REPETITION != diagnostic ]]; then
@@ -1148,6 +1197,10 @@ queue_run() {
         || die "$run_id would re-enable tearing; formal presentation profiles must keep the shared allow_tearing=false policy"
       [[ $HYPR_ALLOW_TEARING_AT_QUEUE == false ]] \
         || die "$run_id requires the persisted shared allow_tearing=false policy before queueing"
+      [[ $HYPR_NEW_RENDER_SCHEDULING_AT_QUEUE == false ]] \
+        || die "$run_id requires the persisted render:new_render_scheduling=false baseline before queueing"
+      [[ $HYPR_DIRECT_SCANOUT_AT_QUEUE == 0 ]] \
+        || die "$run_id requires the persisted render:direct_scanout=0 baseline before queueing"
     fi
     HYPR_VERSION_JSON=$(normalized_hypr_version)
     HYPR_VERSION_HASH=$(printf '%s\n' "$HYPR_VERSION_JSON" | sha256sum | awk '{print $1}')
@@ -1204,8 +1257,12 @@ queue_run() {
       --arg gamescope_hash "$GAMESCOPE_BIN_HASH" --arg gamescopereaper_hash "$GAMESCOPE_REAPER_HASH" \
       --arg backend "$GAMESCOPE_BACKEND" --arg gamescope_args "$GAMESCOPE_ARGS" \
       --arg overlay "$OVERLAY_POLICY" --arg vfr "$HYPR_VFR" --arg allow_tearing "$HYPR_ALLOW_TEARING" \
+      --arg new_render_scheduling "$HYPR_NEW_RENDER_SCHEDULING" --arg direct_scanout "$HYPR_DIRECT_SCANOUT" \
       --arg vfr_at_queue "$HYPR_VFR_AT_QUEUE" --arg tearing_at_queue "$HYPR_ALLOW_TEARING_AT_QUEUE" \
+      --arg scheduling_at_queue "$HYPR_NEW_RENDER_SCHEDULING_AT_QUEUE" \
+      --arg direct_scanout_at_queue "$HYPR_DIRECT_SCANOUT_AT_QUEUE" \
       --arg immediate "$HYPR_IMMEDIATE" --arg boot_id "$BOOT_ID_AT_QUEUE" \
+      --arg nested_refresh "$NESTED_REFRESH" --arg host_policy "$HOST_WORKLOAD_POLICY" \
       --arg hypr_version_hash "$HYPR_VERSION_HASH" --arg kernel_release "$KERNEL_RELEASE" \
       --arg topology_hash "$MONITOR_TOPOLOGY_HASH" \
       --arg build_id "$build_id" --arg config_hash "$config_hash" \
@@ -1221,10 +1278,15 @@ queue_run() {
         gamescope:{mode:$gamescope_mode,source:$gamescope_source,binary:$gamescope_bin,
           version:$gamescope_version,sha256:$gamescope_hash,reaper_sha256:$gamescopereaper_hash,
           backend:$backend,args:$gamescope_args}, overlay_policy:$overlay,
-        hypr:{vfr:($vfr=="true"),allow_tearing:($allow_tearing=="true"),immediate:($immediate=="true"),
+        hypr:{vfr:($vfr=="true"),allow_tearing:($allow_tearing=="true"),
+          new_render_scheduling:($new_render_scheduling=="true"),direct_scanout:($direct_scanout|tonumber),
+          immediate:($immediate=="true"),
           vfr_at_queue:($vfr_at_queue=="true"),allow_tearing_at_queue:($tearing_at_queue=="true"),
+          new_render_scheduling_at_queue:($scheduling_at_queue=="true"),
+          direct_scanout_at_queue:($direct_scanout_at_queue|tonumber),
           version_hash:$hypr_version_hash}, kernel_release:$kernel_release,
-        fps_cap:$fps_cap, warmup_seconds:$warmup_seconds, duration_seconds:$duration_seconds,
+        fps_cap:$fps_cap,nested_refresh:$nested_refresh,host_workload_policy:$host_policy,
+        warmup_seconds:$warmup_seconds, duration_seconds:$duration_seconds,
         hud:true, mangohud_recording:"manual Left Shift+F2", system_trace:"automatic",
         boot_id_at_queue:$boot_id, steam_build_id:$build_id, config_hash:$config_hash,
         prepared_at:(now | todateiso8601)}' > "$run_dir/prepared.json"
@@ -1331,24 +1393,37 @@ save_journal_cursor() {
 }
 
 apply_runtime_hypr() {
-  local run_dir=$1 prior_vfr prior_tearing actual
+  local run_dir=$1 prior_vfr prior_tearing prior_scheduling prior_scanout actual
   prior_vfr=$(hypr_option_bool debug:vfr)
   prior_tearing=$(hypr_option_bool general:allow_tearing)
+  prior_scheduling=$(hypr_option_bool render:new_render_scheduling)
+  prior_scanout=$(hypr_option_int render:direct_scanout)
   {
     printf 'PRIOR_VFR=%q\n' "$prior_vfr"
     printf 'PRIOR_ALLOW_TEARING=%q\n' "$prior_tearing"
+    printf 'PRIOR_NEW_RENDER_SCHEDULING=%q\n' "$prior_scheduling"
+    printf 'PRIOR_DIRECT_SCANOUT=%q\n' "$prior_scanout"
   } > "$run_dir/runtime-hypr-before.env"
   hyprctl keyword debug:vfr "$HYPR_VFR" >/dev/null
   hyprctl keyword general:allow_tearing "$HYPR_ALLOW_TEARING" >/dev/null
+  hyprctl keyword render:new_render_scheduling "$HYPR_NEW_RENDER_SCHEDULING" >/dev/null
+  hyprctl keyword render:direct_scanout "$HYPR_DIRECT_SCANOUT" >/dev/null
   actual=$(hypr_option_bool debug:vfr)
   [[ $actual == "$HYPR_VFR" ]] || die "could not apply debug:vfr=$HYPR_VFR"
   actual=$(hypr_option_bool general:allow_tearing)
   [[ $actual == "$HYPR_ALLOW_TEARING" ]] || die "could not apply general:allow_tearing=$HYPR_ALLOW_TEARING"
+  actual=$(hypr_option_bool render:new_render_scheduling)
+  [[ $actual == "$HYPR_NEW_RENDER_SCHEDULING" ]] \
+    || die "could not apply render:new_render_scheduling=$HYPR_NEW_RENDER_SCHEDULING"
+  actual=$(hypr_option_int render:direct_scanout)
+  [[ $actual == "$HYPR_DIRECT_SCANOUT" ]] \
+    || die "could not apply render:direct_scanout=$HYPR_DIRECT_SCANOUT"
   printf 'applied\n' > "$run_dir/runtime-hypr-status"
 }
 
 restore_runtime_hypr() {
-  local run_id=$1 run_dir prior_vfr prior_tearing PRIOR_VFR="" PRIOR_ALLOW_TEARING=""
+  local run_id=$1 run_dir prior_vfr prior_tearing prior_scheduling prior_scanout
+  local PRIOR_VFR="" PRIOR_ALLOW_TEARING="" PRIOR_NEW_RENDER_SCHEDULING="" PRIOR_DIRECT_SCANOUT=""
   run_dir=$RUNS_DIR/$run_id
   [[ -f $run_dir/runtime-hypr-before.env ]] || return 0
   [[ ! -f $run_dir/runtime-hypr-restored ]] || return 0
@@ -1357,11 +1432,19 @@ restore_runtime_hypr() {
   source "$run_dir/runtime-hypr-before.env"
   prior_vfr=$PRIOR_VFR
   prior_tearing=$PRIOR_ALLOW_TEARING
+  prior_scheduling=$PRIOR_NEW_RENDER_SCHEDULING
+  prior_scanout=$PRIOR_DIRECT_SCANOUT
   hyprctl keyword debug:vfr "$prior_vfr" >/dev/null
   hyprctl keyword general:allow_tearing "$prior_tearing" >/dev/null
+  hyprctl keyword render:new_render_scheduling "$prior_scheduling" >/dev/null
+  hyprctl keyword render:direct_scanout "$prior_scanout" >/dev/null
   [[ $(hypr_option_bool debug:vfr) == "$prior_vfr" ]] || die "failed to restore debug:vfr"
   [[ $(hypr_option_bool general:allow_tearing) == "$prior_tearing" ]] \
     || die "failed to restore general:allow_tearing"
+  [[ $(hypr_option_bool render:new_render_scheduling) == "$prior_scheduling" ]] \
+    || die "failed to restore render:new_render_scheduling"
+  [[ $(hypr_option_int render:direct_scanout) == "$prior_scanout" ]] \
+    || die "failed to restore render:direct_scanout"
   date --iso-8601=seconds > "$run_dir/runtime-hypr-restored"
 }
 
@@ -1480,6 +1563,40 @@ record_process_once() {
     "$(sanitize_cell "$cmdline")" >> "$run_dir/processes.tsv"
 }
 
+record_aux_processes() {
+  local run_dir=$1 timestamp=$2 comm_file pid comm cmdline
+  for comm_file in /proc/[0-9]*/comm; do
+    [[ -r $comm_file ]] || continue
+    pid=${comm_file#/proc/}
+    pid=${pid%/comm}
+    read -r comm < "$comm_file" || continue
+    case $comm in
+      fossilize_replay|steamwebhelper|pressure-vessel|pv-bwrap|wineserver|services.exe) ;;
+      *) continue ;;
+    esac
+    cmdline=$(tr '\0' ' ' < "/proc/$pid/cmdline" 2>/dev/null | sed 's/[[:space:]]*$//' || true)
+    printf '%s\t%s\t' "$timestamp" "$comm" >> "$run_dir/aux-processes.tsv"
+    process_sample "$pid" >> "$run_dir/aux-processes.tsv"
+    printf '\t%s\n' "$(sanitize_cell "$cmdline")" >> "$run_dir/aux-processes.tsv"
+  done
+}
+
+record_cache_state() {
+  local run_dir=$1 phase=$2 path bytes files newest
+  for path in \
+    "$HOME/.cache/mesa_shader_cache" \
+    "$HOME/.cache/mesa_shader_cache_db" \
+    "$HOME/.local/share/Steam/steamapps/shadercache/$APP_ID" \
+    "$HOME/.steam/steam/steamapps/shadercache/$APP_ID"; do
+    [[ -d $path ]] || continue
+    bytes=$(du -sb -- "$path" 2>/dev/null | awk '{print $1}')
+    read -r files newest < <(find "$path" -type f -printf '%T@\n' 2>/dev/null | \
+      awk 'BEGIN{newest=0} {count++; if ($1>newest) newest=$1} END{printf "%d %.0f\n",count+0,newest}')
+    printf '%s\t%s\t%s\t%s\t%s\n' "$phase" "$path" "${bytes:-0}" "${files:-0}" "${newest:-0}" \
+      >> "$run_dir/cache-state.tsv"
+  done
+}
+
 apply_and_verify_client_state() {
   local run_dir=$1 gamescope_pid=${2:-} skyrim_pid=${3:-} clients address actual cmdline exe
   if [[ $GAMESCOPE_MODE == enabled && ! -f $run_dir/client-verification.tsv ]]; then
@@ -1526,7 +1643,7 @@ apply_and_verify_client_state() {
 
 sample_hypr_state() {
   local run_dir=$1 timestamp=$2 verified_pid=${3:-0} skyrim_pid=${4:-0} address=${5:-}
-  local monitors clients active immediate=null vfr allow_tearing topology=null
+  local monitors clients active immediate=null vfr allow_tearing new_scheduling direct_scanout topology=null
   monitors=$(hyprctl -j monitors all 2>/dev/null || printf 'null')
   clients=$(hyprctl -j clients 2>/dev/null || printf 'null')
   active=$(hyprctl -j activewindow 2>/dev/null || printf 'null')
@@ -1539,6 +1656,8 @@ sample_hypr_state() {
   fi
   vfr=$(hypr_option_bool debug:vfr 2>/dev/null || printf 'null')
   allow_tearing=$(hypr_option_bool general:allow_tearing 2>/dev/null || printf 'null')
+  new_scheduling=$(hypr_option_bool render:new_render_scheduling 2>/dev/null || printf 'null')
+  direct_scanout=$(hypr_option_int render:direct_scanout 2>/dev/null || printf 'null')
   if [[ $monitors != null ]]; then
     topology=$(normalize_monitor_json <<< "$monitors" 2>/dev/null || printf 'null')
   fi
@@ -1547,11 +1666,13 @@ sample_hypr_state() {
     --argjson verified_pid "$verified_pid" --argjson skyrim_pid "${skyrim_pid:-0}" \
     --argjson immediate "$immediate" --argjson topology "$topology" \
     --argjson vfr "$vfr" --argjson allow_tearing "$allow_tearing" \
+    --argjson new_scheduling "$new_scheduling" --argjson direct_scanout "$direct_scanout" \
     '{timestamp_ns:$timestamp_ns,monitors:$monitors,
       gamescope_client:(if ($clients|type)=="array" then (first($clients[]|select(.pid==$verified_pid)) // null) else null end),
       gamescope_property:{address:$address,pid:$verified_pid,immediate:$immediate},
       launch:{skyrim_pid:$skyrim_pid},monitor_topology:$topology,
-      hypr_options:{vfr:$vfr,allow_tearing:$allow_tearing},activewindow:$active}' \
+      hypr_options:{vfr:$vfr,allow_tearing:$allow_tearing,
+        new_render_scheduling:$new_scheduling,direct_scanout:$direct_scanout},activewindow:$active}' \
       >> "$run_dir/hypr-state.ndjson" 2>/dev/null || true
 }
 
@@ -1570,6 +1691,8 @@ trace_worker() {
   trap 'trace_worker_exit "$?"' EXIT
   printf 'timestamp_ns\tuptime_s\tmem_available_kb\tswap_used_kb\tsunreclaim_kb\tdirty_kb\twriteback_kb\tcpu_pressure\tmemory_pressure\tio_pressure\tgpu_freq_mhz\tgpu_requested_mhz\thypr_pid\thypr_start\thypr_utime\thypr_stime\thypr_rss\thypr_threads\thypr_read\thypr_write\thypr_fds\tgamescope_pid\tgamescope_start\tgamescope_utime\tgamescope_stime\tgamescope_rss\tgamescope_threads\tgamescope_read\tgamescope_write\tgamescope_fds\txwayland_pid\txwayland_start\txwayland_utime\txwayland_stime\txwayland_rss\txwayland_threads\txwayland_read\txwayland_write\txwayland_fds\tskyrim_pid\tskyrim_start\tskyrim_utime\tskyrim_stime\tskyrim_rss\tskyrim_threads\tskyrim_read\tskyrim_write\tskyrim_fds\n' > "$run_dir/samples.tsv"
   printf 'timestamp_ns\tpid\trole\texe\tcmdline\n' > "$run_dir/processes.tsv"
+  printf 'timestamp_ns\tcomm\tpid\tstart\tutime\tstime\trss_pages\tthreads\tread_bytes\twrite_bytes\tfds\tcmdline\n' \
+    > "$run_dir/aux-processes.tsv"
   printf 'timestamp_ns\tmetric\tvalue\n' > "$run_dir/gpu-state.tsv"
   gpu_path=$(printf '%s\n' /sys/class/drm/card*/gt/gt0/rps_cur_freq_mhz | head -n 1)
   gpu_root=$(dirname -- "$gpu_path")
@@ -1609,11 +1732,11 @@ trace_worker() {
     mem=$(awk '
       /^MemAvailable:/ {a=$2} /^SwapTotal:/ {st=$2} /^SwapFree:/ {sf=$2}
       /^SUnreclaim:/ {su=$2} /^Dirty:/ {d=$2} /^Writeback:/ {w=$2}
-      END {printf "%s\\t%s\\t%s\\t%s\\t%s",a,st-sf,su,d,w}
+      END {printf "%s\t%s\t%s\t%s\t%s",a,st-sf,su,d,w}
     ' /proc/meminfo)
-    pressure_cpu=$(awk '/^some/ {for(i=1;i<=NF;i++) if($i~/^avg10=/){sub(/^avg10=/,"");print $i}}' /proc/pressure/cpu)
-    pressure_memory=$(awk '/^some/ {for(i=1;i<=NF;i++) if($i~/^avg10=/){sub(/^avg10=/,"");print $i}}' /proc/pressure/memory)
-    pressure_io=$(awk '/^some/ {for(i=1;i<=NF;i++) if($i~/^avg10=/){sub(/^avg10=/,"");print $i}}' /proc/pressure/io)
+    pressure_cpu=$(awk '/^some/ {for(i=1;i<=NF;i++) if($i~/^avg10=/){sub(/^avg10=/,"",$i);print $i}}' /proc/pressure/cpu)
+    pressure_memory=$(awk '/^some/ {for(i=1;i<=NF;i++) if($i~/^avg10=/){sub(/^avg10=/,"",$i);print $i}}' /proc/pressure/memory)
+    pressure_io=$(awk '/^some/ {for(i=1;i<=NF;i++) if($i~/^avg10=/){sub(/^avg10=/,"",$i);print $i}}' /proc/pressure/io)
     gpu_freq=NA
     gpu_requested=NA
     [[ -r $gpu_path ]] && read -r gpu_freq < "$gpu_path"
@@ -1630,6 +1753,7 @@ trace_worker() {
     [[ -f $run_dir/client-verification.tsv ]] && \
       address=$(evidence_value "$run_dir/client-verification.tsv" address)
     if (( tick % 4 == 0 )); then
+      record_aux_processes "$run_dir" "$timestamp"
       sample_hypr_state "$run_dir" "$timestamp" "${gamescope_pid:-0}" "${skyrim_pid:-0}" "$address"
       for sysfile in "$gpu_root"/rps_*_freq_mhz "$gpu_root"/punit_req_freq_mhz \
         "$gpu_root"/rc6_residency_ms "$gpu_root"/throttle_reason_*; do
@@ -1700,19 +1824,44 @@ aggregate_journals() {
     read -r cursor < "$run_dir/user-journal.cursor"
     if [[ $cursor != unavailable* ]]; then
       journalctl --user --after-cursor="$cursor" --no-pager -o cat 2>/dev/null | awk -v duration="$duration" '
+        {total++}
         /xwm: got the same buffer committed twice/ {duplicate++}
         /Compositor released us but we were not acquired/ {released++}
         /\[gamescope\].*(Error|error)/ {errors++}
         END {d=(duration>0?duration:1);
+          print "user\ttotal-journal\t" total+0 "\t" (total+0)/d;
           print "user\tduplicate-buffer\t" duplicate+0 "\t" (duplicate+0)/d;
           print "user\txdg-release-without-acquire\t" released+0 "\t" (released+0)/d;
           print "user\tgamescope-error\t" errors+0 "\t" (errors+0)/d}
       ' >> "$run_dir/journal-counts.tsv" || true
+      journalctl --user --after-cursor="$cursor" _SYSTEMD_USER_UNIT=pipewire.service \
+        --no-pager -o cat 2>/dev/null | awk -v duration="$duration" '
+          {total++} /^D (pw[.]|spa[.]|mod[.]|default )/ {debug++}
+          END {d=(duration>0?duration:1);
+            print "user\tpipewire-total\t" total+0 "\t" (total+0)/d;
+            print "user\tpipewire-debug\t" debug+0 "\t" (debug+0)/d}
+        ' >> "$run_dir/journal-counts.tsv" || true
+      journalctl --user --after-cursor="$cursor" _COMM=waybar --no-pager -o cat 2>/dev/null | \
+        awk -v duration="$duration" '
+          {total++; line=tolower($0)} line ~ /error|warn|fail|property/ {errors++}
+          END {d=(duration>0?duration:1);
+            print "user\twaybar-total\t" total+0 "\t" (total+0)/d;
+            print "user\twaybar-error-property\t" errors+0 "\t" (errors+0)/d}
+        ' >> "$run_dir/journal-counts.tsv" || true
       journalctl --user --after-cursor="$cursor" _COMM=Hyprland --no-pager -o json 2>/dev/null | \
         jq -r '.MESSAGE // empty' | awk -v duration="$duration" '
-          /[Ww]arn|[Ee]rror|[Ff]ail/ {events++}
+          {line=tolower($0)}
+          line ~ /warn|error|fail/ {events++}
+          line ~ /cursor.*(import|buffer)|kms.*cursor/ {cursor++}
+          line ~ /page[- ]?flip|pageflip/ {pageflip++}
+          line ~ /plugin|dispatcher.*invalid/ {plugin++}
+          line ~ /debounce/ {debounce++}
           END {d=(duration>0?duration:1);
-            print "user\thyprland-warning-error\t" events+0 "\t" (events+0)/d}
+            print "user\thyprland-warning-error\t" events+0 "\t" (events+0)/d;
+            print "user\thyprland-cursor-kms\t" cursor+0 "\t" (cursor+0)/d;
+            print "user\thyprland-pageflip\t" pageflip+0 "\t" (pageflip+0)/d;
+            print "user\thyprland-plugin-dispatch\t" plugin+0 "\t" (plugin+0)/d;
+            print "user\thyprland-input-debounce\t" debounce+0 "\t" (debounce+0)/d}
         ' >> "$run_dir/journal-counts.tsv" || true
       journalctl --user --after-cursor="$cursor" --no-pager -o cat 2>/dev/null | awk '
         /\[gamescope\]|xwm:|xdg_backend/ {
@@ -1800,7 +1949,7 @@ evidence_value() {
 
 write_runtime_verification() {
   local run_id=$1 run_dir pass=true errors="" value cmdline expected
-  local hypr_seen gamescope_seen xwayland_seen skyrim_seen monitor_valid hypr_options_valid tearing_seen property_tied
+  local hypr_seen gamescope_seen xwayland_seen skyrim_seen monitor_valid hypr_options_valid tearing_seen scanout_seen property_tied
   local topology_valid=false ini_valid=true duration=0 sample_count=0 max_gap=0 density=0 coverage=0 invalid_samples=0
   local controlled_pid=0 controlled_address=""
   local prefs_expected=unavailable prefs_current=unavailable skyrim_expected=unavailable skyrim_current=unavailable
@@ -1856,17 +2005,26 @@ write_runtime_verification() {
       length>0 and all(.[]; .monitor_topology==$prepared[0])' "$run_dir/hypr-state.ndjson")
     [[ $topology_valid == true ]] || { pass=false; errors+="enabled monitor topology drifted during trace; "; }
     hypr_options_valid=$(jq -s --arg mode "$GAMESCOPE_MODE" \
-      --argjson vfr "$HYPR_VFR" --argjson tearing "$HYPR_ALLOW_TEARING" '
+      --argjson vfr "$HYPR_VFR" --argjson tearing "$HYPR_ALLOW_TEARING" \
+      --argjson scheduling "$HYPR_NEW_RENDER_SCHEDULING" --argjson scanout "$HYPR_DIRECT_SCANOUT" '
       (if $mode=="enabled" then
         (map((.gamescope_property.pid? // 0)>0)|index(true))
        else (map((.launch.skyrim_pid? // 0)>0)|index(true)) end) as $start
       | ($start!=null) and all(.[$start:][];
-          .hypr_options.vfr==$vfr and .hypr_options.allow_tearing==$tearing)' \
+          .hypr_options.vfr==$vfr and .hypr_options.allow_tearing==$tearing and
+          .hypr_options.new_render_scheduling==$scheduling and
+          .hypr_options.direct_scanout==$scanout)' \
       "$run_dir/hypr-state.ndjson")
     [[ $hypr_options_valid == true ]] || { pass=false; errors+="Hyprland options drifted during run; "; }
     if [[ $HYPR_ALLOW_TEARING == false ]]; then
       tearing_seen=$(jq -s 'any(.[].monitors[]?; .activelyTearing==true)' "$run_dir/hypr-state.ndjson")
       [[ $tearing_seen == false ]] || { pass=false; errors+="monitor actively tore with tearing disabled; "; }
+    fi
+    if (( HYPR_DIRECT_SCANOUT > 0 )); then
+      scanout_seen=$(jq -s 'any(.[].monitors[]?;
+        ((.directScanoutTo // "0")|tostring) != "0" and ((.directScanoutTo // "")|tostring) != "")' \
+        "$run_dir/hypr-state.ndjson")
+      [[ $scanout_seen == true ]] || { pass=false; errors+="direct scanout never became active; "; }
     fi
     if [[ $GAMESCOPE_MODE == enabled && -f $run_dir/client-verification.tsv ]]; then
       controlled_address=$(evidence_value "$run_dir/client-verification.tsv" address)
@@ -1995,6 +2153,8 @@ activate_run() {
     trap 'trap - EXIT ERR INT TERM; restore_runtime_hypr "$requested"' EXIT ERR INT TERM
     apply_runtime_hypr "$run_dir"
     freeze_generated_inis "$run_dir"
+    printf 'phase\tpath\tbytes\tfiles\tnewest_mtime_epoch\n' > "$run_dir/cache-state.tsv"
+    record_cache_state "$run_dir" start
   fi
   config_hashes > "$run_dir/actual-config-hashes.tsv"
   focused_monitor > "$run_dir/actual-monitor.json"
@@ -2032,6 +2192,7 @@ post_launch() {
   if [[ $RUN_KIND == presentation ]]; then
     trap 'trap - EXIT ERR INT TERM; restore_runtime_hypr "$run_id"' EXIT ERR INT TERM
     stop_trace "$run_id"
+    record_cache_state "$run_dir" end
     write_runtime_verification "$run_id"
     restore_runtime_hypr "$run_id"
     trap - EXIT ERR INT TERM

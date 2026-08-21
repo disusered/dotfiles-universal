@@ -4,6 +4,10 @@ Rotz module for Skyrim SE (AppID `489830`) on Arch Linux with Hyprland/Wayland,
 Proton and gamescope. The reproducible SKSE and quality-of-life mod set is declared
 in [`mods/manifest.tsv`](./mods/manifest.tsv).
 
+The verified performance state, cursor-stall fix, evidence, and constraints for
+future optimization work are summarized in
+[`OPTIMIZATION_HANDOFF.md`](./OPTIMIZATION_HANDOFF.md).
+
 ## What this module does
 
 - Forces **Proton Experimental** for AppID `489830`. Skyrim SE has no native Linux
@@ -22,9 +26,9 @@ in [`mods/manifest.tsv`](./mods/manifest.tsv).
   the caps have to go back.
 - **Generates `Skyrim.ini` and `SkyrimPrefs.ini` on every launch**, sized for
   the focused monitor — see below.
-- Symlinks a Hyprland window rule (`skyrim.conf`) marking the Gamescope surface
-  fullscreen while explicitly keeping `immediate=false`. The shared Hyprland
-  policy also disables tearing globally.
+- Uses the Steam module's shared Hyprland rule for every Gamescope surface. It
+  sets fullscreen, disables animation and immediate presentation, and retains
+  the global tearing-off policy.
 - Renames `Data/Video/BGS_Logo.bik` to `.bak` so the Bethesda logo does not play on
   every launch.
 
@@ -270,8 +274,8 @@ from 78 in two minutes to zero in the next two minutes, and immediately felt
 smooth. Hardware cursor use also changed from false to true, which is recorded as
 an observation rather than treated as a cause. Because this was not a clean-boot,
 controlled-route run, `general:allow_tearing=false` is now the persisted shared
-Hyprland policy. Generic Gamescope rules also explicitly set `immediate=false`,
-codifying the live D0 fix for current and future launches.
+Hyprland policy. The single shared Gamescope rule explicitly sets
+`immediate=false`, codifying the live D0 fix for current and future launches.
 
 Queue a `clean_boot=true` presentation row **before rebooting**. Queueing only
 prepares and freezes the run, so the current Skyrim session may remain open until
@@ -279,7 +283,7 @@ that reboot; the clean test launch itself happens afterward. Rows without a rebo
 gate still require Skyrim to be closed before queueing:
 
 ```sh
-skyrim-benchmark queue H1-1
+skyrim-benchmark queue B0-1
 # reboot, then return to DP-1 at 3440x1440
 skyrim-benchmark status
 ```
@@ -318,7 +322,7 @@ is wrong.
 After Skyrim exits, attach both cursor observations:
 
 ```sh
-skyrim-benchmark complete H1-1 \
+skyrim-benchmark complete B0-1 \
   --game-cursor bad \
   --desktop-cursor good \
   --verdict rejected \
@@ -340,9 +344,9 @@ clean-boot short repetitions; `-S` is a 16,200-second (4.5-hour) soak. A
 `conditional` row is changed to `planned` only after its predecessor passes. A
 candidate passes only with complete automatic telemetry, zero hard cursor stalls
 in Skyrim and on the desktop, two clean short repetitions, and one clean soak.
-There is no controlled ultrawide FPS result for H0, and none is invented. If H1 is
+There is no controlled ultrawide FPS result for H0, and none is invented. If B0 is
 cursor-clean, its two short repetitions establish the first controlled ultrawide
-FPS reference; H1's own performance check is repeat consistency. H2 and later
+FPS reference; B0's own performance check is repeat consistency. H2 and later
 candidates must also stay within 5% of that accepted reference in both average FPS
 and 1% low. Any hard cursor stall rejects the run regardless of FPS.
 Duplicate-buffer and Wayland error rates remain diagnostic; gamescope versions
@@ -352,25 +356,25 @@ The cells remain independent:
 
 | Cell | Sole change from its declared baseline | When it runs |
 |---|---|---|
-| `H1` | `allow_tearing=true` to `false` | First formal candidate |
-| `H2` | system gamescope 3.16.23 to isolated cached 3.16.25-1 | After the full H1 chain passes |
-| `H3` | gamescope backend Wayland to SDL | After H2 evaluation |
-| `H4` | Steam overlay in Skyrim to off | After H3 evaluation |
+| `B0` | current post-fix policy | First formal controlled baseline |
+| `H2` | system gamescope 3.16.23 to isolated cached 3.16.25-1 | After the full B0 chain passes |
+| `H3` | gamescope backend Wayland to SDL | Independent branch from accepted B0 |
+| `H4` | Steam overlay in Skyrim to off | Independent branch from accepted B0 |
 | `H5` | add a 45 FPS gamescope cap | Only if H2-H4 fail and telemetry shows sustained GPU saturation near stalls |
 | `F1` | bypass gamescope | Falsification only if the presentation candidates fail; never a proposed normal-play solution |
 | `C1` | combine independently accepted fields | Only when at least two independent candidate chains are fully accepted |
 
-H1 alone compares against historical H0. After the entire H1 chain passes, H2
-through H5 and F1 each branch independently from accepted H1-S, so every later
+B0 establishes the post-fix controlled reference. After its entire chain passes,
+H2 through H5 and F1 each branch independently from accepted B0-S, so every later
 profile retains `allow_tearing=false` and changes only its own factor. A passing
-post-H1 candidate is not silently folded into another independent cell. Gamescope
+post-B0 candidate is not silently folded into another independent cell. Gamescope
 3.16.25 runs from a versioned extraction of the signed cached Arch package with
 its matching `gamescopereaper`; it does not replace the installed package. The
-`C1` profile intentionally matches accepted H1 and cannot be queued yet. C1 is
-needed only when at least two post-H1 candidate chains pass. Replace its
+`C1` profile intentionally matches accepted B0 and cannot be queued yet. C1 is
+needed only when at least two post-B0 candidate chains pass. Replace its
 placeholder with those fully accepted fields, update the C1 repeat rows to that
-same profile, and then run its two shorts and soak. If no post-H1 combination is
-needed, H1 remains the accepted final configuration and C1 remains unused.
+same profile, and then run its two shorts and soak. If no post-B0 combination is
+needed, B0 remains the accepted final configuration and C1 remains unused.
 The tearing policy is shared by every Hyprland game, not Skyrim-specific. Future
 Gamescope game modules must not re-enable `general:allow_tearing` as a per-game
 optimization. They must also not treat a generic `class=gamescope`
@@ -529,7 +533,6 @@ never mentions the missing runtime.
 | [`benchmark/presentation-matrix.tsv`](./benchmark/presentation-matrix.tsv) | ultrawide Hyprland/gamescope experiment ledger |
 | [`benchmark/presentation-profiles.tsv`](./benchmark/presentation-profiles.tsv) | controlled presentation permutations and the unqueueable C1 placeholder |
 | [`scopebuddy.conf`](./scopebuddy.conf) | `~/.config/scopebuddy/AppID/489830.conf` |
-| [`skyrim.conf`](./skyrim.conf) | `~/.config/hypr/conf.d/skyrim.conf` |
 | [`mods/manifest.tsv`](./mods/manifest.tsv) | manifest — read by the install script, not linked |
 | [`Skyrim.ini`](./Skyrim.ini) | template — read by the script, not linked |
 | [`SkyrimPrefs.igpu.ini`](./SkyrimPrefs.igpu.ini) | template — read by the script, not linked |
