@@ -78,6 +78,12 @@ enabled	name	archive	sha256	destination	archive_root	plugins	source_url
 yes	SKSE64 2.2.6 (AE, game 1.6.1170)	skse64_2_02_06.7z	d7297f1a1d613e5265e1af4dbbfe8bd37a32719c1ccef363fc6187fa6eba0848	root			https://skse.silverlock.org/
 yes	Address Library for SKSE Plugins v11	All in one (all game versions)-32444-11-1770897704.zip	d345ccdac52c096fe9628a62ff3764bbf23111ba30e3d282cd3b1fb66968863a	data			https://www.nexusmods.com/skyrimspecialedition/mods/32444?tab=files
 yes	Unofficial Skyrim SE Patch (USSEP) v4.3.8a	Unofficial Skyrim Special Edition Patch-266-4-3-8a-1774132896.7z	5036e8b4abef7234a1f35d43e33780f529be8f85f449e41211ec4876d03e95d9	data		unofficial skyrim special edition patch.esp	https://www.nexusmods.com/skyrimspecialedition/mods/266?tab=files
+# CSSET replaces the nine vanilla texture BSAs and supplies loose corrections.
+# Keep it after USSEP but before every other mod so later content always wins.
+# Its separate v1.2.3.3 snow patch is unnecessary here: its sole file,
+# textures/landscape/snow01alta.dds, is byte-identical to the copy already in
+# this newer v1.2.3.4 main archive (SHA-256 61c0c2aa...34f1e39).
+yes	Cleaned Skyrim SE Textures (CSSET) v1.2.3.4	Kart_CSSET_POST_1.6.1130-38775-1-2-3-4-1714757549.7z	a27ba8f60be837728ca8bd68bd535d12f859c8a1a7485380c06ec2f7955f9f91	data			https://www.nexusmods.com/skyrimspecialedition/mods/38775?tab=files
 yes	SSE Engine Fixes - Main File v7.0.20	Engine Fixes - Main File-17230-7-0-20-1772078239.7z	21330c95011f41859139635b43ce95ffb5fbadd3cd375d2f4358abcc3cb99407	data	EngineFixes FOMOD Installer/Required;EngineFixes FOMOD Installer/AE		https://www.nexusmods.com/skyrimspecialedition/mods/17230?tab=files
 yes	SSE Engine Fixes - SKSE64 Preloader v7	Engine Fixes - SKSE64 Preloader-17230-7-1771936758.7z	35633dc2904521f35861dbb582e084a10e77bec5b8f08fb08963d7578b07452f	root			https://www.nexusmods.com/skyrimspecialedition/mods/17230?tab=files
 yes	SkyUI v6.11	SkyUI-12604-6-11-1778020881.zip	4eb0c9fc5241e5c3dd2fd773ee8a89627c924bf4445cf70373d3a4c7c4393ff1	data		SkyUI_SE.esp	https://www.nexusmods.com/skyrimspecialedition/mods/12604?tab=files
