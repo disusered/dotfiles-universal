@@ -79,6 +79,11 @@
   },
   "outputStyle": "Concise",
   "effortLevel": "xhigh",
+  "modelSettings": {
+    "claude-opus-5": {
+      "effortLevel": "xhigh"
+    }
+  },
   "advisorModel": "fable",
   "tui": "fullscreen",
   "voice": {

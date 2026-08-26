@@ -2,9 +2,9 @@ personality = "pragmatic"
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 commit_attribution = ""
-model = "gpt-5.6-terra"
+model = "gpt-5.6-sol"
 model_verbosity = "low"
-model_reasoning_effort = "medium"
+model_reasoning_effort = "xhigh"
 plan_mode_reasoning_effort = "xhigh"
 service_tier = "default"
 
@@ -13,6 +13,7 @@ codex_git_commit = false
 plugin_hooks = true
 terminal_resize_reflow = true
 goals = true
+js_repl = false
 
 [shell_environment_policy]
 inherit = "core"
@@ -160,6 +161,9 @@ trust_level = "trusted"
 [projects."/home/carlos/Development/ITERAMIND/projects/impactod4130"]
 trust_level = "trusted"
 
+[projects."/home/carlos/Documents/Codex/2026-08-25/use-only-the-slack-connector-for"]
+trust_level = "trusted"
+
 [plugins."codex-security@openai-curated"]
 enabled = true
 
@@ -170,6 +174,14 @@ enabled = true
 last_updated = "2026-06-28T17:27:01Z"
 source_type = "local"
 source = "/home/carlos/.codex/openviking-plugins-local-marketplace"
+
+[marketplaces.openai-bundled]
+source_type = "local"
+source = "/home/carlos/.codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[marketplaces.openai-primary-runtime]
+source_type = "local"
+source = "/home/carlos/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
 [hooks.state]
 
@@ -189,8 +201,32 @@ trusted_hash = "sha256:c730def8275e2e74d51898cb02c62be67f1905fa5cb8813883b41a391
 [mcp_servers.stitch]
 command = "/home/carlos/.local/bin/stitch-mcp-wrapper"
 
+[mcp_servers.node_repl]
+args = []
+command = "/usr/lib/chatgpt/resources/cua_node/bin/node_repl"
+startup_timeout_sec = 120
+
+[mcp_servers.node_repl.env]
+NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
+NODE_REPL_NODE_MODULE_DIRS = "/usr/lib/chatgpt/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/usr/lib/chatgpt/resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/carlos/.codex:/usr/lib/chatgpt/resources/cua_node/lib/node_modules"
+CODEX_HOME = "/home/carlos/.codex"
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+BROWSER_USE_TINYSKY_ENABLED = "0"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
+BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
+BROWSER_USE_CODEX_APP_VERSION = "26.818.61809"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/carlos/.codex/plugins/cache/openai-bundled/browser/26.818.61809/scripts/browser-service.mjs"}'
+CODEX_CLI_PATH = "/usr/lib/chatgpt/resources/codex"
+
 [apps.connector_76869538009648d5b282a4bb21c3d157.tools."github.create_pull_request"]
 approval_mode = "approve"
+
+[desktop]
+conversationDetailMode = "STEPS_COMMANDS"
+ambient-suggestions-enabled = true
 
 [plugins."openviking-memory@openviking-plugins-local"]
 enabled = true
@@ -218,3 +254,33 @@ approval_mode = "approve"
 
 [plugins."openviking-memory@openviking-plugins-local".mcp_servers.openviking-memory.tools.list]
 approval_mode = "approve"
+
+[plugins."codex-app-tools@openai-bundled"]
+enabled = true
+
+[plugins."sites@openai-bundled"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = true
+
+[plugins."slack@openai-curated"]
+enabled = true
