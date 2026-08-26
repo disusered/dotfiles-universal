@@ -98,6 +98,13 @@ window#waybar {
   color: #{{ base | hex }};
 }
 
+/* Development workloads are stopped on purpose, so this stays muted. Reusing
+   the red of .unavailable would raise an alarm for a state Carlos asked for. */
+#custom-timer.host-paused {
+  background-color: #{{ surface1 | hex }};
+  color: #{{ text | hex }};
+}
+
 #privacy {
   background-color: #{{ red | hex }};
   color: #{{ surface0 | hex }};

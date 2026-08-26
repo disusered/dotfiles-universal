@@ -31,3 +31,14 @@ containers = [
   "supabase_auth_gxaprqniktzkmrzpwrsj",
   "supabase_db_gxaprqniktzkmrzpwrsj",
 ]
+
+# Fire-and-forget pokes after a completed transition, so consumers caching the
+# pause state refresh now instead of on their next poll. Never load-bearing: a
+# hook that fails or matches nothing only costs staleness, because
+# `cfg dev paused <name>` remains the source of truth.
+#
+# timerbar only consults cfg when a request has already failed, so without this
+# the Waybar timer would keep its stale badge until its next 5s resync.
+# The pattern includes the path separator on purpose: a bare "timerbar watch"
+# also matches any shell whose command line merely mentions it.
+notify = ["pkill -USR1 -f '/timerbar watch'"]
