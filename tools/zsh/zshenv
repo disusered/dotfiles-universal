@@ -12,4 +12,7 @@ export LC_TIME='en_US.UTF-8'
 export LC_COLLATE='en_US.UTF-8'
 export LC_MONETARY='en_US.UTF-8'
 export LC_MESSAGES='en_US.UTF-8'
+# User bins. Kept here, not in .zshrc, because SDDM starts the Hyprland
+# session through a login shell: anything the compositor spawns inherits it.
+export PATH="$HOME/.local/bin:$PATH"
 . "$HOME/.cargo/env"
