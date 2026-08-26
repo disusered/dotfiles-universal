@@ -1,0 +1,7 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: sudo pacman -S --noconfirm --needed chromium
+    depends:
+      - /tools/zsh
+  links:
+    puppeteer.zsh: ~/.config/zsh/0510_puppeteer.zsh
