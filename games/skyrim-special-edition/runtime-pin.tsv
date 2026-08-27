@@ -1,0 +1,31 @@
+# Skyrim SE runtime pin — tab-separated, one row per depot.
+#
+# Columns: depot  manifest  contains
+#
+# The game is pinned to runtime 1.6.1170. Every SKSE plugin is compiled against
+# one runtime, so a Bethesda patch silently disables the entire mod set — see
+# README.md, "The game version is pinned to 1.6.1170".
+#
+# These manifest IDs are the 1.6.1170 build of each depot. They are what
+# `download_depot` in the Steam console asks Valve for, so the files come from
+# Valve and no credentials are handed to anything.
+#
+# Provenance: recorded from the recovery run on 2026-08-20, logged in
+# ~/.local/share/Steam/logs/console_log.previous.txt as
+#   Depot download complete : ".../depot_489833" (manifest 1914580699073641964)
+#   Depot download complete : ".../depot_489831" (manifest 8442952117333549665)
+#   Depot download complete : ".../depot_489832" (manifest 8042843504692938467)
+# and confirmed by the resulting SkyrimSE.exe reporting 1.6.1170.0.
+#
+# `files` and `mib` are what the Steam console reports when it starts each
+# download ("Downloading depot 489831 (19 files, 4663 MB) ..."). The restore
+# script checks the file count before copying, so a depot that was interrupted
+# part-way cannot be laid over the install as though it were complete.
+#
+# Do NOT replace these with whatever the current build downloads. The acf's
+# InstalledDepots records the *live* build's manifests, which is a different
+# set and is what Steam re-applies when it updates.
+depot	manifest	files	mib	contains
+489831	8442952117333549665	19	4663	meshes, interface, misc, shaders, animations, sounds, voices
+489832	8042843504692938467	26	7260	textures 0-8, resource pack, creation club content
+489833	1914580699073641964	1	26	SkyrimSE.exe and root files — the depot that decides the version

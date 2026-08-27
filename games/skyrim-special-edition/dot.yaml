@@ -77,5 +77,6 @@ linux[whoami.distro^="Arch"]:
     skyrim-benchmark.sh: ~/.local/bin/skyrim-benchmark
     skyrim-skse-launch.sh: ~/.local/bin/skyrim-skse-launch
     skyrim-install-mods.sh: ~/.local/bin/skyrim-install-mods
+    skyrim-restore-runtime.sh: ~/.local/bin/skyrim-restore-runtime
     mangohud-benchmark.conf: ~/.config/MangoHud/skyrim-benchmark.conf
     scopebuddy.conf: ~/.config/scopebuddy/AppID/489830.conf

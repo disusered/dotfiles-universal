@@ -132,9 +132,58 @@ Steam.
 
 ### Recovering when it updates anyway
 
+```sh
+skyrim-restore-runtime --status     # report drift, touch nothing
+skyrim-restore-runtime              # restore
+```
+
+The pinned depot manifests live in [`runtime-pin.tsv`](./runtime-pin.tsv), with
+their provenance. The script verifies the depot's own `SkyrimSE.exe` reports
+1.6.1170.0 *before* copying anything, refuses to copy a depot that is still
+downloading, re-disables the intro video, and refreshes the vanilla texture
+baseline that makes CSSET removable.
+
+It copies, never deletes, so no mod file in `Data/` is touched — only the
+vanilla files the update replaced.
+
+The one step that is not scripted is the download. `download_depot` is a command
+in the Steam client's own console, and the alternative — steamcmd — would need
+this account's Steam credentials handed to a script. So the script treats it as
+a checked precondition and prints the exact lines to paste:
+
+```sh
+steam -console      # must be a fresh start; the CONSOLE tab then appears in
+                    # the header bar beside Store / Library / Community
+```
+
+```
+download_depot 489830 489831 8442952117333549665
+download_depot 489830 489832 8042843504692938467
+download_depot 489830 489833 1914580699073641964
+```
+
+Files land in `~/.local/share/Steam/ubuntu12_32/steamapps/content/app_489830/`
+— note `ubuntu12_32`, not the `steamapps/content` path you would guess. Nothing
+is overwritten until the script copies it.
+
+### Never verify integrity
+
+**Do not use Steam's "Verify integrity of game files."** It is what broke the pin
+on 2026-08-27. The sequence: a shader pre-cache job failed, which triggered a
+validation pass, which hashed the 1.6.1170 files against a manifest claiming a
+newer build, called 24 of them missing and 4 corrupt, and queued a full repair
+to the current build. It got as far as deleting `SkyrimSE.exe`, all nine texture
+BSAs, `Interface`, `Meshes0`, `Meshes1`, `Misc`, `Shaders`, `Voices_*`, and four
+master ESMs before it was paused.
+
+A buildid in the manifest only defends the routine update check. It does not
+survive a validation pass, and nothing in Steam does.
+
+### Why staying current still does not work
+
 On 2026-08-20 a 2 GB patch moved the game to **1.7.99** (buildid 13189953 →
-24604991) and deleted `skse64_2_2_6.dll` outright. Everything under `Data/`
-survived; only the executable and the SKSE root files were affected.
+24604991) and deleted `skse64_2_2_6.dll` outright. On 2026-08-27 a second patch
+moved it to **1.7.104** (buildid 24914197) and took most of `Data/` with it.
 
 Staying current was tried first and does not work. SKSE 2.3.0 loads against
 1.7.99 and scans every plugin, but none initialise: they are built against a
@@ -144,40 +193,9 @@ format: 5`, and `skse64.log` stops at `preinit complete` with zero successful
 loads. No combination works — v11 has no 1.7.99 database at all — so recovery
 means going back, not forward.
 
-Downgrade with the Steam client's own console. No third-party downgrade tool, no
-credentials handed to anything, and the files come from Valve:
-
-```sh
-steam -console      # adds a Console tab to the client
-```
-
-```
-download_depot 489830 489831 8442952117333549665
-download_depot 489830 489832 8042843504692938467
-download_depot 489830 489833 1914580699073641964
-```
-
-Those three manifest IDs are 1.6.1170. Depot 489833 is the 26 MB executable, the
-only one that decides the version. Files land in
-`~/.local/share/Steam/ubuntu12_32/steamapps/content/app_489830/` — note
-`ubuntu12_32`, not the `steamapps/content` path you would guess. Nothing is
-overwritten until you copy it yourself:
-
-```sh
-G="$(../lib/steam-find-app-path.sh 489830)/steamapps/common/Skyrim Special Edition"
-C=~/.local/share/Steam/ubuntu12_32/steamapps/content/app_489830
-for d in 489831 489832 489833; do cp -a "$C/depot_$d/." "$G/"; done
-strings "$G/SkyrimSE.exe" | grep -m1 '^1\.6\.'      # expect 1.6.1170.0
-```
-
-`cp` does not delete, so no mod file is touched — verified by diffing the depot
-file list against the per-archive lists in `~/.local/state/skyrim-mods/`. The
-copy does restore `Data/Video/BGS_Logo.bik`, so re-disable the intro afterwards.
-
-**Leave `appmanifest_489830.acf` alone.** It still reports buildid 24604991.
-Steam decides whether to update by comparing that number, not by hashing files,
-so a manifest claiming 1.7.99 over a 1.6.1170 install is what keeps Steam quiet.
-Correcting it invites the update straight back.
+**Leave `appmanifest_489830.acf` alone.** After a completed update it reports the
+current buildid over a 1.6.1170 install, and that mismatch is what keeps Steam
+quiet. Correcting it invites the update straight back.
 
 Then restore SKSE 2.2.6. Silverlock has dropped it from the page — only the GOG
 2.2.6 build for 1.6.1179 is linked now — but the file is still served:
@@ -192,9 +210,9 @@ nothing: v12 only *adds* `versionlib-1-7-99-0.bin`, and the 1.6.1170 databases
 are still format 2. Delete that one file and `skse64_1_7_99.dll` if a v12 install
 left them behind.
 
-Moving to 1.7.99 becomes possible once every mod above ships a DLL rebuilt
-against a CommonLib that reads format 5. That is a wait on other authors, not on
-anything in this repo.
+Moving to the current build becomes possible once every mod above ships a DLL
+rebuilt against a CommonLib that reads format 5. That is a wait on other authors,
+not on anything in this repo.
 
 ## Install
 
