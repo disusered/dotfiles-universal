@@ -46,6 +46,18 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "env PYTHONPATH=/home/carlos/Development/ME/herding-cats/workshop/spikes/delusional-skyrim-courier/src python -m skyrim_courier.adapters.claude",
+            "timeout": 1
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
