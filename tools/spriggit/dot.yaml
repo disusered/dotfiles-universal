@@ -1,0 +1,21 @@
+linux:
+  installs:
+    cmd: |
+      version=0.41.0
+      install_dir="$HOME/.local/share/spriggit/$version"
+      if [ ! -x "$install_dir/Spriggit.CLI" ]; then
+        temp_dir=$(mktemp -d)
+        curl --fail --location --retry 2 \
+          --output "$temp_dir/SpriggitLinuxCLI.zip" \
+          "https://github.com/Mutagen-Modding/Spriggit/releases/download/$version/SpriggitLinuxCLI.zip"
+        unzip -q "$temp_dir/SpriggitLinuxCLI.zip" -d "$temp_dir/unpacked"
+        mkdir -p "$install_dir"
+        cp -a "$temp_dir/unpacked/." "$install_dir/"
+        chmod 755 "$install_dir/Spriggit.CLI"
+        rm -r "$temp_dir"
+      fi
+    depends:
+      - /tools/curl
+      - /tools/unzip
+  links:
+    spriggit.sh: ~/.local/bin/spriggit

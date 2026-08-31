@@ -1,0 +1,21 @@
+linux:
+  installs:
+    cmd: |
+      version=2026.03.15
+      install_dir="$HOME/.local/share/papyrus-compiler/$version"
+      if [ ! -x "$install_dir/papyrus-compiler" ]; then
+        temp_dir=$(mktemp -d)
+        curl --fail --location --retry 2 \
+          --output "$temp_dir/papyrus-compiler.tar.gz" \
+          "https://github.com/russo-2025/papyrus-compiler/releases/download/$version/papyrus-compiler-ubuntu.tar.gz"
+        mkdir -p "$temp_dir/unpacked" "$install_dir"
+        tar -xzf "$temp_dir/papyrus-compiler.tar.gz" -C "$temp_dir/unpacked"
+        install -m 755 \
+          "$temp_dir/unpacked/papyrus-compiler/papyrus" \
+          "$install_dir/papyrus-compiler"
+        rm -r "$temp_dir"
+      fi
+    depends:
+      - /tools/curl
+  links:
+    papyrus-compiler.sh: ~/.local/bin/papyrus-compiler

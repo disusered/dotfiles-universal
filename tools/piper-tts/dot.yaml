@@ -1,0 +1,20 @@
+linux:
+  installs:
+    cmd: |
+      version=1.7.0
+      voice=en_GB-northern_english_male-medium
+      install_dir="$HOME/.local/share/piper-tts/$version"
+      voice_dir="$HOME/.local/share/piper-voices"
+      if [ ! -x "$install_dir/bin/python" ]; then
+        uv venv --python 3.13 "$install_dir"
+        uv pip install --python "$install_dir/bin/python" "piper-tts==$version"
+      fi
+      if [ ! -f "$voice_dir/$voice.onnx" ] || [ ! -f "$voice_dir/$voice.onnx.json" ]; then
+        mkdir -p "$voice_dir"
+        "$install_dir/bin/python" -m piper.download_voices \
+          --data-dir "$voice_dir" "$voice"
+      fi
+    depends:
+      - /languages/python/uv
+  links:
+    piper-tts.sh: ~/.local/bin/piper-tts
