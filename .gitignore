@@ -56,4 +56,3 @@ ai/claude/.cache/
 /ai/claude/skills/twg
 /ai/claude/skills/twg-*
 /ai/xbol-observability/tests/__pycache__
-/ai/okf/bin/__pycache__
