@@ -1,8 +1,9 @@
 # OKF v1 Transports
 
-The local CLI and hosted MCP compose the same single-Bundle analysis and
-`okf.operations.v1` Change contract. Select one transport for one Bundle and do
-not switch transports to work around a refusal.
+The local CLI, the repository's own stdio MCP server, and a hosted MCP
+deployment all compose the same single-Bundle analysis and `okf.operations.v1`
+Change contract. Select one transport for one Bundle and do not switch
+transports to work around a refusal.
 
 ## Release-installation seam
 
@@ -11,13 +12,21 @@ owns an exact `@disusered/okf-cli` pin and a lockfile. Install it with the
 package-manager command documented by that consumer, then use its local binary
 or script. If the exact pin, lockfile, or documented command is missing, report
 the release-installation seam and stop; do not improvise with
-`npx`, a toolkit source checkout, the retired Python conformance checker, or a
-local MCP server.
+`npx`, a toolkit source checkout, or the retired Python conformance checker. A
+repository's declared stdio server is not an improvisation, but it is also not a
+substitute for a missing CLI pin: it is a separate configured door, described
+below.
 
-The hosted deployment must supply the `okf_v1_*` tools below and document its
-one Bundle name. If only unversioned `okf_*` tools are present, or the Bundle
-name is unknown, report the deployment cutover seam and stop. Do not substitute
-the older hosted skill or guess a name.
+A hosted deployment must supply the `okf_v1_*` tools below and document its one
+Bundle name. If only unversioned `okf_*` tools are present, or the Bundle name
+is unknown, report the deployment cutover seam and stop. Do not substitute the
+older hosted skill or guess a name.
+
+The local stdio server is versioned separately from the CLI: the
+`@disusered/okf-mcp` package declares `1.0.0-rc.2`. The three configured servers
+currently run a local build of it out of the toolkit checkout,
+`packages/local-mcp/dist/bin.js`, rather than an installed package, so an
+unbuilt `dist` takes all three down at once.
 
 For format-level decisions, read `spec/SPEC.md` from the `okf-contracts`
 package in the consumer's lockfile-backed installation. npm exposes it under
@@ -64,10 +73,14 @@ Call `context` first. It returns manifest-scoped instruction documents when the
 project has `.agents/okf.yaml`; an explicit Bundle root with no manifest returns
 an empty instruction list, so repository instructions still need a direct read.
 
-## Hosted v1 MCP
+## v1 MCP
 
-A hosted deployment serves exactly one configured Bundle. Every call includes
-that documented Bundle name, and the server refuses any other name.
+Two kinds of server expose this surface, and they expose the same one. A hosted
+deployment serves exactly one configured Bundle over the network. A repository's
+own stdio server, `@disusered/okf-mcp`, serves exactly one local Bundle off
+disk, started with one `--bundle` and, where the consumer has one, a
+`--profile-module`. Either way every call includes that one documented Bundle
+name, and the server refuses any other name.
 
 | Tool | Input after selecting `bundle` |
 | --- | --- |
@@ -82,14 +95,16 @@ that documented Bundle name, and the server refuses any other name.
 | `okf_v1_preview_change` | `change` |
 | `okf_v1_apply_change` | `change`, `preview_id` |
 
-Call `okf_v1_context` before substantive work. The tool returns the hosted
-index and deployment-owned instructions. Read and retain the opaque `revision`
-returned for any document that may be updated, deleted, or moved.
+Call `okf_v1_context` before substantive work; `bundle` is required on it as on
+every other tool. It returns the Bundle index and the server's own instructions.
+Read and retain the opaque `revision` returned for any document that may be
+updated, deleted, or moved.
 
-The deployment owns authentication and apply policy. `okf_v1_preview_change`
-is read-only. Show its diff, affected paths, and diagnostics, then wait for
-explicit authorization before `okf_v1_apply_change`. An authorization refusal
-is final for that operation.
+A hosted deployment owns its authentication and apply policy; a local stdio
+server has neither, and inherits the harness's own permissions instead.
+`okf_v1_preview_change` is read-only on either. Show its diff, affected paths,
+and diagnostics, then wait for explicit authorization before
+`okf_v1_apply_change`. An authorization refusal is final for that operation.
 
 ## Change contract
 

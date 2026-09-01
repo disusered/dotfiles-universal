@@ -23,6 +23,10 @@ current repository instructions over these workstation paths.
   graphing, or changes. Follow the owning Store's separate workflow.
 - Zotero is the preferred external capture layer. Capture does not promote a
   Source or Connection into the curated Bundle.
+- A surface with no filesystem reaches this Bundle through the repository's
+  own stdio server, `okf-cats` in its checked-in `.mcp.json`. It serves
+  `polychrome` and nothing else, so it is no route to Black, Red, or
+  Marginalia.
 - OpenViking uses the `local-dev` profile and remains contextual recall.
 - Keep the repository-root `brain -> polychrome` compatibility symlink and
   installed `brainctl` until the Portal cutover is separately authorized. Do
@@ -48,11 +52,15 @@ current repository instructions over these workstation paths.
 - Inspect code, migrations, immutable history, and verified runtime evidence
   when claims depend on current behavior. Preserve raw and bulk evidence under
   `artifacts/`; promote only provenance and durable conclusions into `docs/`.
+- A surface with no filesystem reaches this Bundle through the repository's
+  own stdio server, `okf-xbol` in its checked-in `.mcp.json`.
 - OpenViking uses the `xbol` profile and remains contextual recall.
-- After authored changes, run every check in the maintenance runbook, then
-  `pnpm okf:validate`.
+- After authored changes, run every check in the maintenance runbook. The
+  validation among them is `pnpm okf:validate`, which runs
+  `okf validate . --bundle xbol --strict --json` and passes no profile module.
 - Do not add Polychrome stores, `polychromectl`, a custom general knowledge CLI,
-  a local OKF MCP server, a reference agent, or a Brain/Pi harness to XBOL.
+  an OKF MCP server other than the declared `okf-xbol`, a reference agent, or a
+  Brain/Pi harness to XBOL.
 - `.agents/okf.yaml` declares exactly one `xbol` Bundle. Run
   `pnpm install --frozen-lockfile`; the root scripts use the exact CLI pin.
 
@@ -64,14 +72,20 @@ current repository instructions over these workstation paths.
 - Read repository `AGENTS.md`, `CONTEXT.md`, and the relevant private decision
   and runbook. The Bundle is Carlos-only; keep credentials, raw client data,
   and client-confidential material out of it.
-- Do not start the historical local adapter host. Local access is through the
-  JSON `okf` CLI only.
+- A surface with no filesystem reaches this Bundle through the repository's own
+  stdio server, `okf-iteramind` in its checked-in `.mcp.json`. It is the only
+  one of the three started with a `--profile-module`, because `private` is the
+  only Bundle with an executable profile. The historical local adapter host it
+  replaced is gone; do not go looking for it.
 - OpenViking uses the `iteramind-dev` profile. Resource ingestion is a separate
   explicit request.
-- Run `pnpm install --frozen-lockfile` and `pnpm check`. The root scripts use
-  the exact CLI pin and `.agents/okf-private-profile.mjs`; the Python validator
-  remains a parity oracle during the migration rather than a second generic
-  implementation.
+- Run `pnpm install --frozen-lockfile`, then `pnpm okf:validate` after every
+  authored change. It runs `okf validate .` against `private` with
+  `--profile-module .agents/okf-private-profile.mjs`. `pnpm check` runs
+  `pnpm test`, that validation, and `pnpm okf:visualize` together; `pnpm test`
+  alone covers a change to the profile, the manifest, or the toolkit version.
+  The Python validator that used to shadow this profile is retired, and the
+  archived `iteramind/okf-shared` repository that held it says so in its README.
 
 ## Iteramind Shared
 
@@ -88,10 +102,15 @@ current repository instructions over these workstation paths.
 - Hosted apply remains gated by deployment identity policy and explicit user
   authorization after preview. On refusal, stop.
 
-The current workstation skill distribution still includes older unversioned
-shared-corpus and local-MCP artifacts. They are migration snapshots, not a
-fallback for this skill. The hosted deployment is usable here only after its
-connector exposes the documented `okf_v1_*` surface.
+The deployment cutover is done. The claude.ai `OpenKnowledge` connector exposes
+the ten documented `okf_v1_*` tools and requires `bundle` on every one of them,
+and no unversioned `okf_*` artifact is left in the workstation skill
+distribution. The connector is the only door to the Shared Bundle; a local
+stdio server is a different thing and never serves it.
+
+The `okf-shared-corpus` skill owns the Shared Bundle's authority and content
+policy, and it reads this section and [the transport contract](transports.md)
+rather than restating them. Keep the three consistent.
 
 ## Unknown Consumer
 

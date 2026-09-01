@@ -1,6 +1,6 @@
 ---
 name: okf-knowledge-ops
-description: Explore and curate exactly one governed OKF v0.2 Bundle through the versioned JSON `okf` CLI for local files or deployment-provided `okf_v1_*` MCP tools for hosted storage. Use for grounded questions, validation, source promotion, link and graph audits, and authorized knowledge changes in Polychrome, XBOL, or Iteramind. Do not use for Polychrome Black processing.
+description: Explore and curate exactly one governed OKF v0.2 Bundle, reached with the versioned JSON `okf` CLI, the repository's own stdio `okf_v1_*` MCP server, or a hosted deployment's `okf_v1_*` tools. Use for grounded questions, validation, source promotion, link and graph audits, and authorized knowledge changes in Polychrome, XBOL, or Iteramind. Do not use for Polychrome Black processing.
 ---
 
 # OKF Knowledge Operations
@@ -30,13 +30,31 @@ There is no Bundle-discovery tool in the v1 interface.
 
 ## Choose the Transport
 
-- **Local Bundle:** use the versioned JSON `okf` CLI for Bundle context, reads,
-  search, links, inspection, validation, visualization, and changes. Do not
-  start or use a local OKF MCP server.
-- **Hosted Bundle:** use only the deployment-supplied `okf_v1_*` MCP tools. Do
-  not look for its files or fall back to unversioned `okf_*` tools.
+Transport follows the harness, not the Bundle. A local Bundle is reachable both
+ways, and both reach the same files under the same profile.
 
-Read [references/transports.md](references/transports.md) before invoking either
+- **With file tools:** read the Markdown and use the versioned JSON `okf` CLI
+  for Bundle context, reads, search, links, inspection, validation,
+  visualization, and changes. Validate with the consumer's own script. This is
+  the normal path; do not start a server to reach a checkout you can already
+  see.
+- **With no filesystem:** use the repository's own stdio server,
+  `@disusered/okf-mcp`, one per repository, serving exactly one local Bundle off
+  disk. It exposes the same ten `okf_v1_*` tools a hosted deployment does. Each
+  repository declares its server in a checked-in `.mcp.json`, so a clone arrives
+  configured. Claude Desktop has no project scope, so its three servers live in
+  `~/.config/Claude/claude_desktop_config.json`; Codex reads a project-local
+  `.codex/config.toml`. The names are `okf-xbol`, `okf-cats`, and
+  `okf-iteramind`, and only Iteramind's is started with a `--profile-module`.
+- **Hosted Bundle:** use only the deployment-supplied `okf_v1_*` tools. Do not
+  look for its files or fall back to unversioned `okf_*` tools.
+
+The Iteramind Shared Corpus is the one hosted deployment here. It is R2 objects
+behind Cloudflare Access, reached through the claude.ai `OpenKnowledge`
+connector, and the `okf-shared-corpus` skill owns it. Do not reach for it from
+this one.
+
+Read [references/transports.md](references/transports.md) before invoking a
 transport. It records the verified command and tool shapes, reviewed change
 contract, and unresolved release-installation seams.
 
