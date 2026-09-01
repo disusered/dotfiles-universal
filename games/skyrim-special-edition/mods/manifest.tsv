@@ -135,4 +135,4 @@ yes	DQanM - BQO Patch (after DQanM; ESP replacer for EBQO)	Dungeon Quests are no
 # ── Skyrim Courier proof of concept, 2026-08-31 ───────────────────────────
 # SKSE_HTTP is the localhost transport used by the Papyrus polling quest.
 yes	SKSE HTTP v0.1.0-beta9	SKSE_HTTP_v0.1.0-beta9.zip	0d962d493967e4abc5a5e94f62566ecb035b298e60031bb63c1f622eedf85e0d	data			https://github.com/Leidtier/SKSE_HTTP/releases/tag/v0.1.0-beta9
-yes	Skyrim Courier v0.1.0	SkyrimCourier-0.1.0.zip	64765708af4c5e97537caa71f7adc2481ed4da780265f4787fdd4c5318ea717c	data		SkyrimCourier.esp	local://herding-cats/workshop/spikes/delusional-skyrim-courier
+yes	Skyrim Courier v0.1.0	SkyrimCourier-0.1.0.zip	12a8bc5169a9100dacb1b4f6baed80d315d663a643c009ff44dec02c29fcd297	data		SkyrimCourier.esp	local://herding-cats/workshop/spikes/delusional-skyrim-courier
