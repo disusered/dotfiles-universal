@@ -11,7 +11,9 @@ trap 'rm -rf -- "${stage}"' EXIT
 
 mkdir -p -- "${artifact_dir}"
 cp -RL -- "${plugin_source}/." "${stage}/"
-rm -rf -- "${stage}/skills/okf-knowledge-ops"
+# The plugin holds no copy of the skill: agent-skills is the one tree, and a second
+# copy here only ever drifted from it.
+mkdir -p -- "${stage}/skills"
 cp -RL -- "${canonical_skill}" "${stage}/skills/okf-knowledge-ops"
 rm -f -- "${artifact}"
 (
