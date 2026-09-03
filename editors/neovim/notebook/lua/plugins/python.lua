@@ -94,6 +94,10 @@ end
 
 return {
   {
+    "neovim/nvim-lspconfig",
+    lazy = false,
+  },
+  {
     "mason-org/mason.nvim",
     opts = {
       install_root_dir = shared_mason_root,

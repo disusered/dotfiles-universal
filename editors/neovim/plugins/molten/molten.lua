@@ -10,8 +10,15 @@ return {
     build = ":UpdateRemotePlugins",
     init = function()
       vim.g.molten_auto_init_behavior = "raise"
+      vim.g.molten_auto_open_output = false
+      vim.g.molten_enter_output_behavior = "open_and_enter"
       vim.g.molten_image_provider = "image.nvim"
+      vim.g.molten_image_location = "both"
       vim.g.molten_output_win_max_height = 20
+      vim.g.molten_virt_lines_off_by_1 = true
+      vim.g.molten_virt_text_max_lines = 12
+      vim.g.molten_virt_text_output = true
+      vim.g.molten_wrap_output = true
     end,
     config = function()
       local group = vim.api.nvim_create_augroup("CourseNotebooks", { clear = true })
@@ -44,31 +51,40 @@ return {
       end
 
       local function initialize_notebook(event)
-        if vim.b[event.buf].course_kernel_initialized then
+        if vim.b[event.buf].course_kernel_initialized or vim.b[event.buf].course_kernel_initializing then
           return
         end
 
+        vim.b[event.buf].course_kernel_initializing = true
         vim.schedule(function()
           if not vim.api.nvim_buf_is_valid(event.buf) then
             return
           end
 
-          local ok, kernels = pcall(vim.fn.MoltenAvailableKernels)
-          local kernel_name = metadata_kernel(event.file)
-          if not ok or type(kernels) ~= "table" then
-            vim.notify("Molten kernels are not available", vim.log.levels.WARN)
-            return
-          end
+          vim.api.nvim_buf_call(event.buf, function()
+            local ok, kernels = pcall(vim.fn.MoltenAvailableKernels)
+            local kernel_name = metadata_kernel(vim.api.nvim_buf_get_name(event.buf))
+            if not ok or type(kernels) ~= "table" then
+              vim.b[event.buf].course_kernel_initializing = false
+              vim.notify("Molten kernels are not available", vim.log.levels.WARN)
+              return
+            end
 
-          if kernel_name and vim.tbl_contains(kernels, kernel_name) then
-            initialize(kernel_name)
-            vim.b[event.buf].course_kernel_initialized = true
-          else
-            vim.notify(
-              ("Notebook kernel is unavailable: %s"):format(kernel_name or "<missing metadata>"),
-              vim.log.levels.WARN
-            )
-          end
+            if kernel_name and vim.tbl_contains(kernels, kernel_name) then
+              local initialized, error_message = pcall(initialize, kernel_name)
+              vim.b[event.buf].course_kernel_initialized = initialized
+              vim.b[event.buf].course_kernel_initializing = false
+              if not initialized then
+                vim.notify(("Notebook kernel failed to initialize: %s"):format(error_message), vim.log.levels.ERROR)
+              end
+            else
+              vim.b[event.buf].course_kernel_initializing = false
+              vim.notify(
+                ("Notebook kernel is unavailable: %s"):format(kernel_name or "<missing metadata>"),
+                vim.log.levels.WARN
+              )
+            end
+          end)
         end)
       end
 
@@ -169,18 +185,6 @@ return {
         ft = "quarto",
       },
       {
-        "<leader>jn",
-        "<cmd>MoltenNext<CR>",
-        desc = "Next cell",
-        ft = "quarto",
-      },
-      {
-        "<leader>jp",
-        "<cmd>MoltenPrev<CR>",
-        desc = "Previous cell",
-        ft = "quarto",
-      },
-      {
         "<leader>jO",
         "<cmd>noautocmd MoltenEnterOutput<CR>",
         desc = "Enter output",
@@ -196,6 +200,12 @@ return {
         "<leader>jx",
         "<cmd>MoltenImagePopup<CR>",
         desc = "Open image",
+        ft = "quarto",
+      },
+      {
+        "<leader>jb",
+        "<cmd>MoltenOpenInBrowser<CR>",
+        desc = "Open HTML output",
         ft = "quarto",
       },
       {
