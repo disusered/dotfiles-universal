@@ -1,7 +1,11 @@
-linux[whoami.distro^="Arch"]:
+linux[whoami.distro^="Arch"][whoami.username!="root"]:
   installs:
-    cmd: sudo pacman -S --noconfirm --needed betterbird-bin
+    cmd: sudo pacman -S --noconfirm --needed betterbird-bin hunspell-en_us hunspell-es_mx
     depends:
       - /lib/uwsm
   links:
     betterbird.conf: ~/.config/hypr/conf.d/betterbird.conf
+
+linux[whoami.distro^="Arch"][whoami.username="root"]:
+  links:
+    policies.json: /opt/betterbird/distribution/policies.json

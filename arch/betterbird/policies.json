@@ -1,0 +1,42 @@
+{
+  "policies": {
+    "Preferences": {
+      "mail.biff.show_tray_icon_always": {
+        "Value": true,
+        "Status": "default"
+      },
+      "mail.closeToTray": {
+        "Value": true,
+        "Status": "default"
+      },
+      "mail.minimizeToTray": {
+        "Value": true,
+        "Status": "default"
+      },
+      "mail.minimizeToTray.supportedDesktops": {
+        "Value": "kde,gnome,pop:gnome,xfce,mate,hyprland,x-cinnamon",
+        "Status": "default"
+      },
+      "mail.server.default.autosync_max_age_days": {
+        "Value": 365,
+        "Status": "default"
+      },
+      "mail.server.default.autosync_offline_stores": {
+        "Value": true,
+        "Status": "default"
+      },
+      "mail.server.default.offline_download": {
+        "Value": true,
+        "Status": "default"
+      },
+      "mail.startupMinimized": {
+        "Value": true,
+        "Status": "default"
+      },
+      "spellchecker.dictionary": {
+        "Value": "en-US,es-MX",
+        "Status": "default"
+      }
+    }
+  }
+}
