@@ -33,10 +33,19 @@ Bundle after R2 source events. Never edit it or treat it as authored knowledge.
 
 ## Enforce Shared Corpus policy
 
-- Store stable, reviewed, bot-safe company knowledge only.
-- Require non-empty `type`, `title`, and `description` frontmatter and
-  `status: stable`.
-- Keep internal links inside the Shared Bundle and require them to resolve.
+- Store bot-safe company knowledge only.
+- Require non-empty `type`, `title`, and `description` frontmatter, and a
+  declared `status`. `status: stable` is a claim of review: it needs a
+  `verified` entry naming a `human:<id>` actor, and fails validation without
+  one. Anything nobody has re-read stays `draft`. Drafts belong here; what
+  separates the corpora is audience, not maturity.
+- A Markdown link that leaves the Shared Bundle is an error
+  (`guidance.link.escape`) and blocks the write. Point it at an HTTPS `sources`
+  entry instead.
+- A link to a page inside the bundle that nobody has written yet is **not** an
+  error. The profile deliberately re-reports it as a warning
+  (`iteramind.shared.link.pending`); it is the bundle's own to-do list. Never
+  delete, stub, or reword such a link to make a diagnostic go away.
 - Record external provenance as HTTPS resources in `sources`.
 - Never add credentials, personal context, private drafts, raw client data, or
   client-confidential material.
