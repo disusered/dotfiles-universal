@@ -14,7 +14,7 @@ plugin_hooks = true
 terminal_resize_reflow = true
 goals = true
 js_repl = false
-memories = true
+memories = false
 
 [shell_environment_policy]
 inherit = "core"
@@ -310,8 +310,8 @@ skill = "#cba6f7"
 global = "fileManager"
 
 [memories]
-generate_memories = true
-use_memories = true
+generate_memories = false
+use_memories = false
 
 [plugins."openviking-memory@openviking-plugins-local"]
 enabled = true
