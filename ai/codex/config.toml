@@ -2,10 +2,10 @@ personality = "pragmatic"
 approval_policy = "on-request"
 sandbox_mode = "workspace-write"
 commit_attribution = ""
-model = "gpt-5.6-terra"
+model = "gpt-6-astra"
 model_verbosity = "low"
 model_reasoning_effort = "medium"
-plan_mode_reasoning_effort = "high"
+plan_mode_reasoning_effort = "xhigh"
 service_tier = "default"
 
 [features]
@@ -44,6 +44,7 @@ session_picker_view = "dense"
 [tui.model_availability_nux]
 "gpt-5.5" = 4
 "gpt-5.6-sol" = 4
+gpt-6-astra = 4
 
 [projects."/home/carlos/.dotfiles"]
 trust_level = "trusted"
@@ -184,6 +185,9 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/home/carlos/Documents/Codex/2026-08-28/reply-to-maya-s-message-on"]
+trust_level = "trusted"
+
+[projects."/home/carlos/Development/BRI/cosmiq"]
 trust_level = "trusted"
 
 [plugins."codex-security@openai-curated"]
