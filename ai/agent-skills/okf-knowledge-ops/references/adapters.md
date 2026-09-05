@@ -64,41 +64,16 @@ current repository instructions over these workstation paths.
 - `.agents/okf.yaml` declares exactly one `xbol` Bundle. Run
   `pnpm install --frozen-lockfile`; the root scripts use the exact CLI pin.
 
-## Iteramind Private
-
-- The selected local Bundle is `private`, rooted at `knowledge/private/` in the
-  Iteramind Control Repository. Its `.agents/okf.yaml` declares the root and
-  instruction documents, so target the repository and pass `--bundle private`.
-- Read repository `AGENTS.md`, `CONTEXT.md`, and the relevant private decision
-  and runbook. The Bundle is Carlos-only; keep credentials, raw client data,
-  and client-confidential material out of it.
-- A surface with no filesystem reaches this Bundle through the repository's own
-  stdio server, `okf-iteramind` in its checked-in `.mcp.json`. It is the only
-  one of the three started with a `--profile-module`, because `private` is the
-  only Bundle with an executable profile. The historical local adapter host it
-  replaced is gone; do not go looking for it.
-- OpenViking uses the `iteramind-dev` profile. Resource ingestion is a separate
-  explicit request.
-- Run `pnpm install --frozen-lockfile`, then `pnpm okf:validate` after every
-  authored change. It runs `okf validate .` against `private` with
-  `--profile-module .agents/okf-private-profile.mjs`. `pnpm check` runs
-  `pnpm test`, that validation, and `pnpm okf:visualize` together; `pnpm test`
-  alone covers a change to the profile, the manifest, or the toolkit version.
-  The Python validator that used to shadow this profile is retired, and the
-  archived `iteramind/okf-shared` repository that held it says so in its README.
-
 ## Iteramind Shared
 
 - The selected hosted Bundle is `shared`. It is R2-backed and reached only
   through the deployment-provided `okf_v1_*` tools; there is no checkout to
   search and no local server to start.
 - Call `okf_v1_context` with `bundle: "shared"` and follow the returned
-  deployment instructions. The Shared Bundle accepts stable, reviewed,
-  bot-safe company knowledge only.
+  deployment instructions. The shared Bundle accepts team-safe company Concepts, including drafts.
+  Stable Concepts require the profile's human review evidence.
 - Never add credentials, personal context, private drafts, raw client data, or
-  client-confidential material. Promotion from Private to Shared is an
-  explicit, reviewed content change, not synchronization or cross-Bundle
-  linking.
+  client-confidential material. Iteramind has no local or private Bundle. Do not revive one from old recall.
 - Hosted apply remains gated by deployment identity policy and explicit user
   authorization after preview. On refusal, stop.
 
@@ -108,9 +83,9 @@ and no unversioned `okf_*` artifact is left in the workstation skill
 distribution. The connector is the only door to the Shared Bundle; a local
 stdio server is a different thing and never serves it.
 
-The `okf-shared-corpus` skill owns the Shared Bundle's authority and content
-policy, and it reads this section and [the transport contract](transports.md)
-rather than restating them. Keep the three consistent.
+The `okf-shared-bundle` skill owns the Shared Bundle's authority and content
+policy, and includes its hosted change procedure. Keep these adapter notes consistent
+with that skill.
 
 ## Unknown Consumer
 

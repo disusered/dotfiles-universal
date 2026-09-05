@@ -1,6 +1,6 @@
 ---
 name: okf-knowledge-ops
-description: Explore and curate exactly one governed OKF v0.2 Bundle, reached with the versioned JSON `okf` CLI, the repository's own stdio `okf_v1_*` MCP server, or a hosted deployment's `okf_v1_*` tools. Use for grounded questions, validation, source promotion, link and graph audits, and authorized knowledge changes in Polychrome, XBOL, or Iteramind. Do not use for Polychrome Black processing.
+description: Explore and curate exactly one governed OKF v0.2 Bundle, reached with the versioned JSON `okf` CLI, the repository's own stdio `okf_v1_*` MCP server, or a hosted deployment's `okf_v1_*` tools. Use for grounded questions, validation, source promotion, link and graph audits, and authorized knowledge changes in Polychrome or XBOL. For Iteramind, use okf-shared-bundle. Do not use for Polychrome Black processing.
 ---
 
 # OKF Knowledge Operations
@@ -42,16 +42,15 @@ ways, and both reach the same files under the same profile.
   `@disusered/okf-mcp`, one per repository, serving exactly one local Bundle off
   disk. It exposes the same ten `okf_v1_*` tools a hosted deployment does. Each
   repository declares its server in a checked-in `.mcp.json`, so a clone arrives
-  configured. Claude Desktop has no project scope, so its three servers live in
+  configured. Claude Desktop has no project scope, so its local servers live in
   `~/.config/Claude/claude_desktop_config.json`; Codex reads a project-local
-  `.codex/config.toml`. The names are `okf-xbol`, `okf-cats`, and
-  `okf-iteramind`, and only Iteramind's is started with a `--profile-module`.
+  `.codex/config.toml`. The local server names are `okf-xbol` and `okf-cats`.
 - **Hosted Bundle:** use only the deployment-supplied `okf_v1_*` tools. Do not
   look for its files or fall back to unversioned `okf_*` tools.
 
-The Iteramind Shared Corpus is the one hosted deployment here. It is R2 objects
+The Iteramind shared Bundle is the one hosted deployment here. It is R2 objects
 behind Cloudflare Access, reached through the claude.ai `OpenKnowledge`
-connector, and the `okf-shared-corpus` skill owns it. Do not reach for it from
+connector, and the `okf-shared-bundle` skill owns it. Do not reach for it from
 this one.
 
 Read [references/transports.md](references/transports.md) before invoking a

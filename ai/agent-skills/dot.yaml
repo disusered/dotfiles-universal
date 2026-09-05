@@ -26,10 +26,10 @@ global:
       - ~/.agents/skills/okf-toolkit-maintenance
       - ~/.claude/skills/okf-toolkit-maintenance
       - ~/.config/opencode/skills/okf-toolkit-maintenance
-    okf-shared-corpus:
-      - ~/.agents/skills/okf-shared-corpus
-      - ~/.claude/skills/okf-shared-corpus
-      - ~/.config/opencode/skills/okf-shared-corpus
+    okf-shared-bundle:
+      - ~/.agents/skills/okf-shared-bundle
+      - ~/.claude/skills/okf-shared-bundle
+      - ~/.config/opencode/skills/okf-shared-bundle
     openviking-profiles:
       - ~/.agents/skills/openviking-profiles
       - ~/.claude/skills/openviking-profiles

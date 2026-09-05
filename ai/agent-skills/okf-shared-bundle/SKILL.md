@@ -1,21 +1,22 @@
 ---
-name: okf-shared-corpus
-description: Read and curate Iteramind's Shared Corpus through the hosted versioned OKF tools. Use when asked what the company has decided or documented, to look up team knowledge, or to create, correct, move, or delete a reviewed shared page. Adds Iteramind's authority and content policy to the common single-Bundle OKF workflow.
+name: okf-shared-bundle
+description: Read and curate Iteramind's shared OKF Knowledge Bundle through hosted okf_v1_* tools. Use for Iteramind OKF or Bundle requests, company decisions and documentation, team knowledge lookup, and authorized Concept creation, correction, moves, or deletion. Iteramind uses only the shared Bundle.
 ---
 
-# Iteramind Shared Corpus
+# Iteramind shared Bundle
 
-Use the common transport and change contract instead of maintaining a second
-OKF procedure:
+Use OKF v0.2 terminology: Knowledge Bundle (or Bundle), Concept, Concept ID,
+Frontmatter, Body, Link, Source, and Provenance. A Concept is one Markdown
+document; its Concept ID is its Bundle-relative path without `.md`.
 
-- Read [the transport contract](../okf-knowledge-ops/references/transports.md).
-- Read the **Iteramind Shared** section of
-  [the consumer adapter notes](../okf-knowledge-ops/references/adapters.md).
+Iteramind has exactly one Bundle: `shared`, served at
+`https://okf.iteramind.dev/mcp`. This skill applies to coding agents and company
+agents alike. Use it directly for Iteramind knowledge work.
 
 The hosted deployment serves exactly one Bundle, named `shared`. It is the
-company's reviewed knowledge and is reached only through its `okf_v1_*` MCP
+company's knowledge and is reached only through its `okf_v1_*` MCP
 tools. Do not start a local server, read the R2 bucket directly, use the retired
-unversioned `okf_*` tools, or add the Private Corpus as another Bundle.
+unversioned `okf_*` tools, or configure another Iteramind Bundle.
 
 ## Establish context and authority
 
@@ -31,14 +32,13 @@ to find related pages inside this Bundle only.
 The visualization is a deterministic projection rebuilt from the current
 Bundle after R2 source events. Never edit it or treat it as authored knowledge.
 
-## Enforce Shared Corpus policy
+## Enforce shared Bundle policy
 
 - Store bot-safe company knowledge only.
 - Require non-empty `type`, `title`, and `description` frontmatter, and a
   declared `status`. `status: stable` is a claim of review: it needs a
   `verified` entry naming a `human:<id>` actor, and fails validation without
-  one. Anything nobody has re-read stays `draft`. Drafts belong here; what
-  separates the corpora is audience, not maturity.
+  one. Anything nobody has re-read stays `draft`. Company drafts belong here when their content is safe for the team.
 - A Markdown link that leaves the Shared Bundle is an error
   (`guidance.link.escape`) and blocks the write. Point it at an HTTPS `sources`
   entry instead.
@@ -49,13 +49,12 @@ Bundle after R2 source events. Never edit it or treat it as authored knowledge.
 - Record external provenance as HTTPS resources in `sources`.
 - Never add credentials, personal context, private drafts, raw client data, or
   client-confidential material.
-- Treat promotion from Private to Shared as an explicit reviewed content
-  change. Never synchronize or cross-link the corpora.
 
 ## Change content
 
 Writing requires both an explicit user request and deployment author access.
-Use the common full-page Change contract:
+Use the versioned full-page Change contract. Pass `bundle: "shared"` on every
+call; use the tool schemas for exact arguments:
 
 1. Read the current page and retain its `revision`; a new page has no prior
    revision.
