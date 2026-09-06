@@ -102,9 +102,12 @@ updated, deleted, or moved.
 
 A hosted deployment owns its authentication and apply policy; a local stdio
 server has neither, and inherits the harness's own permissions instead.
-`okf_v1_preview_change` is read-only on either. Show its diff, affected paths,
-and diagnostics, then wait for explicit authorization before
-`okf_v1_apply_change`. An authorization refusal is final for that operation.
+`okf_v1_preview_change` is read-only on either. Inspect its diff, affected paths,
+and diagnostics before `okf_v1_apply_change`. For hosted apply, show the preview
+and obtain the explicit authorization required by the deployment. For local
+apply, existing authorization covers the requested content change; do not ask
+again unless the preview exceeds it or a harness gate requires approval.
+An authorization refusal is final for that operation.
 
 ## Change contract
 

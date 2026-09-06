@@ -89,7 +89,7 @@
       }
     }
   },
-  "outputStyle": "Concise",
+  "outputStyle": "Plain English",
   "effortLevel": "xhigh",
   "modelSettings": {
     "claude-opus-5": {

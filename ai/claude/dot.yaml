@@ -4,6 +4,7 @@ global:
     depends:
       - /ai/agent-instructions
       - /ai/agent-skills
+      - /ai/agents
       - /tools/hyprspace
   links:
     skills: ~/.claude/skills/

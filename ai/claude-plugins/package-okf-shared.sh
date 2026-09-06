@@ -30,7 +30,7 @@ cat > "${stage}/.claude-plugin/plugin.json" <<'JSON'
 {
   "name": "okf-shared-bundle",
   "displayName": "Iteramind Shared Knowledge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "How to read and curate the Iteramind shared OKF Bundle through the hosted OKF connector.",
   "author": {
     "name": "Iteramind"

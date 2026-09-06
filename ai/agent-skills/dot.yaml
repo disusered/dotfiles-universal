@@ -49,6 +49,10 @@ global:
       - ~/.agents/skills/plain-english
       - ~/.claude/skills/plain-english
       - ~/.config/opencode/skills/plain-english
+    report-to-carlos:
+      - ~/.agents/skills/report-to-carlos
+      - ~/.claude/skills/report-to-carlos
+      - ~/.config/opencode/skills/report-to-carlos
     git-commit/commands/git-commit.md:
       - ~/.config/opencode/commands/git-commit.md
       - ~/.claude/commands/git-commit.md

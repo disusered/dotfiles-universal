@@ -6,7 +6,7 @@ description: Use when the user asks to remove AI-sounding prose, fix Claude-ish 
 # Plain English
 
 Apply the Google developer documentation style guide, plus the anti-tell rules Google never
-wrote because it predates LLM prose. Use this skill when writing or repairing documents.
+wrote because it predates LLM prose. Apply it to the requested prose review or rewrite.
 `slop-clean` handles code slop — comments, defensive checks, casts. This handles prose. They
 do not overlap.
 
@@ -34,8 +34,9 @@ document-formatting rules, or a rewrite pass over existing text.
 
 1. Read the target in full before editing. With no target named, review the working tree diff
    against the default branch.
-2. Flag every hit from [references/ai-tells.md](references/ai-tells.md) and
-   [references/word-list.md](references/word-list.md).
+2. Use [references/ai-tells.md](references/ai-tells.md) and
+   [references/word-list.md](references/word-list.md) to identify wording that
+   needs revision. Do not produce an exhaustive inventory unless requested.
 3. Flag passive voice, first-person plural, present-tense violations, superlatives, and
    anthropomorphism.
 4. Flag structural tells: an opening that restates the question, a closing paragraph that
@@ -44,7 +45,8 @@ document-formatting rules, or a rewrite pass over existing text.
 5. Rewrite in place. Preserve meaning, technical accuracy, and reading level.
 6. Reproduce code blocks, commands, file paths, URLs, quoted user text, error output, and
    third-party names byte for byte. Never rewrite inside a fenced block.
-7. Report a short list of rule to count. Do not narrate the edit.
+7. Briefly report the useful result and any unresolved meaning or evidence issue. Include
+   rule counts only when requested; do not narrate the edit.
 
 ## Format Documents
 
@@ -65,7 +67,8 @@ These rules apply to documents rather than replies, so the output style leaves t
 
 ## Consult the Source
 
-Fetch the live page rather than trusting a cached summary. The guide changes.
+When a rule is uncertain or the user requests current Google guidance, fetch the
+relevant live page. The local rules are sufficient for routine house-style edits.
 
 | Topic | URL |
 | --- | --- |

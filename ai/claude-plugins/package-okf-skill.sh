@@ -2,9 +2,8 @@
 # Package the OKF knowledge skill on its own, for surfaces that consume skills but not
 # local MCP servers — Claude Desktop's Plugins panel, and through it Web and Cowork.
 #
-# Deliberately carries no mcpServers entry. The shared corpus is reached through the hosted
-# server registered as a connector, and the private corpus is reached by opening files in a
-# folder shared with Cowork. Neither needs a server launched from a plugin.
+# Deliberately carries no mcpServers entry. Local Bundles use an already configured
+# repository MCP server or files shared with Cowork. Iteramind uses its separate skill.
 set -euo pipefail
 
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
@@ -21,7 +20,7 @@ cat > "${stage}/.claude-plugin/plugin.json" <<'JSON'
 {
   "name": "okf-knowledge",
   "displayName": "OKF Knowledge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Operating instructions for governed OKF Markdown bundles, for surfaces that read files directly or call a hosted OKF server.",
   "author": {
     "name": "Carlos Rosquillas"
@@ -37,10 +36,12 @@ The `okf-knowledge-ops` skill on its own, with no MCP server.
 
 Use it where a surface reads files directly or calls a hosted OKF server:
 
-- **Claude Desktop and Cowork**, for the Iteramind private corpus, once the repository
-  folder is shared in the Desktop UI. The skill supplies the method; `validate_okf.py` in
-  the repository supplies the checking.
-- **Any surface with the hosted shared server connected**, for the Iteramind shared corpus.
+- **Claude Desktop**, for XBOL or Polychrome through the already configured local
+  repository MCP server. Select exactly one Bundle for the operation.
+- **Cowork or a coding harness**, for a local Bundle whose repository files are available.
+
+For Iteramind, use the separate `okf-shared-bundle` skill and hosted connector.
+There is no Iteramind private corpus or local validator in this package.
 
 It intentionally declares no `mcpServers`. A server exists to reach files a surface cannot
 open for itself; a plugin should not start one for files that are already open.

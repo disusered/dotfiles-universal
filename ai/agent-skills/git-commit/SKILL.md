@@ -16,15 +16,16 @@ Prepare clean, logical git commits from the current repository state.
    - `git branch --show-current`
    - `git log --oneline -10`
 2. Include untracked files explicitly; `git diff HEAD` does not show their contents.
-3. Group changes by logical concern, not by file type. Prefer multiple focused conventional commits when the diff naturally separates.
+3. Before staging, check for `.jj` at the repository root. In jj-colocated repositories, use the documented `jj` workflow to create and verify signed commits; never use raw git to create commits or move refs. The git mutation and verification steps below apply only outside those repositories.
+   Group changes by logical concern, not by file type. Prefer multiple focused commits when the diff naturally separates.
 4. Verify before committing when practical:
    - Always run `git diff --check`.
    - Run the most relevant project checks from repo docs or task context.
    - If a full suite fails on unrelated pre-existing files, run targeted checks against changed files and report both facts exactly.
-5. Check recent commit style before choosing commit messages.
-6. If the user explicitly asked to commit, stage only the intended files and create signed commits with `git commit -S ...`. Otherwise, prepare the commit plan and ask before creating commits.
+5. Follow repository instructions and recent commit style. Use Conventional Commits only when neither establishes another style.
+6. If the user explicitly asked to commit, stage only the intended files and create signed commits with `git commit -S ...`. Verify each new commit immediately with `git verify-commit HEAD`. Otherwise, prepare the commit plan and ask before creating commits.
 7. Do not pull, rebase, push, amend, or otherwise rewrite history unless the user explicitly asks for that separate operation.
-8. After committing, verify with `git verify-commit HEAD`, `git status --short`, `git log --oneline -5`, and `git diff HEAD --stat`.
+8. After committing, inspect `git status --short`, `git log --oneline -5`, and `git diff HEAD --stat`. Report the verified commits and any remaining changes.
 
 ## Pitfalls
 

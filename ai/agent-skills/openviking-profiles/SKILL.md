@@ -92,8 +92,9 @@ zsh ~/.dotfiles/ai/openviking/tests/openviking_codex_profile.test.zsh   # expect
 exec zsh                                                                 # reload the wrappers
 ```
 
-Then the account discriminator — the only check that proves the *live* path
-rather than the config. Pick a memory that differs between accounts and read it
+When live model verification is explicitly authorized, use the account
+discriminator to check the live path rather than configuration alone.
+Pick a memory that differs between accounts and read it
 through the MCP tool, not the hooks:
 
 ```sh
@@ -102,11 +103,13 @@ claude -p "Call the OpenViking read tool on viking://user/<user>/memories/profil
 ```
 
 Run it again from a directory outside every project root. Different content
-means routing works; identical content means the env export isn't reaching the
-MCP headers. A brand-new account correctly returns "nothing found".
+supports correct routing; identical content calls for checking the selected
+account and MCP identity before diagnosing an export failure. A brand-new
+account correctly returns "nothing found".
 
-For Codex and OpenCode, start a fresh session in the project and confirm recall
-cites that project's material.
+For an authorized live Codex or OpenCode check, start a fresh session in the
+project and confirm recall cites that project's material. Otherwise report the
+static routing results and leave live model verification untested.
 
 ## Traps
 
@@ -119,7 +122,8 @@ nothing. Restart the agent after moving between projects.
 launcher, IDE extension, a bare `command claude`, or another agent shelling out
 — all bypass the zsh function. This degrades safely (the server resolves an
 empty account, so reads return "nothing found") but looks like data loss. An
-unexpectedly empty recall is the signature; check `env | grep OPENVIKING_`.
+unexpectedly empty recall is the signature; inspect only the nonsensitive
+profile fields listed under auditing below.
 
 **Get MCP tool names from a live call, not from config.** Claude namespaces a
 plugin's MCP tools using the plugin manifest's `name` field, which need not
@@ -127,16 +131,17 @@ match the marketplace entry name. The OpenViking plugin's marketplace entry is
 `claude-code-memory-plugin` but its manifest name is `openviking-memory`, so the
 tools are `mcp__plugin_openviking-memory_openviking__read`, not
 `mcp__openviking__read`. A permission allowlist built from the config file is
-silently inert. Ask a headless run what tool name it invoked.
+silently inert. Inspect registered tools in an existing session or, when live
+model verification is authorized, ask a headless run what tool name it invoked.
 
 **Hooks execute from the plugin cache, not the repo checkout.** `git pull` on
 `~/.openviking/openviking-repo` updates the source; the hooks keep running
 `~/.claude/plugins/cache/...` until `claude plugin update` succeeds. When
 behavior disagrees with the source, check the installed version.
 
-**Never edit `~/.openviking/openviking-repo`.** `dot.yaml` runs
-`git pull --ff-only` against it; local changes are lost. Configuration belongs
-in dotfiles.
+**Never edit `~/.openviking/openviking-repo`.** `dot.yaml` updates this
+upstream checkout with `git pull --ff-only`; local edits can obstruct updates
+and do not change the installed plugin cache. Configuration belongs in dotfiles.
 
 **Don't allowlist mutating memory tools.** `remember`, `add_resource`, and
 `cancel_watch` should prompt. `forget` is irreversible and must never be
@@ -152,7 +157,10 @@ equivalent non-interactive commands.
 When an agent recalls the wrong material, resolve identity from the outside in
 rather than reading configs first:
 
-1. `env | grep OPENVIKING_` in the agent's own shell — this is ground truth.
+1. Inspect only `OPENVIKING_CLI_CONFIG_FILE`, `OPENVIKING_ACCOUNT`,
+   `OPENVIKING_USER`, and `OPENVIKING_AGENT_ID` in the agent's own shell.
+   Do not dump all `OPENVIKING_*` variables or a complete config: other fields
+   may contain credentials.
 2. Compare against what the wrapper *should* produce for that directory by
    calling the helper directly:
    `_openviking_claude_cli_config <path>` and `_openviking_claude_identity <conf>`.
