@@ -6,7 +6,7 @@ linux[whoami.distro^="Arch"]:
       - /arch/kwallet
       - /arch/removable-media
   links:
-    dolphin.conf: ~/.config/hypr/conf.d/dolphin.conf
+    dolphin.lua: ~/.config/hypr/conf.d/dolphin.lua
     kdeglobals: ~/.config/kdeglobals
     kdedefaults-kdeglobals: ~/.config/kdedefaults/kdeglobals
     catppuccin-mocha.colors: ~/.local/share/color-schemes/CatppuccinMocha.colors

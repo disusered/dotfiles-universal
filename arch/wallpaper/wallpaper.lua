@@ -1,0 +1,6 @@
+hl.on("hyprland.start", function()
+  hl.exec_cmd("app2unit -- cfg wallpaper --apply")
+end)
+hl.on("hyprland.start", function()
+  hl.exec_cmd("~/.local/bin/wallpaper-listener")
+end)

@@ -14,8 +14,8 @@ linux[whoami.distro^="Arch"]:
       - /lib/pipewire
       - /lib/qt
   links:
-    hyprland.conf: ~/.config/hypr/hyprland.conf
-    display-modes.conf: ~/.config/hypr/conf.d/display-modes.conf
+    hyprland.lua: ~/.config/hypr/hyprland.lua
+    display-modes.lua: ~/.config/hypr/conf.d/display-modes.lua
     env-hyperland: ~/.config/uwsm/env-hyperland
     pyprland.toml: ~/.config/pypr/config.toml
     pyprland.service: ~/.config/systemd/user/pyprland.service

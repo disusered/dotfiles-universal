@@ -14,6 +14,6 @@ linux[whoami.distro^="Arch"]:
       - /lib/avahi/
       - /lib/pipewire/
   links:
-    steam.conf: ~/.config/hypr/conf.d/steam.conf
+    steam.lua: ~/.config/hypr/conf.d/steam.lua
     steam_minimal.desktop: ~/.local/share/applications/steam_minimal.desktop
     gamemode.ini: ~/.config/gamemode.ini

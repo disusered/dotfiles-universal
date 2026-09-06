@@ -1,5 +1,4 @@
 [pyprland]
-hyprland_version = '0.53.0'
 plugins = ["magnify", "scratchpads", "fetch_client_menu", "toggle_special"]
 include = ["~/.config/pypr/conf.d/"]
 

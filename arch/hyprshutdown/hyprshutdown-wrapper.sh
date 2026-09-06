@@ -4,14 +4,14 @@
 # to an environment variable similar to how we can compose $PATH
 
 # Kill all scratchpad windows (SIGKILL bypasses prompts)
-hyprctl dispatch killwindow class:btop_scratch
-hyprctl dispatch killwindow class:clipse_scratch
-hyprctl dispatch killwindow class:fastfetch_scratch
-hyprctl dispatch killwindow class:cfg_scratch
-hyprctl dispatch killwindow class:fonts_scratch
-hyprctl dispatch killwindow class:cfg_wallpaper_scratch
-hyprctl dispatch killwindow class:org.pulseaudio.pavucontrol
-hyprctl dispatch killwindow class:org.pipewire.Helvum
+hyprctl dispatch "hl.dsp.window.kill({window='class:btop_scratch'})"
+hyprctl dispatch "hl.dsp.window.kill({window='class:clipse_scratch'})"
+hyprctl dispatch "hl.dsp.window.kill({window='class:fastfetch_scratch'})"
+hyprctl dispatch "hl.dsp.window.kill({window='class:cfg_scratch'})"
+hyprctl dispatch "hl.dsp.window.kill({window='class:fonts_scratch'})"
+hyprctl dispatch "hl.dsp.window.kill({window='class:cfg_wallpaper_scratch'})"
+hyprctl dispatch "hl.dsp.window.kill({window='class:org.pulseaudio.pavucontrol'})"
+hyprctl dispatch "hl.dsp.window.kill({window='class:org.pipewire.Helvum'})"
 
 # Safely unmount and power-off removable drives (see Arch Wiki: USB storage devices).
 # --detach calls udisksctl power-off per drive so heads park / SSDs flush.

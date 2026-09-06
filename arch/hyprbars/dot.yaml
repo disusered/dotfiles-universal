@@ -9,4 +9,4 @@ linux[whoami.distro^="Arch"]:
     # depends:
     #   - /arch/hyprland
   links:
-    hyprbars.conf: ~/.config/hypr/conf.d/hyprbars.conf
+    hyprbars.lua: ~/.config/hypr/conf.d/hyprbars.lua

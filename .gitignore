@@ -5,8 +5,8 @@ ai/claude/.cache/
 /arch/dolphin/dolphinrc
 /arch/dolphin/kdeglobals
 /arch/firefox/theme-url.txt
-/arch/hyprbars/hyprbars.conf
-/arch/hyprland/hyprland.conf
+/arch/hyprbars/hyprbars.lua
+/arch/hyprland/hyprland.lua
 /arch/hyprland/hyprtoolkit.conf
 /arch/hyprlock/mocha.conf
 /arch/nwg-look/gtk-4.0/gtk.css

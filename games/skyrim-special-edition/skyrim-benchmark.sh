@@ -92,9 +92,9 @@ CONFIG_PATHS=(
 PRESENTATION_CONFIG_PATHS=(
   "$PRESENTATION_PROFILES_FILE"
   "$MODULE_DIR/skyrim-skse-launch.sh"
-  "$MODULE_DIR/../../arch/steam/steam.conf"
+  "$MODULE_DIR/../../arch/steam/steam.lua"
   "$MODULE_DIR/../../tools/scopebuddy/scb.conf"
-  "$MODULE_DIR/../../arch/hyprland/hyprland.conf.tera"
+  "$MODULE_DIR/../../arch/hyprland/hyprland.lua.tera"
 )
 
 usage() {
@@ -607,8 +607,8 @@ config_hashes() {
       sha256sum -- "$path"
     done
     for path in \
-      "$HOME/.config/hypr/monitors.conf" \
-      "$HOME/.config/hypr/hyprland.conf" \
+      "$HOME/.config/hypr/monitors.lua" \
+      "$HOME/.config/hypr/hyprland.lua" \
       "$HOME/.config/scopebuddy/scb.conf"; do
       [[ -f $path ]] && sha256sum -- "$path"
     done
@@ -638,7 +638,7 @@ bool_to_int() {
 hypr_option_bool() {
   local option=$1 data value
   data=$(hyprctl -j getoption "$option" 2>&1) || die "hyprctl getoption $option failed: $data"
-  value=$(jq -r 'if has("int") then (.int != 0) elif has("set") then .set else error("no boolean value") end' \
+  value=$(jq -r 'if has("bool") then .bool elif has("int") then (.int != 0) else error("no boolean value") end' \
     <<< "$data") || die "could not parse Hyprland option $option: $data"
   [[ $value == true || $value == false ]] || die "could not parse Hyprland option $option: $data"
   printf '%s\n' "$value"
@@ -1071,14 +1071,14 @@ verify_prepared() {
   current_build=$(steam_build_id)
   [[ $current_build == "$STEAM_BUILD_ID" ]] || die "Skyrim build changed from $STEAM_BUILD_ID to $current_build"
   if [[ $RUN_KIND == presentation ]]; then
-    [[ $(hypr_option_bool debug:vfr) == "$HYPR_VFR_AT_QUEUE" ]] \
-      || die "live debug:vfr drifted from queue-time value $HYPR_VFR_AT_QUEUE"
-    [[ $(hypr_option_bool general:allow_tearing) == "$HYPR_ALLOW_TEARING_AT_QUEUE" ]] \
-      || die "live general:allow_tearing drifted from queue-time value $HYPR_ALLOW_TEARING_AT_QUEUE"
-    [[ $(hypr_option_bool render:new_render_scheduling) == "$HYPR_NEW_RENDER_SCHEDULING_AT_QUEUE" ]] \
-      || die "live render:new_render_scheduling drifted from queue-time value $HYPR_NEW_RENDER_SCHEDULING_AT_QUEUE"
-    [[ $(hypr_option_int render:direct_scanout) == "$HYPR_DIRECT_SCANOUT_AT_QUEUE" ]] \
-      || die "live render:direct_scanout drifted from queue-time value $HYPR_DIRECT_SCANOUT_AT_QUEUE"
+    [[ $(hypr_option_bool debug.vfr) == "$HYPR_VFR_AT_QUEUE" ]] \
+      || die "live debug.vfr drifted from queue-time value $HYPR_VFR_AT_QUEUE"
+    [[ $(hypr_option_bool general.allow_tearing) == "$HYPR_ALLOW_TEARING_AT_QUEUE" ]] \
+      || die "live general.allow_tearing drifted from queue-time value $HYPR_ALLOW_TEARING_AT_QUEUE"
+    [[ $(hypr_option_bool render.new_render_scheduling) == "$HYPR_NEW_RENDER_SCHEDULING_AT_QUEUE" ]] \
+      || die "live render.new_render_scheduling drifted from queue-time value $HYPR_NEW_RENDER_SCHEDULING_AT_QUEUE"
+    [[ $(hypr_option_int render.direct_scanout) == "$HYPR_DIRECT_SCANOUT_AT_QUEUE" ]] \
+      || die "live render.direct_scanout drifted from queue-time value $HYPR_DIRECT_SCANOUT_AT_QUEUE"
     [[ $(normalized_hypr_version | sha256sum | awk '{print $1}') == "$HYPR_VERSION_HASH" ]] \
       || die "Hyprland/Aquamarine version changed after queueing"
     [[ $(uname -r) == "$KERNEL_RELEASE" ]] || die "kernel changed after queueing"
@@ -1141,13 +1141,13 @@ print_receipt() {
     printf 'GAMESCOPE_ARGS=%s\n' "${GAMESCOPE_ARGS:-none}"
     printf 'OVERLAY_POLICY=%s\n' "$OVERLAY_POLICY"
     printf 'HYPR_VFR_EXPECTED=%s\n' "$HYPR_VFR"
-    printf 'HYPR_VFR_CURRENT=%s\n' "$(hypr_option_bool debug:vfr)"
+    printf 'HYPR_VFR_CURRENT=%s\n' "$(hypr_option_bool debug.vfr)"
     printf 'HYPR_ALLOW_TEARING_EXPECTED=%s\n' "$HYPR_ALLOW_TEARING"
-    printf 'HYPR_ALLOW_TEARING_CURRENT=%s\n' "$(hypr_option_bool general:allow_tearing)"
+    printf 'HYPR_ALLOW_TEARING_CURRENT=%s\n' "$(hypr_option_bool general.allow_tearing)"
     printf 'HYPR_NEW_RENDER_SCHEDULING_EXPECTED=%s\n' "$HYPR_NEW_RENDER_SCHEDULING"
-    printf 'HYPR_NEW_RENDER_SCHEDULING_BASELINE=%s\n' "$(hypr_option_bool render:new_render_scheduling)"
+    printf 'HYPR_NEW_RENDER_SCHEDULING_BASELINE=%s\n' "$(hypr_option_bool render.new_render_scheduling)"
     printf 'HYPR_DIRECT_SCANOUT_EXPECTED=%s\n' "$HYPR_DIRECT_SCANOUT"
-    printf 'HYPR_DIRECT_SCANOUT_BASELINE=%s\n' "$(hypr_option_int render:direct_scanout)"
+    printf 'HYPR_DIRECT_SCANOUT_BASELINE=%s\n' "$(hypr_option_int render.direct_scanout)"
     printf 'HYPR_IMMEDIATE_EXPECTED=%s\n' "$HYPR_IMMEDIATE"
     printf 'HYPR_VERSION_HASH=%s\n' "$HYPR_VERSION_HASH"
     printf 'KERNEL_RELEASE=%s\n' "$KERNEL_RELEASE"
@@ -1186,10 +1186,10 @@ queue_run() {
     load_presentation_profile "$profile"
     verify_one_factor "$run_id"
     verify_repetition_predecessor "$run_id"
-    HYPR_VFR_AT_QUEUE=$(hypr_option_bool debug:vfr)
-    HYPR_ALLOW_TEARING_AT_QUEUE=$(hypr_option_bool general:allow_tearing)
-    HYPR_NEW_RENDER_SCHEDULING_AT_QUEUE=$(hypr_option_bool render:new_render_scheduling)
-    HYPR_DIRECT_SCANOUT_AT_QUEUE=$(hypr_option_int render:direct_scanout)
+    HYPR_VFR_AT_QUEUE=$(hypr_option_bool debug.vfr)
+    HYPR_ALLOW_TEARING_AT_QUEUE=$(hypr_option_bool general.allow_tearing)
+    HYPR_NEW_RENDER_SCHEDULING_AT_QUEUE=$(hypr_option_bool render.new_render_scheduling)
+    HYPR_DIRECT_SCANOUT_AT_QUEUE=$(hypr_option_int render.direct_scanout)
     [[ $HYPR_VFR_AT_QUEUE == "$HYPR_VFR" ]] \
       || die "presentation profile expects VFR=$HYPR_VFR but queue-time state is $HYPR_VFR_AT_QUEUE"
     if [[ $REPETITION != diagnostic ]]; then
@@ -1198,9 +1198,9 @@ queue_run() {
       [[ $HYPR_ALLOW_TEARING_AT_QUEUE == false ]] \
         || die "$run_id requires the persisted shared allow_tearing=false policy before queueing"
       [[ $HYPR_NEW_RENDER_SCHEDULING_AT_QUEUE == false ]] \
-        || die "$run_id requires the persisted render:new_render_scheduling=false baseline before queueing"
+        || die "$run_id requires the persisted render.new_render_scheduling=false baseline before queueing"
       [[ $HYPR_DIRECT_SCANOUT_AT_QUEUE == 0 ]] \
-        || die "$run_id requires the persisted render:direct_scanout=0 baseline before queueing"
+        || die "$run_id requires the persisted render.direct_scanout=0 baseline before queueing"
     fi
     HYPR_VERSION_JSON=$(normalized_hypr_version)
     HYPR_VERSION_HASH=$(printf '%s\n' "$HYPR_VERSION_JSON" | sha256sum | awk '{print $1}')
@@ -1394,30 +1394,30 @@ save_journal_cursor() {
 
 apply_runtime_hypr() {
   local run_dir=$1 prior_vfr prior_tearing prior_scheduling prior_scanout actual
-  prior_vfr=$(hypr_option_bool debug:vfr)
-  prior_tearing=$(hypr_option_bool general:allow_tearing)
-  prior_scheduling=$(hypr_option_bool render:new_render_scheduling)
-  prior_scanout=$(hypr_option_int render:direct_scanout)
+  prior_vfr=$(hypr_option_bool debug.vfr)
+  prior_tearing=$(hypr_option_bool general.allow_tearing)
+  prior_scheduling=$(hypr_option_bool render.new_render_scheduling)
+  prior_scanout=$(hypr_option_int render.direct_scanout)
   {
     printf 'PRIOR_VFR=%q\n' "$prior_vfr"
     printf 'PRIOR_ALLOW_TEARING=%q\n' "$prior_tearing"
     printf 'PRIOR_NEW_RENDER_SCHEDULING=%q\n' "$prior_scheduling"
     printf 'PRIOR_DIRECT_SCANOUT=%q\n' "$prior_scanout"
   } > "$run_dir/runtime-hypr-before.env"
-  hyprctl keyword debug:vfr "$HYPR_VFR" >/dev/null
-  hyprctl keyword general:allow_tearing "$HYPR_ALLOW_TEARING" >/dev/null
-  hyprctl keyword render:new_render_scheduling "$HYPR_NEW_RENDER_SCHEDULING" >/dev/null
-  hyprctl keyword render:direct_scanout "$HYPR_DIRECT_SCANOUT" >/dev/null
-  actual=$(hypr_option_bool debug:vfr)
-  [[ $actual == "$HYPR_VFR" ]] || die "could not apply debug:vfr=$HYPR_VFR"
-  actual=$(hypr_option_bool general:allow_tearing)
-  [[ $actual == "$HYPR_ALLOW_TEARING" ]] || die "could not apply general:allow_tearing=$HYPR_ALLOW_TEARING"
-  actual=$(hypr_option_bool render:new_render_scheduling)
+  hyprctl eval "hl.config({ debug = { vfr = $HYPR_VFR } })" >/dev/null
+  hyprctl eval "hl.config({ general = { allow_tearing = $HYPR_ALLOW_TEARING } })" >/dev/null
+  hyprctl eval "hl.config({ render = { new_render_scheduling = $HYPR_NEW_RENDER_SCHEDULING } })" >/dev/null
+  hyprctl eval "hl.config({ render = { direct_scanout = $HYPR_DIRECT_SCANOUT } })" >/dev/null
+  actual=$(hypr_option_bool debug.vfr)
+  [[ $actual == "$HYPR_VFR" ]] || die "could not apply debug.vfr=$HYPR_VFR"
+  actual=$(hypr_option_bool general.allow_tearing)
+  [[ $actual == "$HYPR_ALLOW_TEARING" ]] || die "could not apply general.allow_tearing=$HYPR_ALLOW_TEARING"
+  actual=$(hypr_option_bool render.new_render_scheduling)
   [[ $actual == "$HYPR_NEW_RENDER_SCHEDULING" ]] \
-    || die "could not apply render:new_render_scheduling=$HYPR_NEW_RENDER_SCHEDULING"
-  actual=$(hypr_option_int render:direct_scanout)
+    || die "could not apply render.new_render_scheduling=$HYPR_NEW_RENDER_SCHEDULING"
+  actual=$(hypr_option_int render.direct_scanout)
   [[ $actual == "$HYPR_DIRECT_SCANOUT" ]] \
-    || die "could not apply render:direct_scanout=$HYPR_DIRECT_SCANOUT"
+    || die "could not apply render.direct_scanout=$HYPR_DIRECT_SCANOUT"
   printf 'applied\n' > "$run_dir/runtime-hypr-status"
 }
 
@@ -1434,17 +1434,17 @@ restore_runtime_hypr() {
   prior_tearing=$PRIOR_ALLOW_TEARING
   prior_scheduling=$PRIOR_NEW_RENDER_SCHEDULING
   prior_scanout=$PRIOR_DIRECT_SCANOUT
-  hyprctl keyword debug:vfr "$prior_vfr" >/dev/null
-  hyprctl keyword general:allow_tearing "$prior_tearing" >/dev/null
-  hyprctl keyword render:new_render_scheduling "$prior_scheduling" >/dev/null
-  hyprctl keyword render:direct_scanout "$prior_scanout" >/dev/null
-  [[ $(hypr_option_bool debug:vfr) == "$prior_vfr" ]] || die "failed to restore debug:vfr"
-  [[ $(hypr_option_bool general:allow_tearing) == "$prior_tearing" ]] \
-    || die "failed to restore general:allow_tearing"
-  [[ $(hypr_option_bool render:new_render_scheduling) == "$prior_scheduling" ]] \
-    || die "failed to restore render:new_render_scheduling"
-  [[ $(hypr_option_int render:direct_scanout) == "$prior_scanout" ]] \
-    || die "failed to restore render:direct_scanout"
+  hyprctl eval "hl.config({ debug = { vfr = $prior_vfr } })" >/dev/null
+  hyprctl eval "hl.config({ general = { allow_tearing = $prior_tearing } })" >/dev/null
+  hyprctl eval "hl.config({ render = { new_render_scheduling = $prior_scheduling } })" >/dev/null
+  hyprctl eval "hl.config({ render = { direct_scanout = $prior_scanout } })" >/dev/null
+  [[ $(hypr_option_bool debug.vfr) == "$prior_vfr" ]] || die "failed to restore debug.vfr"
+  [[ $(hypr_option_bool general.allow_tearing) == "$prior_tearing" ]] \
+    || die "failed to restore general.allow_tearing"
+  [[ $(hypr_option_bool render.new_render_scheduling) == "$prior_scheduling" ]] \
+    || die "failed to restore render.new_render_scheduling"
+  [[ $(hypr_option_int render.direct_scanout) == "$prior_scanout" ]] \
+    || die "failed to restore render.direct_scanout"
   date --iso-8601=seconds > "$run_dir/runtime-hypr-restored"
 }
 
@@ -1604,8 +1604,8 @@ apply_and_verify_client_state() {
     clients=$(hyprctl -j clients 2>/dev/null) || return 0
     address=$(jq -r --argjson pid "$gamescope_pid" 'first(.[] | select(.pid == $pid)) | .address // empty' \
       <<< "$clients")
-    [[ -n $address ]] || return 0
-    hyprctl dispatch setprop "address:$address" immediate "$(bool_to_int "$HYPR_IMMEDIATE")" lock >/dev/null || return 0
+    [[ $address =~ ^0x[0-9a-fA-F]+$ ]] || return 0
+    hyprctl dispatch "hl.dsp.window.set_prop({ window = \"address:$address\", prop = \"immediate\", value = \"$(bool_to_int "$HYPR_IMMEDIATE")\" })" >/dev/null || return 0
     actual=$(hyprctl getprop "address:$address" immediate 2>/dev/null | \
       grep -Eo 'true|false' | tail -n 1) || return 0
     [[ $actual == "$HYPR_IMMEDIATE" ]] || actual=false-mismatch
@@ -1654,10 +1654,10 @@ sample_hypr_state() {
         grep -Eo 'true|false' | tail -n 1 || printf 'null')
     fi
   fi
-  vfr=$(hypr_option_bool debug:vfr 2>/dev/null || printf 'null')
-  allow_tearing=$(hypr_option_bool general:allow_tearing 2>/dev/null || printf 'null')
-  new_scheduling=$(hypr_option_bool render:new_render_scheduling 2>/dev/null || printf 'null')
-  direct_scanout=$(hypr_option_int render:direct_scanout 2>/dev/null || printf 'null')
+  vfr=$(hypr_option_bool debug.vfr 2>/dev/null || printf 'null')
+  allow_tearing=$(hypr_option_bool general.allow_tearing 2>/dev/null || printf 'null')
+  new_scheduling=$(hypr_option_bool render.new_render_scheduling 2>/dev/null || printf 'null')
+  direct_scanout=$(hypr_option_int render.direct_scanout 2>/dev/null || printf 'null')
   if [[ $monitors != null ]]; then
     topology=$(normalize_monitor_json <<< "$monitors" 2>/dev/null || printf 'null')
   fi

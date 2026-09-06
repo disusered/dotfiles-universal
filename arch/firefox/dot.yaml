@@ -9,4 +9,4 @@ linux[whoami.distro^="Arch"]:
     depends:
       - /arch/speech
   links:
-    firefox.conf: ~/.config/hypr/conf.d/firefox.conf
+    firefox.lua: ~/.config/hypr/conf.d/firefox.lua

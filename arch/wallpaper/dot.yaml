@@ -9,5 +9,5 @@ linux[whoami.distro^="Arch"]:
       - /tools/imagemagick
       - /tools/cfg
   links:
-    wallpaper.conf: ~/.config/hypr/conf.d/wallpaper.conf
+    wallpaper.lua: ~/.config/hypr/conf.d/wallpaper.lua
     wallpaper-listener.sh: ~/.local/bin/wallpaper-listener

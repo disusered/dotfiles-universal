@@ -5,4 +5,4 @@ linux[whoami.distro^="Arch"]:
       - /arch/hyprland
   links:
     config: ~/.config/mako/config
-    mako.conf: ~/.config/hypr/conf.d/mako.conf
+    mako.lua: ~/.config/hypr/conf.d/mako.lua

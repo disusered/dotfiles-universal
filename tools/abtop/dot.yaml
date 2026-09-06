@@ -5,5 +5,5 @@ linux[whoami.distro^="Arch"]:
       - /languages/rust
   links:
     config.toml: {{ dirs.base.config }}/abtop/config.toml
-    abtop.conf: {{ dirs.base.config }}/hypr/conf.d/abtop.conf
+    abtop.lua: {{ dirs.base.config }}/hypr/conf.d/abtop.lua
     abtop.toml: {{ dirs.base.config }}/pypr/conf.d/abtop.toml

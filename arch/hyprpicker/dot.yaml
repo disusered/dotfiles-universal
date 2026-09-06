@@ -4,5 +4,5 @@ linux[whoami.distro^="Arch"]:
   depends:
     - /lib/wl-clipboard
   links:
-    hyprpicker.conf: ~/.config/hypr/conf.d/hyprpicker.conf
+    hyprpicker.lua: ~/.config/hypr/conf.d/hyprpicker.lua
     color-picker.sh: ~/.local/bin/pick-color

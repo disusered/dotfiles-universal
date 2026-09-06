@@ -330,10 +330,10 @@ or commit the whole tree as an optimization cleanup.
 
 ## Authoritative files
 
-- Hyprland policy: `arch/hyprland/hyprland.conf.tera`
-- Display policy: `arch/hyprland/display-modes.conf`
+- Hyprland policy: `arch/hyprland/hyprland.lua.tera`
+- Display policy: `arch/hyprland/display-modes.lua`
 - Shared Gamescope policy: `tools/scopebuddy/scb.conf`
-- Shared Gamescope window rule: `arch/steam/steam.conf`
+- Shared Gamescope window rule: `arch/steam/steam.lua`
 - Dev-workload toggle: `src/dev.rs` in the `cfg` crate
 - Dev-workload allowlist: `[dev]` in `cfg/config.toml`
 - Launcher contract test: `games/skyrim-special-edition/skyrim-skse-launch-self-test.sh`

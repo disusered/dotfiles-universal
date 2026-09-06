@@ -13,7 +13,7 @@ linux|darwin:
   links:
     settings.json: ~/.claude/settings.json
     file-suggestion.sh: ~/.claude/file-suggestion.sh
-    claude.conf: {{ dirs.base.config }}/hypr/conf.d/claude.conf
+    claude.lua: {{ dirs.base.config }}/hypr/conf.d/claude.lua
 windows:
   links:
     settings_win.json: ~/.claude/settings.json

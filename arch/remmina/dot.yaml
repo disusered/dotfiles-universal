@@ -7,4 +7,4 @@ linux[whoami.distro^="Arch"]:
   links:
     remmina.pref: ~/.config/remmina/remmina.pref
     aws-ec2.remmina: ~/.local/share/remmina/aws-ec2.remmina
-    remmina.conf: ~/.config/hypr/conf.d/remmina.conf
+    remmina.lua: ~/.config/hypr/conf.d/remmina.lua

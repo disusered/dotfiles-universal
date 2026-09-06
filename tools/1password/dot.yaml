@@ -5,7 +5,7 @@ linux[whoami.distro^="Arch"]:
       - /lib/pipewire
       - /arch/kwallet
   links:
-    1password.conf: ~/.config/hypr/conf.d/1password.conf
+    1password.lua: ~/.config/hypr/conf.d/1password.lua
     1password.desktop: ~/.local/share/applications/1password-silent.desktop
     agent.toml: ~/.config/1Password/ssh/agent.toml
     config: ~/.ssh/config

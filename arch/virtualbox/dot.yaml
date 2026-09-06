@@ -8,5 +8,5 @@ linux[whoami.distro^="Arch"]:
         sudo gpasswd -a $USER vboxusers
       fi
   links:
-    virtualbox.conf: ~/.config/hypr/conf.d/virtualbox.conf
+    virtualbox.lua: ~/.config/hypr/conf.d/virtualbox.lua
     virtualbox.desktop: ~/.local/share/applications/virtualbox.desktop

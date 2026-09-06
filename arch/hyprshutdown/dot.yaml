@@ -7,5 +7,5 @@ linux[whoami.distro^="Arch"]:
       fi
   links:
     hyprshutdown-wrapper.sh: ~/.local/bin/hyprshutdown-wrapper
-    session.conf: ~/.config/hypr/conf.d/session.conf
+    session.lua: ~/.config/hypr/conf.d/session.lua
     lock.desktop: ~/.local/share/applications/lock.desktop

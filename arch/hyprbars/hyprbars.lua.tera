@@ -1,0 +1,52 @@
+-- hyprpm owns the binary; Hyprland loads it before the second config pass.
+hl.plugin.load("/var/cache/hyprpm/" .. os.getenv("USER") .. "/hyprland-plugins/hyprbars.so")
+if not hl.plugin.hyprbars then
+    return
+end
+
+hl.config({
+    plugin = {
+        hyprbars = {
+            bar_height = 20,
+            bar_color = "{{ surface0 | hyprlang }}",
+            col = { text = "{{ text | hyprlang }}" },
+            bar_title_enabled = true,
+            bar_text_size = 10,
+            bar_text_font = "Sans",
+            bar_text_align = "center",
+            bar_padding = 7,
+            bar_button_padding = 5,
+            bar_buttons_alignment = "right",
+            bar_precedence_over_border = true,
+            inactive_button_color = "{{ overlay0 | hyprlang }}",
+        },
+    },
+})
+
+-- Match hyprbars' automatic foreground contrast from the previous config.
+local function button_foreground(hex)
+    local sum = tonumber(hex:sub(1, 2), 16) + tonumber(hex:sub(3, 4), 16)
+        + tonumber(hex:sub(5, 6), 16)
+    return sum < 255 and "rgb(ffffff)" or "rgb(000000)"
+end
+
+hl.plugin.hyprbars.add_button({
+    bg_color = "{{ red | hyprlang }}",
+    fg_color = button_foreground("{{ red | hex }}"),
+    size = 16,
+    icon = "󰖭",
+    action = "hyprctl dispatch 'hl.dsp.window.close()'",
+})
+hl.plugin.hyprbars.add_button({
+    bg_color = "{{ primary | hyprlang }}",
+    fg_color = button_foreground("{{ primary | hex }}"),
+    size = 16,
+    icon = "󰊓",
+    action = [[hyprctl activewindow -j | jq -e '.pinned' && hyprctl dispatch 'hl.dsp.window.pin({ action = "toggle" })'; hyprctl dispatch 'hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" })']],
+})
+
+hl.window_rule({
+    name = "hyprbars-floating-only",
+    match = { float = false },
+    ["hyprbars:no_bar"] = true,
+})

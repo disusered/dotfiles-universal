@@ -16,4 +16,4 @@ linux[whoami.distro^="Arch"]:
       - /languages/rust
       - /lib/wl-clipboard
   links:
-    dictate.conf: {{ dirs.base.config }}/hypr/conf.d/dictate.conf
+    dictate.lua: {{ dirs.base.config }}/hypr/conf.d/dictate.lua

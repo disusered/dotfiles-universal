@@ -18,4 +18,4 @@ linux[whoami.distro^="Arch"]:
   links:
     raop.conf: {{ dirs.base.config }}/pipewire/pipewire.conf.d/50-raop.conf
     pipewire.service.d/override.conf: {{ dirs.base.config }}/systemd/user/pipewire.service.d/override.conf
-    pipewire.conf: {{ dirs.base.config }}/hypr/conf.d/pipewire.conf
+    pipewire.lua: {{ dirs.base.config }}/hypr/conf.d/pipewire.lua

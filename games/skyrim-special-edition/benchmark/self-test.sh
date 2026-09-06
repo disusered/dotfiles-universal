@@ -446,9 +446,9 @@ printf '\n' >> "$control/hyprctl.log"
 
 bool_json() {
   if [[ $(<"$1") == true ]]; then
-    printf '{"int":1,"set":true}\n'
+    printf '{"bool":true,"set":true}\n'
   else
-    printf '{"int":0,"set":true}\n'
+    printf '{"bool":false,"set":true}\n'
   fi
 }
 
@@ -461,20 +461,24 @@ set_bool() {
 }
 
 case " $* " in
-  *' -j getoption debug:vfr '*)
+  *' keyword '*|*' getoption '*':'*)
+    printf 'legacy Hyprland configuration command rejected\n' >&2
+    exit 2
+    ;;
+  *' -j getoption debug.vfr '*)
     bool_json "$control/hypr-vfr"
     ;;
-  *' -j getoption general:allow_tearing '*)
+  *' -j getoption general.allow_tearing '*)
     bool_json "$control/hypr-tearing"
     ;;
-  *' -j getoption render:new_render_scheduling '*)
+  *' -j getoption render.new_render_scheduling '*)
     bool_json "$control/hypr-new-scheduling"
     ;;
-  *' -j getoption render:direct_scanout '*)
+  *' -j getoption render.direct_scanout '*)
     printf '{"int":%s,"set":true}\n' "$(<"$control/hypr-direct-scanout")"
     ;;
   *' -j version '*)
-    printf '{"tag":"v0.55.2","commit":"mock"}\n'
+    printf '{"tag":"v0.56.2","commit":"mock"}\n'
     ;;
   *' configerrors '*)
     ;;
@@ -492,37 +496,46 @@ case " $* " in
     printf '{"address":"0xabc","class":"gamescope","title":"Skyrim Special Edition"}\n'
     ;;
   *' getprop '*' immediate '*)
-    if [[ $(<"$control/hypr-immediate") == true ]]; then
-      printf 'int: 1\nset: true\n'
-    else
-      printf 'int: 0\nset: true\n'
-    fi
+    cat "$control/hypr-immediate"
     ;;
-  *' keyword debug:vfr '*)
+  ' eval hl.config({ debug = { vfr = true } }) '|' eval hl.config({ debug = { vfr = false } }) ')
     if [[ -f $control/fail-vfr-apply ]]; then
       rm -f -- "$control/fail-vfr-apply"
       printf 'false\n' > "$control/hypr-vfr"
       printf 'ok\n'
       exit 0
     fi
-    set_bool "$control/hypr-vfr" "${3:?}"
+    value=${2#*vfr = }
+    set_bool "$control/hypr-vfr" "${value%% *}"
     printf 'ok\n'
     ;;
-  *' keyword general:allow_tearing '*)
-    set_bool "$control/hypr-tearing" "${3:?}"
+  ' eval hl.config({ general = { allow_tearing = true } }) '|' eval hl.config({ general = { allow_tearing = false } }) ')
+    value=${2#*allow_tearing = }
+    set_bool "$control/hypr-tearing" "${value%% *}"
     printf 'ok\n'
     ;;
-  *' keyword render:new_render_scheduling '*)
-    set_bool "$control/hypr-new-scheduling" "${3:?}"
+  ' eval hl.config({ render = { new_render_scheduling = true } }) '|' eval hl.config({ render = { new_render_scheduling = false } }) ')
+    value=${2#*new_render_scheduling = }
+    set_bool "$control/hypr-new-scheduling" "${value%% *}"
     printf 'ok\n'
     ;;
-  *' keyword render:direct_scanout '*)
-    printf '%s\n' "${3:?}" > "$control/hypr-direct-scanout"
+  ' eval hl.config({ render = { direct_scanout = '[012]' } }) ')
+    value=${2#*direct_scanout = }
+    printf '%s\n' "${value%% *}" > "$control/hypr-direct-scanout"
     printf 'ok\n'
     ;;
-  *' setprop '*' immediate '*)
-    set_bool "$control/hypr-immediate" "${4:?}"
+  *' eval '*)
+    printf 'unexpected Lua configuration: %s\n' "$*" >&2
+    exit 2
+    ;;
+  ' dispatch hl.dsp.window.set_prop({ window = "address:0x'*'", prop = "immediate", value = "'[01]'" }) ')
+    value=${2##*value = \"}
+    set_bool "$control/hypr-immediate" "${value%%\"*}"
     printf 'ok\n'
+    ;;
+  *' dispatch '*)
+    printf 'unexpected dispatcher: %s\n' "$*" >&2
+    exit 2
     ;;
   *)
     printf '{}\n'
@@ -982,7 +995,7 @@ source "$SKYRIM_PERF_STATE_DIR/runs/H5-1/prepared.env"
 touch "$TEST_CONTROL/fail-vfr-apply"
 expect_failure_matching \
   'failed runtime Hypr profile application' \
-  'could not apply debug:vfr=true' \
+  'could not apply debug.vfr=true' \
   "$CONTROLLER" activate H5-1 "$GAMESCOPE_ARGS"
 H5_RUN_DIR=$SKYRIM_PERF_STATE_DIR/runs/H5-1
 [[ $(<"$TEST_CONTROL/hypr-tearing") == false ]]

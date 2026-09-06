@@ -1,4 +1,4 @@
-import { execSync, spawn } from "node:child_process";
+import { execFileSync, execSync, spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { basename } from "node:path";
 
@@ -105,9 +105,9 @@ function isTerminalFocused(terminalPid) {
 }
 
 function focusTerminal(addr) {
-  if (!addr) return;
+  if (!/^0x[0-9a-f]+$/i.test(addr ?? "")) return;
   try {
-    execSync(`hyprctl dispatch focuswindow address:${addr}`, { timeout: 1000 });
+    execFileSync("hyprctl", ["dispatch", `hl.dsp.focus({ window = "address:${addr}" })`], { timeout: 1000 });
     log("focused", addr);
   } catch (e) {
     log("focus failed", e?.message ?? String(e));

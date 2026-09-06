@@ -5,4 +5,4 @@ linux[whoami.distro^="Arch"]:
       - /arch/hyprshot
   links:
     config: ~/.config/swappy/config
-    swappy.conf: ~/.config/hypr/conf.d/swappy.conf
+    swappy.lua: ~/.config/hypr/conf.d/swappy.lua

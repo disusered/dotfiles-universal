@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use std::process::Command;
+use std::process::{Command, Output};
 
 #[derive(Deserialize, Debug)]
 pub struct ActiveWindow {
@@ -55,10 +55,34 @@ fn run_hyprctl(args: &[&str]) -> Result<String, String> {
         .output()
         .map_err(|e| format!("Failed to run hyprctl: {}", e))?;
     if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(format!("hyprctl failed: {}", stderr));
+        return Err(hyprctl_error(&output));
     }
     String::from_utf8(output.stdout).map_err(|e| format!("Invalid UTF-8 from hyprctl: {}", e))
+}
+
+fn hyprctl_error(output: &Output) -> String {
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let details = [stderr.trim(), stdout.trim()]
+        .into_iter()
+        .filter(|s| !s.is_empty())
+        .collect::<Vec<_>>()
+        .join("; ");
+    format!("hyprctl failed ({}): {}", output.status, details)
+}
+
+fn lua_string(value: &str) -> String {
+    let mut quoted = String::from("\"");
+    for ch in value.chars() {
+        match ch {
+            '\\' => quoted.push_str("\\\\"),
+            '"' => quoted.push_str("\\\""),
+            ch if ch.is_ascii_control() => quoted.push_str(&format!("\\{:03}", ch as u32)),
+            ch => quoted.push(ch),
+        }
+    }
+    quoted.push('"');
+    quoted
 }
 
 pub fn get_active_window() -> Result<ActiveWindow, String> {
@@ -77,14 +101,25 @@ pub fn get_monitors() -> Result<Vec<Monitor>, String> {
 }
 
 pub fn dispatch_toggle_special(workspace: &str) -> Result<(), String> {
-    run_hyprctl(&["dispatch", "togglespecialworkspace", workspace])?;
+    let code = toggle_special_code(workspace);
+    run_hyprctl(&["eval", &code])?;
     Ok(())
 }
 
 pub fn dispatch_focus_window(address: &str) -> Result<(), String> {
-    let target = format!("address:{}", address);
-    run_hyprctl(&["dispatch", "focuswindow", &target])?;
+    let code = focus_window_code(address);
+    run_hyprctl(&["eval", &code])?;
     Ok(())
+}
+
+pub fn dispatch_show_and_focus(workspace: &str, address: &str) -> Result<(), String> {
+    let code = show_and_focus_code(workspace, address);
+    run_hyprctl(&["eval", &code])?;
+    Ok(())
+}
+
+fn show_and_focus_code(workspace: &str, address: &str) -> String {
+    format!("{}; {}", toggle_special_code(workspace), focus_window_code(address))
 }
 
 // Eject a stray window out of a special workspace while preserving the
@@ -93,18 +128,30 @@ pub fn dispatch_focus_window(address: &str) -> Result<(), String> {
 // tab group), a plain `movetoworkspacesilent` moves the ENTIRE group —
 // yanking the incumbent along with the stray. Detach first via
 // `moveoutofgroup` (which operates on the focused window) so the move
-// targets only the stray. Runs as a single batched hyprctl call to
+// targets only the stray. Runs as a single Lua hyprctl call to
 // minimize the window where focus is stolen mid-eject.
 pub fn dispatch_eject_to_workspace(workspace_id: i64, address: &str) -> Result<(), String> {
-    let batch = format!(
-        "dispatch focuswindow address:{addr}; \
-         dispatch moveoutofgroup; \
-         dispatch movetoworkspacesilent {ws},address:{addr}",
-        addr = address,
-        ws = workspace_id,
-    );
-    run_hyprctl(&["--batch", &batch])?;
+    let code = eject_to_workspace_code(workspace_id, address);
+    run_hyprctl(&["eval", &code])?;
     Ok(())
+}
+
+fn toggle_special_code(workspace: &str) -> String {
+    format!("hl.dispatch(hl.dsp.workspace.toggle_special({}))", lua_string(workspace))
+}
+
+fn focus_window_code(address: &str) -> String {
+    let target = format!("address:{}", address);
+    format!("hl.dispatch(hl.dsp.focus({{window = {}}}))", lua_string(&target))
+}
+
+fn eject_to_workspace_code(workspace_id: i64, address: &str) -> String {
+    let target = lua_string(&format!("address:{}", address));
+    format!(
+        "hl.dispatch(hl.dsp.focus({{window = {target}}})); \
+         hl.dispatch(hl.dsp.window.move({{out_of_group = true}})); \
+         hl.dispatch(hl.dsp.window.move({{workspace = {workspace_id}, follow = false, window = {target}}}))"
+    )
 }
 
 pub fn find_monitor_with_special<'a>(
@@ -150,6 +197,91 @@ pub fn find_windows_by_class<'a>(clients: &'a [Client], class: &str) -> Vec<&'a 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn check_dispatchers(code: &str, assertions: &str) {
+        // Dispatcher builders return opaque objects, not callable Lua functions.
+        let stub = r#"
+            local calls = {}
+            local function dispatcher(kind, args)
+                return {kind = kind, args = args}
+            end
+            hl = {
+                dispatch = function(d) table.insert(calls, d) end,
+                dsp = {
+                    workspace = {toggle_special = function(name)
+                        return dispatcher('toggle', name)
+                    end},
+                    focus = function(args) return dispatcher('focus', args) end,
+                    window = {move = function(args) return dispatcher('move', args) end},
+                },
+            }
+        "#;
+        let output = Command::new("lua")
+            .args(["-e", &format!("{stub}\n{code}\n{assertions}")])
+            .output()
+            .expect("Lua is required to check dispatcher IPC");
+        assert!(output.status.success(), "{}", String::from_utf8_lossy(&output.stderr));
+    }
+
+    #[test]
+    fn toggle_dispatches_workspace_object() {
+        check_dispatchers(&toggle_special_code("lazygit"), r#"
+            assert(#calls == 1)
+            assert(calls[1].kind == 'toggle' and calls[1].args == 'lazygit')
+        "#);
+    }
+
+    #[test]
+    fn focus_dispatches_window_object() {
+        check_dispatchers(&focus_window_code("0x123"), r#"
+            assert(#calls == 1)
+            assert(calls[1].kind == 'focus' and calls[1].args.window == 'address:0x123')
+        "#);
+    }
+
+    #[test]
+    fn show_and_focus_dispatches_in_order() {
+        check_dispatchers(&show_and_focus_code("lazygit", "0x123"), r#"
+            assert(#calls == 2)
+            assert(calls[1].kind == 'toggle' and calls[1].args == 'lazygit')
+            assert(calls[2].kind == 'focus' and calls[2].args.window == 'address:0x123')
+        "#);
+    }
+
+    #[test]
+    fn eject_dispatches_focus_detach_and_silent_move_in_order() {
+        check_dispatchers(&eject_to_workspace_code(3, "0x123"), r#"
+            assert(#calls == 3)
+            assert(calls[1].kind == 'focus' and calls[1].args.window == 'address:0x123')
+            assert(calls[2].kind == 'move' and calls[2].args.out_of_group == true)
+            assert(calls[3].kind == 'move' and calls[3].args.workspace == 3)
+            assert(calls[3].args.follow == false and calls[3].args.window == 'address:0x123')
+        "#);
+    }
+
+    #[test]
+    fn lua_string_round_trips_special_characters() {
+        let value = "\n\r\t\0\u{7f}123\\\"é]]]=]; error('injected')";
+        let output = Command::new("lua")
+            .args(["-e", &format!("io.write({})", lua_string(value))])
+            .output()
+            .expect("Lua is required to check IPC string escaping");
+        assert!(output.status.success(), "{:?}", output.stderr);
+        assert_eq!(output.stdout, value.as_bytes());
+    }
+
+    #[test]
+    fn hyprctl_error_includes_stdout_when_stderr_is_empty() {
+        use std::os::unix::process::ExitStatusExt;
+        let output = Output {
+            status: std::process::ExitStatus::from_raw(7 << 8),
+            stdout: b"Lua syntax error\n".to_vec(),
+            stderr: Vec::new(),
+        };
+        let error = hyprctl_error(&output);
+        assert!(error.contains("7"));
+        assert!(error.contains("Lua syntax error"));
+    }
 
     fn make_monitor(focused: bool, special_name: &str) -> Monitor {
         make_monitor_full(focused, special_name, 1, "1")

@@ -7,4 +7,4 @@ linux[whoami.distro^="Arch"]:
       - /lib/slurp
       - /arch/hyprpicker
   links:
-    hyprshot.conf: ~/.config/hypr/conf.d/hyprshot.conf
+    hyprshot.lua: ~/.config/hypr/conf.d/hyprshot.lua

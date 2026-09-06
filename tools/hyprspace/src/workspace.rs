@@ -251,9 +251,7 @@ fn detect_context(ws: &WorkspaceConfig, active_window: &ActiveWindow) -> Option<
 }
 
 fn focus_and_show(workspace_name: &str, address: &str) -> Result<(), String> {
-    dispatch_toggle_special(workspace_name)?;
-    dispatch_focus_window(address)?;
-    Ok(())
+    hyprctl::dispatch_show_and_focus(workspace_name, address)
 }
 
 fn spawn_and_wait(
@@ -303,13 +301,13 @@ fn spawn_and_wait(
     // Poll for new window
     let deadline = Instant::now() + Duration::from_secs(2);
     while Instant::now() < deadline {
-        thread::sleep(Duration::from_millis(100));
         if let Ok(clients) = get_clients() {
             if let Some(addr) = pick_new_window(&clients, ws, &title, &pre_spawn_addrs) {
                 let _ = dispatch_focus_window(&addr);
                 return Ok(());
             }
         }
+        thread::sleep(Duration::from_millis(16));
     }
 
     notify::notify(

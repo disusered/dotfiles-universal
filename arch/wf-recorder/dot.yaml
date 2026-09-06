@@ -9,5 +9,5 @@ linux[whoami.distro^="Arch"]:
       - /tools/rofi
       - /tools/jq
   links:
-    wf-recorder.conf: ~/.config/hypr/conf.d/wf-recorder.conf
+    wf-recorder.lua: ~/.config/hypr/conf.d/wf-recorder.lua
     recorder.sh: ~/.config/hypr/scripts/recorder.sh
