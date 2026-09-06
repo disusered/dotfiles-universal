@@ -1,0 +1,11 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -eu
+      DISABLE_TELEMETRY=true blender --background --python-exit-code 1 --python "$HOME/.dotfiles/ai/blender-mcp/setup.py"
+      if ! claude mcp get blender >/dev/null 2>&1; then
+        claude mcp add blender --scope user --transport stdio -e DISABLE_TELEMETRY=true -e BLENDER_HOST=localhost -e BLENDER_PORT=9876 -- /usr/bin/uvx --python 3.11 blender-mcp==1.9.1
+      fi
+    depends:
+      - /tools/blender
+      - /languages/python/uv

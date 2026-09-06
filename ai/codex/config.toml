@@ -4,8 +4,8 @@ sandbox_mode = "workspace-write"
 commit_attribution = ""
 model = "gpt-6-astra"
 model_verbosity = "low"
-model_reasoning_effort = "medium"
-plan_mode_reasoning_effort = "xhigh"
+model_reasoning_effort = "low"
+plan_mode_reasoning_effort = "medium"
 service_tier = "default"
 
 [features]
@@ -234,6 +234,31 @@ trusted_hash = "sha256:37246c58dda596dfef66427d1813722e04f53d3493c705b1a045c5c60
 [mcp_servers.stitch]
 command = "/home/carlos/.local/bin/stitch-mcp-wrapper"
 
+[mcp_servers.blender]
+command = "/usr/bin/uvx"
+args = ["--python", "3.11", "blender-mcp==1.9.1"]
+startup_timeout_sec = 120
+
+[mcp_servers.blender.env]
+DISABLE_TELEMETRY = "true"
+BLENDER_HOST = "localhost"
+BLENDER_PORT = "9876"
+
+[mcp_servers.blender.tools.execute_blender_code]
+approval_mode = "approve"
+
+[mcp_servers.blender.tools.get_scene_info]
+approval_mode = "approve"
+
+[mcp_servers.blender.tools.get_viewport_screenshot]
+approval_mode = "approve"
+
+[mcp_servers.blender.tools.get_hyper3d_status]
+approval_mode = "approve"
+
+[mcp_servers.blender.tools.get_hunyuan3d_status]
+approval_mode = "approve"
+
 [mcp_servers.node_repl]
 args = []
 command = "/usr/lib/chatgpt/resources/cua_node/bin/node_repl"
@@ -316,6 +341,9 @@ global = "fileManager"
 [memories]
 generate_memories = false
 use_memories = false
+
+[notice.model_migrations]
+"gpt-5.4-mini" = "gpt-5.6-luna"
 
 [plugins."openviking-memory@openviking-plugins-local"]
 enabled = true
