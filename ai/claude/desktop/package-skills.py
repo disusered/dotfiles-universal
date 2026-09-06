@@ -13,7 +13,8 @@ def main():
     dest = here / "dist"
     dest.mkdir(exist_ok=True)
     receipts = []
-    for name in ("plain-english", "report-to-carlos", "okf-knowledge-ops", "okf-shared-bundle"):
+    # The organization's shared Bundle skill is delivered by its GitHub marketplace.
+    for name in ("plain-english", "report-to-carlos", "okf-knowledge-ops"):
         root = source / name
         if not (root / "SKILL.md").is_file():
             raise FileNotFoundError(root / "SKILL.md")
