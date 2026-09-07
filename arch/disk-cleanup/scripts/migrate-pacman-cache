@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+"""Relocate the package cache without changing package retention."""
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import tempfile
+
+SOURCE = Path('/var/cache/pacman/pkg')
+TARGET = Path('/home/system-cache/pacman/pkg')
+CONFIG = Path('/etc/pacman.conf')
+BACKUP = Path('/etc/pacman.conf.before-cache-relocation')
+LOCK = Path('/var/lib/pacman/db.lck')
+DROPIN = Path('/etc/systemd/system/paccache.service.d/20-cache-location.conf')
+
+
+def run(*args):
+    return subprocess.check_output(args, text=True).strip()
+
+
+def main():
+    if os.geteuid() != 0:
+        raise SystemExit('Run this migration with sudo.')
+    if not os.path.ismount('/home'):
+        raise SystemExit('/home must be mounted before relocating the cache.')
+    if run('systemctl', 'show', 'paccache.service', '-p', 'ActiveState', '--value') not in ('inactive', 'failed'):
+        raise SystemExit('Wait for paccache.service to finish first.')
+    caches = run('pacman-conf', 'CacheDir').splitlines()
+    if caches not in ([str(SOURCE) + '/'], [str(TARGET) + '/'], [str(TARGET)]):
+        raise SystemExit(f'Unexpected cache configuration: {caches}')
+    timer_active = False
+    fd = os.open(LOCK, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    try:
+        timer_active = run('systemctl', 'show', 'paccache.timer', '-p', 'ActiveState', '--value') == 'active'
+        subprocess.run(['systemctl', 'stop', 'paccache.timer'], check=True)
+        if run('systemctl', 'show', 'paccache.service', '-p', 'ActiveState', '--value') not in ('inactive', 'failed'):
+            raise SystemExit('paccache started concurrently; retry after it finishes.')
+        for path in (TARGET.parent.parent, TARGET.parent, TARGET):
+            if path.is_symlink():
+                raise SystemExit(f'Refusing symlink: {path}')
+            path.mkdir(exist_ok=True, mode=0o755)
+            if path.stat().st_uid != 0 or path.stat().st_mode & 0o022:
+                raise SystemExit(f'Cache directory must be root-owned and not writable by others: {path}')
+        subprocess.run(['rsync', '-a', str(SOURCE) + '/', str(TARGET) + '/'], check=True)
+        difference = run('rsync', '-acin', str(SOURCE) + '/', str(TARGET) + '/')
+        if difference:
+            raise SystemExit(f'Cache copy verification failed:\n{difference}')
+        download_user = run('pacman-conf', 'DownloadUser')
+        if download_user:
+            subprocess.run(['runuser', '-u', download_user, '--', 'test', '-r', str(TARGET)], check=True)
+            subprocess.run(['runuser', '-u', download_user, '--', 'test', '-x', str(TARGET)], check=True)
+        original = CONFIG.read_text()
+        lines = original.splitlines(keepends=True)
+        # Replace the cache directive only in [options], preserving all other configuration.
+        section = None
+        result = []
+        inserted = False
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith('['):
+                section = stripped
+            if section == '[options]' and stripped.startswith('CacheDir') and '=' in stripped:
+                continue
+            result.append(line)
+            if stripped == '[options]':
+                result.append(f'CacheDir = {TARGET}/\n')
+                inserted = True
+        if not inserted:
+            raise SystemExit('Missing [options] in pacman.conf.')
+        if not BACKUP.exists():
+            shutil.copy2(CONFIG, BACKUP)
+        with tempfile.NamedTemporaryFile(mode='w', dir=CONFIG.parent, delete=False) as temporary:
+            temporary.write(''.join(result))
+            temporary_path = Path(temporary.name)
+        try:
+            shutil.copystat(CONFIG, temporary_path)
+            if run('pacman-conf', '--config', str(temporary_path), 'CacheDir') != str(TARGET) + '/':
+                raise SystemExit('Relocated cache configuration did not validate.')
+            DROPIN.parent.mkdir(parents=True, exist_ok=True)
+            DROPIN.write_text('[Unit]\nRequiresMountsFor=/home/system-cache/pacman/pkg\n\n[Service]\nProtectHome=tmpfs\nBindPaths=/home/system-cache/pacman/pkg\n')
+            os.replace(temporary_path, CONFIG)
+        finally:
+            temporary_path.unlink(missing_ok=True)
+        subprocess.run(['systemctl', 'daemon-reload'], check=True)
+        subprocess.run(['paccache', '-dk2'], check=True)
+        subprocess.run(['paccache', '-duk0'], check=True)
+        subprocess.run(['systemd-run', '--wait', '--pipe', '--collect',
+                        '-p', 'ProtectHome=tmpfs', '-p', f'BindPaths={TARGET}',
+                        '/usr/bin/paccache', '-dk2'], check=True)
+        # Only remove the verified original after configuration and checks succeed.
+        for entry in SOURCE.iterdir():
+            if entry.is_dir() and not entry.is_symlink():
+                shutil.rmtree(entry)
+            else:
+                entry.unlink()
+        print(f'Cache relocated to {TARGET}; original configuration: {BACKUP}')
+    finally:
+        os.close(fd)
+        LOCK.unlink()
+        if timer_active:
+            subprocess.run(['systemctl', 'start', 'paccache.timer'], check=True)
+
+
+if __name__ == '__main__':
+    main()

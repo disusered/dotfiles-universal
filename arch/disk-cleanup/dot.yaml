@@ -3,6 +3,7 @@ linux[whoami.distro^="Arch"]:
     cmd: |
       set -euo pipefail
       sudo pacman -S --noconfirm --needed pacman-contrib logrotate
+      sudo python3 ~/.dotfiles/arch/disk-cleanup/scripts/migrate-pacman-cache
 
       sudo install -Dm644 ~/.dotfiles/arch/disk-cleanup/journald/10-disk-cleanup.conf \
         /etc/systemd/journald.conf.d/10-disk-cleanup.conf
