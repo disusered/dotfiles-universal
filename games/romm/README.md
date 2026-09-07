@@ -56,11 +56,28 @@ Do not commit `~/.config/romm/romm.env` or any generated secrets.
 ~/.rotz/bin/rotz install /games/romm
 ```
 
-Then check:
+RomM and its database start on demand, rather than at login. Start the app
+(which also starts its database), then check:
 
 ```bash
+systemctl --user start romm.service
 romm-smoke
 ```
+
+Stop both when finished:
+
+```bash
+systemctl --user stop romm.service romm-db.service
+```
+
+Stopping preserves the library and named volumes. The local and tailnet URLs
+are unavailable while stopped. Installing the module does not start the stack.
+
+Valkey is RomM's Redis-compatible in-memory data store, including metadata and
+background queues. The September 2026 audit measured about 618 MiB of Valkey
+data, mostly preloaded LaunchBox metadata, with no configured memory cap. This
+was an explained baseline, not evidence of a leak. Running the stack on demand
+avoids that idle footprint without evicting queue or metadata entries.
 
 On first boot, open `https://romm.disusered.com` and complete RomM's setup
 wizard. The first user becomes the admin user.

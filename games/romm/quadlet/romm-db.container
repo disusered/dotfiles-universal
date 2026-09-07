@@ -18,6 +18,3 @@ HealthRetries=5
 Restart=on-failure
 RestartSec=5
 TimeoutStartSec=900
-
-[Install]
-WantedBy=default.target

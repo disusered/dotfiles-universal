@@ -13,7 +13,6 @@ linux[whoami.distro^="Arch"]:
       ~/.rotz/bin/rotz link /games/romm -f
       ~/.dotfiles/games/romm/scripts/romm-init
       systemctl --user daemon-reload
-      systemctl --user restart romm-db.service romm.service
     depends:
       - /packages/podman
       - /tools/1password
