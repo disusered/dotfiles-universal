@@ -1,0 +1,10 @@
+[Unit]
+Description=Measure selected package and development storage once daily
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/.dotfiles/arch/system-audit/audit.py storage
+Nice=19
+IOSchedulingClass=idle
+UMask=0077
+TimeoutStartSec=5min

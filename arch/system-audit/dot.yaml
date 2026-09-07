@@ -1,0 +1,15 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -euo pipefail
+      mkdir -p ~/.config/systemd/user
+      ~/.rotz/bin/rotz link /arch/system-audit -f
+      systemctl --user daemon-reload
+      systemctl --user enable --now system-audit-sample.timer system-audit-storage.timer
+    depends:
+      - /lib/arch
+  links:
+    systemd/system-audit-sample.service: ~/.config/systemd/user/system-audit-sample.service
+    systemd/system-audit-sample.timer: ~/.config/systemd/user/system-audit-sample.timer
+    systemd/system-audit-storage.service: ~/.config/systemd/user/system-audit-storage.service
+    systemd/system-audit-storage.timer: ~/.config/systemd/user/system-audit-storage.timer

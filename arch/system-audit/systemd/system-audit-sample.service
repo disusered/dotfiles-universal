@@ -1,0 +1,9 @@
+[Unit]
+Description=Observe host memory and running user services
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/.dotfiles/arch/system-audit/audit.py sample
+Nice=10
+UMask=0077
+TimeoutStartSec=45
