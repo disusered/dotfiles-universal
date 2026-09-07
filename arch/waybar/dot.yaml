@@ -1,7 +1,9 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm --needed waybar
+      # The repository build still sends legacy Hyprland workspace dispatches.
+      # Track upstream until its Lua IPC compatibility fix is released.
+      yay -S --noconfirm --needed waybar-git
       # FIXME: Service??
       # sudo systemctl enable --now waybar.service
     depends:
