@@ -1,15 +1,13 @@
 # AI Tells
 
-The Google style guide predates LLM prose, so it never names these. This file is the layer
-that does. Nothing here is sourced from Google; it is a house list.
+House-style patterns and suggested repairs. These are editorial defaults;
+preserve precise terminology, quotations, and the user's requested voice.
 
-Every entry is a pattern to remove, with the repair.
+## Common filler
 
-## Banned vocabulary
+Replace vague or promotional uses with the specific meaning.
 
-Do not use these words. There is always a plainer one.
-
-| Banned | Use instead |
+| Wording | Suggested repair |
 | --- | --- |
 | delve into | examine, read, work through |
 | seamless, seamlessly | name the thing that no longer breaks |
@@ -31,7 +29,7 @@ Do not use these words. There is always a plainer one.
 | leverage synergies, best-in-class | delete the sentence |
 | deep dive, game-changer, paradigm shift | delete the sentence |
 
-## Banned constructions
+## Repeated constructions
 
 **The negation pivot.** "It's not just X — it's Y." Also "This isn't merely X, it's Y" and
 "X isn't about Y. It's about Z." Delete the negation and assert Y directly.
@@ -90,7 +88,7 @@ density, not existence.
   existing file in this repository spaces them, including `ai/agent-instructions/AGENTS.md`.
   House convention wins over the guide here. Be consistent within a file.
 
-## What this file does not ban
+## Preserve useful language
 
 - Technical terms that are the correct name for the thing.
 - Contractions. They are conversational, which the guide asks for.

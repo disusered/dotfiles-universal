@@ -17,7 +17,9 @@ python3 ai/claude/desktop/package-skills.py
 
 Upload the applicable archives from `dist/` through Customize → Skills. Update
 an existing matching skill instead of enabling duplicates. These three packages
-are local installation artifacts. The local OKF skill needs the appropriate local repository server.
+are local installation artifacts. The reporting package is `operational-report`;
+replace the previous reporting skill when updating an existing installation.
+The local OKF skill needs the appropriate local repository server.
 
 The organization's `okf-shared-bundle` plugin is synced from the private
 `iteramind/agent-plugins` GitHub repository. Update its canonical source at

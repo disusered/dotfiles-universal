@@ -1,5 +1,5 @@
 ---
-name: report-to-carlos
+name: operational-report
 description: Write completion reports and handoffs for releases, migrations, investigations, and substantial multi-project work.
 ---
 

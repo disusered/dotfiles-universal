@@ -14,7 +14,7 @@ def main():
     dest.mkdir(exist_ok=True)
     receipts = []
     # The organization's shared Bundle skill is delivered by its GitHub marketplace.
-    for name in ("plain-english", "report-to-carlos", "okf-knowledge-ops"):
+    for name in ("plain-english", "operational-report", "okf-knowledge-ops"):
         root = source / name
         if not (root / "SKILL.md").is_file():
             raise FileNotFoundError(root / "SKILL.md")

@@ -1,4 +1,4 @@
-# Google Word List — the entries that bite
+# Google word guidance
 
 A curated subset of https://developers.google.com/style/word-list, limited to the entries
 that actually catch generated prose. Every quotation below was taken from that page. For any
@@ -69,6 +69,5 @@ define it on first mention, or link to a trusted definition.
 
 ## Not in Google's list
 
-The guide predates LLM prose and says nothing about `robust`, `seamless`, `comprehensive`,
-`delve`, `powerful`, or `cutting-edge`. Those live in
+Additional house-style guidance for recurring generated prose lives in
 [ai-tells.md](ai-tells.md).

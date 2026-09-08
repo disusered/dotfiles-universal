@@ -61,7 +61,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "claude-fable-5-dd-artsa-6-tpg",
+  "model": "opus[1m]",
   "skillOverrides": {
     "template": "off",
     "frontend-design": "off"
