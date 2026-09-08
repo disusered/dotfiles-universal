@@ -10,9 +10,9 @@ wrote because it predates LLM prose. Apply it to the requested prose review or r
 `slop-clean` handles code slop — comments, defensive checks, casts. This handles prose. They
 do not overlap.
 
-The `Plain English` output style stays available but is not the active one — `Concise` is.
-Load this skill whenever you want these rules applied: the full word list, the
-document-formatting rules, or a rewrite pass over existing text.
+Claude's configured output style is `Plain English`. This skill adds the full word list,
+document-formatting rules, and rewrite guidance. These are writing rules; they do not
+change task scope, execution, permission handling, or which questions need answers.
 
 ## Apply the Rules
 

@@ -15,10 +15,13 @@ Do not run `git pull`, `git pull --rebase`, or `git push` as a session-completio
 
 ## Git Commit Signing
 
-- **NEVER create unsigned commits.** All agent-created commits must be GPG-signed.
+- **NEVER create unsigned commits.** Use the repository's configured signing backend.
 - Use `git commit -S ...` for every commit. Do not rely only on ambient git config.
 - **NEVER use `--no-gpg-sign`, `commit.gpgsign=false`, or any other signing bypass.**
-- If signing fails, stop and report the exact error. Do not retry with signing disabled.
+- If the sandbox blocks the configured signer, retry the same authorized operation through
+  supported escalation. Preserve the backend and identity; never request or export private
+  keys or disable signing. Stop the affected operation on denial or persistent failure and
+  report the exact error.
 - After every agent-created commit, run `git verify-commit HEAD`. Treat verification failure as a failed commit task until the commit is replaced with a signed, verifiable commit.
 
 ## Repository Overview

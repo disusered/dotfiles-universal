@@ -33,4 +33,6 @@ Prepare clean, logical git commits from the current repository state.
 - Do not claim a check passed if only a narrower command passed.
 - Do not mix unrelated changes into one commit for convenience.
 - Do not push as part of this skill unless the user explicitly requests it.
-- Do not use `--no-gpg-sign`, `commit.gpgsign=false`, or any other signing bypass. If signing fails, report the exact failure instead of creating an unsigned commit.
+- Preserve the configured signing backend, including SSH signing through 1Password when configured. `git commit -S` does not require switching to GPG.
+- If signing fails, inspect the exact error and apply the shared tool-failure recovery rules. When sandbox access to the configured signer is blocked, request supported escalation for the same operation. Before retrying a commit, inspect repository state to avoid duplicating a commit that succeeded before verification failed.
+- Never request or export private keys, change the signing backend, or use `--no-gpg-sign`, `commit.gpgsign=false`, or another signing bypass to work around access restrictions. A real denial or persistent failure stops the affected operation; report the exact failure and continue independent authorized work. Do not report the commit task complete until signing verification succeeds.

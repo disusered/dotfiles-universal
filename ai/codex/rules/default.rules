@@ -73,21 +73,23 @@ prefix_rule(pattern=["dotnet", "run"], decision="allow")
 
 prefix_rule(
     pattern = [["sh", "bash", "zsh"]],
-    decision = "forbidden",
-    justification = "Do not execute shell installers from downloaded scripts.",
+    decision = "prompt",
+    justification = "Review shell invocations that are not covered by underlying command rules; a shell invocation alone does not identify a downloaded installer.",
     match = [
         "sh",
         "bash",
         "zsh",
         "sh -s",
         "bash -s",
+        "zsh -lc 'TWG_CONFIG_DIR=~/.config/twg/accounts/iteramind twg jira board --help'",
+        "bash local-script.sh",
     ],
 )
 
 prefix_rule(
     pattern = ["curl"],
     decision = "allow",
-    justification = "curl is allowed for direct HTTP requests, but shell installer pipelines must remain blocked by the shell rule.",
+    justification = "curl is allowed for direct HTTP requests. Executing downloaded content requires a separate command review.",
     match = [
         "curl https://example.com",
         "curl -fsSL https://example.com/install.sh",
@@ -262,7 +264,7 @@ prefix_rule(pattern=["lsusb"], decision="allow")
 prefix_rule(
     pattern = ["git", "commit", "--no-gpg-sign"],
     decision = "forbidden",
-    justification = "Agent-created commits must be GPG-signed; do not bypass signing.",
+    justification = "Agent-created commits must use the configured signing backend; do not bypass signing.",
     match = [
         "git commit --no-gpg-sign -m msg",
     ],
@@ -270,7 +272,7 @@ prefix_rule(
 prefix_rule(
     pattern = ["git", "-c", "commit.gpgsign=false"],
     decision = "forbidden",
-    justification = "Agent-created commits must be GPG-signed; do not disable commit.gpgsign.",
+    justification = "Agent-created commits must use the configured signing backend; do not disable commit.gpgsign.",
     match = [
         "git -c commit.gpgsign=false commit -m msg",
     ],
@@ -302,9 +304,10 @@ prefix_rule(pattern=["git", "spr", "status"], decision="allow")
 prefix_rule(pattern=["gh", "pr", "close"], decision="allow")
 prefix_rule(pattern=["weidu"], decision="allow")
 prefix_rule(pattern=["rm", "uv.lock"], decision="allow")
-# E2E tests: export env vars (BASE_URL, auth tokens) in separate shell commands
-# before running `npx playwright test`. Services may use ephemeral ports when parallelized.
-# Tests must be authorized: always export AUTH/BASE_URL env vars before running.
+# E2E tests require authorization and the project's documented environment loader.
+# Load required variables and run the test in the same process invocation; exports
+# do not persist across tool calls. Check presence without printing secret values.
+# Services may use ephemeral ports when parallelized.
 prefix_rule(pattern=["npx", "playwright", "test"], decision="allow")
 prefix_rule(pattern=["set", "-a"], decision="allow")
 prefix_rule(pattern=[".", "./.env"], decision="allow")
@@ -428,7 +431,6 @@ prefix_rule(pattern=["docker", "port"], decision="allow")
 prefix_rule(pattern=["cfg", "up", "--workspace"], decision="allow")
 prefix_rule(pattern=["git", "ls-remote"], decision="allow")
 prefix_rule(pattern=["npm", "run", "qa:xbs329:diagnostics"], decision="allow")
-prefix_rule(pattern=["env", "TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft", "twg", "confluence", "content", "get"], decision="allow")
 prefix_rule(pattern=["aws"], decision="allow")
 prefix_rule(pattern=["op", "run"], decision="allow")
 prefix_rule(pattern=["docker", "cp"], decision="allow")
@@ -439,3 +441,26 @@ prefix_rule(pattern=["blender", "--background"], decision="allow")
 prefix_rule(pattern=["npm", "ci"], decision="allow")
 prefix_rule(pattern=[".", "./.env.example"], decision="allow")
 prefix_rule(pattern=["pnpm", "exec", "tsx", "apps/portalctl/src/index.ts", "health"], decision="allow")
+prefix_rule(pattern=["make", "release"], decision="allow")
+prefix_rule(pattern=["pnpm", "--filter", "@herding-cats/ui", "test"], decision="allow")
+prefix_rule(pattern=["docker", "compose", "up", "--help"], decision="allow")
+prefix_rule(pattern=["git", "rev-parse", "--show-toplevel"], decision="allow")
+prefix_rule(pattern=["set", "-e"], decision="allow")
+
+# Direct TWG reads for configured accounts; varying keys and queries reuse approval.
+prefix_rule(pattern=["twg", "help"], decision="allow")
+prefix_rule(pattern=["env",["TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/iteramind","TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft"],"twg","help"], decision="allow")
+prefix_rule(pattern=["env",["TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/iteramind","TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft"],"twg","jira","workitem","get"], decision="allow")
+prefix_rule(pattern=["env",["TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/iteramind","TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft"],"twg","jira","workitem","query"], decision="allow")
+prefix_rule(pattern=["env",["TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/iteramind","TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft"],"twg","jira","workitem","search"], decision="allow")
+prefix_rule(pattern=["env",["TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/iteramind","TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft"],"twg","jira","board","get"], decision="allow")
+prefix_rule(pattern=["env",["TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/iteramind","TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft"],"twg","jira","board","query"], decision="allow")
+prefix_rule(pattern=["env",["TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/iteramind","TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft"],"twg","jira","board","backlog","query"], decision="allow")
+prefix_rule(pattern=["env",["TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/iteramind","TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft"],"twg","jira","board","cells","query"], decision="allow")
+prefix_rule(pattern=["env",["TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/iteramind","TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft"],"twg","confluence","content","get"], decision="allow")
+prefix_rule(pattern=["env",["TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/iteramind","TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft"],"twg","confluence","search","query"], decision="allow")
+prefix_rule(pattern=["env",["TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/iteramind","TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft"],"twg","confluence","search","text"], decision="allow")
+prefix_rule(pattern=["env",["TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/iteramind","TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft"],"twg","rovo","search"], decision="allow")
+prefix_rule(pattern=["env",["TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/iteramind","TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft"],"twg","rovo","list-apps"], decision="allow")
+prefix_rule(pattern=["env",["TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/iteramind","TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft"],"twg","docs","search"], decision="allow")
+prefix_rule(pattern=["env",["TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/iteramind","TWG_CONFIG_DIR=/home/carlos/.config/twg/accounts/odasoft"],"twg","work","search"], decision="allow")
