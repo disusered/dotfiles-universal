@@ -1,4 +1,5 @@
 local hs = require("hyprsplit")
+hs.monitor_priority({ "HDMI-A-1", "HDMI-A-2" })
 hs.config({ num_workspaces = 6 })
 
 for workspace = 1, 6 do
