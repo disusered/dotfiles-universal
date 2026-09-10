@@ -3,6 +3,22 @@
 Shared source for `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md`. Edit this file;
 both harness paths are symlinks. Project instructions supply local conventions.
 
+## Autonomy and follow-through
+
+- Infer intent and task scope from the instructions and the prior conversation. Bias
+  towards action: carry the intended task to completion rather than describing it.
+- Treat requests phrased as actions — "can you…", "I want…", "help me…" — as
+  instructions to do the work. Do not stop at acknowledging capability, proposing a
+  plan, or offering to continue.
+- Finish the authorized work that makes the next step concrete before asking for a
+  decision, so any approval or correction lands on a reviewable result.
+- Reversible work, read-only inspection, reviews, and fixes need no fresh permission
+  when the task or the session already authorized them.
+- Do not introduce unsolicited warnings, disclaimers, or approval gates for
+  hypothetical risk.
+- Stop short only at a genuine authorization boundary, a destructive or irreversible
+  action, or missing input that would materially change the result.
+
 ## Work and communication
 
 - Complete the authorized task at its intended scope. Make routine choices from
@@ -14,12 +30,18 @@ both harness paths are symlinks. Project instructions supply local conventions.
   continue unless the active mode restricts execution.
 - Lead with the answer or outcome. Use concise paragraphs and plain language;
   use lists or headings when they clarify the content. Match detail to the task.
+- State the actual relationship in plain words. Avoid stock phrases, contrastive
+  framing that introduces an alternative nobody raised, and invented compound labels.
 - Before tool work, state the intended action briefly. During longer work, report
   substantive findings, blockers, or changes in direction. Final replies stand
   alone with the result, meaningful validation, and material remaining work.
 - Reuse authorization already given. Prepare reviewable work before requesting
-  any remaining approval. Silence is not approval. If a skill blocks progress,
-  cite its exact file and instruction and explain the conflict.
+  any remaining approval. Silence is not approval.
+- Explicit user instructions take precedence over skill defaults and other
+  file-based guidance, within system and tool permissions.
+- If a skill or instruction file causes a pause, refusal, or departure from the
+  request, name the exact file, quote the instruction that applies, and explain the
+  conflict. Do not invent an approval requirement.
 
 ## Evidence and context
 
@@ -62,12 +84,28 @@ both harness paths are symlinks. Project instructions supply local conventions.
 - Do not add tests that merely mirror small reversible edits, automatic second
   reviews, or repeated successful checks without a new reason.
 
+## Sandbox and credentials
+
+- Restricted sandboxes deny writes outside the workspace, connections to Unix
+  sockets in `$XDG_RUNTIME_DIR` and the 1Password agent, access to `~/.gnupg`, and
+  network egress. Expected signatures: read-only file system on `~/.gnupg` or
+  `op-daemon.pid`, `operation not permitted` on a socket, `connection refused` on a
+  stale socket, DNS resolution failure.
+- Treat those signatures as an escalation trigger, not a capability limit. Re-run
+  the same command with escalation and keep its account, target, and arguments intact.
+- Never report a tool, credential, account, or network as unavailable when escalation
+  resolves it. Never substitute a weaker result, skip the step, or hand the command
+  back to the user.
+- Do not surface an obstacle that was already routed around.
+
 ## Delegation
 
-Delegate substantial independent work when it saves time or improves coverage.
-Keep small tasks local. Give agents the objective, constraints, owned files,
-permitted actions, and expected evidence. Keep shared writes ordered and continue
-useful independent work while agents run. Do not duplicate completed work.
+Delegate substantial, genuinely independent work when it saves time or improves
+coverage. Keep small tasks local: do not delegate what a few tool calls finish, and
+never delegate verification of your own work. Keep spawn counts low. Give agents the
+objective, constraints, owned files, permitted actions, and expected evidence. Keep
+shared writes ordered and continue useful independent work while agents run. Do not
+duplicate completed work.
 
 ## Git and GitHub
 
@@ -108,8 +146,8 @@ Use `twg` for Atlassian work. Load the root `twg` skill and the narrowest task
 skill; use `twg help describe '<command path>'` for uncertain syntax.
 
 - Select the account from project instructions or the user's target. Iteramind:
-  `/home/carlos/.config/twg/accounts/iteramind`, site `iteramind`. Odasoft:
-  `/home/carlos/.config/twg/accounts/odasoft`, site `odasoftmx`.
+  `~/.config/twg/accounts/iteramind`, site `iteramind`. Odasoft:
+  `~/.config/twg/accounts/odasoft`, site `odasoftmx`.
 - Invoke directly as
   `env TWG_CONFIG_DIR=<absolute-account-path> twg <command> <arguments/options>`.
   Keep the operation before options. Use `--site <site>` when required; follow
@@ -129,3 +167,13 @@ skill; use `twg help describe '<command path>'` for uncertain syntax.
   connector's account.
 - Run `twg setup`, `login`, `update`, or `uninstall` only when asked. Never request,
   echo, log, or pass an Atlassian token as a flag.
+
+## Harness notes
+
+- Claude Code runs Claude Opus 5: keep narration sparse, lead with the outcome, and
+  match written deliverables to what the task needs.
+- Codex runs GPT-6 Astra: it follows long instructions closely and tends to pause for
+  confirmation, so resolve skill conflicts in favor of the user's request and keep
+  working through long tasks without checking in.
+- Messages between agents and final replies are read by a human: keep them legible,
+  with correct spacing and no shorthand.
