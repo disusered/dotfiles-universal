@@ -1,7 +1,7 @@
 # OpenViking
 
 This module installs OpenViking as a native user service and links the shared
-CLI config.
+CLI config. Codex and Claude Code are the maintained development harnesses.
 
 The service runs natively (not containerized) so it has direct access to host
 SSH keys, git credentials, and the `gh` CLI for private repository indexing.
@@ -68,8 +68,9 @@ The Iteramind profile uses a separate trusted-development memory:
 It applies to `~/Development/ITERAMIND` and descendants. Existing `local-dev`
 memory is not migrated into this account.
 
-OpenCode's global configuration uses the default identity. Its shell wrapper
-overrides the identity for XBOL and Iteramind based on the launch directory.
+OpenCode is deprecated. Its retained configuration is documented in
+[`../opencode/README.md`](../opencode/README.md); this module no longer installs
+its plugin or creates its links. Existing installations and memory are preserved.
 
 ## Codex Memory
 

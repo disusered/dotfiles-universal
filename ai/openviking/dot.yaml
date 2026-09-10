@@ -10,20 +10,13 @@ linux[whoami.distro^="Arch"]:
         echo "OpenViking linked. Run openviking-render-config, then enable openviking.service."
       fi
 
-      # Clone upstream OpenViking repo (shared by opencode + codex)
+      # Clone upstream OpenViking repo (shared by Codex and Claude Code)
       if [ -d ~/.openviking/openviking-repo/.git ]; then
         git -C ~/.openviking/openviking-repo pull --ff-only
       else
         git clone https://github.com/volcengine/OpenViking.git ~/.openviking/openviking-repo
       fi
       OV_REPO=~/.openviking/openviking-repo
-
-      # OpenCode plugin
-      mkdir -p ~/.config/opencode/plugins/openviking
-      cp $OV_REPO/examples/opencode-plugin/wrappers/openviking.mjs ~/.config/opencode/plugins/openviking.mjs
-      cp $OV_REPO/examples/opencode-plugin/index.mjs $OV_REPO/examples/opencode-plugin/package.json ~/.config/opencode/plugins/openviking/
-      cp -r $OV_REPO/examples/opencode-plugin/lib ~/.config/opencode/plugins/openviking/
-      npm --prefix ~/.config/opencode/plugins/openviking install
 
       # Codex plugin (upstream canonical — no fork)
       if command -v codex >/dev/null 2>&1; then
@@ -67,6 +60,5 @@ linux[whoami.distro^="Arch"]:
     systemd/openviking.service: ~/.config/systemd/user/openviking.service
     scripts/openviking-render-config: ~/.local/bin/openviking-render-config
     scripts/openviking-server-wrapper: ~/.local/bin/openviking-server-wrapper
-    openviking-config.json: ~/.config/opencode/plugins/openviking-config.json
     openviking-codex.zsh: ~/.config/zsh/5003_openviking_codex.zsh
     openviking-claude.zsh: ~/.config/zsh/5004_openviking_claude.zsh

@@ -1,17 +1,18 @@
 ---
 name: openviking-profiles
-description: Provision, audit, or repair a per-project OpenViking memory profile across Codex, Claude Code, and OpenCode in the ~/.dotfiles repo. Use this whenever a project should get its own memory account, when an agent is recalling or capturing into the wrong OpenViking account, when memory recall is unexpectedly empty, when `viking://` reads return "nothing found", when adding a new repository to the dotfiles agent setup, or when someone asks why one agent has OpenViking and another does not. Also use before hand-editing ovcli-*.conf, openviking-claude.zsh, openviking-codex.zsh, or the opencode account wrapper — a partial edit routes hooks and MCP to different accounts and fails silently.
+description: Provision, audit, or repair a per-project OpenViking memory profile across Codex and Claude Code in the ~/.dotfiles repo. Use this whenever a project should get its own memory account, when an agent is recalling or capturing into the wrong OpenViking account, when memory recall is unexpectedly empty, when `viking://` reads return "nothing found", when adding a new repository to the dotfiles agent setup, or when someone asks why one agent has OpenViking and another does not. Also use before hand-editing ovcli-*.conf, openviking-claude.zsh, or openviking-codex.zsh — a partial edit routes hooks and MCP to different accounts and fails silently.
 ---
 
 # OpenViking Project Profiles
 
 A profile pins one repository tree to one OpenViking account, so work in that
 repo recalls and captures against its own memory bank instead of the shared
-`local-dev` one. Three agents consume the same profiles — Codex, Claude Code,
-and OpenCode — and each reads the identity through a different mechanism.
+`local-dev` one. The maintained development harnesses, Codex and Claude Code,
+consume the same profiles through different mechanisms. OpenCode is deprecated; its retained
+wrapper is not part of provisioning or validation.
 
 That last point is the whole reason this skill exists. Wiring a profile touches
-six files, and the failure mode for a partial job is silence: recall still
+multiple files, and the failure mode for a partial job is silence: recall still
 works, capture still works, and the memories land somewhere you didn't intend.
 Nothing errors. Work the checklist rather than pattern-matching one file.
 
@@ -22,7 +23,6 @@ Nothing errors. Work the checklist rather than pattern-matching one file.
 | Codex | plugin MCP + hooks | `OPENVIKING_CLI_CONFIG_FILE`, resolved to env by upstream's `ov-credentials.mjs` |
 | Claude hooks | `scripts/config.mjs` | `OPENVIKING_CLI_CONFIG_FILE` → the conf file directly |
 | Claude MCP | plugin `.mcp.json` headers | `OPENVIKING_ACCOUNT` / `OPENVIKING_USER` **env vars only** |
-| OpenCode | plugin | `OPENVIKING_ACCOUNT` / `OPENVIKING_USER` / `OPENVIKING_AGENT_ID` env vars |
 
 Claude is the one that bites: its hooks and its MCP server resolve identity
 through *different* channels. Set the config file but not the env vars and the
@@ -53,13 +53,11 @@ is jj-colocated.
 **3. Link it in `ai/openviking/dot.yaml`** under `links:`:
 `ovcli-<project>.conf: ~/.openviking/ovcli-<project>.conf`
 
-**4. Add the branch to all three wrappers.** The two zsh helpers return a
-*config path*; the OpenCode one returns an *account name*. Same `case`
-structure, different return value — don't copy the wrong one.
+**4. Add the branch to both maintained wrappers.** Both zsh helpers return a
+*config path*.
 
 - `ai/openviking/openviking-claude.zsh` → `_openviking_claude_cli_config`
 - `ai/openviking/openviking-codex.zsh` → `_openviking_codex_cli_config`
-- `ai/opencode/opencode.zsh` → `_openviking_opencode_account`
 
 Each matches both the root and its descendants:
 
@@ -73,9 +71,9 @@ If one project root nests inside another, put the more specific branch first —
 `case` takes the first match.
 
 **5. Add assertions to `ai/openviking/tests/openviking_codex_profile.test.zsh`.**
-Nine per project: root / child / non-project for each of the three agents, plus
-an identity assertion that the Claude account export agrees with the config
-selection. That last one is what catches the hooks-vs-MCP divergence.
+Cover root / child / non-project paths for both harnesses, plus an identity
+assertion that the Claude account export agrees with the config selection.
+That last one is what catches the hooks-vs-MCP divergence.
 
 **6. Update the docs.** `ai/openviking/README.md` (profile list), and
 `ai/agent-skills/okf-knowledge-ops/references/openviking.md` (the Profile Gate
@@ -107,7 +105,7 @@ supports correct routing; identical content calls for checking the selected
 account and MCP identity before diagnosing an export failure. A brand-new
 account correctly returns "nothing found".
 
-For an authorized live Codex or OpenCode check, start a fresh session in the
+For an authorized live Codex check, start a fresh session in the
 project and confirm recall cites that project's material. Otherwise report the
 static routing results and leave live model verification untested.
 

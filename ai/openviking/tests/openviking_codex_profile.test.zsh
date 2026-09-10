@@ -4,7 +4,6 @@ set -euo pipefail
 repo_root=${0:A:h:h:h:h}
 source "$repo_root/ai/openviking/openviking-codex.zsh"
 source "$repo_root/ai/openviking/openviking-claude.zsh"
-source "$repo_root/ai/opencode/opencode.zsh"
 unset OPENVIKING_CLI_CONFIG_FILE
 
 assert_eq() {
@@ -48,10 +47,5 @@ assert_eq "OPENVIKING_ACCOUNT=local-dev" "$(claude_account "$default_conf")" "Cl
 assert_eq "OPENVIKING_USER=carlos" "$(_openviking_claude_identity "$xbol_conf" | grep '^OPENVIKING_USER=' || true)" "Claude identity exports user"
 assert_eq "" "$(_openviking_claude_identity "$xbol_conf" | grep '^OPENVIKING_API_KEY=' || true)" "Claude identity omits empty api_key"
 assert_eq "" "$(_openviking_claude_identity "$HOME/.openviking/does-not-exist.conf")" "Claude identity is empty for a missing config"
-
-assert_eq "xbol" "$(_openviking_opencode_account /home/carlos/Development/XBOL/xbol-api-admin)" "OpenCode XBOL child uses XBOL account"
-assert_eq "iteramind-dev" "$(_openviking_opencode_account /home/carlos/Development/ITERAMIND)" "OpenCode Iteramind root uses Iteramind account"
-assert_eq "iteramind-dev" "$(_openviking_opencode_account /home/carlos/Development/ITERAMIND/projects/example)" "OpenCode Iteramind child uses Iteramind account"
-assert_eq "local-dev" "$(_openviking_opencode_account /home/carlos/.dotfiles)" "OpenCode other paths use default account"
 
 print "ok"

@@ -13,54 +13,40 @@ global:
     bro:
       - ~/.agents/skills/bro
       - ~/.claude/skills/bro
-      - ~/.config/opencode/skills/bro
     manage-course-notebooks:
       - ~/.agents/skills/manage-course-notebooks
       - ~/.claude/skills/manage-course-notebooks
-      - ~/.config/opencode/skills/manage-course-notebooks
     okf-knowledge-ops:
       - ~/.agents/skills/okf-knowledge-ops
       - ~/.claude/skills/okf-knowledge-ops
-      - ~/.config/opencode/skills/okf-knowledge-ops
     okf-toolkit-maintenance:
       - ~/.agents/skills/okf-toolkit-maintenance
       - ~/.claude/skills/okf-toolkit-maintenance
-      - ~/.config/opencode/skills/okf-toolkit-maintenance
     okf-shared-bundle:
       - ~/.agents/skills/okf-shared-bundle
       - ~/.claude/skills/okf-shared-bundle
-      - ~/.config/opencode/skills/okf-shared-bundle
     openviking-profiles:
       - ~/.agents/skills/openviking-profiles
       - ~/.claude/skills/openviking-profiles
-      - ~/.config/opencode/skills/openviking-profiles
     polychrome-journal-ops:
       - ~/.agents/skills/polychrome-journal-ops
       - ~/.claude/skills/polychrome-journal-ops
-      - ~/.config/opencode/skills/polychrome-journal-ops
     financial-planning:
       - ~/.agents/skills/financial-planning
-      - ~/.config/opencode/skills/financial-planning
     brain-portal:
       - ~/.agents/skills/brain-portal
       - ~/.claude/skills/brain-portal
-      - ~/.config/opencode/skills/brain-portal
     plain-english:
       - ~/.agents/skills/plain-english
       - ~/.claude/skills/plain-english
-      - ~/.config/opencode/skills/plain-english
     operational-report:
       - ~/.agents/skills/operational-report
       - ~/.claude/skills/operational-report
-      - ~/.config/opencode/skills/operational-report
     git-commit/commands/git-commit.md:
-      - ~/.config/opencode/commands/git-commit.md
       - ~/.claude/commands/git-commit.md
     slop-clean/commands/slop-clean.md:
-      - ~/.config/opencode/commands/slop-clean.md
       - ~/.claude/commands/slop-clean.md
     grill-with-docs/commands/grill-with-docs.md:
-      - ~/.config/opencode/commands/grill-with-docs.md
       - ~/.claude/commands/grill-with-docs.md
 linux:
   links:
