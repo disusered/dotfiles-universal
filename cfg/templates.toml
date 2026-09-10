@@ -3,6 +3,8 @@
 
 [templates]
 # name = { path = "relative/to/dotfiles", reload = "command" }
+# AI
+dsh-theme = { path = "ai/deepseek-harness/plugins/cfg-theme/lib/client.js.tera" }
 mako = { path = "tools/mako/config.tera", reload = "makoctl reload" }
 btop = { path = "tools/btop/catppuccin_mocha.theme.tera" }
 eza = { path = "tools/eza/catppuccin.yml.tera" }

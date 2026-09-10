@@ -50,10 +50,48 @@ settings, so the value is never echoed back to the page.
 Use the same credential as the Codex module:
 `op://Personal/Deepseek/credential`.
 
+## Theme
+
+The Web UI wears the machine's Catppuccin palette. DSH ships its palette as
+two CSS layers of `--dsw-*` custom properties on `body` — a static literal
+layer and a semantic alias layer defined purely as `var()` indirections. The
+`cfg-theme` client plugin re-points the **static** layer at the cfg theme and
+leaves the alias layer alone, so every semantic token keeps its designed
+meaning and the whole interface re-tints at once.
+
+| Piece | Path |
+| --- | --- |
+| Template (source of truth) | `plugins/cfg-theme/lib/client.js.tera` |
+| Rendered bundle | `plugins/cfg-theme/lib/client.js` |
+| Host half | `plugins/cfg-theme/lib/index.js` |
+| Registry entry | `cfg/templates.toml` → `dsh-theme` |
+| Installed plugin | `~/.dsh/plugins/cfg-theme` (symlink to this module) |
+| Profile resolution | `~/.dsh/profiles/node_modules/cfg-theme` → the plugin |
+| Activation row | `$DSH_HOME/cordis.patch.yml` (hand-written by the install step) |
+
+Dark mode wears the active cfg flavor (`flavor` in `cfg/config.toml`, whose
+palette also supplies the reminder, status, and accent hues). Light mode wears
+Catppuccin Latte, the light counterpart of that flavor; `primary` supplies the
+accent in both modes and `secondary` supplies the error ramp, so
+`cfg theme --set primary=pink --apply` moves the harness with every other
+themed surface.
+
+Re-render after editing the template:
+
+```bash
+cfg update dsh-theme
+```
+
+The harness watches the bundle, so a re-rendered `client.js` reaches a live
+browser within seconds. A brand-new plugin package or composition row only
+reaches an already-running service when that service re-composes: restart the
+unit, or run the profile patch path the harness watches.
+
 ## Verify a change
 
 ```bash
 dsh --profile web --dump-config | grep -A8 'llm-deepseek'
+dsh --profile web --dump-config | grep -A3 cfg-theme
 dsh --profile headless --patch ~/.dsh/profiles/web/cordis.patch.yml "Reply with OK"
 ```
 

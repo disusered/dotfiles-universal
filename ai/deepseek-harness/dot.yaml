@@ -1,9 +1,22 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      mkdir -p ~/.dsh ~/.local/share/deepseek-harness/runtime
+      set -eu
+      mkdir -p ~/.dsh/profiles/node_modules ~/.local/share/deepseek-harness/runtime
       npm install --prefix ~/.local/share/deepseek-harness/runtime --no-audit --no-fund --save-exact @deepseek-ai/dsh@0.1.0-rc.6
       ~/.rotz/bin/rotz link /ai/deepseek-harness -f
+      # Flat module fallback: the web profile resolves `cfg-theme` through this
+      # link. The profile-boot healing routine only rewrites real directories,
+      # so a symlink added here survives every boot.
+      ln -sfn ~/.dsh/plugins/cfg-theme ~/.dsh/profiles/node_modules/cfg-theme
+      # Home-level user patch ($DSH_HOME/cordis.patch.yml), applied over every
+      # profile's own layer. Machine-local Harness state, so its content is
+      # written here rather than linked; re-running this is idempotent.
+      patch=~/.dsh/cordis.patch.yml
+      row="$(printf '%s\n' '- insert:' '    - id: cfg-theme' '      name: cfg-theme')"
+      if [ ! -f "$patch" ]; then printf '%s\n' "$row" > "$patch"
+      elif ! grep -q 'id: cfg-theme' "$patch"; then printf '%s\n' "$row" >> "$patch"
+      fi
       systemctl --user daemon-reload
       systemctl --user enable --now deepseek-harness.service
       ~/.local/bin/dsh --version
@@ -11,6 +24,7 @@ linux[whoami.distro^="Arch"]:
       - /languages/javascript/node/latest
       - /ai/cliproxyapi
   links:
+    plugins/cfg-theme: ~/.dsh/plugins/cfg-theme
     profiles/web/cordis.patch.yml: ~/.dsh/profiles/web/cordis.patch.yml
     scripts/dsh: ~/.local/bin/dsh
     systemd/deepseek-harness.service: ~/.config/systemd/user/deepseek-harness.service

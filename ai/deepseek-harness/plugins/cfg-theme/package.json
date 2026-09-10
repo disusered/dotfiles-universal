@@ -1,0 +1,17 @@
+{
+  "name": "cfg-theme",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DeepSeek Harness Web palette rendered from the cfg theme (Catppuccin).",
+  "type": "module",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web"
+    }
+  }
+}

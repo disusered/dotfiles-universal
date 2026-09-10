@@ -1,0 +1,267 @@
+{#-
+  cfg-theme — the DeepSeek Harness palette, rendered from the cfg theme.
+
+  DSH ships its palette as two CSS layers on body (see
+  @deepseek-ai/dsh-client-ui-theme/lib/styles/design-platform.css): 73
+  --dsw-static-* literals and 89 --dsw-alias-* semantic tokens that are pure
+  var() indirections over them. The shipped alias layer is left completely
+  alone: this file re-points only the static layer, so every alias keeps its
+  designed meaning and the whole UI re-tints at once.
+
+  Dark mode wears the active cfg flavor (flavor={{ flavor }}, primary={{ primary_name }},
+  secondary={{ secondary_name }}); light mode wears Catppuccin Latte, the
+  flavor's light counterpart. cfg's template context exposes only the active
+  flavor's palette, so the Latte step of each color name is inlined in the
+  latte() macro below — the names still come from cfg, which is why
+  'cfg theme --set primary=pink --apply' moves both modes together.
+
+  Rendered by: cfg update cfg-theme   (registry: cfg/templates.toml)
+  Consumer:    ~/.dsh/plugins/cfg-theme/lib/client.js (linked from this tree)
+-#}
+{%- macro latte(name) -%}
+{%- if name == "rosewater" -%}dc8a78{%- elif name == "flamingo" -%}dd7878{%- elif name == "pink" -%}ea76cb{%- elif name == "mauve" -%}8839ef{%- elif name == "red" -%}d20f39{%- elif name == "maroon" -%}e64553{%- elif name == "peach" -%}fe640b{%- elif name == "yellow" -%}df8e1d{%- elif name == "green" -%}40a02b{%- elif name == "teal" -%}179299{%- elif name == "sky" -%}04a5e5{%- elif name == "sapphire" -%}209fb5{%- elif name == "blue" -%}1e66f5{%- elif name == "lavender" -%}7287fd{%- elif name == "text" -%}4c4f69{%- elif name == "subtext1" -%}5c5f77{%- elif name == "subtext0" -%}6c6f85{%- elif name == "overlay2" -%}7c7f93{%- elif name == "overlay1" -%}8c8fa1{%- elif name == "overlay0" -%}9ca0b0{%- elif name == "surface2" -%}acb0be{%- elif name == "surface1" -%}bcc0cc{%- elif name == "surface0" -%}ccd0da{%- elif name == "base" -%}eff1f5{%- elif name == "mantle" -%}e6e9ef{%- elif name == "crust" -%}dce0e8{%- endif -%}
+{%- endmacro -%}
+{%- set accent = self::latte(name=primary_name) -%}
+{%- set accent_alt = self::latte(name=secondary_name) -%}
+{%- set latte_base = self::latte(name="base") -%}
+window.__ModuleLoader__.load({
+	id: "cfg-theme",
+	factory: (require) => {
+		var module = { exports: {} };
+		var exports = module.exports;
+		Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+		/** Cordis plugin name; also the bundle id the host serves. */
+		const name = "cfg-theme";
+		/** Required services: none — the override is a document-level stylesheet. */
+		const inject = [];
+		/** Tag identity, mirroring the bundled-sheet convention of the shipped packages. */
+		const STYLE_SOURCE = "cfg-theme/theme.css";
+		/**
+		* The cfg-rendered token override. Its selectors outrank the shipped
+		* sheets (html body = 0,0,2 over body = 0,0,1; html body[data-ds-dark-theme]
+		* = 0,1,2 over body[data-ds-dark-theme] = 0,1,1), and because the alias
+		* layer resolves through var() at its use site, re-pointing the static
+		* layer here reaches every surface the shipped palette reached.
+		*/
+		const css = `
+/* ---------------------------------------------------------------------------
+   Light — Catppuccin Latte. Canvas is latte base; surfaces walk down the Latte
+   grey ramp; text walks up from dimmed (subtext0) to primary (text).
+   --------------------------------------------------------------------------- */
+html body {
+  --dsw-static-amber-100: color-mix(in srgb, #{{ self::latte(name="yellow") }} 18%, #{{ latte_base }});
+  --dsw-static-amber-400: color-mix(in srgb, #{{ self::latte(name="yellow") }} 72%, #{{ latte_base }});
+  --dsw-static-amber-500: color-mix(in srgb, #{{ self::latte(name="yellow") }} 74%, #{{ self::latte(name="text") }});
+  --dsw-static-amber-600: color-mix(in srgb, #{{ self::latte(name="peach") }} 76%, #{{ self::latte(name="text") }});
+  --dsw-static-amber-900: color-mix(in srgb, #{{ self::latte(name="peach") }} 55%, #{{ self::latte(name="text") }});
+
+  --dsw-static-blue-50: color-mix(in srgb, #{{ accent }} 10%, #{{ latte_base }});
+  --dsw-static-blue-50p: color-mix(in srgb, #{{ accent }} 12%, #{{ latte_base }});
+  --dsw-static-blue-75: color-mix(in srgb, #{{ accent }} 16%, #{{ latte_base }});
+  --dsw-static-blue-100: color-mix(in srgb, #{{ accent }} 22%, #{{ latte_base }});
+  --dsw-static-blue-300: color-mix(in srgb, #{{ accent }} 42%, #{{ latte_base }});
+  --dsw-static-blue-400: #{{ accent }};
+  --dsw-static-blue-450: #{{ accent }};
+  --dsw-static-blue-500: #{{ accent }};
+  --dsw-static-blue-600: color-mix(in srgb, #{{ accent }} 70%, #{{ latte_base }});
+  --dsw-static-blue-800: color-mix(in srgb, #{{ accent }} 45%, #{{ latte_base }});
+  --dsw-static-blue-900: #{{ accent }};
+  --dsw-static-blue-950: color-mix(in srgb, #{{ accent }} 25%, #{{ latte_base }});
+
+  --dsw-static-deepseek-50: color-mix(in srgb, #{{ accent }} 9%, #{{ latte_base }});
+  --dsw-static-deepseek-100: color-mix(in srgb, #{{ accent }} 16%, #{{ latte_base }});
+  --dsw-static-deepseek-200: color-mix(in srgb, #{{ accent }} 26%, #{{ latte_base }});
+  --dsw-static-deepseek-300: color-mix(in srgb, #{{ accent }} 40%, #{{ latte_base }});
+  --dsw-static-deepseek-400: #{{ self::latte(name="mauve") }};
+  --dsw-static-deepseek-450: #{{ accent }};
+  --dsw-static-deepseek-500: #{{ accent }};
+  --dsw-static-deepseek-600: color-mix(in srgb, #{{ accent }} 55%, #{{ latte_base }});
+  --dsw-static-deepseek-700-delete: color-mix(in srgb, #{{ accent }} 45%, #{{ latte_base }});
+  --dsw-static-deepseek-800: color-mix(in srgb, #{{ accent }} 35%, #{{ latte_base }});
+  --dsw-static-deepseek-900: color-mix(in srgb, #{{ accent }} 30%, #{{ latte_base }});
+
+  --dsw-static-green-100: color-mix(in srgb, #{{ self::latte(name="green") }} 16%, #{{ latte_base }});
+  --dsw-static-green-400: color-mix(in srgb, #{{ self::latte(name="green") }} 65%, #{{ latte_base }});
+  --dsw-static-green-500: color-mix(in srgb, #{{ self::latte(name="green") }} 78%, #{{ self::latte(name="text") }});
+  --dsw-static-green-900: color-mix(in srgb, #{{ self::latte(name="green") }} 55%, #{{ self::latte(name="text") }});
+
+  --dsw-static-neutral-00: #{{ self::latte(name="base") }};
+  --dsw-static-neutral-50: #{{ self::latte(name="mantle") }};
+  --dsw-static-neutral-100: #{{ self::latte(name="crust") }};
+  --dsw-static-neutral-150: #{{ self::latte(name="surface0") }};
+  --dsw-static-neutral-200: #{{ self::latte(name="surface0") }};
+  --dsw-static-neutral-250: #{{ self::latte(name="surface1") }};
+  --dsw-static-neutral-300: #{{ self::latte(name="surface1") }};
+  --dsw-static-neutral-400: #{{ self::latte(name="overlay0") }};
+  --dsw-static-neutral-500: #{{ self::latte(name="overlay2") }};
+  --dsw-static-neutral-550: #{{ self::latte(name="subtext0") }};
+  --dsw-static-neutral-600: #{{ self::latte(name="subtext1") }};
+  --dsw-static-neutral-700: #{{ self::latte(name="text") }};
+  --dsw-static-neutral-800: #{{ self::latte(name="crust") }};
+  --dsw-static-neutral-850: #{{ self::latte(name="mantle") }};
+  --dsw-static-neutral-900: #{{ self::latte(name="base") }};
+  --dsw-static-neutral-1000: #{{ self::latte(name="base") }};
+
+  --dsw-static-neutral-bluish-00: #{{ self::latte(name="base") }};
+  --dsw-static-neutral-bluish-50: #{{ self::latte(name="mantle") }};
+  --dsw-static-neutral-bluish-60: #{{ self::latte(name="crust") }};
+  --dsw-static-neutral-bluish-75: #{{ self::latte(name="surface0") }};
+  --dsw-static-neutral-bluish-100: #{{ self::latte(name="surface1") }};
+  --dsw-static-neutral-bluish-150: #{{ self::latte(name="surface0") }};
+  --dsw-static-neutral-bluish-200: #{{ self::latte(name="surface2") }};
+  --dsw-static-neutral-bluish-300: #{{ self::latte(name="overlay1") }};
+  --dsw-static-neutral-bluish-400: #{{ self::latte(name="overlay1") }};
+  --dsw-static-neutral-bluish-500: #{{ self::latte(name="overlay2") }};
+  --dsw-static-neutral-bluish-600: #{{ self::latte(name="subtext0") }};
+  --dsw-static-neutral-bluish-700: #{{ self::latte(name="subtext1") }};
+  /* The light theme's two dark chips: toast fill and tooltip fill. The tooltip
+     renders its text in --dsw-static-neutral-bluish-00 (see the frontend
+     bundle's .bubble rule), so its fill must stay dark in both palettes. */
+  --dsw-static-neutral-bluish-750: #{{ self::latte(name="overlay2") }};
+  --dsw-static-neutral-bluish-800: #{{ self::latte(name="text") }};
+  --dsw-static-neutral-bluish-850: #{{ self::latte(name="text") }};
+  --dsw-static-neutral-bluish-875: #{{ self::latte(name="crust") }};
+  --dsw-static-neutral-bluish-900: #{{ self::latte(name="crust") }};
+  --dsw-static-neutral-bluish-950: #{{ self::latte(name="subtext0") }};
+  --dsw-static-neutral-bluish-1000: #{{ self::latte(name="text") }};
+
+  --dsw-static-red-50: color-mix(in srgb, #{{ accent_alt }} 10%, #{{ latte_base }});
+  --dsw-static-red-100: color-mix(in srgb, #{{ accent_alt }} 16%, #{{ latte_base }});
+  --dsw-static-red-400: color-mix(in srgb, #{{ accent_alt }} 70%, #{{ latte_base }});
+  --dsw-static-red-500: #{{ accent_alt }};
+  --dsw-static-red-600: #{{ accent_alt }};
+  --dsw-static-red-900: color-mix(in srgb, #{{ accent_alt }} 55%, #{{ self::latte(name="text") }});
+
+  /* The alias layer's only literals. The other 85 alias tokens are var()
+     indirections and are deliberately not restated here. */
+  --dsw-alias-brand-primary: #{{ accent }};
+  --dsw-alias-brand-text: #{{ accent }};
+  --dsw-alias-brand-primary-new-colorprimary-new-color: #{{ accent }};
+  --dsw-alias-button-primary-hover: color-mix(in srgb, #{{ accent }} 85%, #{{ self::latte(name="text") }});
+  /* The composer's send button paints a hardcoded white glyph on this fill
+     (.uV2eYG_primary in ui-conversation). Latte's accent is already the deep
+     step, so the fill is the accent itself and the hover deepens it. */
+  --dsw-alias-button-info-fill: #{{ accent }};
+  --dsw-alias-button-info-hover: color-mix(in srgb, #{{ accent }} 85%, #{{ self::latte(name="text") }});
+}
+
+/* ---------------------------------------------------------------------------
+   Dark — the active cfg flavor ({{ flavor }}). Canvas is base; the sidebar and
+   code blocks sit on mantle below it; raised surfaces walk surface0 → surface1
+   → surface2 → overlay0.
+   --------------------------------------------------------------------------- */
+html body[data-ds-dark-theme] {
+  --dsw-static-amber-100: color-mix(in srgb, #{{ yellow | hex }} 18%, #{{ base | hex }});
+  --dsw-static-amber-400: color-mix(in srgb, #{{ yellow | hex }} 55%, #{{ base | hex }});
+  --dsw-static-amber-500: #{{ yellow | hex }};
+  --dsw-static-amber-600: #{{ peach | hex }};
+  --dsw-static-amber-900: color-mix(in srgb, #{{ yellow | hex }} 16%, #{{ base | hex }});
+
+  --dsw-static-blue-50: color-mix(in srgb, #{{ primary | hex }} 12%, #{{ base | hex }});
+  --dsw-static-blue-50p: color-mix(in srgb, #{{ primary | hex }} 16%, #{{ base | hex }});
+  --dsw-static-blue-75: color-mix(in srgb, #{{ primary | hex }} 22%, #{{ base | hex }});
+  --dsw-static-blue-100: color-mix(in srgb, #{{ primary | hex }} 30%, #{{ base | hex }});
+  --dsw-static-blue-300: color-mix(in srgb, #{{ primary | hex }} 60%, #{{ base | hex }});
+  --dsw-static-blue-400: #{{ primary | hex }};
+  --dsw-static-blue-450: #{{ primary | hex }};
+  --dsw-static-blue-500: color-mix(in srgb, #{{ primary | hex }} 85%, #{{ crust | hex }});
+  --dsw-static-blue-600: color-mix(in srgb, #{{ primary | hex }} 65%, #{{ base | hex }});
+  --dsw-static-blue-800: color-mix(in srgb, #{{ primary | hex }} 30%, #{{ base | hex }});
+  --dsw-static-blue-900: #{{ primary | hex }};
+  --dsw-static-blue-950: color-mix(in srgb, #{{ primary | hex }} 18%, #{{ base | hex }});
+
+  --dsw-static-deepseek-50: color-mix(in srgb, #{{ primary | hex }} 10%, #{{ base | hex }});
+  --dsw-static-deepseek-100: color-mix(in srgb, #{{ primary | hex }} 16%, #{{ base | hex }});
+  --dsw-static-deepseek-200: color-mix(in srgb, #{{ primary | hex }} 34%, #{{ base | hex }});
+  --dsw-static-deepseek-300: color-mix(in srgb, #{{ primary | hex }} 55%, #{{ base | hex }});
+  --dsw-static-deepseek-400: #{{ primary | hex }};
+  --dsw-static-deepseek-450: #{{ primary | hex }};
+  --dsw-static-deepseek-500: color-mix(in srgb, #{{ primary | hex }} 80%, #{{ crust | hex }});
+  --dsw-static-deepseek-600: color-mix(in srgb, #{{ primary | hex }} 68%, #{{ base | hex }});
+  --dsw-static-deepseek-700-delete: color-mix(in srgb, #{{ primary | hex }} 52%, #{{ base | hex }});
+  --dsw-static-deepseek-800: color-mix(in srgb, #{{ primary | hex }} 22%, #{{ base | hex }});
+  --dsw-static-deepseek-900: color-mix(in srgb, #{{ primary | hex }} 12%, #{{ base | hex }});
+
+  --dsw-static-green-100: color-mix(in srgb, #{{ green | hex }} 18%, #{{ base | hex }});
+  --dsw-static-green-400: color-mix(in srgb, #{{ green | hex }} 70%, #{{ base | hex }});
+  --dsw-static-green-500: #{{ green | hex }};
+  --dsw-static-green-900: color-mix(in srgb, #{{ green | hex }} 16%, #{{ base | hex }});
+
+  --dsw-static-neutral-00: #{{ text | hex }};
+  --dsw-static-neutral-50: #{{ subtext1 | hex }};
+  --dsw-static-neutral-100: #{{ subtext0 | hex }};
+  --dsw-static-neutral-150: #{{ overlay2 | hex }};
+  --dsw-static-neutral-200: #{{ overlay1 | hex }};
+  --dsw-static-neutral-250: #{{ overlay0 | hex }};
+  --dsw-static-neutral-300: #{{ overlay0 | hex }};
+  --dsw-static-neutral-400: #{{ overlay1 | hex }};
+  --dsw-static-neutral-500: #{{ overlay0 | hex }};
+  --dsw-static-neutral-550: #{{ overlay0 | hex }};
+  --dsw-static-neutral-600: #{{ surface2 | hex }};
+  --dsw-static-neutral-700: #{{ surface1 | hex }};
+  --dsw-static-neutral-800: #{{ surface0 | hex }};
+  --dsw-static-neutral-850: #{{ surface0 | hex }};
+  --dsw-static-neutral-900: #{{ mantle | hex }};
+  --dsw-static-neutral-1000: #{{ crust | hex }};
+
+  --dsw-static-neutral-bluish-00: #{{ text | hex }};
+  --dsw-static-neutral-bluish-50: #{{ text | hex }};
+  --dsw-static-neutral-bluish-60: #{{ subtext0 | hex }};
+  --dsw-static-neutral-bluish-75: #{{ overlay2 | hex }};
+  --dsw-static-neutral-bluish-100: #{{ overlay2 | hex }};
+  --dsw-static-neutral-bluish-150: #{{ overlay0 | hex }};
+  --dsw-static-neutral-bluish-200: #{{ overlay0 | hex }};
+  --dsw-static-neutral-bluish-300: #{{ subtext1 | hex }};
+  --dsw-static-neutral-bluish-400: #{{ subtext0 | hex }};
+  --dsw-static-neutral-bluish-500: #{{ overlay2 | hex }};
+  --dsw-static-neutral-bluish-600: #{{ overlay1 | hex }};
+  --dsw-static-neutral-bluish-700: #{{ surface1 | hex }};
+  --dsw-static-neutral-bluish-750: #{{ surface1 | hex }};
+  --dsw-static-neutral-bluish-800: #{{ surface1 | hex }};
+  --dsw-static-neutral-bluish-850: #{{ surface0 | hex }};
+  --dsw-static-neutral-bluish-875: color-mix(in srgb, #{{ base | hex }} 55%, #{{ surface0 | hex }});
+  --dsw-static-neutral-bluish-900: #{{ mantle | hex }};
+  --dsw-static-neutral-bluish-950: #{{ base | hex }};
+  --dsw-static-neutral-bluish-1000: #{{ crust | hex }};
+
+  --dsw-static-red-50: color-mix(in srgb, #{{ secondary | hex }} 12%, #{{ base | hex }});
+  --dsw-static-red-100: color-mix(in srgb, #{{ secondary | hex }} 18%, #{{ base | hex }});
+  --dsw-static-red-400: #{{ secondary | hex }};
+  --dsw-static-red-500: color-mix(in srgb, #{{ secondary | hex }} 80%, #{{ crust | hex }});
+  --dsw-static-red-600: #{{ secondary | hex }};
+  --dsw-static-red-900: color-mix(in srgb, #{{ secondary | hex }} 16%, #{{ base | hex }});
+
+  --dsw-alias-brand-primary: #{{ primary | hex }};
+  --dsw-alias-brand-text: #{{ primary | hex }};
+  --dsw-alias-brand-primary-new-colorprimary-new-color: #{{ primary | hex }};
+  --dsw-alias-button-primary-hover: color-mix(in srgb, #{{ primary | hex }} 80%, #{{ crust | hex }});
+  /* Same white glyph, opposite step: the shipped dark theme pairs it with the
+     bright brand step (deepseek-400, never -500), so this fill is the accent
+     itself — the same value as --dsw-alias-brand-primary. The Latte reading
+     used here before rendered as a second, deeper purple beside it. */
+  --dsw-alias-button-info-fill: #{{ primary | hex }};
+  --dsw-alias-button-info-hover: color-mix(in srgb, #{{ primary | hex }} 85%, #{{ base | hex }});
+}
+`;
+		/**
+		* Mount the override: one plugin-owned style tag in head, removed on
+		* dispose (and by the client HMR reload path, which drops every
+		* style[data-plugin="cfg-theme"] before re-running this apply).
+		* @param ctx - client cordis context.
+		*/
+		function apply(ctx) {
+			ctx.effect(() => {
+				const el = document.createElement("style");
+				el.dataset.plugin = name;
+				el.dataset.pluginCss = STYLE_SOURCE;
+				el.textContent = css;
+				document.head.append(el);
+				return () => el.remove();
+			}, "cfg-theme: Catppuccin palette override");
+		}
+		exports.apply = apply;
+		exports.inject = inject;
+		exports.name = name;
+		return module.exports;
+	}
+});
