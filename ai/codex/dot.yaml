@@ -7,6 +7,9 @@ linux|darwin:
       - /ai/agent-skills
       - /ai/agents
   links:
+    deepseek.config.toml: ~/.codex/deepseek.config.toml
+    deepseek-models.json: ~/.codex/deepseek-models.json
+    deepseek.zsh: ~/.config/zsh/5006_codex_deepseek.zsh
     config.toml: ~/.codex/config.toml
     rules: ~/.codex/rules/
     mcp-servers/stitch/env.tpl: ~/.codex/mcp-servers/stitch/env.tpl
