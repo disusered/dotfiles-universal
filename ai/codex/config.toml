@@ -408,3 +408,7 @@ enabled = true
 
 [plugins."skyrim-courier@personal"]
 enabled = true
+
+[mcp_servers.portal-tasks]
+command = "node"
+args = ["/home/carlos/Development/ME/herding-cats/projects/brain-portal/apps/mcp/dist/bin.js"]
