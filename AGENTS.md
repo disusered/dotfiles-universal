@@ -27,8 +27,8 @@ This is a universal dotfiles repository managed by [Rotz](https://github.com/vol
 # Link dotfiles without running installation commands
 ~/.rotz/bin/rotz link
 
-# Check status of dotfiles
-~/.rotz/bin/rotz status
+# Dry-run the link plan
+~/.rotz/bin/rotz -r link
 ```
 
 ## Architecture
