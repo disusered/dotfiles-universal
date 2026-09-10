@@ -1,4 +1,7 @@
 global:
+  installs:
+    # No-op command; see ai/agent-instructions/dot.yaml for why it is needed.
+    cmd: "true"
   links:
     fact-checker.md: ~/.claude/agents/fact-checker.md
     fact_checker.toml: ~/.codex/agents/fact_checker.toml

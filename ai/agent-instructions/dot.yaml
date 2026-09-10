@@ -1,4 +1,9 @@
 global:
+  installs:
+    # Links-only module. rotz admits only modules that carry an `installs` block
+    # into its dependency graph, so without this no-op the `depends` edges in
+    # ai/claude and ai/codex fail as "Dependency ... was not found".
+    cmd: "true"
   links:
     AGENTS.md:
       - ~/.claude/CLAUDE.md
