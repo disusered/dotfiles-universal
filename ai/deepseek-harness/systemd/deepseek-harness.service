@@ -27,7 +27,7 @@ ProtectKernelLogs=true
 ProtectKernelModules=true
 ProtectKernelTunables=true
 ProtectSystem=strict
-ReadWritePaths=%h/.dsh %h/Development/ME/herding-cats
+ReadWritePaths=%h/.dsh %h/Development/ME/herding-cats %h/.dotfiles
 RestrictRealtime=true
 RestrictSUIDSGID=true
 
