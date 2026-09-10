@@ -8,7 +8,7 @@ Type=simple
 WorkingDirectory=%h/Development/ME/herding-cats
 Environment=DSH_HOME=%h/.dsh
 Environment=DSH_PERMISSION_MODE=danger-full-access
-ExecStart=%h/.local/bin/mise exec node@24 -- %h/.local/bin/dsh web --host 127.0.0.1 --port 43120 --trusted-host harness.disusered.com
+ExecStart=%h/.local/bin/mise exec node@24 -- %h/.local/bin/dsh web --host 127.0.0.1 --port 43120 --trusted-host harness.disusered.com --no-open
 Restart=on-failure
 RestartSec=3s
 TimeoutStartSec=120s
