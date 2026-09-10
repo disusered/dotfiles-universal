@@ -1,5 +1,6 @@
 personality = "pragmatic"
 approval_policy = "on-request"
+approvals_reviewer = "auto_review"
 sandbox_mode = "workspace-write"
 commit_attribution = ""
 model = "gpt-6-astra"
