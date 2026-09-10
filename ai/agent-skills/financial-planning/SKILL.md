@@ -1,11 +1,11 @@
 ---
 name: financial-planning
-description: Operate Carlos' private local-first financial ledger, purchase catalog, and explicit funding envelopes. Use when Carlos asks to record or revise a confirmed actual, retain a source-labelled quote, create or fund a purchase envelope piecemeal, inspect funding gaps, review YNAB spending evidence, or compare a purchase target with its funded balance.
+description: Operate the private local-first financial ledger, purchase catalog, and explicit funding envelopes. Use when asked to record or revise a confirmed actual, retain a source-labelled quote, create or fund a purchase envelope piecemeal, inspect funding gaps, review YNAB spending evidence, or compare a purchase target with its funded balance.
 ---
 
 # Financial Planning
 
-Treat Carlos' explicit decisions as the planning authority. Use hledger as the
+Treat the user's explicit decisions as the planning authority. Use hledger as the
 numeric record and calculation engine, the planner database as the purchase and
 research workboard, and YNAB only as read-only spending evidence. Never turn a
 historical spending statistic into money available for a purchase.
@@ -14,7 +14,7 @@ historical spending statistic into money available for a purchase.
 
 Run every command with this working directory:
 
-`/home/carlos/Development/ME/herding-cats/workshop/skunkworks/financial-ledger`
+`~/Development/ME/herding-cats/workshop/skunkworks/financial-ledger`
 
 Use only the verified CLI contract:
 
@@ -37,7 +37,7 @@ quotes, and raw YNAB evidence exactly. Let hledger derive totals and valuations.
 Treat the live financial-planner SQLite database as a purchase and research
 workboard, never as the source of envelope balances. Run these commands with:
 
-`/home/carlos/Development/ME/herding-cats/workshop/skunkworks/financial-planner`
+`~/Development/ME/herding-cats/workshop/skunkworks/financial-planner`
 
 Use only this bounded CLI:
 
@@ -53,7 +53,7 @@ do not put USD amounts into it or invent an FX conversion.
 
 Use the local dashboard to review payment state, fulfillment, envelope balances,
 funding gaps, and read-only YNAB spending signals. It may record hledger
-envelope contributions only after Carlos explicitly confirms the displayed
+envelope contributions only after the user explicitly confirms the displayed
 split. Never submit the suggested split as if it were approval.
 
 ## Start a finance turn
@@ -73,7 +73,7 @@ split. Never submit the suggested split as if it were approval.
 
 - Treat “I need/want X” as a possible quote or envelope, not permission to
   spend or fund it.
-- Add an actual only when Carlos explicitly confirms it. Keep the payment date
+- Add an actual only when the user explicitly confirms it. Keep the payment date
   exact; if it is unknown, record a migration/opening entry rather than invent
   one.
 - Append a new quote for a correction. Never overwrite an older quote,
@@ -89,7 +89,7 @@ Use this model:
 
 1. `Planning:Available` is confirmed planning money that has not been
    earmarked. It is not a monthly forecast and must not be auto-allocated.
-2. Create `Planning:Envelope:<Purchase>:Funded` only when Carlos explicitly
+2. Create `Planning:Envelope:<Purchase>:Funded` only when the user explicitly
    starts funding that purchase. A purchase may remain captured without an
    envelope.
 3. Record each contribution as an exact, dated transfer from
@@ -98,7 +98,7 @@ Use this model:
 4. Keep `Planning:Envelope:<Purchase>:Spent` separate. When a funded purchase is
    confirmed, move the consumed amount from `Funded` to `Spent`; when it was
    never prefunded, deduct it directly from `Planning:Available` into `Spent`.
-5. Never move money into, out of, or between envelopes without Carlos'
+5. Never move money into, out of, or between envelopes without the user's
    explicit allocation decision.
 6. Derive the funding target from the current source-backed quote components.
    Derive the funded balance from hledger. Use hledger or an exact command-line
@@ -118,7 +118,7 @@ Use this model:
 ## Funding projections
 
 - A funding projection is optional and uses only explicit future contribution
-  amounts and dates chosen by Carlos.
+  amounts and dates chosen by the user.
 - Without an explicit contribution schedule, report the current funding gap and
   no completion date.
 - Do not use planner capacity bands, automatic scenario allocation, YNAB Ready
@@ -136,7 +136,7 @@ or purchase status:
    records; do not carry forward a number from chat.
 4. Report what changed and whether the purchase is unpaid, partly paid,
    paid-pending, or complete.
-5. If Carlos supplied an explicit future contribution schedule, refresh its
+5. If the user supplied an explicit future contribution schedule, refresh its
    projected dates. Otherwise report no completion date.
 
 ## Quotes, actuals, and YNAB
@@ -144,7 +144,7 @@ or purchase status:
 - `ynab pull` is GET-only. It writes a raw private snapshot plus a generated
   pending journal; it never writes to YNAB.
 - Use YNAB to inspect merchants, categories, recurring charges, and spending
-  trends when Carlos asks where money went or where he may be overspending.
+  trends when asked where money went or whether spending is exceeding the plan.
 - Never use YNAB data to create or fund a purchase envelope, infer an envelope
   contribution, calculate future purchase funding, or authorize spending.
 - Review staged entries before reconciliation. Never automatically promote,

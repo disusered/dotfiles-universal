@@ -1,11 +1,11 @@
 ---
 name: polychrome-journal-ops
-description: Select and explicitly process the newest, last N, named, or revised Carlos-authored Neorg Black entries into revision-bound, attributed connection proposals and Zotero capture receipts without rewriting the human body. Use when Carlos asks to process Black, process latest entries, find connections to Polychrome, archive entry URLs in Zotero, review or reprocess stale entries, or accept or reject an existing proposal.
+description: Select and explicitly process the newest, last N, named, or revised Neorg Black entries into revision-bound, attributed connection proposals and Zotero capture receipts without rewriting the human body. Use when asked to process Black, process latest entries, find connections to Polychrome, archive entry URLs in Zotero, review or reprocess stale entries, or accept or reject an existing proposal.
 ---
 
 # Polychrome Journal Operations
 
-Preserve Carlos's authored narrative. Semantic work belongs in structured
+Preserve the author's narrative. Semantic work belongs in structured
 handoffs and Marginalia; deterministic tooling alone updates a Black managed
 section.
 
@@ -196,9 +196,9 @@ polychromectl proposal decide <id> \
 ```
 
 Replace `--accept` with `--reject` only when that is the explicit decision. Use
-the actor Carlos authorized and the actual decision time. Preserve the proposal
+the authorized actor and the actual decision time. Preserve the proposal
 and decision history. Use `--supersede` only for an undecided stale-revision
-proposal; it creates no Connection. When Carlos explicitly names a replacement,
+proposal; it creates no Connection. When the user explicitly names a replacement,
 add `--replacement-proposal <id>` to that supersede decision.
 
 Do not draft Red prose, publish, promote a Source, or write OpenViking memory
@@ -228,4 +228,4 @@ all remaining handoffs and its selection after reporting the outcome.
 Report the selection ID when selection was used; applied, failed, and
 not-attempted entry IDs and hashes; capture statuses; proposal IDs; validation
 actually run; stale results; unresolved prompts; and any OpenViking operation
-separately. Never present suggestions as Carlos's words or accepted knowledge.
+separately. Never present suggestions as the author's words or accepted knowledge.

@@ -1,6 +1,6 @@
 ---
 name: brain-portal
-description: Operate Carlos' private Brain Portal through its stable portalctl interface. Use when a request asks to validate, publish, list, or roll back a sourced infographic, table, metric view, or chart; inspect portal health; or make a bounded update to a portal workspace such as purchase research, sources, watches, observations, components, or receipts.
+description: Operate the private Brain Portal through its stable portalctl interface. Use when a request asks to validate, publish, list, or roll back a sourced infographic, table, metric view, or chart; inspect portal health; or make a bounded update to a portal workspace such as purchase research, sources, watches, observations, components, or receipts.
 ---
 
 # Brain Portal
@@ -12,7 +12,7 @@ is not a chatbot, an agent runtime, or a general-purpose database interface.
 ## Locate and Orient
 
 1. Use `${BRAIN_PORTAL_ROOT}` when set; otherwise use
-   `/home/carlos/Development/ME/herding-cats/projects/brain-portal`.
+   `~/Development/ME/herding-cats/projects/brain-portal`.
 2. Read `AGENTS.md` and `CONTEXT.md` in that project before changing behavior.
 3. Run `pnpm portalctl help` to verify the current command surface. Do not infer
    commands from this skill when the checked-out application differs.
@@ -58,7 +58,7 @@ They do not authorize a purchase, allocate money, or infer affordability.
 - Treat hledger as accounting authority, authored Markdown as Brain authority,
   and staged YNAB data as read-only evidence.
 - Keep exact personal finance values and receipt contents out of Git, Brain
-  pages, logs, and chat summaries unless Carlos explicitly requests them.
+  pages, logs, and chat summaries unless explicitly requested.
 - Use the separate `financial-planning` skill when a request changes confirmed
   financial actuals, quotes, or ledger funding evidence.
 

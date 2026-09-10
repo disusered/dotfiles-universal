@@ -4,7 +4,7 @@ Local, container-first metrics and logs stack for XBOL.
 
 ## Not deployed
 
-This stack no longer runs on Carlos' workstation. Work services are not hosted
+This stack no longer runs on this workstation. Work services are not hosted
 there any more, and the stack was reclaiming roughly 1.1 GB of metrics, logs,
 and Cloud Logging spool for dashboards nobody opened.
 
@@ -15,7 +15,7 @@ so `rotz install` cannot redeploy it by accident.
 
 To deploy it on a server, rename `dot.yaml.disabled` back to `dot.yaml` and run
 the module. Two things are workstation-specific and need revisiting first: the
-recipe reads Carlos' `~/.config/gcloud/application_default_credentials.json`,
+recipe reads the workstation's `~/.config/gcloud/application_default_credentials.json`,
 and the `xbol.disusered.com` Caddy route and DNS record were removed, so the
 Grafana host has to be published some other way.
 
@@ -28,7 +28,7 @@ GCP Cloud Monitoring metrics
   -> Grafana Prometheus datasource
 
 GCP Cloud Logging entries
-  -> host-side xbol-gcp-log-fetch using Carlos' existing gcloud auth
+  -> host-side xbol-gcp-log-fetch using the existing gcloud auth
   -> raw Cloud Logging NDJSON spool under ~/.local/share/xbol-observability/log-spool
   -> Grafana Alloy loki.source.file
   -> local Loki single-node
@@ -80,7 +80,7 @@ The Quadlet containers mount committed config directories directly from this rep
 
 ## Auth boundary
 
-The metrics path still mounts Carlos' ADC JSON into Alloy only:
+The metrics path still mounts the workstation ADC JSON into Alloy only:
 
 ```text
 ~/.config/gcloud/application_default_credentials.json
@@ -89,7 +89,7 @@ The metrics path still mounts Carlos' ADC JSON into Alloy only:
 
 Grafana, VictoriaMetrics, Loki, and the XBOL sandbox do not receive GCP credentials.
 
-The logs path does not add any new Google credential mount. `xbol-gcp-log-fetch` runs on the host as Carlos and uses existing `gcloud` auth, then writes raw local NDJSON spool files for Alloy to tail.
+The logs path does not add any new Google credential mount. `xbol-gcp-log-fetch` runs on the host as the logged-in user and uses existing `gcloud` auth, then writes raw local NDJSON spool files for Alloy to tail.
 
 Grafana credentials live in 1Password item `op://Personal/XBOL Grafana Local`.
 The bootstrap stores these fields:
@@ -100,7 +100,7 @@ The bootstrap stores these fields:
 
 Do not commit Grafana passwords or service account tokens. `xbol-grafana-bootstrap` reads and updates the 1Password item, resets the built-in admin password through `grafana cli --password-from-stdin`, and uses the Grafana API to converge users and service-account state.
 
-Longer term, replace Carlos' ADC with a dedicated read-only identity that has only the minimum monitoring/log-reading permissions. That requires admin support and is not assumed here.
+Longer term, replace the workstation ADC with a dedicated read-only identity that has only the minimum monitoring/log-reading permissions. That requires admin support and is not assumed here.
 
 ## Collected sources
 

@@ -12,7 +12,7 @@
 
 ## Authority
 
-- Carlos alone authors the Black body.
+- The author alone writes the Black body.
 - A deterministic adapter owns the managed Connections section.
 - Marginalia owns attributed proposals, memos, and receipts.
 - The curated Polychrome store owns accepted Connections.
@@ -45,7 +45,7 @@ Normalize requested scopes exactly:
 - without an explicit state, “reprocess” or “revised” selects `stale`.
 
 `--latest` is mandatory and accepts 1 through 1,024. “Newest” or “latest”
-supplies one; “last N” supplies N. Ask for one of those counts when Carlos says
+supplies one; “last N” supplies N. Ask for one of those counts when the request says
 only “process Black” or names only a state. Do not invent a count, silently
 split an oversized selection, or mix states.
 
@@ -167,7 +167,7 @@ Capture evidence preserves the exact body URL:
   Sanitized failure reporting names the request or entry, not the private URL.
 
 Do not include chain-of-thought. A rationale states concise evidence useful to
-Carlos's review.
+the author's review.
 
 ## Apply Preflight
 
