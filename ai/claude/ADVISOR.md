@@ -8,6 +8,11 @@ Use the advisor for unresolved consequential tradeoffs or recurring failures.
 Supply a bounded question, evidence, and constraints. Advice does not authorize
 actions. Preserve billing consent; a saved setting does not establish actual use.
 
+Consult the advisor for consequential unresolved tradeoffs or recurring failures
+after focused diagnosis. Give it the specific question, evidence, and constraints.
+Reconcile advice with observed results and existing authorization. Keep routine
+edits local.
+
 Use `/advisor` to inspect the selection and `/usage` to inspect usage.
 
 Sources:
