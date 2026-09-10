@@ -45,19 +45,21 @@ signing runs through 1Password's SSH agent
 read-only mounts do not block connecting to it. A signed commit created from
 inside the running service is the check that matters.
 
-The failure mode is the 1Password desktop app not running. Its socket survives
-as a stale inode with no listener, and every commit dies with:
+The failure is nothing listening on `~/.1password/agent.sock`, which git reports
+the same way whatever the reason. A closed app leaves a stale socket inode
+behind; an app that is running can fail identically while its SSH agent is not
+serving. The listener is the discriminator — `ss -xl | grep -F '.1password'`
+printing nothing means no signer:
 
 ```
 error: 1Password: Could not connect to socket. Is the agent running?
 fatal: failed to write commit object
 ```
 
-`ss -xl | grep -F '.1password'` printing nothing means exactly that. Recover by
-starting the app's autostart unit, then retry the same commit:
+Recover by restarting the agent's unit, then retry the same commit:
 
 ```bash
-systemctl --user start app-1password@autostart.service
+systemctl --user restart app-1password@autostart.service
 ```
 
 Do not reach for `--no-gpg-sign` or another signing backend; a commit whose
