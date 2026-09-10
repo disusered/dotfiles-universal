@@ -1,5 +1,6 @@
-# Local model routing for the Herding Cats operator deployment. Secrets remain
-# in CLIProxyAPI's machine-local state and enter DSH only through apiKeyEnv.
+# Model routing for the Herding Cats operator deployment. No secret enters this
+# file: each route names a credential reference that DSH resolves per request,
+# from CLIProxyAPI's machine-local state or the managed credential document.
 - id: llm-pi-ai
   config:
     providers:
@@ -15,7 +16,26 @@
             reasoningEfforts:
               xhigh: xhigh
 
+# DeepSeek's own API. `deepseek-flash` is DeepSeek V4.1 Flash, the current
+# canonical id; the catalog replaces the adapter's stale defaults
+# (deepseek-v4-flash and deepseek-v4-pro) so the picker advertises what the
+# endpoint actually serves. Capacity and output cap keep the adapter defaults.
+- id: llm-deepseek
+  config:
+    apiKeyEnv: DEEPSEEK_API_KEY
+    reasoningEffort: high
+    models:
+      - id: deepseek-flash
+        name: DeepSeek V4.1 Flash
+
+# Web search is a separate auxiliary DeepSeek call on the Anthropic-compatible
+# Messages endpoint; pin it to the canonical id too.
+- id: web-search-deepseek
+  config:
+    apiKeyEnv: DEEPSEEK_API_KEY
+    model: deepseek-flash
+
 - id: agent-default-model
   config:
-    provider: cliproxyapi
-    model: gpt-5.6-sol
+    provider: deepseek-official
+    model: deepseek-flash
