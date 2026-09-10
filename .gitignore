@@ -56,3 +56,6 @@ ai/claude/.cache/
 /ai/claude/skills/twg
 /ai/claude/skills/twg-*
 /ai/xbol-observability/tests/__pycache__
+
+# Browser QA screenshots and audit logs written by agent-browser runs.
+/.ab-evidence/
