@@ -36,6 +36,32 @@ Until then the old process keeps running its old code, while
 `~/.dsh/profiles/node_modules/*` (195 symlinks into the runtime path) already
 resolves to the new tree.
 
+## Browser access
+
+`dsh web` in 0.1.5-rc.1 authenticates the GUI. Each process mints a random
+launch token, the first visit from a browser must carry `?token=…` to exchange
+it for a 30-day cookie bound to that authority, and every browser without the
+cookie gets a 401 page pointing back at the service log. No flag turns it off,
+and the log is not readable from the tailnet devices that need it.
+
+The tailnet bind is this deployment's trust boundary, so a device that reaches
+`harness.disusered.com` is already authorized by the network. The install step
+therefore runs `scripts/patch-no-browser-auth`, which makes that one predicate
+constant, and the GUI opens directly from any tailnet device. The loopback
+Host/Origin fence stays: it keeps the `/api` bridge off attacker-controlled
+hostnames and out of cross-site browser requests, which is not what the token
+protects against.
+
+The patch edits a built artifact, so the install re-applies it after each
+re-pin, and a DSH revision that moves the method fails the install instead of
+serving a runtime whose GUI quietly demands a token again. Re-running the
+script is safe:
+
+```bash
+~/.dotfiles/ai/deepseek-harness/scripts/patch-no-browser-auth
+systemctl --user restart deepseek-harness.service
+```
+
 ## Signed commits from inside the harness
 
 Harness sessions inherit the unit's environment and `commit.gpgsign` is on, so

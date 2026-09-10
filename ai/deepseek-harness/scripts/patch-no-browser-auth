@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Drop the per-device browser-token fence from `dsh web`.
+#
+# Upstream (>= 0.1.5-rc.1) authenticates every Host RPC and the index page
+# through BrowserAuth: a random per-process token in the URL mints a 30-day
+# cookie bound to the requesting authority, and every browser without it gets
+# the 401 page instead of the GUI. This deployment's trust boundary is the
+# tailnet bind, so the fence buys nothing that the listener does not already
+# provide and costs every device a trip to the service log, which tailnet
+# devices cannot read.
+#
+# The patch makes that one predicate constant and leaves the loopback
+# Host/Origin request fence — the DNS-rebinding defense — untouched. The
+# module's install step re-applies it after each re-pin, and it fails loudly
+# when an upstream revision moves the method rather than quietly serving an
+# unpatched runtime.
+set -euo pipefail
+
+readonly marker="herding-cats local patch (ai/deepseek-harness)"
+readonly runtime="${DSH_RUNTIME:-$HOME/.local/share/deepseek-harness/runtime}"
+readonly target="$runtime/node_modules/@deepseek-ai/dsh-client-connection/lib/index.js"
+
+if [[ ! -f "$target" ]]; then
+  printf 'patch-no-browser-auth: %s is missing; run rotz install /ai/deepseek-harness\n' "$target" >&2
+  exit 1
+fi
+
+if grep -qF "$marker" "$target"; then
+  printf 'patch-no-browser-auth: already applied\n'
+  exit 0
+fi
+
+if ! grep -qE '^[[:space:]]+isAuthenticated\(request\) \{$' "$target"; then
+  printf 'patch-no-browser-auth: BrowserAuth.isAuthenticated moved in %s; re-derive the patch\n' "$target" >&2
+  exit 1
+fi
+
+cp -n "$target" "$target.dsh-noauth-orig"
+sed -i "s|^\(\s*\)isAuthenticated(request) {$|\1isAuthenticated(request) {\n\t\t/* $marker */\n\t\treturn true;|" "$target"
+grep -qF "$marker" "$target"
+node --check "$target"
+printf 'patch-no-browser-auth: applied to %s\n' "$target"

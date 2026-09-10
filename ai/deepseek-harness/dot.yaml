@@ -4,6 +4,10 @@ linux[whoami.distro^="Arch"]:
       set -eu
       mkdir -p ~/.dsh/profiles/node_modules ~/.local/share/deepseek-harness/runtime
       npm install --prefix ~/.local/share/deepseek-harness/runtime --no-audit --no-fund --save-exact @deepseek-ai/dsh@0.1.5-rc.1
+      # Upstream fences the GUI behind a per-process token each browser has to
+      # exchange out of the service log; this deployment trusts the tailnet
+      # bind instead. See README, "Browser access".
+      ~/.dotfiles/ai/deepseek-harness/scripts/patch-no-browser-auth
       ~/.rotz/bin/rotz link /ai/deepseek-harness -f
       # Flat module fallback: the web profile resolves `cfg-theme` through this
       # link. The profile-boot healing routine only rewrites real directories,
