@@ -20,6 +20,14 @@
 # canonical id; the catalog replaces the adapter's stale defaults
 # (deepseek-v4-flash and deepseek-v4-pro) so the picker advertises what the
 # endpoint actually serves. Capacity and output cap keep the adapter defaults.
+#
+# `inputModalities` is load-bearing, not decorative. Naming `models` replaces
+# the adapter's whole built-in catalog, and an entry that omits `image` defaults
+# to text-only — which is what makes `read_image` and pasted attachments fail
+# with "does not declare image input". The endpoint accepts image parts for this
+# model, so this declaration is what switches multimodal input on. It requires
+# DSH >= 0.1.5; the 0.1.0 adapter ignores the key and stays text-only, so its
+# presence is inert until the runtime is upgraded.
 - id: llm-deepseek
   config:
     apiKeyEnv: DEEPSEEK_API_KEY
@@ -27,6 +35,7 @@
     models:
       - id: deepseek-flash
         name: DeepSeek V4.1 Flash
+        inputModalities: [text, image]
 
 # Web search is a separate auxiliary DeepSeek call on the Anthropic-compatible
 # Messages endpoint; pin it to the canonical id too.

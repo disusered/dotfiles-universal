@@ -5,7 +5,7 @@ service booting the harness Web UI on `127.0.0.1:43120`, published to the
 tailnet as `harness.disusered.com` through the Caddy module.
 
 The harness home is `~/.dsh` and the pinned runtime is
-`~/.local/share/deepseek-harness/runtime` (`@deepseek-ai/dsh@0.1.0-rc.6`). The
+`~/.local/share/deepseek-harness/runtime` (`@deepseek-ai/dsh@0.1.5-rc.1`). The
 `dsh` launcher on `PATH` boots that pinned runtime and injects
 CLIProxyAPI's local client token when it exists.
 
@@ -19,6 +19,23 @@ The install pins the runtime, links this module's files, and enables the
 `deepseek-harness.service` user unit. New `.dsh` versions are adopted by
 changing the version in `dot.yaml`, not by installing globally.
 
+Run the install from a normal login shell, never from inside a harness session.
+The unit sets `ProtectHome=read-only` and re-opens only `~/.dsh`, the workspace,
+and `~/.dotfiles`, so an agent trying to re-pin its own runtime gets
+`Read-only file system` on `~/.local/share`. That wall is deliberate: the
+harness cannot replace the code it is running.
+
+The install also does not restart a running service — `enable --now` leaves an
+active unit alone, so the new runtime is only adopted on the next restart:
+
+```bash
+systemctl --user restart deepseek-harness.service
+```
+
+Until then the old process keeps running its old code, while
+`~/.dsh/profiles/node_modules/*` (195 symlinks into the runtime path) already
+resolves to the new tree.
+
 ## Models
 
 `profiles/web/cordis.patch.yml` is the deployment's routing layer. New sessions
@@ -30,6 +47,13 @@ runs on the same key and model.
 `deepseek-flash` is DeepSeek V4.1 Flash. DeepSeek retired `deepseek-v4-flash`
 and `deepseek-v4-pro`; the API still accepts both legacy names and serves
 them with V4.1 Flash, so configuration should name the canonical id.
+
+`inputModalities: [text, image]` on that catalog entry is load-bearing, not
+decoration. Naming `models` in the patch replaces the adapter's whole built-in
+catalog, and an entry that omits `image` defaults to text-only — so `read_image`
+and pasted attachments fail with "does not declare image input" even though the
+endpoint happily accepts image parts for this model. The key needs DSH >= 0.1.5
+to do anything; the 0.1.0 adapter ignores it and stays text-only.
 
 The patch is symlinked live into `~/.dsh/profiles/web/cordis.patch.yml`, and a
 running harness watches that file and re-composes, so edits apply without a
@@ -99,3 +123,7 @@ The dump shows the composed rows; the headless run performs one real request
 through the deployment's composition. The Web UI's Models page shows the
 stored credential (redacted) and the model picker groups the routes by
 provider.
+
+For image input specifically, `dump-config` must show `image` under the model's
+`inputModalities`, and the first `read_image` call after a restart must succeed
+instead of reporting that the model does not declare image input.
