@@ -49,8 +49,16 @@
     provider: deepseek-official
     model: deepseek-flash
 
-# Pin the in-page folder picker: the adaptive chooser (-auto) resolves to the
-# native OS chooser when the host sees a display, which leaves the Web shell's
-# workspace dialog unable to list directories.
+# Pin the in-page folder picker. A patch may not retarget a row's plugin — the
+# loader binds an id to the package it first saw and skips any patch that names
+# a different one — so the adaptive chooser is disabled and the browse
+# interaction is mounted directly. `-auto` mounts backend and client surface as
+# a pair; the backend alone registers the capability with nothing rendering it,
+# so both rows are required.
 - id: directory-picker
-  name: '@deepseek-ai/dsh-host-directory-picker-browse'
+  disabled: true
+- insert:
+    - id: directory-picker-browse
+      name: '@deepseek-ai/dsh-host-directory-picker-browse'
+    - id: directory-picker-browse-surface
+      name: '@deepseek-ai/dsh-client-ui-directory-picker-browse'
