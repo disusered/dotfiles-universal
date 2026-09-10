@@ -36,6 +36,33 @@ Until then the old process keeps running its old code, while
 `~/.dsh/profiles/node_modules/*` (195 symlinks into the runtime path) already
 resolves to the new tree.
 
+## Signed commits from inside the harness
+
+Harness sessions inherit the unit's environment and `commit.gpgsign` is on, so
+signing runs through 1Password's SSH agent
+(`gpg.ssh.program = /opt/1Password/op-ssh-sign`). No `SSH_AUTH_SOCK` is needed:
+`op-ssh-sign` finds `~/.1password/agent.sock` by itself, and the unit's
+read-only mounts do not block connecting to it. A signed commit created from
+inside the running service is the check that matters.
+
+The failure mode is the 1Password desktop app not running. Its socket survives
+as a stale inode with no listener, and every commit dies with:
+
+```
+error: 1Password: Could not connect to socket. Is the agent running?
+fatal: failed to write commit object
+```
+
+`ss -xl | grep -F '.1password'` printing nothing means exactly that. Recover by
+starting the app's autostart unit, then retry the same commit:
+
+```bash
+systemctl --user start app-1password@autostart.service
+```
+
+Do not reach for `--no-gpg-sign` or another signing backend; a commit whose
+verification failed is not a finished commit.
+
 ## Models
 
 `profiles/web/cordis.patch.yml` is the deployment's routing layer. New sessions
