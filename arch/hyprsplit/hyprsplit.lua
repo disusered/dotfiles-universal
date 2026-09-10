@@ -14,7 +14,10 @@ function hs.MonitorRange:new(monitor)
     end)
     hs.monitor_priority_list = {}
     for _, connected in ipairs(monitors) do
-        table.insert(hs.monitor_priority_list, connected.name)
+        -- The plugin skips parked outputs the same way when it walks this list.
+        if connected ~= nil and not connected.is_mirror and connected.id ~= -1 then
+            table.insert(hs.monitor_priority_list, connected.name)
+        end
     end
     return monitor_range_new(self, monitor)
 end
