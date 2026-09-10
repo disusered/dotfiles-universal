@@ -39,3 +39,9 @@
   config:
     provider: deepseek-official
     model: deepseek-flash
+
+# Pin the in-page folder picker: the adaptive chooser (-auto) resolves to the
+# native OS chooser when the host sees a display, which leaves the Web shell's
+# workspace dialog unable to list directories.
+- id: directory-picker
+  name: '@deepseek-ai/dsh-host-directory-picker-browse'
