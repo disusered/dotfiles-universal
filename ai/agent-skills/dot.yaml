@@ -55,3 +55,6 @@ linux:
       - ~/Development/XBOL/.claude/skills/cocoindex
       - ~/Development/ME/herding-cats/.agents/skills/cocoindex
       - ~/Development/ME/herding-cats/.claude/skills/cocoindex
+    ynab-routine-reconciliation:
+      - ~/Development/ME/herding-cats/.agents/skills/ynab-routine-reconciliation
+      - ~/Development/ME/herding-cats/.claude/skills/ynab-routine-reconciliation

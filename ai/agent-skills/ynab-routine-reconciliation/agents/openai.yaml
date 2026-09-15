@@ -1,0 +1,4 @@
+interface:
+  display_name: "YNAB Routine Reconciliation"
+  short_description: "Import bank rows and hand them off for QA"
+  default_prompt: "Use $ynab-routine-reconciliation to reconcile this bank export with YNAB and hand me the unapproved imports for QA."
