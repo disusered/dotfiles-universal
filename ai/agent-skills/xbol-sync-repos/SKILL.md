@@ -61,10 +61,11 @@ tracking remotes other than origin. Every other local branch is a candidate, whe
 or not its origin upstream still exists — a live upstream is not a reason to keep a
 local ref, because origin holds that work either way.
 
-Gather the pull request state for each candidate with
-`gh pr list --repo odasoft/<repository> --head <branch> --state all`. Pin `--repo` on
-every GitHub call: several checkouts carry a `club-tijuana` remote named `client`, and
-an unpinned call has read from it before.
+Gather the pull request state and head commit for each candidate with
+`gh pr list --repo odasoft/<repository> --head <branch> --state all --json
+number,state,headRefName,headRefOid,author`. Pin `--repo` on every GitHub call:
+several checkouts carry a `club-tijuana` remote named `client`, and an unpinned call
+has read from it before.
 
 Delete the local branch when any of these holds:
 
@@ -72,17 +73,28 @@ Delete the local branch when any of these holds:
   `main`, or an existing `release/*`), verified with `git merge-base --is-ancestor`.
 - Every commit `git cherry <integration-ref> <candidate>` reports is patch equivalent
   (a nonempty result containing only `-` lines).
-- Its pull request state is `MERGED`.
+- Its pull request state is `MERGED` **and** `git rev-parse <branch>` equals that pull
+  request's `headRefOid`.
 - Its pull request state is `CLOSED` and `git rev-parse <branch>` equals
-  `git rev-parse origin/<branch>`. Compare the object IDs directly; do not infer
-  equality from the `[gone]` or ahead/behind markers.
-- Its pull request state is `CLOSED`, its upstream was pruned, and
-  `git ls-remote origin refs/pull/<number>/head` still resolves. GitHub retains pull
-  request head refs after the branch is deleted, so the work remains fetchable.
+  `git rev-parse origin/<branch>`.
+- Its pull request state is `CLOSED`, its upstream was pruned, and `git rev-parse
+  <branch>` equals the object ID that `git ls-remote origin refs/pull/<number>/head`
+  reports. GitHub retains pull request head refs after the branch is deleted, so a tip
+  that matches remains fetchable.
+- It has no pull request and `git rev-parse <branch>` equals `git rev-parse
+  origin/<branch>`. Origin holds the identical commit, so the local ref carries nothing.
+
+Compare object IDs directly in every case. Do not infer equality from the `[gone]`
+marker, from ahead/behind counts, or from pull request state alone.
 
 Keep and report, never delete:
 
 - Any branch with an `OPEN` pull request.
+- **Stale tips.** Any branch whose pull request is `MERGED` or `CLOSED` but whose local
+  tip does not match that pull request's head commit or the origin branch. Commits were
+  added after the pull request closed and exist nowhere else. Report the branch, the
+  pull request number, and how many commits are unpushed
+  (`git rev-list --count <pr-head>..<branch>`).
 - Any branch with no pull request, no integration proof, and a tip that exists nowhere
   on origin. This is genuinely unique local work; name it and say why it was kept.
 
