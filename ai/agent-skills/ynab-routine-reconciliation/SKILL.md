@@ -26,8 +26,10 @@ bun run ynab:apply-evidence -- --plan <plan>                 # 3. dry run
 bun run ynab:apply-evidence -- --plan <plan> --confirm-source-backed-writes
 ```
 
-Banorte exports do not declare their coverage, so pass it. BanBajío PDFs declare their
-own period. An empty `transaction_ids` array from the refresh is success with nothing new.
+Budget and account ids come from `fixtures/private/ynab/discovery.json`; run
+`bun run ynab:discover` if it is stale. Banorte exports do not declare their coverage, so
+pass it. BanBajío PDFs declare their own period. An empty `transaction_ids` array from the
+refresh is success with nothing new.
 
 ## Read the plan before applying
 
@@ -54,7 +56,8 @@ rows cleared. A pending row that already exists in YNAB is updated in place, nev
 deleted and recreated. A row YNAB's own importer would absorb is left out of the plan.
 Created rows carry a payee and category and stay unapproved. A create count below the
 number of rows submitted is YNAB matching an import to a hand-entered row, not a failure;
-`duplicate_import_ids` names the suppressed ones.
+`duplicate_import_ids` names the suppressed ones. YNAB refuses a new date on a split
+transaction, so the plan reports one as a blocker instead of attempting it.
 
 ## If a run changed something it should not have
 
