@@ -58,3 +58,7 @@ linux:
     ynab-routine-reconciliation:
       - ~/Development/ME/herding-cats/.agents/skills/ynab-routine-reconciliation
       - ~/Development/ME/herding-cats/.claude/skills/ynab-routine-reconciliation
+    xbol-sync-repos:
+      - ~/Development/XBOL/.agents/skills/xbol-sync-repos
+      - ~/Development/XBOL/.claude/skills/xbol-sync-repos
+      - ~/.codex/skills/xbol-sync-repos
