@@ -1,0 +1,25 @@
+# Faugus Launcher — GTK front end for running Windows games through
+# UMU-Launcher (Proton outside Steam).
+#
+# Prefer the binary from chaotic-aur when that repo is enabled and its sync
+# database is current. The fallback names aur/ explicitly: a bare
+# `yay -S faugus-launcher` re-resolves to the same chaotic package, so it is a
+# no-op whenever the chaotic entry is what failed (its mirrors prune old builds,
+# so a stale local db 404s).
+#
+# Deliberately does not install umu-launcher or a Proton-GE package. Faugus
+# downloads its own umu-run into ~/.local/share/faugus-launcher/ and its own
+# Proton into ~/.local/share/Steam/compatibilitytools.d/, and keeps both
+# updated. A system umu-launcher would just sit unused.
+#
+# Prefixes live in ~/Faugus/.
+
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      if ! pacman -Qi faugus-launcher &>/dev/null; then
+        sudo pacman -S --noconfirm --needed faugus-launcher \
+          || yay -S --noconfirm --needed aur/faugus-launcher
+      fi
+    depends:
+      - /tools/yay
