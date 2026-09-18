@@ -14,4 +14,4 @@ hl.window_rule({
 --##################
 
 
-hl.bind("SUPER + P", hl.dsp.exec_cmd("app2unit 1password.desktop"))
+hl.bind("SUPER + P", hl.dsp.exec_cmd("app2unit com.onepassword.OnePassword.desktop"))
