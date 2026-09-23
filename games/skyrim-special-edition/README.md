@@ -16,6 +16,10 @@ future optimization work are summarized in
   `scb -- gamemoderun ~/.local/bin/skyrim-skse-launch %command%`, wrapping the
   game in [ScopeBuddy](../../tools/scopebuddy)/gamescope, requesting GameMode,
   and swapping the Bethesda launcher for SKSE.
+- Pins normal Skyrim launches to gamescope 3.16.28 from a signature-verified
+  Arch package in `~/.local/state/skyrim-performance/tools/`. The 2026-09-23
+  upgrade to 3.16.29 hid the menu cursor and made the camera spin; replaying
+  the same launch with 3.16.28 restored both. The system package is unchanged.
 - **Leaves the frame rate to SSE Display Tweaks.** Skyrim's Havok physics is
   stepped off the frame rate; above roughly 60 fps vanilla makes objects drift or
   launch themselves, carts and ladders break, and water flow at the wrong speed.

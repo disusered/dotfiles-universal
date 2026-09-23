@@ -8,6 +8,10 @@ linux[whoami.distro^="Arch"]:
       LIB=$("$HOME/.dotfiles/games/lib/steam-find-app-path.sh" 489830)
       GAME_DIR="$LIB/steamapps/common/Skyrim Special Edition"
 
+      # Gamescope 3.16.29 broke Skyrim mouse input on this setup. Keep the
+      # verified working build local to Skyrim rather than downgrading Arch.
+      "$HOME/.dotfiles/games/skyrim-special-edition/skyrim-pin-gamescope.sh"
+
       # Force the Windows build through Proton. Skyrim SE has no native Linux
       # port, and leaving the mapping unset means whatever Steam's global
       # default happens to be that week.
