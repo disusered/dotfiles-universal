@@ -5,9 +5,12 @@ description: Reconcile a bank statement export with Carlos's live YNAB account, 
 
 # YNAB Routine Reconciliation
 
-Work in `workshop/skunkworks/email-ynab-updater`, from the project root. The run is
-four commands and the code owns the reconciliation rules. Writing a script to do this
-job is the failure mode this skill exists to prevent.
+Work in `workshop/skunkworks/email-ynab-updater` on the Herding Cats `main`
+checkout, from that project directory. The run is four commands and the code owns
+the reconciliation rules. Writing a script to do this job is the failure mode this
+skill exists to prevent. The private payee map and discovery file live in that
+checkout's gitignored `fixtures/private/ynab/`; a linked worktree has its own empty
+copy, so do not run from one.
 
 ## Routine
 
@@ -37,6 +40,8 @@ refresh is success with nothing new.
   for every statement row: report the delta and stop. Never invent a balance adjustment.
 - `blockers` lists rows with no confident payee. Resolve them from the account's existing
   conventions or hand them to Carlos. Do not guess a merchant.
+- Inspect created rows' payees against their statement merchants. An amount-only
+  ledger match can assign a different merchant's payee; stop if the plan shows one.
 - The dry run prints operation counts and the projected balance. Check them, then apply.
 
 ## Never
@@ -53,8 +58,13 @@ refresh is success with nothing new.
 Check them in the plan; do not reimplement them. Import ids are
 `YNAB:<milliunits>:<iso_date>:<occurrence>`. Pending bank rows enter uncleared, posted
 rows cleared. A pending row that already exists in YNAB is updated in place, never
-deleted and recreated. A row YNAB's own importer would absorb is left out of the plan.
-Created rows carry a payee and category and stay unapproved. A create count below the
+deleted and recreated, including when a hold, tip or currency conversion changed its
+amount at posting; that change counts in the projected balance. A payee comes from
+the account's conventions (canonical map, YNAB's stored import names, merchant-agreeing
+ledger history); a card merchant never seen before is proposed under the bank's name
+for Carlos's review. A SPEI to Carlos's own name at BanBajío is `Transfer : BanBajio`.
+A row YNAB's own importer would absorb is left out of the plan. Created rows carry a
+payee, a category when the ledger has one for that payee, and stay unapproved. A create count below the
 number of rows submitted is YNAB matching an import to a hand-entered row, not a failure;
 `duplicate_import_ids` names the suppressed ones. YNAB refuses a new date on a split
 transaction, so the plan reports one as a blocker instead of attempting it.
