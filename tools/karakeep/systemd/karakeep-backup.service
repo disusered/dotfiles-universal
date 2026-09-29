@@ -1,0 +1,7 @@
+[Unit]
+Description=Back up Karakeep records, archives and private configuration
+
+[Service]
+Type=oneshot
+ExecStart=%h/.dotfiles/tools/karakeep/scripts/backup
+UMask=0077

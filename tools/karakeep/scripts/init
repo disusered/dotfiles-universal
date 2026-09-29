@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+"""Initialize private deployment settings without replacing existing secrets."""
+import os
+import secrets
+from pathlib import Path
+
+os.umask(0o077)
+config = Path.home() / ".config/karakeep"
+data = Path.home() / ".local/share/karakeep"
+config.mkdir(parents=True, exist_ok=True)
+for name in ("data", "search", "backups"):
+    (data / name).mkdir(parents=True, exist_ok=True)
+server = config / "server.env"
+search = config / "search.env"
+if server.exists() != search.exists():
+    raise SystemExit("Incomplete existing Karakeep configuration; restore the missing env file before retrying.")
+if not server.exists():
+    key = secrets.token_hex(32)
+    server.write_text("\n".join([
+        "NEXTAUTH_URL=https://karakeep.disusered.com",
+        "NEXTAUTH_SECRET=" + secrets.token_hex(32),
+        "DATA_DIR=/data",
+        "MEILI_ADDR=http://meilisearch:7700",
+        "MEILI_MASTER_KEY=" + key,
+        "BROWSER_WEB_URL=http://chrome:9222",
+        "DISABLE_SIGNUPS=true",
+        "CRAWLER_FULL_PAGE_ARCHIVE=true",
+        "CRAWLER_FULL_PAGE_SCREENSHOT=true",
+        "CRAWLER_MONOLITH_TIMEOUT_SEC=30",
+        "OCR_LANGS=eng,spa",
+        "OCR_CACHE_DIR=/data/ocr",
+        "DB_WAL_MODE=true",
+        "INFERENCE_ENABLE_AUTO_TAGGING=false",
+        "INFERENCE_ENABLE_AUTO_SUMMARIZATION=false",
+    ]) + "\n")
+    search.write_text("MEILI_MASTER_KEY=" + key + "\n")
+for path in (server, search):
+    path.chmod(0o600)
+print("Karakeep private configuration ready.")

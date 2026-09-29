@@ -1,0 +1,18 @@
+[Unit]
+Description=Karakeep full-text search
+
+[Container]
+ContainerName=karakeep-search
+Image=docker.io/getmeili/meilisearch:v1.41.0
+Pull=missing
+Network=karakeep.network
+NetworkAlias=meilisearch
+EnvironmentFile=%h/.config/karakeep/search.env
+Environment=MEILI_NO_ANALYTICS=true
+Volume=%h/.local/share/karakeep/search:/meili_data
+NoNewPrivileges=true
+
+[Service]
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=900

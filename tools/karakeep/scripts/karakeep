@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+"""Bounded agent entry point for the pinned official Karakeep CLI."""
+import json
+import os
+from pathlib import Path
+import shlex
+import stat
+import sys
+
+VERSION = "0.33.2"
+READS = {
+    "bookmarks": {"list", "search", "get", "content"},
+    "lists": {"list", "get"},
+    "tags": {"list", "get"},
+    "highlights": {"list", "get"},
+}
+
+
+def fail(message):
+    sys.exit(f"karakeep: {message}")
+
+
+def main():
+    args = sys.argv[1:]
+    if not args or args in (["--help"], ["-h"]):
+        print("Karakeep agent wrapper (official CLI 0.33.2)\n"
+              "Usage: karakeep [--json] whoami\n"
+              "       karakeep [--json] bookmarks {list,search,get,content,add} ...\n"
+              "       karakeep [--json] {lists,tags,highlights} {list,get} ...\n"
+              "Use <command> --help for upstream options.\n"
+              "Capture with bookmarks add only when explicitly requested.\n"
+              "Credentials: ~/.config/karakeep/api.env")
+        return
+    if any(arg.split("=", 1)[0] in {"--api-key", "--server-addr"} for arg in args):
+        fail("credential and server flags are disabled; use api.env")
+    command = args[1:] if args[:1] == ["--json"] else args
+    allowed = command == ["--version"] or command[:1] == ["whoami"]
+    if len(command) >= 2:
+        allowed = allowed or command[1] in READS.get(command[0], set())
+        allowed = allowed or command[:2] == ["bookmarks", "add"]
+    if not allowed:
+        fail("supported operations are reads and explicit bookmarks add; see --help")
+
+    home = Path.home()
+    prefix = home / ".local/share/karakeep-cli"
+    executable = prefix / "bin/karakeep"
+    manifest = prefix / "lib/node_modules/@karakeep/cli/package.json"
+    try:
+        if json.loads(manifest.read_text())["version"] != VERSION:
+            fail(f"expected official CLI {VERSION}; see AGENT-USAGE.md")
+        if not os.access(executable, os.X_OK):
+            fail("official CLI is not executable; see AGENT-USAGE.md")
+    except (OSError, ValueError, KeyError):
+        fail(f"install official CLI {VERSION} at {prefix}; see AGENT-USAGE.md")
+
+    env = os.environ.copy()
+    for key in ("KARAKEEP_API_KEY", "KARAKEEP_SERVER_ADDR"):
+        env.pop(key, None)
+    help_only = command == ["--version"] or any(a in {"--help", "-h"} for a in command)
+    if not help_only:
+        config = home / ".config/karakeep/api.env"
+        try:
+            with config.open() as stream:
+                metadata = os.fstat(stream.fileno())
+                if (not stat.S_ISREG(metadata.st_mode) or metadata.st_uid != os.getuid()
+                        or stat.S_IMODE(metadata.st_mode) & 0o077):
+                    fail("api.env must be user-owned with no group/other permissions (0600)")
+                values = {}
+                for line in stream:
+                    line = line.strip()
+                    if not line or line.startswith("#"):
+                        continue
+                    if line.startswith("export "):
+                        line = line[7:].lstrip()
+                    key, separator, raw = line.partition("=")
+                    key = key.strip()
+                    if not separator or key not in {"KARAKEEP_API_KEY", "KARAKEEP_SERVER_ADDR"} or key in values:
+                        fail("api.env must contain unique KARAKEEP_API_KEY/KARAKEEP_SERVER_ADDR assignments")
+                    tokens = shlex.split(raw, comments=True)
+                    if len(tokens) > 1:
+                        fail("api.env values containing spaces must be quoted")
+                    values[key] = tokens[0] if tokens else ""
+        except (OSError, ValueError):
+            fail("cannot read api.env or its assignment syntax is invalid")
+        if not values.get("KARAKEEP_API_KEY"):
+            fail("API key is not configured; account setup must complete first")
+        if values.get("KARAKEEP_SERVER_ADDR") not in {
+            "https://karakeep.disusered.com", "http://127.0.0.1:43130"
+        }:
+            fail("api.env server must be https://karakeep.disusered.com or http://127.0.0.1:43130")
+        env.update(values)
+    os.execve(executable, [str(executable), *args], env)
+
+
+if __name__ == "__main__":
+    main()

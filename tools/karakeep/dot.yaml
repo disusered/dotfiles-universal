@@ -1,0 +1,25 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -euo pipefail
+      ~/.dotfiles/tools/karakeep/scripts/init
+      mkdir -p ~/.config/containers/systemd
+      ~/.rotz/bin/rotz link /tools/karakeep -f
+      podman pull ghcr.io/karakeep-app/karakeep:0.33.2
+      podman pull ghcr.io/karakeep-app/karakeep-chrome@sha256:5b19bbb160e9ff60681a3abd97e1c4ec9f64212301410de658c3900ab7ef31e7
+      podman pull docker.io/getmeili/meilisearch:v1.41.0
+      npm install --global --prefix "$HOME/.local/share/karakeep-cli" --ignore-scripts --no-audit --no-fund @karakeep/cli@0.33.2
+      systemctl --user daemon-reload
+      systemctl --user restart karakeep.service
+      systemctl --user enable --now karakeep-backup.timer
+    depends:
+      - /packages/podman
+  links:
+    quadlet/karakeep.network: ~/.config/containers/systemd/karakeep.network
+    quadlet/karakeep.container: ~/.config/containers/systemd/karakeep.container
+    quadlet/karakeep-chrome.container: ~/.config/containers/systemd/karakeep-chrome.container
+    quadlet/karakeep-search.container: ~/.config/containers/systemd/karakeep-search.container
+    systemd/karakeep-backup.service: ~/.config/systemd/user/karakeep-backup.service
+    systemd/karakeep-backup.timer: ~/.config/systemd/user/karakeep-backup.timer
+    scripts/backup: ~/.local/bin/karakeep-backup
+    scripts/karakeep: ~/.local/bin/karakeep

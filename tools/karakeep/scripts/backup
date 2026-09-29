@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+umask 077
+backup_dir="$HOME/.local/share/karakeep/backups"
+mkdir -p "$backup_dir"
+exec 9>"$backup_dir/.lock"
+flock -n 9 || exit 0
+stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+archive="$backup_dir/karakeep-$stamp.tar.gz"
+was_active=false
+if systemctl --user is-active --quiet karakeep.service; then
+  was_active=true
+  trap 'if $was_active; then systemctl --user start karakeep.service; fi' EXIT
+  systemctl --user stop karakeep.service
+fi
+tar -czf "$archive.partial" -C "$HOME" .config/karakeep .local/share/karakeep/data
+mv "$archive.partial" "$archive"
+if $was_active; then
+  systemctl --user start karakeep.service
+  was_active=false
+fi
+printf 'Karakeep backup: %s\n' "$archive"

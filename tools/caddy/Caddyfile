@@ -45,3 +45,9 @@ harness.disusered.com {
 		}
 	}
 }
+
+karakeep.disusered.com {
+	bind {$CADDY_TAILSCALE_IP}
+	import disusered_tls
+	reverse_proxy 127.0.0.1:43130
+}
