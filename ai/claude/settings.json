@@ -8,6 +8,11 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1"
   },
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
   "permissions": {
     "allow": [
       "Bash(twg help *)",
@@ -105,7 +110,8 @@
     "feature-dev@claude-plugins-official": false,
     "pyright-lsp@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
-    "mcp-server-dev@claude-plugins-official": true
+    "mcp-server-dev@claude-plugins-official": true,
+    "claude-security@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "openviking-plugins-local": {
@@ -137,14 +143,44 @@
     "enabled": true,
     "mode": "hold"
   },
+  "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": false,
   "skipWorkflowUsageWarning": true,
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": true,
-  "autoMemoryEnabled": false,
-  "attribution": {
-    "commit": "",
-    "pr": "",
-    "sessionUrl": false
-  }
+  "autoMode": {
+    "soft_deny": [
+      "$defaults",
+      "Bash(dotnet ef database drop:*) in xbol-db-develop and xbol-api-* — schema-destructive, migrations must originate in xbol-db-develop only",
+      "Bash(gcloud sql instances delete:*) or (gcloud sql instances patch --tier or similar destructive flags) against `boletera` / project `boletera-qa`",
+      "Bash(terraform apply:*) / (tofu apply:*) run locally in infra-cloud — repo policy requires the authorized runner, not local execution"
+    ],
+    "environment": [
+      "### Org-wide",
+      "**Organization**: None configured",
+      "**Cloud provider(s)**: GCP (project `boletera-qa`, Cloud SQL `boletera`) — per `infra-cloud/` Terraform/Terragrunt, scoped to this workspace",
+      "**Repository visibility**: assume private — this repo (`~/Development/XBOL`) has no remotes configured, so no host-based visibility signal exists; treat as private local checkout",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: 1Password (`op` CLI observed in project usage); repo also contains `scripts/secrets/` helpers (xbol-secrets.toml, xbol_secret_json.py, xbol_admin_secret_json.py) — treat as secrets-handling code, not a credential source",
+      "**Default / protected branches**: not queryable via gh (no remote/org derivable) — unknown, treat as unconfirmed",
+      "**CI/CD deploy targets**: None configured",
+      "**Network posture**: None configured",
+      "**Host containment**: None configured — assume Claude Code runs on an ordinary developer machine with open internet",
+      "**Source control**: The trusted repo (`~/Development/XBOL`, no remotes configured) only — this is an umbrella workspace; each subdirectory (e.g. xbol-api-ticketing, xbol-api-admin, xbol-web-client) is its own independent git repo with its own history and must be treated separately",
+      "**Trusted internal domains**: None configured",
+      "**Trusted cloud buckets**: None configured",
+      "**Key internal services**: seats.io (third-party seat-reservation service wrapped by xbol-api-ticketing); Cloud SQL instance `boletera` in GCP project `boletera-qa`",
+      "**Internal package registry**: None configured",
+      "**Sensitive data locations & audiences**: `scripts/secrets/` (xbol-secrets.toml, xbol_secret_json.py, xbol_admin_secret_json.py, and their tests) — credential-handling code; `docs/concepts/admission-credential.md` — share only with audiences cleared for credential/admission material",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment; GCP project `boletera-qa` is QA, not production, but treat any `boletera-prod`-style name with the same caution if encountered",
+      "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources in `infra-cloud/` (Terraform + Terragrunt for GCP project `boletera-qa`); anything whose name or tag carries `prod` or `production` as a whole word or name segment; per repo instructions, Terraform/OpenTofu must never be run locally — only via the repository's verified authorized runner",
+      "### User-specific",
+      "**Primary use of Claude Code**: software development (umbrella coordination workspace for the XBOL ticketing platform — .NET APIs, Next.js/Blazor/React Native frontends, GCP infra)",
+      "**Trusted repo**: `~/Development/XBOL` (this umbrella workspace, no remotes configured) and its subdirectory repos (xbol-api-ticketing, xbol-api-admin, xbol-api-client, xbol-db-develop, xbol-web-client, xbol-web-admin, etc.), each its own independent git repo — schema/EF migrations belong only in xbol-db-develop; never add them under xbol-api-*",
+      "**Org-specific CLIs**: `twg` (Atlassian/Jira work, per-account config under `~/.config/twg/accounts/{iteramind,odasoft}`); `gcloud` and `cloud-sql-proxy` (GCP boletera-qa); `dotnet` (backend APIs) — routine under this project's subdirectories",
+      "**Trusted repo qualifiers**: EF Core migrations only under `xbol-db-develop/`; never hand-edit NSwag-generated clients (e.g. `xbol-api-admin`'s `ITicketingClient`)"
+    ]
+  },
+  "voiceEnabled": true
 }
