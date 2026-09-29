@@ -1,0 +1,7 @@
+linux:
+  installs:
+    cmd: python3 "$HOME/.dotfiles/ai/okf-cats/configure.py"
+  links:
+    ../agent-skills/karakeep-polychrome:
+      - ~/.agents/skills/karakeep-polychrome
+      - ~/.claude/skills/karakeep-polychrome

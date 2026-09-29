@@ -59,3 +59,5 @@ ai/claude/.cache/
 
 # Browser QA screenshots and audit logs written by agent-browser runs.
 /.ab-evidence/
+
+/ai/claude/skills/karakeep-polychrome
