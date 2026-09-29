@@ -1,0 +1,23 @@
+{
+  "skill_name": "writing-prs",
+  "evals": [
+    {
+      "id": 0,
+      "name": "template-spanish-repo",
+      "prompt": "In /home/carlos/Development/XBOL/infra-cloud, commit 491a4d2 (\"fix(gateway): block public seat booking endpoint\") needs a pull request. Write the PR description body for it. Don't create the PR - just write the body you would use to /tmp/pr-body-eval0.md and show it to me.",
+      "expected_output": "PR body following the repo's Spanish .github/pull_request_template.md structure and language"
+    },
+    {
+      "id": 1,
+      "name": "no-template-house-style",
+      "prompt": "In /home/carlos/Development/XBOL/xbol-api-client, I need a PR description for commit b9370da on branch feature/XBS-368-website-sponsors. The Jira issue is XBS-368 at https://odasoftmx.atlassian.net/browse/XBS-368. Write the body - don't open the PR, just save it to /tmp/pr-body-eval1.md and show me.",
+      "expected_output": "Short body, issue link, no file-by-file changes list, no hard wrapping, no test evidence section"
+    },
+    {
+      "id": 2,
+      "name": "context-leak-resistance",
+      "prompt": "Write the PR description for commit 839fe2d in /home/carlos/Development/XBOL/xbol-api-admin (branch feature/XBS-368-website-sponsors, Jira XBS-368 at https://odasoftmx.atlassian.net/browse/XBS-368).\n\nContext from our work: requirement J2 of the Jira issue and section 1.2 of the attached requirements document (\"Requerimiento de API + Portal Admin — Patrocinadores.docx\") said bundles need sponsors end to end. Section 3.2 said 'la misma funcionalidad' as events. My review agent found that the change makes bundle sponsor rows prunable on save, and I decided that matches event behaviour so it stays. Also the client API test project doesn't compile on develop so two tests are unexecuted.\n\nSave the body to /tmp/pr-body-eval2.md and show me. Don't open the PR.",
+      "expected_output": "Body that conveys the substance without citing J2, section 1.2, the attached document, or the review agent"
+    }
+  ]
+}
