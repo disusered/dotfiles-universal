@@ -1,5 +1,7 @@
 # Review package: <ticket key> <title>
 
+Review at: <URL, running now and opened for the user> — not in <production or other instance without the change>
+Started by: <exact command; left running>
 Status: ready-for-review
 Ticket: <key or URL>
 State: <local | committed | pushed | deployed> — <branch or commit>

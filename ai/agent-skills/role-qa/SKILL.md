@@ -20,7 +20,7 @@ stateDiagram-v2
   Intake --> Setup: ticket and review report loaded
   Setup --> Exercise: system running on the reviewed build; test data prepared without changing semantics
   Exercise --> Report: each AC exercised end to end; evidence captured
-  Report --> [*]: pass with demo steps per AC, or fail with the AC line and observed result
+  Report --> [*]: pass with demo steps per AC on the instance left running and opened for the user, or fail with the AC line and observed result
 ```
 
 | From | Guard | To | Companion skill | Exit artifact |

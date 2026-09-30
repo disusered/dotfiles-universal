@@ -67,8 +67,27 @@ A turn ends in exactly one of two states:
 
 | State | Guard |
 | --- | --- |
-| **Ready for review** | the role's output artifact is written and every guard on its exit transition holds |
+| **Ready for review** | the role's output artifact is written, every guard on its exit transition holds, and the review target is live (below) |
 | **Unable to continue** | the interrupt below reached `Questions` |
+
+### Review target
+
+Work handed to the user for review or acceptance must be open in front of them
+when the turn ends. The handoff never asks the user to build, start, deploy, or
+find anything.
+
+- Start the review instance yourself (dev server, preview build, or the
+  workspace's review environment per its tracker doc), leave it running, and
+  confirm it responds (for example `curl` returns 200) as the last check of the
+  turn.
+- Open it for the user (browser tab or the harness's open action) and put its
+  exact URL on the first line of the handoff and the review package.
+- Name what it is not: if production or another instance the user normally
+  uses does not have the change, say so in that same first line.
+- Evidence comes from that same running instance, not from an earlier or
+  stopped one.
+- A stopped server, an unstated port, or "run X to see it" is not ready for
+  review.
 
 Any other resting state is a protocol violation: no progress reports, no status
 prose, no "done", "finished", "complete", or "mostly" about the work, no

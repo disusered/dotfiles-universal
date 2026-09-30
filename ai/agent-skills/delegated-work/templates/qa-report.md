@@ -2,8 +2,9 @@
 
 Status: <ready-for-acceptance | ready-for-dev>
 Result: <pass | fail>
+Review at: <URL, running now and opened for the user> — not in <instance without the change>
 Build: <commit or deployed version>
-Environment: <URL or command that runs it>
+Started by: <exact command; left running>
 
 ## Acceptance criteria
 

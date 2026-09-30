@@ -23,7 +23,7 @@ stateDiagram-v2
   Build --> Verify: code builds; tests run
   Verify --> Build: an AC lacks evidence produced this turn
   Verify --> Build: scope audit finds unsourced behavior (remove it)
-  Verify --> Handoff: every AC has evidence; every hunk has a source
+  Verify --> Handoff: every AC has evidence from the running review instance; every hunk has a source; the instance responds and is opened for the user
   Handoff --> [*]: review package written; status ready-for-review
 ```
 
@@ -33,7 +33,7 @@ stateDiagram-v2
 | Sync | baseline synced | Plan | `xbol-sync-repos`, `cats-land status` | — |
 | Plan | every planned change has a source | Build | — | source map (draft) |
 | Build | builds; tests run | Verify | `implement`, `tdd`, `diagnosing-bugs` | — |
-| Verify | per-AC evidence this turn; scope audit clean | Handoff | `code-review` (spec axis) | — |
+| Verify | per-AC evidence this turn from the running review instance; scope audit clean; instance responds and is opened for the user | Handoff | `code-review` (spec axis), `run` | — |
 | Handoff | package written | end | — | review package |
 
 ## Traceability gate (Plan)
