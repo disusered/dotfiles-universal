@@ -7,8 +7,6 @@ global:
     agent-browser: ~/.agents/skills/agent-browser
     git-commit: ~/.agents/skills/git-commit
     slop-clean: ~/.agents/skills/slop-clean
-    grill-with-docs: ~/.agents/skills/grill-with-docs
-    domain-modeling: ~/.agents/skills/domain-modeling
     cfg-project-tasks: ~/.agents/skills/cfg-project-tasks
     bro:
       - ~/.agents/skills/bro
@@ -39,15 +37,34 @@ global:
     plain-english:
       - ~/.agents/skills/plain-english
       - ~/.claude/skills/plain-english
-    operational-report:
-      - ~/.agents/skills/operational-report
-      - ~/.claude/skills/operational-report
+    delegated-work:
+      - ~/.agents/skills/delegated-work
+      - ~/.claude/skills/delegated-work
+    role-pm:
+      - ~/.agents/skills/role-pm
+      - ~/.claude/skills/role-pm
+    role-architect:
+      - ~/.agents/skills/role-architect
+      - ~/.claude/skills/role-architect
+    role-developer:
+      - ~/.agents/skills/role-developer
+      - ~/.claude/skills/role-developer
+    role-reviewer:
+      - ~/.agents/skills/role-reviewer
+      - ~/.claude/skills/role-reviewer
+    role-qa:
+      - ~/.agents/skills/role-qa
+      - ~/.claude/skills/role-qa
+    role-release:
+      - ~/.agents/skills/role-release
+      - ~/.claude/skills/role-release
+    role-ops:
+      - ~/.agents/skills/role-ops
+      - ~/.claude/skills/role-ops
     git-commit/commands/git-commit.md:
       - ~/.claude/commands/git-commit.md
     slop-clean/commands/slop-clean.md:
       - ~/.claude/commands/slop-clean.md
-    grill-with-docs/commands/grill-with-docs.md:
-      - ~/.claude/commands/grill-with-docs.md
 linux:
   links:
     cocoindex:

@@ -33,8 +33,10 @@ both harness paths are symlinks. Project instructions supply local conventions.
 - State the actual relationship in plain words. Avoid stock phrases, contrastive
   framing that introduces an alternative nobody raised, and invented compound labels.
 - Before tool work, state the intended action briefly. During longer work, report
-  substantive findings, blockers, or changes in direction. Final replies stand
-  alone with the result, meaningful validation, and material remaining work.
+  substantive findings, blockers, or changes in direction.
+- Delegated development work follows the `delegated-work` skill: a turn ends
+  ready for review (the role's output artifact written, every guard met) or
+  unable to continue (context, agreement, then questions). No other stop.
 - Reuse authorization already given. Prepare reviewable work before requesting
   any remaining approval. Silence is not approval.
 - Explicit user instructions take precedence over skill defaults and other

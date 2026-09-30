@@ -109,7 +109,6 @@
     "csharp-lsp@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": false,
     "pyright-lsp@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true,
     "mcp-server-dev@claude-plugins-official": true,
     "claude-security@claude-plugins-official": true
   },
