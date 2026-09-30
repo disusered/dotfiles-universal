@@ -100,6 +100,11 @@ stateDiagram-v2
   Each question carries why it is asked, where its options came from, the cost
   of each option, and what the answer changes.
 
+Tool, environment, and implementation failures belong to the role: diagnose
+and fix them. They enter the interrupt only when they end in a real permission
+denial, quoted with the exact command and error. Run single documented
+commands; a wrapper script or a sandbox-bypass flag is never a workaround.
+
 A key decision is one where a wrong guess changes what the stakeholders get:
 scope, user-facing behavior, data, or anything hard to reverse. Routine
 implementation choices that follow project conventions are not key decisions.
