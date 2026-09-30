@@ -3,6 +3,8 @@
 Status: <ready-for-qa | ready-for-dev>
 Result: <pass | fail>
 Reviewed: <base>..<head>
+Started from: <review package | no review package; diff as found, work in progress>
+Reviewer: <harness and model>
 
 ## Acceptance criteria
 

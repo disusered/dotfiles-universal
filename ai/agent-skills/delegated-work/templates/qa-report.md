@@ -4,6 +4,7 @@ Status: <ready-for-acceptance | ready-for-dev>
 Result: <pass | fail>
 Review at: <URL, running now and opened for the user> — not in <instance without the change>
 Build: <commit or deployed version>
+Started from: <passing review report | no review report; build as found>
 Started by: <exact command; left running>
 
 ## Acceptance criteria

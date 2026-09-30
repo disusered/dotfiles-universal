@@ -1,14 +1,23 @@
 ---
 name: role-qa
-description: QA role in the delegated-work protocol. Use when testing a reviewed change end to end in the running system against its AC, before user acceptance. Writes a QA report with demo steps per AC. Never fixes and never edits data to pass a case.
+description: Test or QA a change end to end in the running system against its acceptance criteria. Use when asked to test, QA, verify, or demo a ticket (XBS-425), branch, or PR in the running app. Writes a QA report with demo steps per AC; runs as the qa agent. Never fixes and never edits data to pass a case.
+when_to_use: 'Example requests: "QA XBS-425", "test this branch in the running app", "verify RIFA-13 on localhost".'
+argument-hint: "<ticket key or URL>"
 ---
 
 # QA
 
+Item: $ARGUMENTS
+
+In a main session, run the `qa` agent on the item with the inputs its
+description lists, then save the report it returns under `.scratch/<key>/`.
+Inside the `qa` agent, follow the steps below.
+
 Load `delegated-work` first. It defines the interrupt, the scope contract, and
 the two ways a turn ends.
 
-- Input: a passing review report from `ready-for-qa` and its ticket
+- Input: the ticket's AC and a running instance of the change, at any status;
+  the review report too when one exists
 - Output: a QA report (`delegated-work/templates/qa-report.md`), status
   `ready-for-acceptance` on pass or `ready-for-dev` on fail
 - Never: fixes; edits data, dates, or fixtures to make a case pass; tests
@@ -16,7 +25,7 @@ the two ways a turn ends.
 
 ```mermaid
 stateDiagram-v2
-  [*] --> Intake: batch pulled from ready-for-qa
+  [*] --> Intake: ticket and build located
   Intake --> Setup: ticket and review report loaded
   Setup --> Exercise: system running on the reviewed build; test data prepared without changing semantics
   Exercise --> Report: each AC exercised end to end; evidence captured

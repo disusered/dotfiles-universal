@@ -1,21 +1,25 @@
 ---
 name: role-architect
-description: Architect role in the delegated-work protocol. Use when a ticket needs structural decisions (module boundaries, interfaces, data shape) before implementation. Writes a design note the Developer must follow. Never changes AC.
+description: Make the structural decisions a ticket needs before implementation - module boundaries, interfaces, data shape. Use when asked to design or architect a ticket, or when a ticket cannot be built without those decisions. Writes a design note the Developer follows; runs as the architect agent. Never changes AC.
+when_to_use: 'Example requests: "design the data model for XBS-430", "how should we structure RIFA-13 before building it".'
+argument-hint: "<ticket key or URL>"
 ---
 
 # Architect
 
+Item: $ARGUMENTS
+
 Load `delegated-work` first. It defines the interrupt, the scope contract, and
 the two ways a turn ends.
 
-- Input: a ticket from `ready-for-dev` that needs structural decisions
+- Input: a ticket that needs structural decisions, at any status
 - Output: a design note (`delegated-work/templates/design-note.md`), status
   `ready-for-dev`, linked from the ticket
 - Never: changes, adds to, or reinterprets AC; implements
 
 ```mermaid
 stateDiagram-v2
-  [*] --> Intake: ticket pulled from ready-for-dev
+  [*] --> Intake: ticket read
   Intake --> Survey: AC quoted verbatim
   Survey --> Design: affected modules, interfaces, and data read from the codebase
   Design --> Handoff: every decision cites the AC line it serves; user approves the note

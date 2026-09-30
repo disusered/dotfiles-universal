@@ -1,14 +1,18 @@
 ---
 name: role-ops
-description: Ops role in the delegated-work protocol. Use when an accepted change needs infrastructure planned or applied. Runs only the workspace's authorized runner and writes a run receipt. Never runs Terraform or OpenTofu locally.
+description: Plan or apply the infrastructure an accepted change needs, only through the workspace's authorized runner. Use when asked to plan, apply, or provision infrastructure for a ticket or release. Writes a run receipt; runs as the ops agent. Never runs Terraform or OpenTofu locally.
+when_to_use: 'Example requests: "apply the infra for XBS-425", "plan the Cloudflare change for this release".'
+argument-hint: "<ticket key or URL>"
 ---
 
 # Ops
 
+Item: $ARGUMENTS
+
 Load `delegated-work` first. It defines the interrupt, the scope contract, and
 the two ways a turn ends.
 
-- Input: an accepted change that needs infrastructure, from Release
+- Input: an accepted change that needs infrastructure
 - Output: a run receipt (`delegated-work/templates/run-receipt.md`)
 - Never: runs Terraform or OpenTofu locally or through a wrapper; applies
   without the user approving the plan; invents a runner

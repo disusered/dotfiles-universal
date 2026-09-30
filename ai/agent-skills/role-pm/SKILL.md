@@ -1,9 +1,13 @@
 ---
 name: role-pm
-description: PM role in the delegated-work protocol. Use when capturing a request, feature, epic, or sprint as tickets with acceptance criteria. Writes tickets with status ready-for-dev. Never builds.
+description: Plan work as tickets with acceptance criteria - capture a request, feature, bug report, epic, or sprint. Use when asked to plan, capture, ticket, spec, or scope work, or to plan the next sprint or batch. Writes tickets with status ready-for-dev; runs as the pm agent. Never builds.
+when_to_use: 'Example requests: "plan the next sprint", "turn this into tickets", "write the AC for this feature", "capture this bug".'
+argument-hint: "<ticket key or URL>"
 ---
 
 # PM
+
+Item: $ARGUMENTS
 
 Load `delegated-work` first. It defines the interrupt, the scope contract, and
 the two ways a turn ends.

@@ -1,14 +1,17 @@
 ---
 name: delegated-work
-description: Protocol for delegated development work. Use for any task handed off to be built, fixed, reviewed, tested, released, or planned. Defines the roles, their handoff artifacts and queues, the two ways a turn may end, the unable-to-continue interrupt, and the scope contract. Load the matching role-* skill for the role being taken.
+description: Work on a ticket or change at any stage - review, fix, adjust, implement, build, QA, test, commit, open a PR, ship, or plan it. Use when asked to do one of those on a ticket (XBS-425, RIFA-13, .../browse/XBS-425), branch, PR, or work already in progress. Routes the request to a role agent, and defines the two ways a turn ends, the unable-to-continue interrupt, and the scope contract.
+when_to_use: 'Example requests: "review the implementation of XBS-425", "review and adjust XBS-425", "implement XBS-430", "fix the bug in RIFA-13", "QA this branch", "open the PR for XBS-425", "plan the next sprint".'
 ---
 
 # Delegated work
 
-Delegated work is split into roles. Each role reads one input artifact, runs
-its state machine, writes one output artifact, and hands off. Roles never share
-a conversation; each runs in its own context (fresh session, subagent, or
-`/handoff`, per Matt Pocock's `PHASE-BOUNDARIES.md`).
+Work on a ticket is split into roles. Each role starts from the artifacts that
+already exist, runs its state machine, writes one output artifact, and ends
+the turn. Any session may run any role on any item at any stage: one phase on
+several items, one item end to end, or a later session picking up what an
+earlier one left. Review and QA run in the `reviewer` and `qa` agents, which
+see only the ticket, the diff or build, and what the caller passes them.
 
 The diagrams and tables are the rules. The text only explains them.
 
@@ -33,33 +36,78 @@ flowchart LR
   REL -- "Release receipt" --> DONE([Done])
 ```
 
-| Role | Skill | Input | Output | Never |
-| --- | --- | --- | --- | --- |
-| PM | `role-pm` | request | ticket | builds; marks work done |
-| Architect | `role-architect` | ticket needing structural decisions | design note | changes AC |
-| Developer | `role-developer` | ticket (+ design note) | review package | edits, relaxes, or reinterprets AC |
-| Reviewer | `role-reviewer` | ticket + review package + diff | review report | fixes |
-| QA | `role-qa` | ticket + passing review report | QA report | fixes; edits data to pass a case |
-| Release | `role-release` | acceptance | release receipt | deploys from a worktree; publishes without approval |
-| Ops | `role-ops` | accepted change needing infrastructure | run receipt | runs Terraform or OpenTofu locally |
+The chart shows where each artifact usually goes next. It is not an order of
+entry: a role starts from its minimum input below, whatever came before.
+
+| Role | Skill | Agent | Starts from | Output | Never |
+| --- | --- | --- | --- | --- | --- |
+| PM | `role-pm` | `pm` | a request | ticket | builds; marks work done |
+| Architect | `role-architect` | `architect` | a ticket | design note | changes AC |
+| Developer | `role-developer` | `developer` | a ticket or user instruction (+ design note, review or QA report if present) | review package | edits, relaxes, or reinterprets AC |
+| Reviewer | `role-reviewer` | `reviewer` | the ticket's AC and a diff (branch, PR, worktree), as it stands | review report | fixes |
+| QA | `role-qa` | `qa` | the ticket's AC and a running instance | QA report | fixes; edits data to pass a case |
+| Release | `role-release` | `release` | the user's acceptance | release receipt | deploys from a worktree; publishes without approval |
+| Ops | `role-ops` | `ops` | an accepted change needing infrastructure | run receipt | runs Terraform or OpenTofu locally |
 
 Artifact templates live in `templates/`. A new role is added from
-`templates/role.md`.
+`templates/role.md`, with an agent in `~/.dotfiles/ai/agents/`.
 
-## Queues
+## Routing a request
 
-Every artifact carries a status. Each role pulls a batch from the queue in
-front of it and sets the next status on handoff.
+Pick the role from what was asked, not from the item's status. Each role runs
+in its agent (the Agent tool with that `subagent_type`), which has the role's
+skills preloaded. Items in one request run in parallel, one agent per item.
+The `reviewer` and `qa` agents cannot write files: they return their report
+as their final message, and the caller saves it under `.scratch/<key>/`.
 
-| Status | Set by | Pulled by |
-| --- | --- | --- |
-| `ready-for-dev` | PM or stakeholders | Developer (or Architect first) |
-| `ready-for-review` | Developer | Reviewer |
-| `ready-for-qa` | Reviewer | QA |
-| `ready-for-acceptance` | QA | user |
-| `ready-for-release` | user | Release |
+| Request | Roles, in order |
+| --- | --- |
+| review X | Reviewer |
+| review and fix / adjust / redesign X | Reviewer, then Developer on the review report and the user's notes |
+| implement / build / fix X | Developer, then Reviewer |
+| test / QA X | QA |
+| commit / land / open the PR / ship X | Release |
+| plan / capture / ticket / sprint | PM |
+| X needs structural decisions | Architect, before Developer |
 
-The workspace tracker doc maps these statuses to the tracker's states or labels.
+When a request also carries the user's own notes (design feedback, a
+functional change), those notes are user instructions for the Developer, with
+the same standing as AC lines.
+
+A missing upstream artifact never stops a role. The role builds what it needs
+from its minimum input (the Reviewer maps hunks to AC from the diff itself) and
+states on the first line of its artifact what it started from, for example
+"No review package; reviewed `develop..HEAD` as found, work in progress."
+Unfinished AC are judged `missing`, not waited for.
+
+## Item state
+
+Artifacts live in the item's folder (`.scratch/<key>/` unless the tracker doc
+says otherwise). A role reads the folder to see what exists and writes the next
+status to `.scratch/<key>/status` on handoff. The status records where the item
+is; it never decides which role may start.
+
+| Status | Written by |
+| --- | --- |
+| `ready-for-dev` | PM or stakeholders; Reviewer or QA on fail |
+| `ready-for-review` | Developer |
+| `ready-for-qa` | Reviewer on pass |
+| `ready-for-acceptance` | QA on pass |
+| `ready-for-release` | user |
+
+Several agents or models may run the same role on one item. Each writes its own
+artifact, suffixed with its model (`review-report.fable.md`), and none
+overwrites another's. The workspace tracker doc maps statuses to the tracker's
+states or labels.
+
+## Plan mode
+
+Review and QA need no plan mode. Their agents cannot write files and run with
+`permissionMode: default`, so a plan-mode session can start them and put the
+returned reports in the plan file. For a Developer in plan mode, the plan file
+is the traceability gate: every planned change cites its AC line or user
+instruction and names the agent that will run each role after approval. That
+turn is ready for review when the plan is written and `ExitPlanMode` is called.
 
 ## Ending a turn
 
@@ -67,7 +115,7 @@ A turn ends in exactly one of two states:
 
 | State | Guard |
 | --- | --- |
-| **Ready for review** | the role's output artifact is written, every guard on its exit transition holds, and the review target is live (below) |
+| **Ready for review** | the role's output artifact is written (for `reviewer` and `qa`, returned and saved by the caller), every guard on its exit transition holds, and the review target is live (below) |
 | **Unable to continue** | the interrupt below reached `Questions` |
 
 ### Review target
@@ -152,7 +200,7 @@ add to, relax, tighten, reinterpret, or rewrite them.
 
 Read the workspace's tracker doc (linked from its AGENTS.md "Agent skills"
 block) before taking a role. It states the tracker, the roles the agent may
-take, the AC owner, the queue mapping, the permitted writes, and the release
+take, the AC owner, the item-state mapping, the permitted writes, and the release
 target. A role the workspace does not allow is not taken; its artifact comes
 from the stakeholders.
 

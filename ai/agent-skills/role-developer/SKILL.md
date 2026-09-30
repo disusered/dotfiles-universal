@@ -1,14 +1,20 @@
 ---
 name: role-developer
-description: Developer role in the delegated-work protocol. Use when implementing a ticket. Enforces the traceability gate and scope audit, and writes a review package with per-AC evidence. Never edits, relaxes, or reinterprets AC.
+description: Implement, build, fix, or adjust a ticket or change, including fixing review or QA findings on work already in progress. Use when asked to implement, build, fix, change, adjust, or redesign a ticket (XBS-425, .../browse/XBS-425). Enforces the traceability gate and scope audit and writes a review package with per-AC evidence; runs as the developer agent. Never edits, relaxes, or reinterprets AC.
+when_to_use: 'Example requests: "implement XBS-430", "fix the findings on XBS-425", "adjust the dashboard per my notes", "fix the bug in RIFA-13".'
+argument-hint: "<ticket key or URL>"
 ---
 
 # Developer
 
+Item: $ARGUMENTS
+
 Load `delegated-work` first. It defines the interrupt, the scope contract, and
 the two ways a turn ends.
 
-- Input: a ticket from `ready-for-dev` (and its design note, if any)
+- Input: a ticket or a user instruction, at any status, plus any design note,
+  review report, or QA report already in the item's folder; findings in those
+  reports and the user's notes are planned like AC lines
 - Output: a review package (`delegated-work/templates/review-package.md`),
   status `ready-for-review`
 - Never: edits, relaxes, tightens, or reinterprets AC; changes data or fixtures
@@ -16,7 +22,7 @@ the two ways a turn ends.
 
 ```mermaid
 stateDiagram-v2
-  [*] --> Intake: ticket pulled from ready-for-dev
+  [*] --> Intake: ticket and existing artifacts read
   Intake --> Sync: AC quoted verbatim
   Sync --> Plan: baseline synced; stranded work known
   Plan --> Build: traceability gate — every planned change cites an AC line or user instruction

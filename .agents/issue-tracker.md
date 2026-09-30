@@ -21,7 +21,7 @@ content lives in `.scratch/<todo-id>/ticket.md`.
 Capture a TODO with `tasks_capture` and write the ticket to
 `.scratch/<todo-id>/ticket.md`.
 
-## Queue mapping
+## Item state
 
 Until Portal TODOs carry a work stage, the stage is the first line of
 `.scratch/<todo-id>/status`.

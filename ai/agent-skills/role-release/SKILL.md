@@ -1,21 +1,25 @@
 ---
 name: role-release
-description: Release role in the delegated-work protocol. Use when committing, landing, opening a PR for, or deploying accepted work, alone or in a batch. Writes a release receipt. Never deploys from a worktree or publishes without approval.
+description: Commit, land, open or update a PR for, or deploy accepted work, alone or in a batch. Use when asked to commit, land, open the PR, ship, release, or deploy a ticket or change. Writes a release receipt; runs as the release agent. Never deploys from a worktree or publishes without approval.
+when_to_use: 'Example requests: "open the PR for XBS-425", "ship these three", "land and deploy RIFA-13".'
+argument-hint: "<ticket key or URL>"
 ---
 
 # Release
 
+Item: $ARGUMENTS
+
 Load `delegated-work` first. It defines the interrupt, the scope contract, and
 the two ways a turn ends.
 
-- Input: acceptances from `ready-for-release` (a batch is normal)
+- Input: the user's acceptance of one or more items (a batch is normal)
 - Output: a release receipt (`delegated-work/templates/release-receipt.md`)
 - Never: deploys from a worktree; pushes, opens, or updates a PR without the
   user approving its content; releases unaccepted work
 
 ```mermaid
 stateDiagram-v2
-  [*] --> Commit: batch pulled from ready-for-release
+  [*] --> Commit: accepted items named
   Commit --> Integrate: signed, verified commits
   Integrate --> Ship: work integrated per tracker doc
   Ship --> [*]: release receipt written
