@@ -6,7 +6,7 @@
     ],
     "layer": "top",
     "position": "top",
-    "height": 25,
+    "height": 30,
     "spacing": 4,
     "modules-left": [
       "clock",
@@ -110,7 +110,7 @@
         "mpv": "🎵"
       },
       "status-icons": {
-        "paused": "⏸"
+        "paused": "\u23f8\ufe0e"
       },
       "interval": 15,
       "dynamic-len": 60
@@ -138,7 +138,7 @@
     ],
     "layer": "top",
     "position": "top",
-    "height": 25,
+    "height": 30,
     "spacing": 4,
     "modules-left": [
       "clock",
@@ -174,7 +174,7 @@
         "mpv": "🎵"
       },
       "status-icons": {
-        "paused": "⏸"
+        "paused": "\u23f8\ufe0e"
       },
       "interval": 15,
       "dynamic-len": 60
@@ -209,7 +209,7 @@
     "output": "HDMI-A-2",
     "layer": "top",
     "position": "top",
-    "height": 25,
+    "height": 30,
     "spacing": 2,
     "modules-left": [
       "hyprland/workspaces"
