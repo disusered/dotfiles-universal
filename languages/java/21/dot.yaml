@@ -1,0 +1,7 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      source "$HOME/.sdkman/bin/sdkman-init.sh"
+      sdk list java 2>/dev/null | grep -q 'installed.*21\.0\.12+1\.1-tem' || echo n | sdk install java 21.0.12+1.1-tem
+    depends:
+      - /tools/sdkman

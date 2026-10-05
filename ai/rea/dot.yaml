@@ -1,0 +1,27 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -eu
+      REA_VERSION=3.2.1
+      GHIDRA_DIR="$HOME/.local/opt/ghidra_12.1.4_PUBLIC"
+      JAVA_DIR="$HOME/.sdkman/candidates/java/21.0.12+1.1-tem"
+      tmp=$(mktemp -d)
+      trap 'rm -rf "$tmp"' EXIT
+      if [ ! -x "$GHIDRA_DIR/support/analyzeHeadless" ]; then
+        curl -fsSL -o "$tmp/ghidra.zip" https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_12.1.4_build/ghidra_12.1.4_PUBLIC_20260921.zip
+        echo "ddac49f903da9d5bac833e5cc79395098b9c33cfd3279be5f31bd00387d2d4db  $tmp/ghidra.zip" | sha256sum -c -
+        mkdir -p "$HOME/.local/opt"
+        unzip -q "$tmp/ghidra.zip" -d "$HOME/.local/opt"
+      fi
+      skill="$HOME/.agents/skills/reverse-engineer-anything"
+      if ! grep -qs 'version: "23"' "$skill/SKILL.md"; then
+        (cd "$tmp" && PATH=/usr/bin:/bin npm pack "rea-agents@$REA_VERSION" --silent >/dev/null && tar xzf "rea-agents-$REA_VERSION.tgz")
+        rm -rf "$skill"
+        cp -r "$tmp/package/skills/reverse-engineer-anything" "$skill"
+      fi
+      ln -sfn ../../../../.agents/skills/reverse-engineer-anything "$HOME/.claude/skills/reverse-engineer-anything"
+      if ! claude mcp get rea >/dev/null 2>&1; then
+        claude mcp add rea --scope user --transport stdio -e PATH=/usr/bin:/bin -e "GHIDRA_INSTALL_DIR=$GHIDRA_DIR" -e "JAVA_HOME=$JAVA_DIR" -- npx -y "rea-agents@$REA_VERSION" mcp
+      fi
+    depends:
+      - /languages/java/21

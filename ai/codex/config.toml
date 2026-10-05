@@ -262,6 +262,16 @@ approval_mode = "approve"
 approval_mode = "approve"
 
 [mcp_servers.node_repl]
+[mcp_servers.rea]
+command = "npx"
+args = ["-y", "rea-agents@3.2.1", "mcp"]
+startup_timeout_sec = 30
+
+[mcp_servers.rea.env]
+PATH = "/usr/bin:/bin"
+GHIDRA_INSTALL_DIR = "/home/carlos/.local/opt/ghidra_12.1.4_PUBLIC"
+JAVA_HOME = "/home/carlos/.sdkman/candidates/java/21.0.12+1.1-tem"
+
 args = []
 command = "/usr/lib/chatgpt/resources/cua_node/bin/node_repl"
 startup_timeout_sec = 120
