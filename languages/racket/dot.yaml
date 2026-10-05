@@ -1,0 +1,18 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -e
+      sudo pacman -S --noconfirm --needed racket
+      # `#lang sicp` — the SICP language level (nil, inc/dec, error, the picture
+      # language) so the book's code runs unmodified in DrRacket or `racket`.
+      raco pkg install --auto --skip-installed sicp
+      # Editor support: LSP and formatter used by editors/neovim/plugins/racket.lua
+      raco pkg install --auto --skip-installed racket-langserver fmt
+darwin:
+  installs:
+    cmd: |
+      set -e
+      brew install --cask racket
+      raco pkg install --auto --skip-installed sicp racket-langserver fmt
+    depends:
+      - /packages/homebrew

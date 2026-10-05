@@ -52,6 +52,7 @@ global:
       - ~/.config/nvim/lua/plugins/noice.lua
       - ~/.config/nvim-notebook/lua/plugins/noice.lua
     quicker.lua: ~/.config/nvim/lua/plugins/quicker.lua
+    racket.lua: ~/.config/nvim/lua/plugins/racket.lua
     rails.lua: ~/.config/nvim/lua/plugins/rails.lua
     razor.lua: ~/.config/nvim/lua/plugins/razor.lua
     snacks.lua:
