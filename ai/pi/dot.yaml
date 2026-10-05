@@ -1,0 +1,18 @@
+linux:
+  installs:
+    cmd: |
+      set -eu
+      npm install -g --no-audit --no-fund @earendil-works/pi-coding-agent@1.0.2
+      # OptChat is our own reviewed copy; see README for provenance.
+      (cd ~/.dotfiles/ai/pi/extensions/optchat && npm ci --ignore-scripts --no-audit --no-fund)
+      pi install ~/.dotfiles/ai/pi/extensions/optchat
+      # Unlicensed upstream, so installed from git pinned to the reviewed commit.
+      pi install git:github.com/aliceisjustplaying/pi-you-should-know@1322e7410e7b3f08bf4bd03ab9728d996c647d0c
+      pi install npm:pi-notify@1.4.0
+      pi install npm:@bacnh85/pi-checkpoint@0.1.9
+      cats=~/Development/ME/herding-cats
+      pi mcp add okf-cats --cwd "$cats" -- node "$cats/utilities/cats-mcp/server.mjs"
+      pi mcp add portal-tasks --cwd "$cats" -- node "$cats/projects/brain-portal/apps/mcp/dist/bin.js"
+      pi --version
+    depends:
+      - /languages/javascript/node/latest
