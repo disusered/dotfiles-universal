@@ -98,10 +98,7 @@ behavior changes. Preserve existing worktree changes and permission settings.
 
 ## Agent skills
 
-Delegated work follows the `delegated-work` protocol and its `role-*` skills,
-built on Matt Pocock's skills.
-
 ### Issue tracker
 
-Brain Portal Tasks; the agent may take every role, one per context. See
+Brain Portal Tasks, through the `portal-tasks` MCP server. See
 `.agents/issue-tracker.md`.

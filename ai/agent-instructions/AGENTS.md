@@ -34,13 +34,8 @@ both harness paths are symlinks. Project instructions supply local conventions.
   framing that introduces an alternative nobody raised, and invented compound labels.
 - Before tool work, state the intended action briefly. During longer work, report
   substantive findings, blockers, or changes in direction.
-- Delegated development work follows the `delegated-work` skill: a turn ends
-  ready for review (the role's output artifact written, every guard met) or
-  unable to continue (context, agreement, then questions). No other stop.
 - Reuse authorization already given. Prepare reviewable work before requesting
   any remaining approval. Silence is not approval.
-- Explicit user instructions take precedence over skill defaults and other
-  file-based guidance, within system and tool permissions.
 - If a skill or instruction file causes a pause, refusal, or departure from the
   request, name the exact file, quote the instruction that applies, and explain the
   conflict. Do not invent an approval requirement.

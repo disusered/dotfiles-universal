@@ -36,30 +36,6 @@ global:
     plain-english:
       - ~/.agents/skills/plain-english
       - ~/.claude/skills/plain-english
-    delegated-work:
-      - ~/.agents/skills/delegated-work
-      - ~/.claude/skills/delegated-work
-    role-pm:
-      - ~/.agents/skills/role-pm
-      - ~/.claude/skills/role-pm
-    role-architect:
-      - ~/.agents/skills/role-architect
-      - ~/.claude/skills/role-architect
-    role-developer:
-      - ~/.agents/skills/role-developer
-      - ~/.claude/skills/role-developer
-    role-reviewer:
-      - ~/.agents/skills/role-reviewer
-      - ~/.claude/skills/role-reviewer
-    role-qa:
-      - ~/.agents/skills/role-qa
-      - ~/.claude/skills/role-qa
-    role-release:
-      - ~/.agents/skills/role-release
-      - ~/.claude/skills/role-release
-    role-ops:
-      - ~/.agents/skills/role-ops
-      - ~/.claude/skills/role-ops
     git-commit/commands/git-commit.md:
       - ~/.claude/commands/git-commit.md
     slop-clean/commands/slop-clean.md:

@@ -4,13 +4,6 @@ global:
     cmd: "true"
   links:
     fact-checker.md: ~/.claude/agents/fact-checker.md
-    reviewer.md: ~/.claude/agents/reviewer.md
-    developer.md: ~/.claude/agents/developer.md
-    qa.md: ~/.claude/agents/qa.md
-    release.md: ~/.claude/agents/release.md
-    pm.md: ~/.claude/agents/pm.md
-    architect.md: ~/.claude/agents/architect.md
-    ops.md: ~/.claude/agents/ops.md
     fact_checker.toml: ~/.codex/agents/fact_checker.toml
     knowledge_explorer.toml: ~/.codex/agents/knowledge_explorer.toml
     knowledge_curator.toml: ~/.codex/agents/knowledge_curator.toml

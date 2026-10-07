@@ -1,15 +1,11 @@
-# Issue tracker: Brain Portal Tasks (owner)
+# Issue tracker: Brain Portal Tasks
 
-Used by the `delegated-work` protocol and Matt Pocock's skills ("Other" tracker).
-
-## Workspace configuration
+Used by Matt Pocock's skills ("Other" tracker).
 
 | Field | Value |
 | --- | --- |
 | Tracker | Brain Portal Tasks, via the `portal-tasks` MCP server |
-| AC owner | the user, through the PM role |
-| Roles the agent may take | all, one per context |
-| Release target | signed commits on `main` with `git-commit`; links applied with `rotz`. No push without an explicit request |
+| Landing | signed commits on `main` with `git-commit`; links applied with `rotz`. No push without an explicit request |
 
 ## When a skill says "fetch the relevant ticket"
 
@@ -20,8 +16,3 @@ content lives in `.scratch/<todo-id>/ticket.md`.
 
 Capture a TODO with `tasks_capture` and write the ticket to
 `.scratch/<todo-id>/ticket.md`.
-
-## Item state
-
-Until Portal TODOs carry a work stage, the stage is the first line of
-`.scratch/<todo-id>/status`.
