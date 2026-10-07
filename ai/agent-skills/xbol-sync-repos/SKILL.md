@@ -1,24 +1,35 @@
 ---
 name: xbol-sync-repos
-description: Fetch and prune origin, switch XBOL repositories to their baseline branch, fast-forward them, and clear obsolete local branches and worktrees whose work is recoverable. Use when asked to sync or clean the XBOL checkouts.
+description: Fetch and prune the club-tijuana `client` remote, switch XBOL repositories to their baseline branch, fast-forward them, and clear obsolete local branches and worktrees whose work is recoverable. Use when asked to sync or clean the XBOL checkouts.
 ---
 
 Maintain these existing checkouts under `/home/carlos/Development/XBOL`:
 
-- `xbol-api-admin`
-- `xbol-api-ticketing`
-- `xbol-api-client`
-- `xbol-db-develop` (origin repository `odasoft/xbol-db`)
-- `xbol-web-client`
-- `xbol-web-admin`
-- `xbol-bastion` — use `main` / `origin/main`
+| Checkout             | Remote   | GitHub repository              | Baseline |
+| -------------------- | -------- | ------------------------------ | -------- |
+| `xbol-api-admin`     | `client` | `club-tijuana/xbol-api-admin`     | `dev`    |
+| `xbol-api-ticketing` | `client` | `club-tijuana/xbol-api-ticketing` | `dev`    |
+| `xbol-api-client`    | `client` | `club-tijuana/xbol-api-client`    | `dev`    |
+| `xbol-web-client`    | `client` | `club-tijuana/xbol-web-client`    | `dev`    |
+| `xbol-web-admin`     | `client` | `club-tijuana/xbol-web-admin`     | `dev`    |
+| `xbol-db-develop`    | `client` | `club-tijuana/xbol-db`            | `main`   |
+| `xbol-bastion`       | `origin` | `odasoft/xbol-bastion`            | `main`   |
 
-An invocation to run this maintenance authorizes origin fetching and pruning, clean
-checkout switches, fast-forward updates, removal of obsolete worktrees and worktree
-metadata, and deletion of obsolete local branches whose work is recoverable. It does
-not authorize deleting any branch on GitHub; that requires the separate confirmation
-described under "Delete origin branches". Creating or editing this skill alone does
-not authorize a maintenance run.
+`client` (`club-tijuana/*`) is the main remote. `origin` (`odasoft/*`) is deprecated;
+Bastion is the only exception, because `club-tijuana/xbol-bastion` is still empty.
+In the rest of this skill, "the remote" means the checkout's remote from the table.
+
+**Main-based repositories.** A repository whose remote has no `dev` branch, such as
+`xbol-db`, is main-based: its baseline is `main` and its integration refs are
+`<remote>/main` and `<remote>/release/*`. That is a normal state, not a missing target.
+Do not ask about it, create a `dev` branch, or look for `develop`.
+
+An invocation to run this maintenance authorizes fetching and pruning the remote,
+clean checkout switches, fast-forward updates, removal of obsolete worktrees and
+worktree metadata, and deletion of obsolete local branches whose work is recoverable.
+It does not authorize deleting any branch on GitHub; that requires the separate
+confirmation described under "Delete remote branches". Creating or editing this skill
+alone does not authorize a maintenance run.
 
 Use `git -C <repository>` for every command, or the harness's working-directory
 argument where one exists.
@@ -26,63 +37,64 @@ argument where one exists.
 ## Sync
 
 Read applicable workspace and repository instructions. Inspect each checkout's status,
-`git remote get-url origin`, local branches with upstreams, and
-`git worktree list --porcelain`. Only use the corresponding `odasoft/*` origin.
-Never access `client` or any `club-tijuana` remote, including fetch-all operations.
-Preserve unrelated changes.
+`git remote get-url <remote>`, local branches with upstreams, and
+`git worktree list --porcelain`. Confirm the remote URL points at the repository in the
+table. Fetch only that remote: never fetch `origin` for a `client` checkout, and never
+use fetch-all operations. Preserve unrelated changes.
 
-Run `git fetch --prune origin` in each repository and record the time of that fetch;
+Run `git fetch --prune <remote>` in each repository and record the time of that fetch;
 the receipt reports it. Independent repository fetches may run concurrently. Check
 each exit status; retry sandbox, network, or socket failures with supported escalation
 using the same command. A failed fetch blocks cleanup in that repository, not the
 others.
 
-Use `main` and `origin/main` for Bastion throughout the sync and verification steps;
-use `develop` and `origin/develop` for the other repositories.
+For a clean checkout, run `git switch <baseline>` followed by
+`git merge --ff-only <remote>/<baseline>`. If the local baseline branch does not
+exist, use `git switch --track -c <baseline> <remote>/<baseline>` instead. Check for an
+existing linked worktree occupying the baseline before switching. Do not stash or
+discard dirty work.
 
-For a clean checkout with `origin/develop`, run `git switch develop` followed by
-`git merge --ff-only origin/develop`. If local develop does not exist, use
-`git switch --track -c develop origin/develop` instead. Check for an existing linked
-worktree occupying develop before switching. Do not stash or discard dirty work.
+Verify `git rev-list --left-right --count <baseline>...<remote>/<baseline>`; a
+successful fast-forward command does not prove equality when the baseline is locally
+ahead. Report ahead/diverged commits and ask before resetting or rebasing. An existing
+commit elsewhere does not itself authorize resetting the baseline.
 
-Verify `git rev-list --left-right --count develop...origin/develop`; a successful
-fast-forward command does not prove equality when develop is locally ahead.
-Report ahead/diverged commits and ask before resetting or rebasing. An existing
-commit elsewhere does not itself authorize resetting develop.
-
-If the configured origin target is missing, ask for the intended branch instead of
-creating a remote branch or inventing a base. The user has explicitly selected
-main for Bastion; do not ask again merely because origin/develop is absent there.
+If the table's baseline is missing on the remote and the repository is not main-based,
+ask for the intended branch instead of creating a remote branch or inventing a base.
 
 ## Classify every local branch
 
-Protect `develop`, `main`, `master`, and any branch the user names. Ignore branches
-tracking remotes other than origin. Every other local branch is a candidate, whether
-or not its origin upstream still exists — a live upstream is not a reason to keep a
-local ref, because origin holds that work either way.
+Protect `dev`, `main`, `master`, and any branch the user names. Also protect a leftover
+local `develop` from the odasoft era: do not sync, reset, or delete it; report its
+object ID so the user can decide. Every other local branch is a candidate, whether it
+tracks the remote, tracks `origin`, or has no upstream — a live upstream is not a
+reason to keep a local ref, because the remote holds that work either way.
 
 Gather the pull request state and head commit for each candidate with
-`gh pr list --repo odasoft/<repository> --head <branch> --state all --json
-number,state,headRefName,headRefOid,author`. Pin `--repo` on every GitHub call:
-several checkouts carry a `club-tijuana` remote named `client`, and an unpinned call
-has read from it before.
+`gh pr list --repo <github-repository> --head <branch> --state all --json
+number,state,headRefName,headRefOid,author`, using the repository from the table. Pin
+`--repo` on every GitHub call: checkouts still carry the deprecated `origin`, and an
+unpinned call can read from the wrong repository.
 
-Delete the local branch when any of these holds:
+The integration refs are the freshly fetched `<remote>/dev` (where it exists),
+`<remote>/main`, and existing `<remote>/release/*`. Delete the local branch when any of
+these holds:
 
-- Its tip is an ancestor of a freshly fetched origin integration branch (`develop`,
-  `main`, or an existing `release/*`), verified with `git merge-base --is-ancestor`.
+- Its tip is an ancestor of an integration ref, verified with
+  `git merge-base --is-ancestor`.
 - Every commit `git cherry <integration-ref> <candidate>` reports is patch equivalent
   (a nonempty result containing only `-` lines).
 - Its pull request state is `MERGED` **and** `git rev-parse <branch>` equals that pull
   request's `headRefOid`.
 - Its pull request state is `CLOSED` and `git rev-parse <branch>` equals
-  `git rev-parse origin/<branch>`.
+  `git rev-parse <remote>/<branch>`.
 - Its pull request state is `CLOSED`, its upstream was pruned, and `git rev-parse
-  <branch>` equals the object ID that `git ls-remote origin refs/pull/<number>/head`
+  <branch>` equals the object ID that `git ls-remote <remote> refs/pull/<number>/head`
   reports. GitHub retains pull request head refs after the branch is deleted, so a tip
   that matches remains fetchable.
 - It has no pull request and `git rev-parse <branch>` equals `git rev-parse
-  origin/<branch>`. Origin holds the identical commit, so the local ref carries nothing.
+  <remote>/<branch>`. The remote holds the identical commit, so the local ref carries
+  nothing.
 
 Compare object IDs directly in every case. Do not infer equality from the `[gone]`
 marker, from ahead/behind counts, or from pull request state alone.
@@ -91,12 +103,15 @@ Keep and report, never delete:
 
 - Any branch with an `OPEN` pull request.
 - **Stale tips.** Any branch whose pull request is `MERGED` or `CLOSED` but whose local
-  tip does not match that pull request's head commit or the origin branch. Commits were
+  tip does not match that pull request's head commit or the remote branch. Commits were
   added after the pull request closed and exist nowhere else. Report the branch, the
   pull request number, and how many commits are unpushed
   (`git rev-list --count <pr-head>..<branch>`).
+- **Legacy odasoft work.** A branch that tracks `origin` and has no proof against the
+  remote's integration refs or pull requests. Do not fetch `origin` to prove it; name
+  it and say it predates the move to `club-tijuana`.
 - Any branch with no pull request, no integration proof, and a tip that exists nowhere
-  on origin. This is genuinely unique local work; name it and say why it was kept.
+  on the remote. This is genuinely unique local work; name it and say why it was kept.
 
 Preserve uncertain squash or rewritten histories unless pull request state or another
 source resolves them. Record the branch name, its old object ID, and the signal used
@@ -116,27 +131,29 @@ worktree reported by `git worktree list --porcelain`:
 - **Clean, and its branch qualifies for deletion above** — `git worktree remove` it,
   then delete the branch.
 - **Clean, and its branch is kept** — leave both in place.
-- **Detached HEAD whose commit is an ancestor of an origin integration ref** — remove
-  the worktree. `git worktree prune` never reaches these, because their paths exist.
+- **Detached HEAD whose commit is an ancestor of an integration ref** — remove the
+  worktree. `git worktree prune` never reaches these, because their paths exist.
 - **Detached HEAD whose commit is on no integration ref** — keep and report the commit.
 
 Also run `git worktree prune --verbose` to discard records for absent paths.
 
-## Delete origin branches
+## Delete remote branches
 
 Deleting a branch on GitHub is an outward action and is never part of the authorized
-local cleanup. After the local pass, list the origin branches that qualify: the branch
+local cleanup. After the local pass, list the remote branches that qualify: the branch
 was deleted locally and its pull request author is `disusered`. Never propose deleting
-another author's origin branch — remove only the local copy of their work.
+another author's remote branch — remove only the local copy of their work. Never
+propose deletions on the deprecated `origin` for a `client` checkout.
 
-Present that list with each branch's pull request number and state, then wait for
-explicit confirmation before running any `git push origin --delete`. Proceed with the
-rest of the report if confirmation does not come.
+Present that list with each branch's repository, pull request number, and state, then
+wait for explicit confirmation before running any `git push <remote> --delete`.
+Proceed with the rest of the report if confirmation does not come.
 
 ## Verify and report
 
 Verify the final branch, clean or dirty status, and ahead/behind counts against the
-fetched origin target for every checkout. Report the number of deleted local branches,
+fetched baseline for every checkout. Report each repository's remote and baseline so a
+main-based repository reads as normal. Report the number of deleted local branches,
 removed worktrees, pruned refs and metadata, and retained exceptions with evidence.
 Distinguish missing targets and locally ahead branches from successful synchronization.
 
