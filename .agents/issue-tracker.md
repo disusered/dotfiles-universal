@@ -9,8 +9,8 @@ Used by Matt Pocock's skills ("Other" tracker).
 
 ## When a skill says "fetch the relevant ticket"
 
-Read the TODO with `tasks_get`. Until Portal TODOs carry a body, the ticket
-content lives in `.scratch/<todo-id>/ticket.md`.
+Read the TODO with `tasks_get`. The ticket content lives in
+`.scratch/<todo-id>/ticket.md`.
 
 ## When a skill says "publish to the issue tracker"
 
