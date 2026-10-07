@@ -4,7 +4,6 @@ global:
     depends:
       - /languages/python/uv
   links:
-    agent-browser: ~/.agents/skills/agent-browser
     git-commit: ~/.agents/skills/git-commit
     slop-clean: ~/.agents/skills/slop-clean
     cfg-project-tasks: ~/.agents/skills/cfg-project-tasks

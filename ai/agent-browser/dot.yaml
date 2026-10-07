@@ -1,3 +1,0 @@
-linux[whoami.distro^="Arch"]:
-  installs:
-    cmd: command -v agent-browser &>/dev/null || npm install -g agent-browser

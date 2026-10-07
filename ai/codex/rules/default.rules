@@ -320,7 +320,6 @@ prefix_rule(pattern=["gcloud", "secrets", "list", "--project=boletera-qa", "--fo
 prefix_rule(pattern=["bundle", "exec", "rails"], decision="allow")
 prefix_rule(pattern=["git", "merge-tree"], decision="allow")
 prefix_rule(pattern=["git", "fetch"], decision="allow")
-prefix_rule(pattern=["agent-browser"], decision="allow")
 prefix_rule(pattern=["git", "worktree"], decision="allow")
 prefix_rule(pattern=["gcloud", "secrets", "versions", "access", "latest", "--secret=smtp-secret", "--project=boletera-prod"], decision="allow")
 prefix_rule(pattern=["npm", "run", "test:admin:headless"], decision="allow")

@@ -36,7 +36,7 @@ stateDiagram-v2
 | --- | --- | --- | --- | --- |
 | Intake | ticket and report loaded | Setup | — | — |
 | Setup | running on the reviewed build | Exercise | `run`, project run instructions | — |
-| Exercise | every AC exercised; evidence captured | Report | `agent-browser`, `webapp-testing` | — |
+| Exercise | every AC exercised; evidence captured | Report | project test instructions; native browser skill for interactive checks | — |
 | Report | report written | end | — | QA report |
 
 If the system cannot run, or the only way to show an AC is to change data

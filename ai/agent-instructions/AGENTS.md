@@ -83,6 +83,11 @@ both harness paths are symlinks. Project instructions supply local conventions.
   checks appropriate to the changed behavior, including required domain checks.
   E2E tests require authorization and their documented environment and credentials.
   Services may use ephemeral ports.
+- Run automated browser tests through the project's documented headless runner.
+  For interactive browser work, use Claude in Chrome or Codex's native Browser/Chrome
+  tools and load the corresponding native browser skill. Use the user's existing
+  browser session when sign-ins are needed. If the required native connection is
+  unavailable, report the missing connection rather than launch a separate browser.
 - Do not add tests that merely mirror small reversible edits, automatic second
   reviews, or repeated successful checks without a new reason.
 
