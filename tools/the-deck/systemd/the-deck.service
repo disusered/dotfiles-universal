@@ -1,0 +1,23 @@
+[Unit]
+Description=The Deck live visuals and music bridge for Roku
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Development/ME/herding-cats/workshop/spikes/the-deck
+EnvironmentFile=%h/.config/the-deck/env
+ExecStart=/usr/bin/python3 -u %h/Development/ME/herding-cats/workshop/spikes/the-deck/tv/bridge.py --host ${DECK_LISTEN_HOST} --port ${DECK_PORT} --public-host ${DECK_PUBLIC_HOST} --roku-host ${DECK_ROKU_HOST} --browser-origin ${DECK_BROWSER_ORIGIN}
+Restart=on-failure
+RestartSec=3s
+TimeoutStopSec=20s
+UMask=0077
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=read-only
+ProtectSystem=strict
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=default.target

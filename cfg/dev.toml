@@ -14,6 +14,7 @@ units = [
   "brain-portal.service",
   "brain-portal-postgres.service",
   "deepseek-harness.service",
+  "the-deck.service",
   "watchman.socket",
   "romm.service",
   "romm-db.service",

@@ -1,0 +1,16 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -eu
+      if ! pacman -Q python ffmpeg >/dev/null 2>&1; then
+        sudo pacman -S --needed --noconfirm python ffmpeg
+      fi
+      mkdir -p ~/.config/the-deck
+      if [ ! -f ~/.config/the-deck/env ]; then
+        install -m0600 ~/.dotfiles/tools/the-deck/env.example ~/.config/the-deck/env
+      fi
+      ~/.rotz/bin/rotz link /tools/the-deck -f
+      systemctl --user daemon-reload
+      echo 'The Deck service is installed. Run cfg run open from workshop/spikes/the-deck to start it.'
+  links:
+    systemd/the-deck.service: ~/.config/systemd/user/the-deck.service
