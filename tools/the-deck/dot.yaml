@@ -2,10 +2,11 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       set -eu
-      if ! pacman -Q python ffmpeg >/dev/null 2>&1; then
-        sudo pacman -S --needed --noconfirm python ffmpeg
+      if ! pacman -Q python ffmpeg gcc openssl >/dev/null 2>&1; then
+        sudo pacman -S --needed --noconfirm python ffmpeg gcc openssl
       fi
       mkdir -p ~/.config/the-deck
+      install -d -m0700 ~/.local/state/the-deck
       if [ ! -f ~/.config/the-deck/env ]; then
         install -m0600 ~/.dotfiles/tools/the-deck/env.example ~/.config/the-deck/env
       fi
