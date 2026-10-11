@@ -11,6 +11,10 @@ linux[whoami.distro^="Arch"]:
       fi
       ~/.rotz/bin/rotz link /tools/the-deck -f
       systemctl --user daemon-reload
+      if ! cmp -s ~/.dotfiles/tools/the-deck/resolved.conf /etc/systemd/resolved.conf.d/70-the-deck.conf; then
+        sudo install -Dm0644 ~/.dotfiles/tools/the-deck/resolved.conf /etc/systemd/resolved.conf.d/70-the-deck.conf
+        sudo systemctl restart systemd-resolved.service
+      fi
       echo 'The Deck service is installed. Run cfg run open from workshop/spikes/the-deck to start it.'
   links:
     systemd/the-deck.service: ~/.config/systemd/user/the-deck.service
