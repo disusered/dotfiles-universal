@@ -4,7 +4,7 @@ Used by Matt Pocock's skills ("Other" tracker).
 
 | Field | Value |
 | --- | --- |
-| Tracker | Brain Portal Tasks, via the `portal-tasks` MCP server |
+| Tracker | Brain Portal Tasks, via the `portal` MCP server |
 | Landing | signed commits on `main` with `git-commit`; links applied with `rotz`. No push without an explicit request |
 
 ## When a skill says "fetch the relevant ticket"

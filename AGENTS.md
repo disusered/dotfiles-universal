@@ -100,5 +100,5 @@ behavior changes. Preserve existing worktree changes and permission settings.
 
 ### Issue tracker
 
-Brain Portal Tasks, through the `portal-tasks` MCP server. See
+Brain Portal Tasks, through the `portal` MCP server. See
 `.agents/issue-tracker.md`.

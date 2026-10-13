@@ -12,7 +12,7 @@ linux:
       pi install npm:@bacnh85/pi-checkpoint@0.1.9
       cats=~/Development/ME/herding-cats
       pi mcp add okf-cats --cwd "$cats" -- node "$cats/utilities/cats-mcp/server.mjs"
-      pi mcp add portal-tasks --cwd "$cats" -- node "$cats/projects/brain-portal/apps/mcp/dist/bin.js"
+      pi mcp add portal --cwd "$cats" -- node "$cats/projects/brain-portal/apps/mcp/dist/bin.js"
       pi --version
     depends:
       - /languages/javascript/node/latest

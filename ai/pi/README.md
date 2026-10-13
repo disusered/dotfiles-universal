@@ -25,4 +25,4 @@ Profile data lives in `~/.optchat/profiles/<name>/`.
   pinned to reviewed commit `1322e74`, not copied here.
 - `pi-notify@1.4.0`, `@bacnh85/pi-checkpoint@0.1.9`: pinned npm packages.
 
-MCP servers `okf-cats` and `portal-tasks` come from the Herding Cats checkout.
+MCP servers `okf-cats` and `portal` come from the Herding Cats checkout.

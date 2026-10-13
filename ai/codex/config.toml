@@ -420,6 +420,6 @@ enabled = true
 [plugins."skyrim-courier@personal"]
 enabled = true
 
-[mcp_servers.portal-tasks]
+[mcp_servers.portal]
 command = "/home/carlos/.local/share/mise/shims/node"
 args = ["/home/carlos/Development/ME/herding-cats/projects/brain-portal/apps/mcp/dist/bin.js"]
