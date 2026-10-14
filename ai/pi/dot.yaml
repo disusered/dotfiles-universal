@@ -1,4 +1,6 @@
 linux:
+  links:
+    themes: ~/.pi/agent/themes
   installs:
     cmd: |
       set -eu

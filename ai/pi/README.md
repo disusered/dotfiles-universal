@@ -26,3 +26,18 @@ Profile data lives in `~/.optchat/profiles/<name>/`.
 - `pi-notify@1.4.0`, `@bacnh85/pi-checkpoint@0.1.9`: pinned npm packages.
 
 MCP servers `okf-cats` and `portal` come from the Herding Cats checkout.
+
+## themes
+
+`themes/cats.json.tera` is a cfg template (`pi-theme` in `cfg/templates.toml`).
+It renders `themes/cats.json` from the active cfg flavor, primary, and secondary
+colors, so changing them through cfg recolors Pi as well. `dot.yaml` links this
+directory to `~/.pi/agent/themes`, and Pi's `"theme": "cats"` setting selects it.
+Pi hot-reloads the active theme file, so no reload command is needed.
+
+The roles follow the Herding Cats tokens in `packages/tokens/theme.css`: base,
+mantle, and surface0 for the page and panels, overlay2 for dim text, and the
+cfg primary as the accent. The `latte` flavor renders a light theme; every
+other flavor renders a dark one. The tool success, tool error, and search-match
+backgrounds blend green, red, and yellow into base at 16%. Pi does not paint the
+terminal background, so panels assume a terminal themed with the same flavor.

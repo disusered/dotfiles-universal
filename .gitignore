@@ -38,6 +38,7 @@ ai/claude/.cache/
 # Generic database files (sqlite, etc.) should not be committed
 *.db
 /ai/opencode/catppuccin.json
+/ai/pi/themes/cats.json
 
 # Codex MCP server local env files (contain materialized secrets)
 /ai/codex/mcp-servers/**/env.local
