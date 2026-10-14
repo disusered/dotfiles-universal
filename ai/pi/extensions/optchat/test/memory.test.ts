@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync, appendFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { mkdtempSync, rmSync, appendFileSync, writeFileSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Memory, start, end, bytes, localDay, type Compression } from '../src/memory.ts';
@@ -126,5 +126,156 @@ test('crash recovery saves unconsumed inputs once, including append-before-ack c
     assert.equal(memory.root.length, 2);
     assert.equal(new Inbox(dir).recover(memory), 0);
     assert.equal(memory.root.length, 2);
+  } finally { await memory.close(); rmSync(dir, { recursive: true, force: true }); }
+});
+
+// Synthetic persisted profiles: no real history, provider credentials, or model calls.
+function seedView(dir: string, count: number, parts: { l: number; i: number }[],
+  summaries: { l: number; i: number; text: string }[], savedCount = count, shrinking = false) {
+  for (const sub of ['main', 'tree']) mkdirSync(join(dir, sub), { recursive: true });
+  writeFileSync(join(dir, 'main', 'fixture.jsonl'), Array.from({ length: count }, (_, i) =>
+    JSON.stringify({ i, kind: 'user', text: `original ${i}`, date: '2026-10-08T00:00:00Z' })).join('\n') + '\n');
+  writeFileSync(join(dir, 'tree', 'fixture.jsonl'), summaries.map(s => JSON.stringify(s)).join('\n') + '\n');
+  writeFileSync(join(dir, 'view.json'), JSON.stringify({ version: 1, count: savedCount, shrinking, parts }), { mode: 0o600 });
+}
+
+test('merge priority uses the last message, not the first (recipe T=10 counterexample)', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'optchat-priority-'));
+  const summaries = Array.from({ length: 10 }, (_, i) => ({ l: 0, i, text: 'x'.repeat(100) }));
+  summaries.push({ l: 2, i: 0, text: 'old A' }, { l: 2, i: 1, text: 'old B' },
+    { l: 3, i: 0, text: 'old merged' }, { l: 1, i: 4, text: 'recent merged' });
+  seedView(dir, 10, [{ l: 2, i: 0 }, { l: 2, i: 1 }, { l: 0, i: 8 }], summaries, 9);
+  const memory = new Memory(dir, async () => 'summary', () => {}, 209);
+  try {
+    assert.deepEqual(memory.view, [{ l: 2, i: 0 }, { l: 2, i: 1 }, { l: 1, i: 4 }]);
+    assert.ok(memory.size <= 104);
+  } finally { await memory.close(); rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('view grows untouched through 128KB, then batch shrinks to 64KB', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'optchat-batch-'));
+  const parts = Array.from({ length: 250 }, (_, i) => ({ l: 0, i }));
+  const summaries = Array.from({ length: 251 }, (_, i) => ({ l: 0, i, text: 'x'.repeat(512) }));
+  for (let i = 0; i < 125; i++) summaries.push({ l: 1, i, text: 'p'.repeat(256) });
+  seedView(dir, 250, parts, summaries.slice(0, 250).concat(summaries.slice(251)));
+  const memory = new Memory(dir, async () => 'summary', () => {});
+  try {
+    assert.equal(memory.size, 128_000);
+    assert.deepEqual(memory.view, parts);
+    memory.append('user', 'new message');
+    assert.ok(memory.size <= 64_000);
+    assert.ok(memory.view.some(p => p.l === 1));
+    assert.equal(end(memory.view.at(-1)!), 251);
+  } finally { await memory.close(); rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('an unfinished batch survives restart and resumes when missing parents are built', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'optchat-resume-batch-'));
+  const summaries = Array.from({ length: 6 }, (_, i) => ({ l: 0, i, text: 'x'.repeat(450) }));
+  summaries.push({ l: 1, i: 0, text: 'p'.repeat(100) }, { l: 1, i: 1, text: 'p'.repeat(100) });
+  seedView(dir, 6, Array.from({ length: 5 }, (_, i) => ({ l: 0, i })), summaries, 5);
+  let memory = new Memory(dir, async () => 'p'.repeat(100), () => {}, 2000);
+  try {
+    assert.equal(memory.size, 1100); // Below high-water mark, but still above batch target.
+    assert.equal(JSON.parse(readFileSync(join(dir, 'view.json'), 'utf8')).shrinking, true);
+    const parts = structuredClone(memory.view);
+    await memory.close();
+    memory = new Memory(dir, async () => 'p'.repeat(100), () => {}, 2000);
+    assert.deepEqual(memory.view, parts);
+    await memory.settle(AbortSignal.timeout(5000), true);
+    assert.ok(memory.size <= 1000);
+    assert.equal(JSON.parse(readFileSync(join(dir, 'view.json'), 'utf8')).shrinking, false);
+  } finally { await memory.close(); rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('restart restores exact saved view despite additional cached summaries; suffix recovers once', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'optchat-exact-view-'));
+  const parts = [{ l: 1, i: 0 }, { l: 0, i: 2 }, { l: 0, i: 3 }];
+  const summaries = Array.from({ length: 4 }, (_, i) => ({ l: 0, i, text: `summary ${i}` }));
+  summaries.push({ l: 1, i: 0, text: 'saved older pair' }, { l: 1, i: 1, text: 'another pair' },
+    { l: 2, i: 0, text: 'whole history' });
+  seedView(dir, 4, parts, summaries);
+  let memory = new Memory(dir, async () => 'summary', () => {});
+  try {
+    const rendered = memory.render();
+    assert.deepEqual(memory.view, parts);
+    await memory.close();
+    memory = new Memory(dir, async () => 'summary', () => {});
+    assert.equal(memory.render(), rendered);
+    assert.equal(statSync(join(dir, 'view.json')).mode & 0o777, 0o600);
+    await memory.close();
+    // Simulate crash after durable log append but before the view checkpoint.
+    appendFileSync(join(dir, 'main', 'fixture.jsonl'), JSON.stringify({ i: 4, kind: 'user',
+      text: 'crash suffix', date: '2026-10-08T00:00:00Z' }) + '\n');
+    memory = new Memory(dir, async () => 'summary', () => {});
+    assert.deepEqual(memory.view, [...parts, { l: 0, i: 4 }]);
+    assert.equal(memory.root[4].text, 'crash suffix');
+    await memory.close();
+    memory = new Memory(dir, async () => 'summary', () => {});
+    assert.deepEqual(memory.view, [...parts, { l: 0, i: 4 }]);
+  } finally { await memory.close(); rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('legacy and corrupt checkpoints recover with warnings without changing authoritative log', async () => {
+  for (const checkpoint of [undefined, '{broken', JSON.stringify({ version: 1, count: 2,
+    shrinking: false, parts: [{ l: 0, i: 1 }] })]) {
+    const dir = mkdtempSync(join(tmpdir(), 'optchat-checkpoint-recovery-'));
+    mkdirSync(join(dir, 'main'));
+    const file = join(dir, 'main', 'fixture.jsonl');
+    const log = [0, 1].map(i => JSON.stringify({ i, kind: 'user', text: `original ${i}`,
+      date: '2026-10-08T00:00:00Z' })).join('\n') + '\n';
+    writeFileSync(file, log);
+    if (checkpoint !== undefined) writeFileSync(join(dir, 'view.json'), checkpoint);
+    const warnings: string[] = [];
+    const memory = new Memory(dir, async () => 'summary', text => warnings.push(text));
+    try {
+      assert.equal(warnings.length, 1);
+      assert.deepEqual(memory.view, [{ l: 0, i: 0 }, { l: 0, i: 1 }]);
+      assert.equal(readFileSync(file, 'utf8'), log);
+      assert.equal(JSON.parse(readFileSync(join(dir, 'view.json'), 'utf8')).count, 2);
+    } finally { await memory.close(); rmSync(dir, { recursive: true, force: true }); }
+  }
+});
+
+
+test('equally due pairs merge oldest first', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'optchat-tie-'));
+  const summaries = Array.from({ length: 7 }, (_, i) => ({ l: 0, i, text: i === 6 ? 'z' : 'x'.repeat(10) }));
+  summaries.push({ l: 1, i: 0, text: 'a'.repeat(40) }, { l: 1, i: 1, text: 'b'.repeat(40) },
+    { l: 2, i: 0, text: 'old' }, { l: 1, i: 2, text: 'recent' });
+  seedView(dir, 7, [{ l: 1, i: 0 }, { l: 1, i: 1 }, { l: 0, i: 4 }, { l: 0, i: 5 }], summaries, 6);
+  const memory = new Memory(dir, async () => 'summary', () => {}, 100);
+  try {
+    assert.deepEqual(memory.view, [{ l: 2, i: 0 }, { l: 0, i: 4 }, { l: 0, i: 5 }, { l: 0, i: 6 }]);
+  } finally { await memory.close(); rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('below the high-water mark, newly available parents do not rewrite the view', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'optchat-prefix-'));
+  const summaries = Array.from({ length: 4 }, (_, i) => ({ l: 0, i, text: 'x'.repeat(200) }));
+  const parts = summaries.map(({ l, i }) => ({ l, i }));
+  seedView(dir, 4, parts, summaries);
+  const memory = new Memory(dir, async () => 'summary', () => {}, 1000);
+  try {
+    const before = memory.render();
+    await memory.settle(AbortSignal.timeout(5000), true);
+    assert.equal(memory.render(), before);
+    memory.append('talk', 'small reply');
+    await memory.settle(AbortSignal.timeout(5000), true);
+    assert.deepEqual(memory.view.slice(0, 4), parts);
+    assert.ok(memory.render().startsWith(before.slice(0, -'</chat>'.length)));
+  } finally { await memory.close(); rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('restart resumes a batch if the tree write beat the view checkpoint before a crash', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'optchat-tree-ahead-'));
+  const summaries = Array.from({ length: 4 }, (_, i) => ({ l: 0, i, text: 'x'.repeat(200) }));
+  summaries.push({ l: 1, i: 0, text: 'old' }, { l: 1, i: 1, text: 'recent' }, { l: 2, i: 0, text: 'all' });
+  seedView(dir, 4, Array.from({ length: 4 }, (_, i) => ({ l: 0, i })), summaries, 4, true);
+  const memory = new Memory(dir, async () => { throw new Error('all summaries already exist'); }, () => {}, 1000);
+  try {
+    assert.ok(memory.size <= 500);
+    assert.equal(JSON.parse(readFileSync(join(dir, 'view.json'), 'utf8')).shrinking, false);
+    await memory.settle(AbortSignal.timeout(5000), true);
   } finally { await memory.close(); rmSync(dir, { recursive: true, force: true }); }
 });

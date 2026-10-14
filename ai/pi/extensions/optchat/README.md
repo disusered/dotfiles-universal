@@ -71,8 +71,9 @@ Both modes build in a separate memory generation. The active-memory pointer chan
 
 - Data: `~/.optchat/profiles/work/` and `~/.optchat/profiles/personal/`.
 - `main/`: authoritative dated JSONL conversation log, without model reasoning.
-- `tree/`: persistent binary summary nodes; the current view is reconstructed from the log and tree on startup.
-- After an import, `active-memory.json` points to `memories/<id>/`, which contains the active `main/` and `tree/`. Prior generations remain retained. `imports/pending.json` tracks resumable work; completed import records include the previous generation path. Keep these directories in backups.
+- `tree/`: persistent binary summary nodes.
+- `view.json`: atomically saved view partition, log position, and unfinished batch state (private mode 0600). Startup restores the saved partition and appends any log entries written after it. Legacy profiles without a checkpoint, or damaged checkpoints, warn and rebuild once from the preserved log/tree; that recovery cannot preserve the old cache prefix.
+- After an import, `active-memory.json` points to `memories/<id>/`, which contains the active `main/`, `tree/`, and `view.json`. Prior generations remain retained. `imports/pending.json` tracks resumable work; completed import records include the previous generation path. Keep these directories in backups.
 - `AGENTS.md`: profile instructions; `config.json`: compactor/subagent models.
 - `pending-inputs.json` and `pending-reports.json`: recovery journals.
 - `runs/`: child Pi sessions and `*.optchat.json` run metadata; `usage.jsonl`: usage ledger for all roles; `memory.html`: browser snapshot.
@@ -86,7 +87,7 @@ Local Git checkpoints are made after parent turns and on clean shutdown. They in
 
 ## How closely this follows the recipe
 
-The reference is [Victor's recipe](https://gist.github.com/VictorTaelin/91837951a5ce5b38f341ec1ba1df6449), linked with implementation notes in `docs/victor-recipe.md`. Its four prompt constants are preserved. Memory uses 512-byte summary targets, a 128,000-byte view, binary merges, contextual compression, eight compression workers, fixed retry delays, and five attempts for oversized summaries. Long tool text is capped at 30,000 characters.
+The reference is [Victor's recipe](https://gist.github.com/VictorTaelin/91837951a5ce5b38f341ec1ba1df6449), linked with implementation notes in `docs/victor-recipe.md`. Its four prompt constants are preserved. Memory uses 512-byte summary targets and a view that grows to 128,000 bytes, then batch-merges down to at most 64,000 bytes as parent summaries become available. Merge priority measures age from the pair's last message, with oldest-first ties. The exact view partition is saved rather than reconstructed at every restart. It also uses binary merges, contextual compression, eight compression workers, fixed retry delays, and five attempts for oversized summaries. Long tool text is capped at 30,000 characters.
 
 Every new parent run waits for pending summaries, freezes the memory view, and starts fresh model context from that view and the new input. The current run's tool conversation and reasoning remain intact until it ends. Original logged messages are available through `zoom` and `date`. Anthropic requests get stable view cache breakpoints; this is not a guarantee of lower cost for every workload.
 

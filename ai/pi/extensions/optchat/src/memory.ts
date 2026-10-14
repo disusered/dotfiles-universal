@@ -1,4 +1,4 @@
-import { closeSync, existsSync, fsyncSync, mkdirSync, openSync, readFileSync, readdirSync, writeSync } from 'node:fs';
+import { closeSync, existsSync, fsyncSync, mkdirSync, openSync, readFileSync, readdirSync, renameSync, writeSync } from 'node:fs';
 import { join } from 'node:path';
 import { EventEmitter } from 'node:events';
 
@@ -78,6 +78,7 @@ export class Memory {
   private retryTimer?: ReturnType<typeof setTimeout>;
   private scheduled = false;
   private stopped = false;
+  private shrinking = false;
   lastError?: string;
 
   constructor(readonly directory: string, private readonly compress: Compressor,
@@ -93,9 +94,59 @@ export class Memory {
         throw new Error('Invalid OptChat summary record.');
       this.tree.set(key(value), { ...value, size: bytes(value.text) });
     }
-    // Fold history in order; do not retile the entire log on each turn.
-    for (let i = 0; i < this.root.length; i++) { this.view.push({ l: 0, i }); this.fit(i + 1); }
+    // Restore the exact partition. Only legacy/damaged checkpoints need a one-time fold.
+    const restored = this.restoreView();
+    for (let i = restored; i < this.root.length; i++) {
+      this.view.push({ l: 0, i }); this.fit(i + 1, false);
+    }
+    // A crash may have saved new parents in the tree before checkpointing the merge.
+    if (this.shrinking) this.fit(this.root.length, false);
+    this.saveView();
     this.schedule();
+  }
+  private restoreView(): number {
+    const file = join(this.directory, 'view.json');
+    if (!existsSync(file)) {
+      if (this.root.length) this.warn('No saved OptChat view; migrating legacy history once.');
+      return 0;
+    }
+    try {
+      const saved: unknown = JSON.parse(readFileSync(file, 'utf8'));
+      if (!object(saved) || saved.version !== 1 || !Number.isSafeInteger(saved.count)
+        || (saved.count as number) < 0 || (saved.count as number) > this.root.length
+        || typeof saved.shrinking !== 'boolean' || !Array.isArray(saved.parts))
+        throw new Error('Invalid checkpoint header.');
+      const parts: Part[] = [];
+      let next = 0;
+      for (const value of saved.parts) {
+        if (!object(value) || !Number.isSafeInteger(value.l) || !Number.isSafeInteger(value.i)
+          || (value.l as number) < 0 || (value.l as number) > 52 || (value.i as number) < 0)
+          throw new Error('Invalid checkpoint part.');
+        const part = { l: value.l as number, i: value.i as number };
+        if (start(part) !== next || !Number.isSafeInteger(end(part)) || end(part) > (saved.count as number)
+          || (part.l > 0 && !this.node(part))) throw new Error('Invalid checkpoint coverage.');
+        parts.push(part); next = end(part);
+      }
+      if (next !== saved.count) throw new Error('Incomplete checkpoint coverage.');
+      this.view.push(...parts); this.shrinking = saved.shrinking;
+      return next;
+    } catch (error) {
+      this.warn(`Cannot restore OptChat view; rebuilding from preserved log: ${error instanceof Error ? error.message : error}`);
+      return 0;
+    }
+  }
+  private saveView() {
+    const file = join(this.directory, 'view.json'), temporary = file + '.tmp';
+    const fd = openSync(temporary, 'w', 0o600);
+    try {
+      const data = Buffer.from(JSON.stringify({ version: 1, count: this.root.length,
+        shrinking: this.shrinking, parts: this.view }) + '\n');
+      if (writeSync(fd, data) !== data.length) throw new Error('Incomplete OptChat view write.');
+      fsyncSync(fd);
+    } finally { closeSync(fd); }
+    renameSync(temporary, file);
+    const directory = openSync(this.directory, 'r');
+    try { fsyncSync(directory); } finally { closeSync(directory); }
   }
   append(kind: Kind, text: string, date = new Date().toISOString(), receipt?: string) {
     if (this.stopped) throw new Error('Memory is closed.');
@@ -111,14 +162,16 @@ export class Memory {
   get pending() { return this.root.filter(e => !this.tree.has(key({ l: 0, i: e.i }))).length; }
   get active() { return this.busy.size; }
   get size() { return this.view.reduce((n, p) => n + bytes(this.text(p)), 0); }
-  private fit(total = this.root.length) {
+  private fit(total = this.root.length, persist = true) {
     let size = this.size;
-    while (size > this.budget) {
+    if (size > this.budget) this.shrinking = true;
+    const target = Math.floor(this.budget / 2);
+    while (this.shrinking && size > target) {
       let best = -1; let due = -Infinity;
       for (let j = 0; j + 1 < this.view.length; j++) {
         const a = this.view[j], b = this.view[j + 1];
         if (a.l !== b.l || a.i % 2 || b.i !== a.i + 1 || !this.node({ l: a.l + 1, i: a.i / 2 })) continue;
-        const age = (total - start(a)) / 2 ** (a.l + 2);
+        const age = (total - (end(b) - 1)) / 2 ** a.l;
         if (age > due) { best = j; due = age; }
       }
       if (best < 0) break;
@@ -127,6 +180,8 @@ export class Memory {
       size += bytes(this.text(parent)) - bytes(this.text(a)) - bytes(this.text(b));
       this.view.splice(best, 2, parent);
     }
+    if (size <= target) this.shrinking = false;
+    if (persist) this.saveView();
     this.events.emit('change');
   }
   private schedule() {
