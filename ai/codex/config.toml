@@ -3,7 +3,7 @@ approval_policy = "on-request"
 approvals_reviewer = "auto_review"
 sandbox_mode = "workspace-write"
 commit_attribution = ""
-model = "gpt-6-astra"
+model = "gpt-6.1-sol"
 model_verbosity = "low"
 model_reasoning_effort = "medium"
 plan_mode_reasoning_effort = "xhigh"
@@ -47,6 +47,7 @@ screen_reader_detection_done = true
 "gpt-5.5" = 4
 "gpt-5.6-sol" = 4
 gpt-6-astra = 4
+"gpt-6.1-sol" = 4
 
 [projects."/home/carlos/.dotfiles"]
 trust_level = "trusted"
@@ -192,6 +193,9 @@ trust_level = "trusted"
 [projects."/home/carlos/Development/BRI/cosmiq"]
 trust_level = "trusted"
 
+[projects."/home/carlos/Development/ME/STUDY/sicp"]
+trust_level = "trusted"
+
 [plugins."codex-security@openai-curated"]
 enabled = true
 
@@ -283,12 +287,12 @@ NODE_REPL_NODE_PATH = "/usr/lib/chatgpt/resources/cua_node/bin/node"
 NODE_REPL_TRUSTED_CODE_PATHS = "/home/carlos/.codex:/usr/lib/chatgpt/resources/cua_node/lib/node_modules"
 CODEX_HOME = "/home/carlos/.codex"
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
-BROWSER_USE_TINYSKY_ENABLED = "0"
-NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
-NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
+BROWSER_USE_TINYSKY_ENABLED = "1"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = ""
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = ""
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.818.61809"
-NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/carlos/.codex/plugins/cache/openai-bundled/browser/26.818.61809/scripts/browser-service.mjs"}'
+BROWSER_USE_CODEX_APP_VERSION = "26.917.61114"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/carlos/.codex/plugins/cache/openai-bundled/browser/26.917.61114/scripts/browser-service.mjs"}'
 CODEX_CLI_PATH = "/usr/lib/chatgpt/resources/codex"
 
 [apps.connector_76869538009648d5b282a4bb21c3d157.tools."github.create_pull_request"]
@@ -387,9 +391,6 @@ approval_mode = "approve"
 [plugins."codex-app-tools@openai-bundled"]
 enabled = true
 
-[plugins."sites@openai-bundled"]
-enabled = true
-
 [plugins."browser@openai-bundled"]
 enabled = true
 
@@ -418,6 +419,9 @@ enabled = true
 enabled = true
 
 [plugins."skyrim-courier@personal"]
+enabled = true
+
+[plugins."unified-computer-use@openai-bundled"]
 enabled = true
 
 [mcp_servers.portal]
