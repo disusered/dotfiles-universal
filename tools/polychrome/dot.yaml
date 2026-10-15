@@ -10,7 +10,5 @@ linux[whoami.distro^="Arch"]:
       cargo install --path "$polychrome_src" --bin polychromectl --force
     depends:
       - /languages/javascript/node/latest
-      - /tools/docling
-      - /tools/pdf-inspector
   links:
     okf: ~/.local/bin/okf

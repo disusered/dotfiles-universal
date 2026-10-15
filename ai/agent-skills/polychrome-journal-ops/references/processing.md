@@ -87,12 +87,19 @@ the returned bookmark ID, read the record back, and distinguish record storage,
 crawl/content, and retrievable archive evidence. Keep exact URLs in private
 evidence and sanitize failures in reports.
 
-The repository owns the processing schema. Inspect its current capture contract
-before applying a handoff. Legacy item-key grammars and adapter methods do not
-represent Karakeep bookmark IDs or archive states. If those requirements remain,
-report the contract incompatibility and preserve bounded research without
-applying an invalid handoff. Do not invoke the retired backend or invent a
-replacement schema. Research and proposal review can proceed independently.
+The repository owns the processing schema. New capture evidence uses exact
+`url`, `status` (`existing`, `full`, `metadata-only`, or `failed`), `method`
+(`karakeep-cli` or `none`), `attempted`, and `archiveVerified`. Successful
+records require `bookmarkId` and a distinct `bookmarkIds` array containing it.
+`full` also requires `archiveVerified: true` and a verified `archiveAssetId`;
+other statuses cannot claim a verified archive. Keep actual `crawlStatus`
+separate. Failed captures use a sanitized `error` and no bookmark IDs.
+Unsafe URLs require method `none`, `attempted: false`, `archiveVerified: false`,
+and error `privacy-blocked`.
+
+Historical receipts retain their original evidence and remain readable. New
+handoffs must use the current Karakeep contract. Historical keys and methods
+cannot be used to create new processing receipts.
 
 ## Handoff
 

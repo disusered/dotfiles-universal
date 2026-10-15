@@ -123,11 +123,11 @@ capture, response reconciliation, and readback. Use `karakeep-polychrome` for
 saved-source research. Record actual bookmark IDs, source URLs, crawl status,
 and verified archive evidence; storage alone does not establish preservation.
 
-Read the current repository-owned processing schema before constructing capture
-fields. If it still requires the retired capture backend's item keys, methods,
-or adapter, report that incompatibility and retain the research for a supported
-handoff. Never fabricate keys, rename a schema, coerce Karakeep IDs into legacy
-fields, or invoke a retired backend to satisfy validation.
+Use the current repository-owned processing schema for capture fields. New
+handoffs use Karakeep bookmark IDs, method `karakeep-cli` or `none`, and
+`archiveVerified`. A `full` result also requires a verified `archiveAssetId`.
+Historical receipts remain readable in their original format; they do not
+authorize new writes using the retired capture contract.
 
 Keep private capture inputs and receipts in exact regular, non-symlink files
 under `umask 077`. Never send credential-bearing or non-public URLs to a capture
