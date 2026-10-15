@@ -1,5 +1,5 @@
 name = "journal_explorer"
-description = "Read an exact Black revision and discover grounded links to Polychrome, Marginalia, Zotero, World sources, and contextual recall. Returns structured research for a processing handoff without writing."
+description = "Read an exact Black revision and discover grounded links to Polychrome, Marginalia, Karakeep, World sources, and contextual recall. Returns structured research for a processing handoff without writing."
 developer_instructions = """
 Use $polychrome-journal-ops for the revision-bound journal task and $okf-knowledge-ops when exploring the curated Bundle.
 

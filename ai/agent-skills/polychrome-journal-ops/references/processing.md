@@ -4,7 +4,7 @@
 
 - [Authority](#authority)
 - [Selection and Batch Safety](#selection-and-batch-safety)
-- [Zotero Capture Input](#zotero-capture-input)
+- [Karakeep Capture Evidence](#karakeep-capture-evidence)
 - [Handoff](#handoff)
 - [Apply Preflight](#apply-preflight)
 - [Initial Relations](#initial-relations)
@@ -16,7 +16,7 @@
 - A deterministic adapter owns the managed Connections section.
 - Marginalia owns attributed proposals, memos, and receipts.
 - The curated Polychrome store owns accepted Connections.
-- Zotero owns captured external source records.
+- Karakeep owns captured external source records.
 - Red owns collaboratively edited derivatives and is private by default.
 
 The body hash is SHA-256 over the exact bytes between the Black human-body
@@ -56,7 +56,7 @@ path with `mktemp`, verify it is a regular non-symlink file, restrict it with
 identifies the retry. Do not reconstruct, reorder, extend, or backfill the
 selection.
 
-Stop before body inspection, Zotero capture, or store writes if `black select`
+Stop before body inspection, Karakeep capture, or store writes if `black select`
 fails or does not return a valid `polychrome.black.selection.v1` manifest.
 Invalid discovery and duplicate IDs fail the command. Treat
 `processedRevisionConsistent: false` as a rebuildable recovery diagnostic, not
@@ -79,48 +79,20 @@ the private selection manifest after every member is resolved. If drift or
 another terminal failure makes the batch non-retryable, report it and remove
 all remaining handoffs and that selection.
 
-## Zotero Capture Input
+## Karakeep Capture Evidence
 
-The private input document is:
+Use the existing Karakeep capture workflow documented in
+`~/.dotfiles/tools/karakeep/AGENT-USAGE.md`. Reconcile every requested URL with
+the returned bookmark ID, read the record back, and distinguish record storage,
+crawl/content, and retrievable archive evidence. Keep exact URLs in private
+evidence and sanitize failures in reports.
 
-```json
-{
-  "schemaVersion": "polychrome.zotero.capture-input.v1",
-  "requests": [
-    {
-      "id": "capture:batch-unique-id",
-      "url": "https://example.test/exact-url",
-      "title": "optional title",
-      "snapshotContent": "optional snapshot bytes represented as a JSON string"
-    }
-  ]
-}
-```
-
-`requests` contains at most 512 entries. Each `id` is unique, nonempty,
-control-free, and at most 256 bytes. Each `url` is the exact network-safe body
-URL, is control- and whitespace-free, and is at most 8,192 bytes. Deduplicate
-exact URLs across the frozen selection or named entry before creating requests.
-Optional `title` is nonempty, control-free, and at most 4,096 bytes. Optional
-`snapshotContent` contains no NUL, is at most 8 MiB per request, and totals at
-most 12 MiB across the input. The complete input is at most 16 MiB. Omit or use
-JSON `null` for either optional field when absent.
-
-Under `umask 077`, create the exact path with `mktemp`, verify it is a regular
-non-symlink file, restrict it with `chmod 600`, then write and reverify only
-that file before invocation. Never include an API key, bearer token, cookie, or
-unrelated secret. Do not place credential-bearing, local, non-public, or
-otherwise blocked URLs in the adapter input; represent those directly in the
-handoff as privacy-blocked evidence.
-
-Validate the complete `polychrome.zotero.capture-results.v1` response. Require
-one result with the matching ID and exact URL for every request, then copy that
-result to every applicable entry handoff. A valid per-request `failed` result
-is evidence and processing continues. Stop before apply only when the adapter
-cannot authenticate, invocation fails, or a complete valid result document
-cannot be established. Remove the exact capture input as soon as its verified
-results are incorporated; retain it only while an exact adapter retry is
-required.
+The repository owns the processing schema. Inspect its current capture contract
+before applying a handoff. Legacy item-key grammars and adapter methods do not
+represent Karakeep bookmark IDs or archive states. If those requirements remain,
+report the contract incompatibility and preserve bounded research without
+applying an invalid handoff. Do not invoke the retired backend or invent a
+replacement schema. Research and proposal review can proceed independently.
 
 ## Handoff
 
@@ -142,29 +114,11 @@ Each source anchor is a zero-based, end-exclusive UTF-8 byte range into the
 exact inspected body. Its `quote` must equal that byte slice. Do not compute
 anchors from rendered, normalized, or rewrapped text.
 
-Capture evidence preserves the exact body URL:
-
-- Every record requires exact `url`; a recognized `status` and `method`; and
-  boolean `attempted` and `snapshotConfirmed`. Methods are `local-api`,
-  `web-api`, `connector-snapshot`, and `none`.
-- `existing`, `full`, and `metadata-only` require `itemKey` and a duplicate-free
-  `itemKeys` array of 1 through 1,024 keys that includes the primary key. Each
-  key matches `[A-Z0-9]{1,32}`. Successful evidence forbids `error`.
-- `existing` requires method `local-api` or `web-api` and
-  `snapshotConfirmed: false`; `attempted` may be true or false.
-- `full` requires method `connector-snapshot`, `attempted: true`, and
-  `snapshotConfirmed: true`.
-- `metadata-only` requires method `connector-snapshot` or `web-api`,
-  `attempted: true`, and `snapshotConfirmed: false`.
-- `failed` requires a sanitized `error`, forbids `itemKey` and `itemKeys`, and
-  requires `snapshotConfirmed: false`. It uses method `none` exactly when
-  `attempted` is false and a non-`none` attempted method otherwise.
-- A credential-bearing, local, non-public, or otherwise blocked URL is not sent
-  to Zotero or the network. Its result is `failed`, method `none`,
-  `attempted: false`, `snapshotConfirmed: false`, and error
-  `privacy-blocked`.
-- Exact successful capture evidence may preserve a query string by design.
-  Sanitized failure reporting names the request or entry, not the private URL.
+Capture evidence preserves the exact body URL and observed Karakeep bookmark
+and archive identifiers. Use only fields accepted by the current repository
+contract. Treat unsafe URLs as unattempted privacy failures; never send them to
+the network. Do not claim archive preservation from a bookmark ID or a crawl
+status alone.
 
 Do not include chain-of-thought. A rationale states concise evidence useful to
 the author's review.
@@ -218,14 +172,13 @@ Stop and report the exact failure when:
 - selection discovery is invalid or ambiguous;
 - the entry is outside the registered Black root;
 - the body revision changed;
-- the Zotero adapter cannot authenticate or return a complete valid result
-  document; or
+- the Karakeep capture operation cannot authenticate or return complete evidence,
+  or the processing contract cannot represent that evidence; or
 - required validation fails.
 
-A valid per-request Zotero `failed` result is capture evidence, not a terminal
-workflow failure. Preserve it in every applicable handoff and continue. It
-does not authorize another archive service. Correct a check-mode anchor,
-target, or schema failure under the frozen selection when the exact revision
+A per-request capture failure is evidence. Preserve it using the current
+contract when supported; it does not authorize another archive service. Correct
+a check-mode anchor, target, or schema failure under the frozen selection when the exact revision
 still matches; otherwise stop. A stale revision does not authorize rebasing
 agent output onto changed prose. Preserve partial capture statuses without
 implying the overall apply succeeded. Do not echo a failed exact URL in logs,

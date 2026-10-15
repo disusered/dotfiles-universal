@@ -14,15 +14,16 @@ current repository instructions over these workstation paths.
 - The shared toolkit owns generic parsing, validation, search, links, graph
   analysis, inspection, and visualization for the Polychrome Bundle.
   `polychromectl` remains the project CLI for federation and authority rules;
-  Black, Red, and Marginalia; Zotero; Journal; publication; and temporary Brain
+  Black, Red, and Marginalia; Journal; publication; and temporary Brain
   Portal compatibility.
 - Never target Black, Red, or Marginalia with an `okf change`. Process Black
   only on an explicit request and only through `polychrome-journal-ops`; never
   rewrite bytes in a Black Human Body.
 - Links to other Polychrome Stores do not authorize cross-Bundle OKF traversal,
   graphing, or changes. Follow the owning Store's separate workflow.
-- Zotero is the preferred external capture layer. Capture does not promote a
-  Source or Connection into the curated Bundle.
+- Karakeep owns saved external sources and highlights. Use
+  `karakeep-polychrome` for retrieval and cited synthesis. Capture does not
+  promote a Source or Connection into the curated Bundle.
 - A surface with no filesystem reaches this Bundle through the repository's
   own stdio server, `okf-cats` in its checked-in `.mcp.json`. It serves
   `polychrome` and nothing else, so it is no route to Black, Red, or
