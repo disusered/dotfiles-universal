@@ -29,8 +29,11 @@ signed local WIP commits on preservation branches, checkout switches, fast-forwa
 updates, removal of obsolete worktrees and worktree metadata, and deletion of obsolete
 local branches whose work is recoverable.
 It does not authorize deleting any branch on GitHub; that requires the separate
-confirmation described under "Delete remote branches". Creating or editing this skill
-alone does not authorize a maintenance run.
+confirmation described under "Delete remote branches". A standalone skill-edit
+request does not authorize a maintenance run. When a skill repair is part of an
+already-authorized incomplete sync, carry that authorization forward; do not treat
+the edit as completion of the sync. Honor a user's instruction to limit work to the
+skill or its isolated tests.
 
 Use `git -C <repository>` for every command, or the harness's working-directory
 argument where one exists.
@@ -238,3 +241,19 @@ its reason. Include WIP preservation branches, commit IDs, paths, and signature
 verification results. Do not run builds or tests solely for Git maintenance beyond
 required commit checks. Create only the authorized local WIP commits; push only
 explicitly authorized remote branch deletions.
+
+## Validate workflow changes
+
+When changing WIP preservation or completion behavior, test the revised skill by
+executing it in isolated Git repositories before reporting the repair as verified.
+A frontmatter validator, a text review, or manually repairing a live checkout does
+not demonstrate that the revised skill completes the workflow.
+
+Cover dirty feature, dirty baseline, and dirty detached checkouts with staged,
+unstaged, and untracked files, plus an ahead/diverged baseline. Check the resulting
+Git state: exact file contents preserved in retained signed WIP commits, clean base
+checkouts on equal fetched baselines, no new worktrees or stashes, and no rewritten
+history. The diverged case must remain incomplete with its unique commits intact.
+Check that the receipt records the result and preservation evidence. Restrict test
+remotes and all mutations to fixtures; use the installed skill's procedure, not a
+separate repair script. Report which cases actually ran and any failed checks.
