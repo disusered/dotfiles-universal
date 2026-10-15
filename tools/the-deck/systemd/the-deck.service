@@ -1,5 +1,5 @@
 [Unit]
-Description=The Deck TV and Sala lighting service
+Description=The Deck, with the TV and Sala lights when they are on this network
 After=network-online.target
 Wants=network-online.target
 
