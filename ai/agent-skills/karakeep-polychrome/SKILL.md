@@ -5,7 +5,7 @@ description: Retrieve saved Karakeep sources and highlights for personal knowled
 
 # Saved sources to personal knowledge
 
-Use the existing `okf-cats` connection for this personal workflow. Start with
+Use the `brain-portal` connection for this personal workflow. Start with
 `okf_v1_context` and `bundle: "polychrome"`; read its operating instructions.
 Do not use another enabled OKF or hosted knowledge connector based on a topic
 match. The destination is Carlos's personal corpus at

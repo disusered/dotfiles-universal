@@ -24,10 +24,10 @@ current repository instructions over these workstation paths.
 - Karakeep owns saved external sources and highlights. Use
   `karakeep-polychrome` for retrieval and cited synthesis. Capture does not
   promote a Source or Connection into the curated Bundle.
-- A surface with no filesystem reaches this Bundle through the repository's
-  own stdio server, `okf-cats` in its checked-in `.mcp.json`. It serves
-  `polychrome` and nothing else, so it is no route to Black, Red, or
-  Marginalia.
+- A surface with no filesystem reaches this Bundle through the `brain-portal`
+  connector. Its `okf_v1_*` tools serve `polychrome` and nothing else, so they
+  are no route to Black, Red, or Marginalia; an applied change runs the
+  `polychromectl` maintenance below and reports it as `maintenance.status`.
 - OpenViking uses the `local-dev` profile and remains contextual recall.
 - Keep the repository-root `brain -> polychrome` compatibility symlink and
   installed `brainctl` until the Portal cutover is separately authorized. Do
@@ -53,14 +53,14 @@ current repository instructions over these workstation paths.
 - Inspect code, migrations, immutable history, and verified runtime evidence
   when claims depend on current behavior. Preserve raw and bulk evidence under
   `artifacts/`; promote only provenance and durable conclusions into `docs/`.
-- A surface with no filesystem reaches this Bundle through the repository's
-  own stdio server, `okf-xbol` in its checked-in `.mcp.json`.
+- A surface with no filesystem reaches this Bundle through the
+  `xbol-knowledge` connector, the toolkit's `okf mcp` serving `docs/`.
 - OpenViking uses the `xbol` profile and remains contextual recall.
 - After authored changes, run every check in the maintenance runbook. The
   validation among them is `pnpm okf:validate`, which runs
   `okf validate . --bundle xbol --strict --json` and passes no profile module.
 - Do not add Polychrome stores, `polychromectl`, a custom general knowledge CLI,
-  an OKF MCP server other than the declared `okf-xbol`, a reference agent, or a
+  an OKF MCP server other than `xbol-knowledge`, a reference agent, or a
   Brain/Pi harness to XBOL.
 - `.agents/okf.yaml` declares exactly one `xbol` Bundle. Run
   `pnpm install --frozen-lockfile`; the root scripts use the exact CLI pin.
@@ -78,11 +78,9 @@ current repository instructions over these workstation paths.
 - Hosted apply remains gated by deployment identity policy and explicit user
   authorization after preview. On refusal, stop.
 
-The deployment cutover is done. The claude.ai `OpenKnowledge` connector exposes
-the ten documented `okf_v1_*` tools and requires `bundle` on every one of them,
-and no unversioned `okf_*` artifact is left in the workstation skill
-distribution. The connector is the only door to the Shared Bundle; a local
-stdio server is a different thing and never serves it.
+The `iteramind-knowledge` connector exposes the eleven `okf_v1_*` tools and
+requires `bundle` on every one of them. It is the only door to the Shared
+Bundle; no local server serves it.
 
 The `okf-shared-bundle` skill owns the Shared Bundle's authority and content
 policy, and includes its hosted change procedure. Keep these adapter notes consistent

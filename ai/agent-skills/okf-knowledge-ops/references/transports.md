@@ -1,6 +1,6 @@
 # OKF v1 Transports
 
-The local CLI, the repository's own stdio MCP server, and a hosted MCP
+The local CLI, a workspace's knowledge connector, and a hosted MCP
 deployment all compose the same single-Bundle analysis and `okf.operations.v1`
 Change contract. Select one transport for one Bundle and do not switch
 transports to work around a refusal.
@@ -13,7 +13,7 @@ package-manager command documented by that consumer, then use its local binary
 or script. If the exact pin, lockfile, or documented command is missing, report
 the release-installation seam and stop; do not improvise with
 `npx`, a toolkit source checkout, or the retired Python conformance checker. A
-repository's declared stdio server is not an improvisation, but it is also not a
+workspace's knowledge connector is not an improvisation, but it is also not a
 substitute for a missing CLI pin: it is a separate configured door, described
 below.
 
@@ -22,11 +22,10 @@ Bundle name. If only unversioned `okf_*` tools are present, or the Bundle name
 is unknown, report the deployment cutover seam and stop. Do not substitute the
 older hosted skill or guess a name.
 
-The local stdio server is versioned separately from the CLI: the
-`@disusered/okf-mcp` package declares `1.0.0-rc.2`. The three configured servers
-currently run a local build of it out of the toolkit checkout,
-`packages/local-mcp/dist/bin.js`, rather than an installed package, so an
-unbuilt `dist` takes all three down at once.
+The local server ships inside the CLI as `okf mcp`, from the same exact
+`@disusered/okf-cli` pin. `brain-portal` embeds its exported
+`createOkfLocalServer`; `xbol-knowledge` runs `okf mcp --http` from XBOL's own
+installation.
 
 For format-level decisions, read `spec/SPEC.md` from the `okf-contracts`
 package in the consumer's lockfile-backed installation. npm exposes it under
@@ -76,15 +75,16 @@ an empty instruction list, so repository instructions still need a direct read.
 ## v1 MCP
 
 Two kinds of server expose this surface, and they expose the same one. A hosted
-deployment serves exactly one configured Bundle over the network. A repository's
-own stdio server, `@disusered/okf-mcp`, serves exactly one local Bundle off
-disk, started with one `--bundle` and, where the consumer has one, a
-`--profile-module`. Either way every call includes that one documented Bundle
+deployment serves exactly one configured Bundle from R2. A local server,
+`okf mcp`, serves exactly one Bundle off disk, started with one `--bundle` and,
+where the consumer has one, a `--profile-module`; over `--http` it listens on
+loopback and a tunnel behind Cloudflare Access publishes it. Either way every call includes that one documented Bundle
 name, and the server refuses any other name.
 
 | Tool | Input after selecting `bundle` |
 | --- | --- |
 | `okf_v1_context` | none |
+| `okf_v1_index` | optional `path` (default `.`) |
 | `okf_v1_list` | optional `path` (default `.`), optional `depth` (0–8, default 2) |
 | `okf_v1_search` | `query`, optional `limit` (1–100, default 20) |
 | `okf_v1_read` | `path` |
@@ -100,8 +100,9 @@ every other tool. It returns the Bundle index and the server's own instructions.
 Read and retain the opaque `revision` returned for any document that may be
 updated, deleted, or moved.
 
-A hosted deployment owns its authentication and apply policy; a local stdio
-server has neither, and inherits the harness's own permissions instead.
+A hosted deployment owns its authentication and apply policy. A local server
+has neither in its own code: on loopback it inherits the harness's permissions,
+and published through a tunnel it relies on Cloudflare Access in front.
 `okf_v1_preview_change` is read-only on either. Inspect its diff, affected paths,
 and diagnostics before `okf_v1_apply_change`. For hosted apply, show the preview
 and obtain the explicit authorization required by the deployment. For local

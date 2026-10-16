@@ -9,7 +9,7 @@
       "name": "brain-portal",
       "source": "./claude-plugins/brain-portal",
       "displayName": "Brain Portal",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Carlos's personal day and knowledge: tasks, habits, timers, goals, the Today plan and the Studio slate, plus the Polychrome knowledge base.",
       "author": {
         "name": "Carlos Rosquillas"
@@ -27,7 +27,7 @@
       "name": "xbol-knowledge",
       "source": "./claude-plugins/xbol-knowledge",
       "displayName": "XBOL Knowledge",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "description": "Evidence-backed knowledge for the XBOL ticketing and cashless platforms: domain language, decisions, requirements, operations, initiatives and release history.",
       "author": {
         "name": "Carlos Rosquillas"

@@ -42,19 +42,20 @@ ways, and both reach the same files under the same profile.
   visualization, and changes. Validate with the consumer's own script. This is
   the normal path; do not start a server to reach a checkout you can already
   see.
-- **With no filesystem:** use the repository's own stdio server,
-  `@disusered/okf-mcp`, one per repository, serving exactly one local Bundle off
-  disk. It exposes the same ten `okf_v1_*` tools a hosted deployment does. Each
-  repository declares its server in a checked-in `.mcp.json`, so a clone arrives
-  configured. Claude Desktop has no project scope, so its local servers live in
-  `~/.config/Claude/claude_desktop_config.json`; Codex reads a project-local
-  `.codex/config.toml`. The local server names are `okf-xbol` and `okf-cats`.
+- **With no filesystem:** use the workspace's knowledge connector. Each serves
+  exactly one Bundle with the same eleven `okf_v1_*` tools a hosted deployment
+  does. Polychrome is `brain-portal` (Brain Portal's server, which also carries
+  the day tools); XBOL is `xbol-knowledge`. Their plugins in the `carlos-local`
+  catalog install each connector with its skills. On this machine they answer at
+  `http://127.0.0.1:1937/v1/mcp` and `http://127.0.0.1:1934/v1/mcp`; cloud
+  clients use `https://brain-mcp.disusered.com/v1/mcp` and
+  `https://xbol-mcp.disusered.com/v1/mcp`, signing in through Cloudflare Access.
 - **Hosted Bundle:** use only the deployment-supplied `okf_v1_*` tools. Do not
   look for its files or fall back to unversioned `okf_*` tools.
 
 The Iteramind shared Bundle is the one hosted deployment here. It is R2 objects
-behind Cloudflare Access, reached through the claude.ai `OpenKnowledge`
-connector, and the `okf-shared-bundle` skill owns it. Do not reach for it from
+behind Cloudflare Access, reached through the `iteramind-knowledge` connector,
+and the `okf-shared-bundle` skill owns it. Do not reach for it from
 this one.
 
 Read [references/transports.md](references/transports.md) before invoking a
