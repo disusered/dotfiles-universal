@@ -1,0 +1,34 @@
+[Unit]
+Description=XBOL Knowledge MCP server (the XBOL OKF Bundle)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Development/XBOL
+Environment=NODE_ENV=production
+ExecStart=%h/.local/bin/mise exec node@24 -- node %h/Development/XBOL/node_modules/@disusered/okf-cli/dist/bin.js mcp %h/Development/XBOL --bundle xbol --http --port 1934 --allowed-host xbol-mcp.disusered.com --name xbol-knowledge --title "XBOL Knowledge" --description "Evidence-backed knowledge for the XBOL ticketing and cashless platforms: domain language, decisions, requirements, operations, initiatives and release history. Search, read, and propose reviewed changes." --purpose "XBOL Knowledge is the evidence-backed engineering knowledge for the XBOL ticketing and cashless platforms; when a page and the current code disagree, follow the authority order in schema/knowledge-operations.md."
+Restart=on-failure
+RestartSec=3s
+TimeoutStopSec=15s
+UMask=0077
+
+LockPersonality=true
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+ProtectHome=read-only
+# Reviewed changes write the Bundle under docs/.
+ReadWritePaths=%h/Development/XBOL/docs
+RestrictRealtime=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=default.target

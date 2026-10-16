@@ -1,0 +1,13 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      systemctl --user daemon-reload
+      if [ -x ~/Development/XBOL/node_modules/@disusered/okf-cli/dist/bin.js ] || [ -f ~/Development/XBOL/node_modules/@disusered/okf-cli/dist/bin.js ]; then
+        systemctl --user enable --now xbol-knowledge-mcp.service
+      else
+        echo "XBOL Knowledge linked. Run pnpm install in ~/Development/XBOL, then enable xbol-knowledge-mcp.service."
+      fi
+    depends:
+      - /languages/javascript/node/latest
+  links:
+    systemd/xbol-knowledge-mcp.service: ~/.config/systemd/user/xbol-knowledge-mcp.service
