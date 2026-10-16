@@ -27,7 +27,7 @@ budget. They run with idle I/O scheduling and low CPU priority. Inaccessible
 stores produce an error entry; when du provides a partial total it is retained
 with `incomplete=true` and represents a lower bound. Daily records also include
 filesystem capacity, free bytes and user-available bytes for `/`, `/home` and
-`/mnt/windows`, or an explicit unmounted/error indication. The list deliberately does not walk every project
+`/data`, or an explicit unmounted/error indication. The list deliberately does not walk every project
 for `.next`, `target` or `.turbo` directories. Seven daily samples are needed to
 assess growth; large size alone does not establish unbounded growth.
 

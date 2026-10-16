@@ -99,7 +99,7 @@ def store_size(path, timeout):
 
 def capacities():
     rows = []
-    for path in ("/", "/home", "/mnt/windows"):
+    for path in ("/", "/home", "/data"):
         row = {"path": path}
         try:
             # An unmounted directory would report the parent filesystem misleadingly.
