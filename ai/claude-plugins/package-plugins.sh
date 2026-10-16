@@ -3,8 +3,8 @@
 # Desktop chat, Cowork and Claude Code from one upload.
 #
 # The plugins carry skills only. Their connectors are claude.ai account connectors, so a plugin
-# that also declared mcpServers would list the same server twice. okf-knowledge-ops ships once,
-# in okf-knowledge, which brain-portal and xbol-knowledge both rely on.
+# that also declared mcpServers would list the same server twice. The generic okf-knowledge-ops
+# skill these build on ships once, in the Iteramind organization's OKF Knowledge plugin.
 #
 # claude.ai holds a snapshot and does not track the dotfiles copy. Rebuild after editing a
 # skill under ai/agent-skills, then re-upload the changed zip.

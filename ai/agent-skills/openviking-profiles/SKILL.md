@@ -75,10 +75,10 @@ Cover root / child / non-project paths for both harnesses, plus an identity
 assertion that the Claude account export agrees with the config selection.
 That last one is what catches the hooks-vs-MCP divergence.
 
-**6. Update the docs.** `ai/openviking/README.md` (profile list), and
-`ai/agent-skills/okf-knowledge-ops/references/openviking.md` (the Profile Gate
-table — agents consult it before using recall). If the project is an OKF
-bundle, add its section to `okf-knowledge-ops/references/adapters.md` too.
+**6. Update the docs.** `ai/openviking/README.md` (profile list). If the
+project is an OKF bundle, name the account and its config file in that
+workspace's knowledge skill (for example `xbol-knowledge-ops`), which agents
+consult before using recall.
 
 ## Verification
 

@@ -1,7 +1,7 @@
 {
   "name": "brain-portal",
   "displayName": "Brain Portal",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Skills for Carlos's personal day and the Polychrome knowledge base, used with the Brain Portal connector.",
   "author": { "name": "Carlos Rosquillas" },
   "homepage": "https://brain.disusered.com",

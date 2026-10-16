@@ -41,3 +41,16 @@ Record an unresolved contradiction instead of picking the convenient side.
   XBOL root; it must report zero errors and zero warnings.
 - Never put credentials, personal data, or another client's material in the
   Bundle. Never read, link, or change another Bundle from here.
+
+## Workspace
+
+- Read `AGENTS.md`, `docs/schema/okf-profile.md`,
+  `docs/schema/knowledge-operations.md` and
+  `docs/runbooks/maintain-okf-bundle.md` before changing the Bundle; run every
+  check in that runbook afterwards. `docs/viz.html` is generated and ignored.
+- `.agents/okf.yaml` declares exactly one `xbol` Bundle. Run
+  `pnpm install --frozen-lockfile`; the root scripts use the exact CLI pin.
+- OpenViking recall uses the `xbol` account (`~/.openviking/ovcli-xbol.conf`)
+  and stays contextual.
+- Do not add Polychrome stores, `polychromectl`, a custom general knowledge
+  CLI, or an OKF MCP server other than `xbol-knowledge` to XBOL.

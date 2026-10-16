@@ -22,6 +22,7 @@ global:
       - ~/.agents/skills/openviking-profiles
       - ~/.claude/skills/openviking-profiles
     polychrome-journal-ops: ~/.agents/skills/polychrome-journal-ops
+    polychrome-knowledge-ops: ~/.agents/skills/polychrome-knowledge-ops
     karakeep-polychrome: ~/.agents/skills/karakeep-polychrome
     xbol-knowledge-ops: ~/.agents/skills/xbol-knowledge-ops
     financial-planning:

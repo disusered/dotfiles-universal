@@ -1,8 +1,0 @@
-{
-  "name": "okf-knowledge",
-  "displayName": "OKF Knowledge",
-  "version": "0.2.0",
-  "description": "The method for exploring and curating one governed OKF Bundle through a knowledge connector's okf_v1_* tools or the okf CLI.",
-  "author": { "name": "Carlos Rosquillas" },
-  "keywords": ["knowledge", "okf"]
-}
