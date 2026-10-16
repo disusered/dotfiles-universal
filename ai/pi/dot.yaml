@@ -14,6 +14,7 @@ linux:
       pi install npm:@bacnh85/pi-checkpoint@0.1.9
       pi mcp add brain-portal --url http://127.0.0.1:1937/v1/mcp
       pi mcp add xbol-knowledge --url http://127.0.0.1:1934/v1/mcp
+      pi mcp add iteramind-knowledge --url https://okf.iteramind.dev/mcp
       pi --version
     depends:
       - /languages/javascript/node/latest

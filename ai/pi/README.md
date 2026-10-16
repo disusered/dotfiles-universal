@@ -25,7 +25,9 @@ Profile data lives in `~/.optchat/profiles/<name>/`.
   pinned to reviewed commit `1322e74`, not copied here.
 - `pi-notify@1.4.0`, `@bacnh85/pi-checkpoint@0.1.9`: pinned npm packages.
 
-MCP servers `okf-cats` and `portal` come from the Herding Cats checkout.
+`dot.yaml` registers three MCP servers over HTTP: `brain-portal` and
+`xbol-knowledge` on their loopback services, and `iteramind-knowledge` at
+`https://okf.iteramind.dev/mcp`, which signs in through Cloudflare Access.
 
 ## themes
 

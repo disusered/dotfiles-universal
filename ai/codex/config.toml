@@ -423,7 +423,3 @@ enabled = true
 
 [plugins."unified-computer-use@openai-bundled"]
 enabled = true
-
-# Brain Portal: the day and the Polychrome knowledge Bundle, served by the brain-portal-mcp service.
-[mcp_servers.brain_portal]
-url = "http://127.0.0.1:1937/v1/mcp"

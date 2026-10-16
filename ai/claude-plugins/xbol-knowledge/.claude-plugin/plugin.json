@@ -1,8 +1,8 @@
 {
   "name": "xbol-knowledge",
   "displayName": "XBOL Knowledge",
-  "version": "1.1.0",
-  "description": "Evidence-backed knowledge for the XBOL ticketing and cashless platforms: domain language, decisions, requirements, operations, initiatives and release history.",
+  "version": "1.2.0",
+  "description": "Skill for the XBOL ticketing and cashless platforms' knowledge base, used with the XBOL Knowledge connector.",
   "author": { "name": "Carlos Rosquillas" },
-  "keywords": ["knowledge", "okf", "xbol", "mcp"]
+  "keywords": ["knowledge", "okf", "xbol"]
 }

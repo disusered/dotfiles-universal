@@ -45,11 +45,11 @@ ways, and both reach the same files under the same profile.
 - **With no filesystem:** use the workspace's knowledge connector. Each serves
   exactly one Bundle with the same eleven `okf_v1_*` tools a hosted deployment
   does. Polychrome is `brain-portal` (Brain Portal's server, which also carries
-  the day tools); XBOL is `xbol-knowledge`. Their plugins in the `carlos-local`
-  catalog install each connector with its skills. On this machine they answer at
-  `http://127.0.0.1:1937/v1/mcp` and `http://127.0.0.1:1934/v1/mcp`; cloud
-  clients use `https://brain-mcp.disusered.com/v1/mcp` and
-  `https://xbol-mcp.disusered.com/v1/mcp`, signing in through Cloudflare Access.
+  the day tools); XBOL is `xbol-knowledge`. Claude and ChatGPT reach them as
+  account connectors at `https://brain-mcp.disusered.com/v1/mcp` and
+  `https://xbol-mcp.disusered.com/v1/mcp`, signing in through Cloudflare Access;
+  Pi uses the loopback services at `http://127.0.0.1:1937/v1/mcp` and
+  `http://127.0.0.1:1934/v1/mcp`.
 - **Hosted Bundle:** use only the deployment-supplied `okf_v1_*` tools. Do not
   look for its files or fall back to unversioned `okf_*` tools.
 

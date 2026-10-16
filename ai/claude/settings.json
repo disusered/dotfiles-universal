@@ -111,21 +111,13 @@
     "pyright-lsp@claude-plugins-official": true,
     "mcp-server-dev@claude-plugins-official": true,
     "claude-security@claude-plugins-official": true,
-    "cc-plugin-you-should-know@builtin": true,
-    "brain-portal@carlos-local": true,
-    "xbol-knowledge@carlos-local": true
+    "cc-plugin-you-should-know@builtin": true
   },
   "extraKnownMarketplaces": {
     "openviking-plugins-local": {
       "source": {
         "source": "directory",
         "path": "/home/carlos/.openviking/openviking-repo/examples"
-      }
-    },
-    "carlos-local": {
-      "source": {
-        "source": "directory",
-        "path": "/home/carlos/.dotfiles/ai"
       }
     }
   },
