@@ -3,4 +3,5 @@ global:
     config.toml: ~/.config/cfg/config.toml
     templates.toml: ~/.config/cfg/templates.toml
     dev.toml: ~/.config/cfg/dev.toml
+    cleanup.toml: ~/.config/cfg/cleanup.toml
     palettes: ~/.config/cfg/palettes

@@ -26,3 +26,20 @@ only the original CacheDir setting (preserving any subsequent Pacman edits).
 Remove `/etc/systemd/system/paccache.service.d/20-cache-location.conf`, reload
 systemd, validate `pacman-conf CacheDir` and `paccache -dk2`, and restart the
 timer. Remove the relocated copy only after verification.
+
+## User file age limits
+
+`tmpfiles/user-disk-cleanup.conf` is linked into `~/.config/user-tmpfiles.d/`
+and applied daily by the user `systemd-tmpfiles-clean.timer`. Each rule deletes
+files older than its age; the `m:` prefix ages by modification time, so reading
+a file does not keep it.
+
+| Path | Age |
+|---|---|
+| `~/.config/gcloud/logs` | 3 days |
+| `~/.local/share/xbol-observability/log-spool/cloudlogging` | 14 days |
+| `~/.codex/sessions` | 90 days |
+| `~/.local/share/karakeep/backups` | 14 days (restic also keeps Karakeep data) |
+| `~/.local/share/herding-cats/brain-portal/backups` | 30 days |
+
+Preview with `systemd-tmpfiles --user --clean --dry-run`.

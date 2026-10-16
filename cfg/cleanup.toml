@@ -1,0 +1,22 @@
+# Retention for stores with no native eviction, read by `cfg cleanup`.
+# Native policies (tmpfiles ages, paccache, journald, podman and uv timers)
+# live with their owning dotfiles modules; this file covers only what cfg does.
+
+# Cargo projects cleaned by the explicit `cargo-targets` target.
+cargo_manifests = [
+  "~/Development/ME/herding-cats/utilities/cfg/Cargo.toml",
+  "~/.dotfiles/tools/hyprspace/Cargo.toml",
+]
+
+# Build output in git repos with no commit and no source edit for idle_days.
+# Report-only: list with `cfg cleanup plan --target idle-builds`, delete with
+# `cfg cleanup apply --target idle-builds --yes`.
+[idle_builds]
+roots = ["~/Development", "~/Learning"]
+idle_days = 30
+artifacts = ["target", "node_modules", ".venv", ".next", ".turbo"]
+exclude = []
+
+# Turbo 2.x never evicts its local cache.
+[turbo]
+max_age_days = 14
