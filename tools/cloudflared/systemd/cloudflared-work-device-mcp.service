@@ -1,0 +1,32 @@
+[Unit]
+Description=Cloudflare Tunnel for the work device's published MCP servers
+After=network-online.target brain-portal-mcp.service xbol-knowledge-mcp.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Ingress and Access live in cat-infra (mcp.tf). This process only carries the tunnel; it reaches
+# loopback ports and nothing else. The token file is written once with
+# `cloudflared tunnel token work-device-mcp` and kept at mode 0600.
+ExecStart=/usr/bin/cloudflared tunnel --no-autoupdate run --token-file %h/.config/cloudflared/work-device-mcp.token
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=15s
+
+LockPersonality=true
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+ProtectHome=read-only
+RestrictRealtime=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=default.target

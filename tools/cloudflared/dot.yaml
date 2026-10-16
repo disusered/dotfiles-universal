@@ -1,0 +1,13 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      pacman -Q cloudflared &>/dev/null || sudo pacman -S --needed cloudflared
+      mkdir -p -m 700 ~/.config/cloudflared
+      systemctl --user daemon-reload
+      if [ -f ~/.config/cloudflared/work-device-mcp.token ]; then
+        systemctl --user enable --now cloudflared-work-device-mcp.service
+      else
+        echo "cloudflared linked. Run 'cloudflared tunnel login', then 'cloudflared tunnel token work-device-mcp > ~/.config/cloudflared/work-device-mcp.token' (chmod 600), then enable cloudflared-work-device-mcp.service."
+      fi
+  links:
+    systemd/cloudflared-work-device-mcp.service: ~/.config/systemd/user/cloudflared-work-device-mcp.service
