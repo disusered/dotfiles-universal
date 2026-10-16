@@ -1,6 +1,6 @@
 ---
 name: okf-knowledge-ops
-description: Explore and curate exactly one governed OKF v0.2 Bundle, reached with the versioned JSON `okf` CLI, the repository's own stdio `okf_v1_*` MCP server, or a hosted deployment's `okf_v1_*` tools. Use for grounded questions, validation, source promotion, link and graph audits, and authorized knowledge changes in Polychrome or XBOL. For Iteramind, use okf-shared-bundle. Do not use for Polychrome Black processing.
+description: Explore and curate exactly one governed OKF v0.2 Bundle, reached with the versioned JSON `okf` CLI or a knowledge connector's `okf_v1_*` tools (brain-portal for Polychrome, xbol-knowledge for XBOL). Use for grounded questions, validation, source promotion, link and graph audits, and authorized knowledge changes in Polychrome or XBOL. For Iteramind, use okf-shared-bundle. Do not use for Polychrome Black processing.
 ---
 
 # OKF Knowledge Operations
