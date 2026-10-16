@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Incremental restic backup of $HOME plus the stateful parts of /data.
+# Container volumes and Karakeep are read from btrfs snapshots so databases
+# are captured crash-consistently while their services keep running.
+set -euo pipefail
+umask 077
+
+export RESTIC_REPOSITORY="${RESTIC_REPOSITORY:-/data/backups/restic-home}"
+export RESTIC_PASSWORD_FILE="${RESTIC_PASSWORD_FILE:-$HOME/.config/restic/home.password}"
+excludes="$HOME/.dotfiles/tools/restic/excludes"
+snap_root=/data/backups/.snap
+
+exec 9>/data/backups/.restic-home.lock
+flock -n 9 || exit 0
+
+cleanup() {
+  for s in "$snap_root"/*; do
+    if [ -e "$s" ]; then
+      # Snapshots hold files owned by container sub-UIDs; deleting them as an
+      # unprivileged user needs user_subvol_rm_allowed on /data and the
+      # user namespace.
+      podman unshare btrfs subvolume delete "$s" >/dev/null
+    fi
+  done
+}
+trap cleanup EXIT
+mkdir -p "$snap_root"
+cleanup
+btrfs subvolume snapshot /data/@containers "$snap_root/containers" >/dev/null
+btrfs subvolume snapshot /data/@karakeep "$snap_root/karakeep" >/dev/null
+
+# podman unshare maps container sub-UIDs back so restic can read volume data.
+podman unshare restic backup \
+  --one-file-system \
+  --exclude-caches \
+  --exclude-file "$excludes" \
+  --tag scheduled \
+  "$HOME" \
+  "$snap_root/containers/storage/volumes" \
+  "$snap_root/karakeep/data"
+
+# The backup can leave its lock behind on exit; unlock removes only locks
+# whose process is gone, never a live one.
+podman unshare restic unlock
+podman unshare restic forget --retry-lock 5m --tag scheduled --prune \
+  --keep-daily 7 --keep-weekly 4 --keep-monthly 6

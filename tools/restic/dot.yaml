@@ -1,0 +1,14 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    cmd: |
+      set -euo pipefail
+      sudo pacman -S --needed --noconfirm restic btrfs-progs
+      ~/.rotz/bin/rotz link /tools/restic -f
+      systemctl --user daemon-reload
+      systemctl --user enable --now restic-home.timer
+    depends:
+      - /packages/podman
+  links:
+    systemd/restic-home.service: ~/.config/systemd/user/restic-home.service
+    systemd/restic-home.timer: ~/.config/systemd/user/restic-home.timer
+    scripts/backup: ~/.local/bin/restic-home-backup

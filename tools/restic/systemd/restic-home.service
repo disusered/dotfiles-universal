@@ -1,0 +1,10 @@
+[Unit]
+Description=Back up home and stateful /data folders with restic
+RequiresMountsFor=/data
+
+[Service]
+Type=oneshot
+ExecStart=%h/.dotfiles/tools/restic/scripts/backup
+UMask=0077
+Nice=10
+IOSchedulingClass=idle

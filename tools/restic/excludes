@@ -1,0 +1,23 @@
+# Regenerable caches, toolchains and build output
+/home/carlos/.cache
+/home/carlos/.nuget
+/home/carlos/.gradle
+/home/carlos/.npm
+/home/carlos/go/pkg
+/home/carlos/Android/Sdk
+/home/carlos/.local/share/uv
+/home/carlos/.local/share/pnpm
+/home/carlos/.local/share/mise
+/home/carlos/.local/share/NuGet
+/home/carlos/.local/share/Trash
+/home/carlos/.local/share/herding-cats/brain-portal/releases
+/home/carlos/.config/Claude/vm_bundles
+/home/carlos/.config/google-chrome/*/Service Worker/CacheStorage
+/home/carlos/.codex/packages
+**/.turbo
+**/node_modules
+**/.venv
+**/target
+**/.next
+**/bin/Debug
+**/obj
