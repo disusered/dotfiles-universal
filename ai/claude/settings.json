@@ -111,7 +111,9 @@
     "pyright-lsp@claude-plugins-official": true,
     "mcp-server-dev@claude-plugins-official": true,
     "claude-security@claude-plugins-official": true,
-    "cc-plugin-you-should-know@builtin": true
+    "cc-plugin-you-should-know@builtin": true,
+    "brain-portal@carlos-local": true,
+    "xbol-knowledge@carlos-local": true
   },
   "extraKnownMarketplaces": {
     "openviking-plugins-local": {

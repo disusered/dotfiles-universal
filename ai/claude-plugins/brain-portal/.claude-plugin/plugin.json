@@ -1,0 +1,9 @@
+{
+  "name": "brain-portal",
+  "displayName": "Brain Portal",
+  "version": "1.0.0",
+  "description": "Carlos's personal day and knowledge: tasks, habits, timers, goals, the Today plan and the Studio slate, plus the Polychrome knowledge base.",
+  "author": { "name": "Carlos Rosquillas" },
+  "homepage": "https://brain.disusered.com",
+  "keywords": ["knowledge", "okf", "polychrome", "tasks", "today", "mcp"]
+}

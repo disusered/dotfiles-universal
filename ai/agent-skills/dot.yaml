@@ -13,26 +13,19 @@ global:
     manage-course-notebooks:
       - ~/.agents/skills/manage-course-notebooks
       - ~/.claude/skills/manage-course-notebooks
-    okf-knowledge-ops:
-      - ~/.agents/skills/okf-knowledge-ops
-      - ~/.claude/skills/okf-knowledge-ops
+    okf-knowledge-ops: ~/.agents/skills/okf-knowledge-ops
     okf-toolkit-maintenance:
       - ~/.agents/skills/okf-toolkit-maintenance
       - ~/.claude/skills/okf-toolkit-maintenance
-    okf-shared-bundle:
-      - ~/.agents/skills/okf-shared-bundle
-      - ~/.claude/skills/okf-shared-bundle
+    okf-shared-bundle: ~/.agents/skills/okf-shared-bundle
     openviking-profiles:
       - ~/.agents/skills/openviking-profiles
       - ~/.claude/skills/openviking-profiles
-    polychrome-journal-ops:
-      - ~/.agents/skills/polychrome-journal-ops
-      - ~/.claude/skills/polychrome-journal-ops
+    polychrome-journal-ops: ~/.agents/skills/polychrome-journal-ops
+    karakeep-polychrome: ~/.agents/skills/karakeep-polychrome
     financial-planning:
       - ~/.agents/skills/financial-planning
-    brain-portal:
-      - ~/.agents/skills/brain-portal
-      - ~/.claude/skills/brain-portal
+    brain-portal: ~/.agents/skills/brain-portal
     plain-english:
       - ~/.agents/skills/plain-english
       - ~/.claude/skills/plain-english
