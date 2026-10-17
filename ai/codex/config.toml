@@ -237,6 +237,9 @@ trusted_hash = "sha256:c730def8275e2e74d51898cb02c62be67f1905fa5cb8813883b41a391
 [hooks.state."skyrim-courier@personal:hooks/hooks.json:stop:0:0"]
 trusted_hash = "sha256:37246c58dda596dfef66427d1813722e04f53d3493c705b1a045c5c60db238e1"
 
+[mcp_servers.motion]
+url = "https://mcp.motion.dev"
+
 [mcp_servers.stitch]
 command = "/home/carlos/.local/bin/stitch-mcp-wrapper"
 
