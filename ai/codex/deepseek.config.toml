@@ -1,7 +1,7 @@
 model = "deepseek-flash"
 model_provider = "deepseek"
 model_catalog_json = "~/.codex/deepseek-models.json"
-model_reasoning_effort = "high"
+model_reasoning_effort = "max"
 plan_mode_reasoning_effort = "high"
 model_reasoning_summary = "none"
 web_search = "disabled"
