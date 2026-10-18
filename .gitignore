@@ -64,3 +64,10 @@ ai/claude/.cache/
 /.ab-evidence/
 
 /ai/claude/skills/karakeep-polychrome
+# Installer-owned or harness-written skill paths; not authored here.
+/ai/claude/skills/algorithmic-art
+/ai/claude/skills/anatomy/
+/ai/claude/skills/synced/
+/ai/claude/skills/.trash/
+# skill-creator eval output.
+/ai/claude/skills/*-workspace/
