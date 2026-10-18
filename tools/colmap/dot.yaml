@@ -1,0 +1,7 @@
+linux[whoami.distro^="Arch"]:
+  installs:
+    # No NVIDIA GPU here; the PKGBUILD defaults to a CUDA build. Without
+    # MAKEFLAGS its ninja build runs on one core.
+    cmd: BUILD_CUDA=OFF MAKEFLAGS="-j$(nproc)" yay -S --noconfirm --needed colmap
+    depends:
+      - /tools/yay
