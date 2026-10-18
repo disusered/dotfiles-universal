@@ -55,7 +55,7 @@ Platform-specific configurations use conditional syntax:
 - **`/languages`** - Programming language toolchains (ruby, node, python, rust, go, dotnet, lua)
 - **`/lib`** - System libraries and dependencies (pipewire, qt, avahi, uwsm, xdg)
 - **`/arch`** - Arch Linux specific apps (keychron, emote, swappy, wlogout, wttrbar)
-- **`/ai`** - AI tool configurations (claude, gemini, postgres-mcp, mcp-chrome)
+- **`/ai`** - AI tool configurations (claude, codex, antigravity-cli, pi, openviking, brain-portal, xbol-knowledge)
 - **`/packages`** - Package managers (scoop, homebrew, rancher)
 - **`/modules`** - Shared PowerShell functions
 
@@ -83,9 +83,10 @@ linux[whoami.distro^="Arch"]:
 
 ## Agent setup and skill discovery
 
-Shared behavior is maintained in `ai/agent-instructions/AGENTS.md`; Claude Code
-and Codex read that same source through their global symlinks. Keep project
-details here and model-specific tuning in the harness configuration.
+Shared behavior is maintained in `ai/agent-instructions/AGENTS.md`; Claude Code,
+Codex, and Antigravity (`agy` and Antigravity 2.0) read that same source through
+their global symlinks. Keep project details here and model-specific tuning in the
+harness configuration.
 
 Use the active harness's installed skill catalog and supported loading mechanism.
 Read a skill when its workflow applies; do not load every skill or install a

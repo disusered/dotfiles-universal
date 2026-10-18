@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "okf-shared": {
+      "url": "https://okf.iteramind.dev/mcp"
+    }
+  }
+}

@@ -185,5 +185,11 @@ skill; use `twg help describe '<command path>'` for uncertain syntax.
 - Codex runs GPT-6 Astra: it follows long instructions closely and tends to pause for
   confirmation, so resolve skill conflicts in favor of the user's request and keep
   working through long tasks without checking in.
+- Antigravity (`agy` and Antigravity 2.0) loads global instructions from
+  `~/.gemini/AGENTS.md`, global skills from `~/.gemini/config/skills.json`, and
+  global MCP servers from `~/.gemini/config/mcp_config.json`, while project-scoped
+  MCP servers live in `.agents/plugins/<name>/mcp_config.json`. When invoking
+  `claude -p` or `codex exec` for bounded cross-agent consults, redirect stdin from
+  `/dev/null` (`< /dev/null`) so non-interactive subprocesses do not hang.
 - Messages between agents and final replies are read by a human: keep them legible,
   with correct spacing and no shorthand.

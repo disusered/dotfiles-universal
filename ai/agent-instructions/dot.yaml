@@ -3,8 +3,9 @@ global:
     # Links-only module. rotz admits only modules that carry an `installs` block
     # into its dependency graph, so without this no-op the `depends` edges in
     # ai/claude and ai/codex fail as "Dependency ... was not found".
-    cmd: "true"
+    cmd: rm -f ~/.gemini/GEMINI.md
   links:
     AGENTS.md:
       - ~/.claude/CLAUDE.md
       - ~/.codex/AGENTS.md
+      - ~/.gemini/AGENTS.md

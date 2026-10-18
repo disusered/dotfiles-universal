@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "xbol-knowledge": {
+      "url": "http://127.0.0.1:1934/v1/mcp"
+    }
+  }
+}

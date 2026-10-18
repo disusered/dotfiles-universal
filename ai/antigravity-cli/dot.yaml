@@ -1,0 +1,78 @@
+linux|darwin:
+  installs:
+    cmd: |
+      set -eu
+      if ! command -v agy >/dev/null 2>&1; then
+        installer="$(mktemp)"
+        trap 'rm -f "$installer"' EXIT
+        curl -fsSL https://antigravity.google/cli/install.sh -o "$installer"
+        bash "$installer"
+      fi
+
+      chmod +x "$HOME/.dotfiles/ai/antigravity-cli/title.sh"
+
+      mkdir -p "$HOME/.gemini/config" "$HOME/.gemini/antigravity-cli"
+      ln -sfn "$HOME/.agents/skills" "$HOME/.gemini/config/skills"
+      ln -sfn "$HOME/.agents/skills" "$HOME/.gemini/antigravity-cli/skills"
+
+      mcp_cfg="$HOME/.gemini/config/mcp_config.json"
+      if [ ! -f "$mcp_cfg" ] || [ ! -s "$mcp_cfg" ]; then
+        printf '{}\n' > "$mcp_cfg"
+      fi
+      tmp_mcp="$(mktemp)"
+      jq '
+        .mcpServers = ((.mcpServers // {})
+          | del(.StitchMCP, ."iteramind-knowledge", ."okf-shared", ."xbol-knowledge")
+          + {
+            "brain-portal": {
+              "url": "http://127.0.0.1:1937/v1/mcp"
+            },
+            "motion": {
+              "url": "https://mcp.motion.dev"
+            },
+            "stitch": {
+              "command": ($ENV.HOME + "/.local/bin/stitch-mcp-wrapper"),
+              "args": []
+            },
+            "blender": {
+              "command": "/usr/bin/uvx",
+              "args": ["--python", "3.11", "blender-mcp==1.9.1"],
+              "env": {
+                "DISABLE_TELEMETRY": "true",
+                "BLENDER_HOST": "localhost",
+                "BLENDER_PORT": "9876"
+              }
+            },
+            "rea": {
+              "command": "npx",
+              "args": ["-y", "rea-agents@3.2.1", "mcp"],
+              "env": {
+                "GHIDRA_INSTALL_DIR": "/opt/ghidra",
+                "JAVA_HOME": "/usr/lib/jvm/java-21-openjdk"
+              }
+            }
+          }
+        )
+      ' "$mcp_cfg" > "$tmp_mcp"
+      mv "$tmp_mcp" "$mcp_cfg"
+
+      settings_cfg="$HOME/.gemini/antigravity-cli/settings.json"
+      if [ ! -f "$settings_cfg" ] || [ ! -s "$settings_cfg" ]; then
+        printf '{}\n' > "$settings_cfg"
+      fi
+      tmp_settings="$(mktemp)"
+      jq '
+        .title = {
+          "type": "command",
+          "command": "~/.gemini/antigravity-cli/title.sh"
+        }
+      ' "$settings_cfg" > "$tmp_settings"
+      mv "$tmp_settings" "$settings_cfg"
+    depends:
+      - /ai/agent-instructions
+      - /ai/agent-skills
+  links:
+    skills.json: ~/.gemini/config/skills.json
+    title.sh: ~/.gemini/antigravity-cli/title.sh
+    plugins/okf-shared: ~/Development/ITERAMIND/.agents/plugins/okf-shared
+    plugins/xbol-knowledge: ~/Development/XBOL/.agents/plugins/xbol-knowledge

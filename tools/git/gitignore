@@ -22,8 +22,8 @@ bv
 .op/
 
 AGENTS.md
-# The canonical global agent instructions. Both ~/.claude/CLAUDE.md and
-# ~/.codex/AGENTS.md are symlinks to this one file.
+# The canonical global agent instructions. ~/.claude/CLAUDE.md,
+# ~/.codex/AGENTS.md, and ~/.gemini/AGENTS.md are symlinks to this one file.
 !ai/agent-instructions/AGENTS.md
 
 # Generic database files (sqlite, etc.) should not be committed
@@ -32,6 +32,7 @@ AGENTS.md
 # skills
 skills-lock.json
 .agents/skills
+.agents/plugins
 .cfg
 .env
 Procfile
