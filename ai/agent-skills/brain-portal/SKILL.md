@@ -1,6 +1,6 @@
 ---
 name: brain-portal
-description: Operate the private Brain Portal through its stable portalctl interface. Use when a request asks to validate, publish, list, or roll back a sourced infographic, table, metric view, or chart; inspect portal health; or make a bounded update to a portal workspace such as purchase research, sources, watches, observations, components, or receipts.
+description: Operate and deploy the private Brain Portal, its MCP server, and the connected brain-agent Pi service. Use when a request asks to deploy Brain Portal or brain-agent; validate, publish, list, or roll back a sourced infographic, table, metric view, or chart; inspect portal health; or make a bounded update to a portal workspace such as purchase research, sources, watches, observations, components, or receipts.
 ---
 
 # Brain Portal
@@ -61,6 +61,37 @@ They do not authorize a purchase, allocate money, or infer affordability.
   pages, logs, and chat summaries unless explicitly requested.
 - Use the separate `financial-planning` skill when a request changes confirmed
   financial actuals, quotes, or ledger funding evidence.
+
+## Deploy Portal, MCP, and Pi Services
+
+When asked to deploy Brain Portal, its MCP tools, or `brain-agent`:
+
+1. Land and sign all commits on `main` (`projects/brain-portal` and/or
+   `utilities/brain-agent` in Herding Cats). `scripts/deploy.sh` exports only
+   committed `main`.
+2. Run `./scripts/deploy.sh` from `projects/brain-portal` (outside the sandbox
+   so it can reach `~/.config/brain-portal/env` and the systemd user bus). It
+   exports the release, runs migrations and build, restarts
+   `brain-portal.service` (`127.0.0.1:43110`) and
+   `brain-portal-worker.service`, builds `@brain-portal/mcp` in the repository
+   checkout, and restarts `brain-portal-mcp.service` (`127.0.0.1:1937`) and
+   `brain-agent.service` (Pi Durable on `127.0.0.1:43140`).
+3. If only `utilities/brain-agent` or `apps/mcp` changed without a full web
+   release, build `apps/mcp` (`pnpm --filter @brain-portal/mcp build`) and
+   restart both companion services together:
+
+   ```sh
+   systemctl --user restart brain-portal-mcp.service brain-agent.service
+   ```
+
+4. Deployment is complete when all four units report `active` and both health
+   probes respond:
+
+   ```sh
+   systemctl --user is-active brain-portal.service brain-portal-worker.service brain-portal-mcp.service brain-agent.service
+   curl -fsS http://127.0.0.1:43110/api/health
+   curl -fsS http://127.0.0.1:43140/v1/health
+   ```
 
 ## Verify
 
