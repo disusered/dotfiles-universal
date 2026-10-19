@@ -64,12 +64,18 @@ jellyfin.disusered.com {
 	reverse_proxy 127.0.0.1:8096
 }
 
-# Tailscale Funnel terminates public TLS and reaches this loopback listener.
-# Only share links cross the boundary; every other path is a plain 404.
+# Cloudflare Tunnel reaches this loopback-only public document reader.
+# All private Portal routes and assets stay behind the tailnet listener.
 http://:43111 {
 	bind 127.0.0.1
-	@share path /s/*
+	@share {
+		host share.disusered.com
+		path_regexp share ^/s/[A-Za-z0-9_-]{16,64}(/opengraph-image)?/?$
+	}
 	handle @share {
+		@write not method GET HEAD
+		header @write Allow "GET, HEAD"
+		respond @write 405
 		reverse_proxy 127.0.0.1:43110
 	}
 	handle {
