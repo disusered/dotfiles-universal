@@ -112,7 +112,8 @@ map ctrl+shift+t new_tab_with_cwd
 
 # Smart-splits integration
 allow_remote_control yes
-listen_on unix:@mykitty
+# The smart-splits Kitty backend requires a filesystem socket. Restart Kitty after changing this.
+listen_on unix:/tmp/mykitty
 
 map ctrl+j neighboring_window down
 map ctrl+k neighboring_window up
