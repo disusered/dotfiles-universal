@@ -2,11 +2,20 @@ linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
       set -euo pipefail
+      if ! mountpoint -q /data; then
+        echo 'Mount /data before installing RomM.' >&2
+        exit 1
+      fi
+      install -d -m 2770 /data/media/ROMs
+      mkdir -p ~/Games/romm/library
+      if [ -d ~/Games/romm/library/roms ] && [ ! -L ~/Games/romm/library/roms ]; then
+        rmdir ~/Games/romm/library/roms
+      fi
+      ln -sfn /data/media/ROMs ~/Games/romm/library/roms
       podman pull docker.io/library/mariadb:latest
       podman pull docker.io/rommapp/romm:latest
       mkdir -p ~/.config/containers/systemd
       mkdir -p ~/.config/romm
-      mkdir -p ~/Games/romm/library/roms
       mkdir -p ~/Games/romm/library/bios
       mkdir -p ~/Games/romm/assets
       mkdir -p ~/Games/romm/config

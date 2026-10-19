@@ -14,12 +14,19 @@ The app is exposed only on localhost. Caddy publishes the tailnet route.
 
 ## Storage
 
-RomM library storage lives under `~/Games/romm`:
+ROM payloads live on the data volume:
 
-- `~/Games/romm/library/roms`
+- `/data/media/ROMs` (mounted into the container as `/romm/library/roms`)
+
+Small RomM state remains under `~/Games/romm`:
+
 - `~/Games/romm/library/bios`
 - `~/Games/romm/assets`
 - `~/Games/romm/config`
+
+`~/Games/romm/library/roms` is a symlink to `/data/media/ROMs` for local
+convenience. The container mounts the data-volume path directly rather than
+depending on the symlink.
 
 The library directory follows RomM's recommended top-level `roms/` and `bios/`
 layout.
