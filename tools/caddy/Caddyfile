@@ -63,3 +63,15 @@ jellyfin.disusered.com {
 	import disusered_tls
 	reverse_proxy 127.0.0.1:8096
 }
+
+# Tailscale Funnel terminates public TLS and reaches this loopback listener.
+# Only share links cross the boundary; every other path is a plain 404.
+http://:43111 {
+	@share path /s/*
+	handle @share {
+		reverse_proxy 127.0.0.1:43110
+	}
+	handle {
+		respond 404
+	}
+}
