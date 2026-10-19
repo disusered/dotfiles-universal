@@ -1,10 +1,15 @@
 return {
-  "mrjones2014/smart-splits.nvim",
+  "smart-splits-nvim/smart-splits.nvim",
   lazy = false,
-  build = "./kitty/install-kittens.bash",
+  dependencies = {
+    {
+      "smart-splits-nvim/backend-kitty",
+      module = "smart-splits-backend-kitty",
+    },
+  },
   opts = {
-    at_edge = "stop",
-    multiplexer_integration = "kitty",
+    move = { at_edge = "stop" },
+    mux = { backend = "smart-splits-backend-kitty" },
   },
   keys = function()
     local smart_splits = require("smart-splits")
