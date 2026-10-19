@@ -15,7 +15,7 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-DEFAULT_SESSION = Path.home() / "Downloads/rtorrent/.session"
+DEFAULT_SESSION = Path("/data/archive/rtorrent/.session")
 CACHE_DIR = Path.home() / ".cache/rtorrent-tracker-refresh"
 LIST_URL = "https://raw.githubusercontent.com/ngosang/trackerslist/master/{}.txt"
 

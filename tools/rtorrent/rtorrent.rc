@@ -8,7 +8,9 @@
 
 
 ## Instance layout (base paths)
-method.insert = cfg.basedir,  private|const|string, (cat,"/home/carlos/Downloads/rtorrent/")
+## Keep the payload directory on the large data volume. The legacy
+## ~/Downloads/rtorrent path remains as a convenience symlink.
+method.insert = cfg.basedir,  private|const|string, (cat,"/data/archive/rtorrent/")
 method.insert = cfg.download, private|const|string, (cat,(cfg.basedir),"download/")
 method.insert = cfg.logs,     private|const|string, (cat,(cfg.basedir),"log/")
 method.insert = cfg.logfile,  private|const|string, (cat,(cfg.logs),"rtorrent-",(system.time),".log")
@@ -26,8 +28,8 @@ execute.throw = sh, -c, (cat,\
 
 
 ## Listening port for incoming peer traffic (fixed; you can also randomize it)
-network.port_range.set = 50000-50000
-network.port_random.set = no
+network.listen.port.range.set = 50000-50000
+network.listen.port.random.set = no
 
 
 ## Tracker-less torrent and UDP tracker support
@@ -51,15 +53,7 @@ throttle.min_peers.seed.set = 30
 throttle.max_peers.seed.set = 80
 trackers.numwant.set = 80
 
-protocol.encryption.set = allow_incoming,try_outgoing,enable_retry
-
-
-## Limits for file handle resources, this is optimized for
-## an `ulimit` of 1024 (a common default). You MUST leave
-## a ceiling of handles reserved for rTorrent's internal needs!
-network.http.max_open.set = 50
-network.max_open_files.set = 600
-network.max_open_sockets.set = 300
+protocol.encryption.set = allow
 
 
 ## Memory resource usage (increase if you have a large number of items loaded,
@@ -78,11 +72,10 @@ execute.nothrow = sh, -c, (cat, "echo >",\
 
 
 ## Other operational settings (check & adapt)
-encoding.add = UTF-8
 system.umask.set = 0027
 system.cwd.set = (directory.default)
 network.http.dns_cache_timeout.set = 25
-schedule2 = monitor_diskspace, 15, 60, ((close_low_diskspace, 1000M))
+schedule = monitor_diskspace, 15, 60, ((close_low_diskspace, 1000M))
 #pieces.hash.on_completion.set = no
 #view.sort_current = seeding, greater=d.ratio=
 #keys.layout.set = qwerty
@@ -101,11 +94,27 @@ method.insert = d.data_path, simple,\
 method.insert = d.session_file, simple, "cat=(session.path), (d.hash), .torrent"
 
 
+## Publish completed media into Jellyfin and RomM.
+## The helper hardlinks within a filesystem and uses Btrfs reflinks between
+## subvolumes, preserving rTorrent's source files for seeding without an
+## immediate second copy of the payload. Movies, TV, Music, and common ROM
+## extensions are routed automatically; use --label when detection is ambiguous.
+method.set_key = event.download.finished, media_link, \
+    "execute.nothrow = /home/carlos/.local/bin/rtorrent-media-link, (d.data_path)"
+
+## Reconcile the complete view as a fallback. This catches completed torrents
+## loaded from the session when rTorrent starts and any finish event that was
+## missed while the client was not running.
+schedule = media_link_reconcile, 30, 300, \
+    ((d.multicall2, complete, \
+        "execute.nothrow=/home/carlos/.local/bin/rtorrent-media-link,(d.data_path)"))
+
+
 ## Watch directories (add more as you like, but use unique schedule names)
 ## Add torrent
-schedule2 = watch_load, 11, 10, ((load.verbose, (cat, (cfg.watch), "load/*.torrent")))
+schedule = watch_load, 11, 10, ((load.verbose, (cat, (cfg.watch), "load/*.torrent")))
 ## Add & download straight away
-schedule2 = watch_start, 10, 10, ((load.start_verbose, (cat, (cfg.watch), "start/*.torrent")))
+schedule = watch_start, 10, 10, ((load.start_verbose, (cat, (cfg.watch), "start/*.torrent")))
 
 
 ## Run the rTorrent process as a daemon in the background

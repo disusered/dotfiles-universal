@@ -1,7 +1,8 @@
 linux[whoami.distro^="Arch"]:
   installs:
     cmd: |
-      sudo pacman -S --noconfirm --needed rtorrent
+      sudo pacman -S --noconfirm --needed rtorrent acl
   links:
     rtorrent.rc: ~/.rtorrent.rc
     refresh-trackers.py: ~/.local/bin/rtorrent-refresh-trackers
+    rtorrent-media-link: ~/.local/bin/rtorrent-media-link

@@ -1,0 +1,479 @@
+#!/usr/bin/env python3
+"""Publish completed rTorrent payloads into Jellyfin and RomM libraries.
+
+Files are hardlinked when they share a filesystem. Across Btrfs subvolumes the
+script uses copy-on-write reflinks, which also leave the seeding path intact
+without immediately duplicating the payload.
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import pwd
+import re
+import shutil
+import subprocess
+import sys
+import time
+from dataclasses import dataclass
+from pathlib import Path
+
+DEFAULT_SOURCE = Path("/data/archive/rtorrent/download")
+DEFAULT_MEDIA_ROOT = Path("/data/media")
+DEFAULT_ROMS_ROOT = DEFAULT_MEDIA_ROOT / "ROMs"
+DEFAULT_LOG = Path.home() / ".local/state/rtorrent-media-link.log"
+
+VIDEO_EXTENSIONS = {
+    ".avi",
+    ".flv",
+    ".m2ts",
+    ".m4v",
+    ".mkv",
+    ".mov",
+    ".mp4",
+    ".mpeg",
+    ".mpg",
+    ".ts",
+    ".webm",
+    ".wmv",
+}
+AUDIO_EXTENSIONS = {
+    ".aac",
+    ".aif",
+    ".aiff",
+    ".alac",
+    ".ape",
+    ".flac",
+    ".m4a",
+    ".mp3",
+    ".ogg",
+    ".opus",
+    ".wav",
+    ".wv",
+}
+ROM_PLATFORMS = {
+    ".3ds": "3ds",
+    ".32x": "segacd32",
+    ".a26": "atari2600",
+    ".a78": "atari7800",
+    ".cia": "3ds",
+    ".fds": "nes",
+    ".gba": "gba",
+    ".gb": "gb",
+    ".gbc": "gbc",
+    ".gcm": "ngc",
+    ".gg": "gamegear",
+    ".lnx": "atarilynx",
+    ".md": "genesis",
+    ".n64": "n64",
+    ".nds": "nds",
+    ".nes": "nes",
+    ".nsp": "switch",
+    ".pce": "pcengine",
+    ".rvz": "ngc",
+    ".sfc": "snes",
+    ".smc": "snes",
+    ".sms": "mastersystem",
+    ".v64": "n64",
+    ".wad": "wii",
+    ".wbfs": "wii",
+    ".xci": "switch",
+    ".z64": "n64",
+}
+SIDECAR_EXTENSIONS = {
+    ".ass",
+    ".cue",
+    ".idx",
+    ".jpeg",
+    ".jpg",
+    ".m3u",
+    ".nfo",
+    ".png",
+    ".srt",
+    ".ssa",
+    ".sub",
+    ".vtt",
+    ".webp",
+}
+TV_PATTERN = re.compile(
+    r"(?:^|[.\s_-])(?:s\d{1,2}e\d{1,3}|\d{1,2}x\d{2}|season[ ._-]?\d+)(?:[.\s_-]|$)",
+    re.IGNORECASE,
+)
+LABEL_CATEGORIES = {
+    "audio": "music",
+    "film": "movies",
+    "films": "movies",
+    "movie": "movies",
+    "movies": "movies",
+    "music": "music",
+    "show": "tv",
+    "shows": "tv",
+    "tv": "tv",
+}
+
+
+@dataclass(frozen=True)
+class Route:
+    category: str
+    platform: str | None = None
+
+
+@dataclass
+class Counts:
+    linked: int = 0
+    existing: int = 0
+    conflicts: int = 0
+    skipped: int = 0
+    failed: int = 0
+
+
+class Logger:
+    def __init__(self, path: Path | None, dry_run: bool):
+        self.path = path
+        self.dry_run = dry_run
+        if self.path is not None and not dry_run:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+
+    def __call__(self, message: str) -> None:
+        print(message)
+        if self.path is None or self.dry_run:
+            return
+        with self.path.open("a", encoding="utf-8") as log:
+            log.write(f"{time.strftime('%Y-%m-%dT%H:%M:%S%z')} {message}\n")
+
+
+def parse_label(raw: str | None) -> Route | None:
+    if not raw:
+        return None
+    value = raw.strip().lower()
+    for separator in (":", "/"):
+        if separator in value:
+            category, platform = value.split(separator, 1)
+            if category in {"rom", "roms"} and platform:
+                return Route("roms", re.sub(r"[^a-z0-9_-]+", "-", platform))
+    category = LABEL_CATEGORIES.get(value)
+    if category is None:
+        return None
+    return Route(category)
+
+
+def classify_media(path: Path, relative_path: Path) -> Route | None:
+    suffix = path.suffix.lower()
+    if suffix in AUDIO_EXTENSIONS:
+        return Route("music")
+    if suffix in VIDEO_EXTENSIONS:
+        category = "tv" if TV_PATTERN.search(str(relative_path)) else "movies"
+        return Route(category)
+    platform = ROM_PLATFORMS.get(suffix)
+    if platform is not None:
+        return Route("roms", platform)
+    return None
+
+
+def is_sidecar(path: Path) -> bool:
+    return path.suffix.lower() in SIDECAR_EXTENSIONS
+
+
+def iter_item_files(item: Path) -> list[tuple[Path, Path]]:
+    if item.is_file() and not item.is_symlink():
+        return [(item, Path(item.name))]
+    if not item.is_dir() or item.is_symlink():
+        return []
+
+    files: list[tuple[Path, Path]] = []
+    for root, directories, filenames in os.walk(item, followlinks=False):
+        root_path = Path(root)
+        directories[:] = [
+            name for name in directories if not (root_path / name).is_symlink()
+        ]
+        for filename in filenames:
+            source = root_path / filename
+            if source.is_symlink():
+                continue
+            relative = item.name / source.relative_to(item)
+            files.append((source, Path(relative)))
+    return files
+
+
+def routes_for_files(
+    files: list[tuple[Path, Path]], label: Route | None
+) -> dict[Path, Route]:
+    if label is not None:
+        return {source: label for source, _ in files}
+
+    routes = {
+        source: route
+        for source, relative in files
+        if (route := classify_media(source, relative)) is not None
+    }
+    if not routes:
+        return {}
+
+    category_routes = set(routes.values())
+    if len(category_routes) == 1:
+        only_route = next(iter(category_routes))
+        for source, _ in files:
+            routes.setdefault(source, only_route)
+        return routes
+
+    media_names = {
+        source.name.removesuffix(source.suffix).lower(): route
+        for source, route in routes.items()
+    }
+    for source, _ in files:
+        if source in routes or not is_sidecar(source):
+            continue
+        lower_name = source.name.lower()
+        for media_name, route in media_names.items():
+            if lower_name.startswith(media_name):
+                routes[source] = route
+                break
+    return routes
+
+
+def target_path(
+    relative: Path,
+    route: Route,
+    media_root: Path,
+    roms_root: Path,
+) -> Path:
+    if route.category == "movies":
+        return media_root / "Movies" / relative
+    if route.category == "tv":
+        return media_root / "TV" / relative
+    if route.category == "music":
+        return media_root / "Music" / relative
+    if route.category == "roms" and route.platform:
+        return roms_root / route.platform / relative
+    raise ValueError(f"unsupported route: {route}")
+
+
+def publish_file(source: Path, destination: Path) -> str:
+    if source.stat().st_dev == destination.parent.stat().st_dev:
+        os.link(source, destination, follow_symlinks=False)
+        return "hardlinked"
+
+    cp = shutil.which("cp")
+    if cp is None:
+        raise RuntimeError("cp is required for cross-subvolume reflinks")
+    subprocess.run(
+        [
+            cp,
+            "--reflink=always",
+            "--preserve=mode,timestamps",
+            "--",
+            str(source),
+            str(destination),
+        ],
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    return "reflinked"
+
+
+def already_published(source: Path, destination: Path) -> bool:
+    try:
+        if destination.samefile(source):
+            return True
+    except OSError:
+        pass
+
+    source_stat = source.stat()
+    destination_stat = destination.stat()
+    return (
+        source_stat.st_size == destination_stat.st_size
+        and source_stat.st_mtime_ns == destination_stat.st_mtime_ns
+    )
+
+
+def grant_jellyfin_access(paths: list[Path]) -> None:
+    if not paths:
+        return
+    try:
+        pwd.getpwnam("jellyfin")
+    except KeyError:
+        return
+    setfacl = shutil.which("setfacl")
+    if setfacl is None:
+        raise RuntimeError("setfacl is required to grant Jellyfin read access")
+    for offset in range(0, len(paths), 100):
+        chunk = [str(path) for path in paths[offset : offset + 100]]
+        subprocess.run(
+            [setfacl, "-m", "u:jellyfin:r--", *chunk],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+
+
+def process_item(
+    item: Path,
+    *,
+    label: Route | None,
+    media_root: Path,
+    roms_root: Path,
+    dry_run: bool,
+    grant_access: bool,
+    counts: Counts,
+    log: Logger,
+) -> None:
+    if not item.exists():
+        log(f"missing: {item}")
+        counts.failed += 1
+        return
+
+    files = iter_item_files(item)
+    if not files:
+        log(f"skip: {item.name} has no regular files")
+        counts.skipped += 1
+        return
+
+    routes = routes_for_files(files, label)
+    if not routes:
+        log(f"skip: {item.name} has no recognizable media; use --label")
+        counts.skipped += 1
+        return
+
+    pending_acl: list[Path] = []
+    for source, relative in files:
+        route = routes.get(source)
+        if route is None or (route.category == "roms" and not route.platform):
+            counts.skipped += 1
+            continue
+        destination = target_path(relative, route, media_root, roms_root)
+        if destination.exists() or destination.is_symlink():
+            if destination.is_file() and already_published(source, destination):
+                counts.existing += 1
+                pending_acl.append(destination)
+                continue
+            log(f"conflict: {destination} already exists")
+            counts.conflicts += 1
+            continue
+
+        if dry_run:
+            log(f"dry-run: {source} -> {destination}")
+            counts.linked += 1
+            continue
+
+        try:
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            method = publish_file(source, destination)
+        except (OSError, RuntimeError, subprocess.CalledProcessError) as error:
+            log(f"error: {source} -> {destination}: {error}")
+            counts.failed += 1
+            continue
+        if grant_access:
+            try:
+                grant_jellyfin_access([destination])
+            except (RuntimeError, subprocess.CalledProcessError) as error:
+                log(f"error: could not grant Jellyfin access to {destination}: {error}")
+                counts.failed += 1
+        log(f"{method}: {source} -> {destination}")
+        counts.linked += 1
+
+    if not dry_run and pending_acl and grant_access:
+        try:
+            grant_jellyfin_access(pending_acl)
+        except (RuntimeError, subprocess.CalledProcessError) as error:
+            log(f"error: could not grant Jellyfin access to existing links: {error}")
+            counts.failed += 1
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Publish completed rTorrent payloads into Jellyfin media and RomM libraries."
+        ),
+        epilog=(
+            "Examples:\n"
+            "  rtorrent-media-link --all\n"
+            "  rtorrent-media-link --label tv '/data/archive/rtorrent/download/Show'\n"
+            "  rtorrent-media-link --label roms:snes '/data/archive/rtorrent/download/Game'"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "paths",
+        nargs="*",
+        type=Path,
+        help="completed torrent file or directory",
+    )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="scan every top-level item in --source",
+    )
+    parser.add_argument("--source", type=Path, default=DEFAULT_SOURCE)
+    parser.add_argument("--media-root", type=Path, default=DEFAULT_MEDIA_ROOT)
+    parser.add_argument("--roms-root", type=Path, default=DEFAULT_ROMS_ROOT)
+    parser.add_argument(
+        "--label",
+        help="route every selected file as movies, tv, music, or roms:<platform>",
+    )
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--no-acl",
+        action="store_true",
+        help="do not grant the jellyfin user read access with setfacl",
+    )
+    parser.add_argument(
+        "--no-log",
+        action="store_true",
+        help="do not append results to the default state log",
+    )
+    args = parser.parse_args()
+    if args.all and args.paths:
+        parser.error("--all cannot be combined with explicit paths")
+    return args
+
+
+def main() -> int:
+    args = parse_args()
+    label = parse_label(args.label)
+    if args.label and label is None:
+        print(f"error: unknown label {args.label!r}", file=sys.stderr)
+        return 2
+
+    if args.all or not args.paths:
+        if not args.source.is_dir():
+            print(f"error: source directory not found: {args.source}", file=sys.stderr)
+            return 1
+        items = sorted(
+            path for path in args.source.iterdir() if path.is_file() or path.is_dir()
+        )
+    else:
+        items = args.paths
+
+    if not items:
+        print(f"nothing to import under {args.source}")
+        return 0
+
+    log = Logger(None if args.no_log else DEFAULT_LOG, args.dry_run)
+    counts = Counts()
+    for item in items:
+        process_item(
+            item.resolve(),
+            label=label,
+            media_root=args.media_root,
+            roms_root=args.roms_root,
+            dry_run=args.dry_run,
+            grant_access=not args.no_acl,
+            counts=counts,
+            log=log,
+        )
+
+    log(
+        "done: "
+        f"{counts.linked} linked, {counts.existing} already published, "
+        f"{counts.conflicts} conflicts, {counts.skipped} skipped, "
+        f"{counts.failed} failed"
+    )
+    return 1 if counts.failed else 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
