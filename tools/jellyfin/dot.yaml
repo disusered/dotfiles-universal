@@ -1,0 +1,17 @@
+linux[whoami.distro^="Arch"]:
+  links:
+    scripts/configure-libraries: ~/.local/bin/jellyfin-libraries
+  installs:
+    cmd: |
+      set -eu
+      if ! mountpoint -q /data; then
+        echo 'Mount /data before installing Jellyfin.' >&2
+        exit 1
+      fi
+      sudo pacman -S --needed --noconfirm jellyfin-server jellyfin-web jellyfin-ffmpeg
+      sudo install -d -m 2750 -o "$(id -un)" -g jellyfin \
+        /data/media /data/media/Movies /data/media/TV /data/media/Music
+      sudo install -Dm0644 ~/.dotfiles/tools/jellyfin/systemd/media.conf \
+        /etc/systemd/system/jellyfin.service.d/media.conf
+      sudo systemctl daemon-reload
+      sudo systemctl enable --now jellyfin.service

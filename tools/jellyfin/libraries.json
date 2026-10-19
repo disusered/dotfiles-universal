@@ -1,0 +1,26 @@
+{
+  "LibraryOptions": {
+    "EnableRealtimeMonitor": true,
+    "SaveLocalMetadata": false,
+    "SaveSubtitlesWithMedia": false,
+    "SaveLyricsWithMedia": false,
+    "SaveTrickplayWithMedia": false
+  },
+  "Libraries": [
+    {
+      "Name": "Movies",
+      "CollectionType": "movies",
+      "Locations": ["/data/media/Movies"]
+    },
+    {
+      "Name": "TV",
+      "CollectionType": "tvshows",
+      "Locations": ["/data/media/TV"]
+    },
+    {
+      "Name": "Music",
+      "CollectionType": "music",
+      "Locations": ["/data/media/Music"]
+    }
+  ]
+}
