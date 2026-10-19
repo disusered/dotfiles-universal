@@ -3,6 +3,10 @@ export PAGER='less'
 # ZSH environment variable for temporary files
 export TMPDIR="/tmp"
 
+# Keep Python bytecode caches out of source trees; they are mirrored under the
+# user cache directory instead of being written next to the source files.
+export PYTHONPYCACHEPREFIX="${XDG_CACHE_HOME:-$HOME/.cache}/python"
+
 # Locale settings
 export LANG='en_US.UTF-8'
 export LC_ALL='en_US.UTF-8'

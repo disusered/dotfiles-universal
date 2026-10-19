@@ -58,7 +58,11 @@ ai/claude/.cache/
 /ai/claude/skills/twg-*
 # Upstream Motion skill installed in ~/.agents/skills; Claude uses a local link.
 /ai/claude/skills/motion
-/ai/xbol-observability/tests/__pycache__
+
+# Python bytecode caches; PYTHONPYCACHEPREFIX in tools/zsh/zshenv keeps new
+# ones outside the tree.
+__pycache__/
+*.pyc
 
 # Browser QA screenshots and audit logs.
 /.ab-evidence/
