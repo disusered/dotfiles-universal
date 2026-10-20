@@ -17,7 +17,9 @@ The installer initializes private env files only when neither exists, links Quad
 - `~/.local/share/karakeep/search`: rebuildable full-text index.
 - `~/.local/share/karakeep/backups`: private complete data/config archives.
 
-Full-page Monolith archiving and screenshots are enabled. English and Spanish OCR use Tesseract. The built-in AI tagger uses OpenRouter's `google/gemini-2.5-flash-lite` through the existing ordinary API key in 1Password. AI summaries, LLM OCR, and automatic embedding generation remain disabled. Signups are disabled outside initial owner-account provisioning. Karakeep account credentials belong in Personal/Karakeep; the provider key belongs in Personal/OpenRouter API Key - OpenViking in 1Password.
+Full-page Monolith archiving and screenshots are enabled. English and Spanish OCR use Tesseract. The built-in AI tagger uses DeepSeek's `deepseek-flash` through the existing ordinary API key in 1Password. AI summaries, LLM OCR, and automatic embedding generation remain disabled. Signups are disabled outside initial owner-account provisioning. Karakeep account credentials belong in Personal/Karakeep; the provider key belongs in Personal/Deepseek in 1Password.
+
+The repository and 1Password configuration contain no separate RapidSeek endpoint or credential. Existing notes use "RapidSeek" alongside DeepSeek without resolving a distinct provider; this deployment therefore uses the configured DeepSeek API directly.
 
 ## AI tagging
 
@@ -36,9 +38,11 @@ systemctl --user daemon-reload
 systemctl --user restart karakeep.service
 ```
 
-Karakeep sends the bookmark URL, title, description, and extracted plain-text content to OpenRouter for link tagging. Notes send their body, PDFs send extracted text, and image bookmarks send the image bytes plus the tagging prompt. `INFERENCE_CONTEXT_LENGTH=2048` truncates text input. `EMBEDDING_ENABLE_AUTO_INDEXING=false` prevents semantic-search embeddings from being generated during tagging.
+Karakeep sends the bookmark URL, title, description, and extracted plain-text content to DeepSeek for link tagging. Notes send their body, PDFs send extracted text, and image bookmarks send the image bytes plus the tagging prompt. `INFERENCE_CONTEXT_LENGTH=2048` truncates text input. `EMBEDDING_ENABLE_AUTO_INDEXING=false` prevents semantic-search embeddings from being generated during tagging.
 
-At OpenRouter's prices on 2026-10-20, Gemini 2.5 Flash Lite costs $0.10 per million input tokens and $0.40 per million output tokens. A text bookmark using the full configured context and output budget would cost at most about $0.00041; typical short bookmarks cost much less. Image input is billed by its image token count. These are estimates, not a spending cap.
+At DeepSeek's off-peak prices on 2026-10-20, `deepseek-flash` costs $0.15 per million cache-miss input tokens and $0.60 per million output tokens; peak rates are double, while cache hits cost $0.003-$0.006 per million tokens. A text bookmark using the full configured context and output budget would cost at most about $0.00061 off-peak; typical short bookmarks cost much less. Image input is billed by its token count. These are estimates, not a spending cap.
+
+This deployment calls DeepSeek directly. The proposed `cats-llm-proxy` audit and usage-control layer is not implemented, so Karakeep requests bypass that future proxy coverage. Point `OPENAI_BASE_URL` at the approved proxy only after it supports the required model, JSON mode, usage accounting, and failure behavior.
 
 Enable or disable tagging for new bookmarks in Karakeep under User Settings > AI. Do not use the admin bulk-retag action unless explicitly intended; it sends the whole archive to the provider.
 
