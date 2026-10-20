@@ -17,7 +17,32 @@ The installer initializes private env files only when neither exists, links Quad
 - `~/.local/share/karakeep/search`: rebuildable full-text index.
 - `~/.local/share/karakeep/backups`: private complete data/config archives.
 
-Full-page Monolith archiving and screenshots are enabled. English and Spanish OCR use Tesseract. AI tagging/summarization are disabled; no model API is needed to save, read or search. Signups are disabled outside initial owner-account provisioning. Credentials belong in Personal/Karakeep in 1Password.
+Full-page Monolith archiving and screenshots are enabled. English and Spanish OCR use Tesseract. The built-in AI tagger uses OpenRouter's `google/gemini-2.5-flash-lite` through the existing ordinary API key in 1Password. AI summaries, LLM OCR, and automatic embedding generation remain disabled. Signups are disabled outside initial owner-account provisioning. Karakeep account credentials belong in Personal/Karakeep; the provider key belongs in Personal/OpenRouter API Key - OpenViking in 1Password.
+
+## AI tagging
+
+The provider configuration is kept separately from the application env:
+
+- `inference.env.tpl` is the committed template containing the 1Password reference and non-secret AI settings.
+- `~/.config/karakeep/inference.env` is the rendered private configuration. It must be owned by the current user with mode 0600.
+
+Render or refresh it after changing the template:
+
+```sh
+op inject --file-mode 0600 --force \
+  --in-file ~/.dotfiles/tools/karakeep/inference.env.tpl \
+  --out-file ~/.config/karakeep/inference.env
+systemctl --user daemon-reload
+systemctl --user restart karakeep.service
+```
+
+Karakeep sends the bookmark URL, title, description, and extracted plain-text content to OpenRouter for link tagging. Notes send their body, PDFs send extracted text, and image bookmarks send the image bytes plus the tagging prompt. `INFERENCE_CONTEXT_LENGTH=2048` truncates text input. `EMBEDDING_ENABLE_AUTO_INDEXING=false` prevents semantic-search embeddings from being generated during tagging.
+
+At OpenRouter's prices on 2026-10-20, Gemini 2.5 Flash Lite costs $0.10 per million input tokens and $0.40 per million output tokens. A text bookmark using the full configured context and output budget would cost at most about $0.00041; typical short bookmarks cost much less. Image input is billed by its image token count. These are estimates, not a spending cap.
+
+Enable or disable tagging for new bookmarks in Karakeep under User Settings > AI. Do not use the admin bulk-retag action unless explicitly intended; it sends the whole archive to the provider.
+
+To roll back this integration, restore the saved `karakeep.container` and `server.env` from the timestamped backup, remove `~/.config/karakeep/inference.env`, then run `systemctl --user daemon-reload` and `systemctl --user restart karakeep.service`. Removing the extra `EnvironmentFile` line alone is enough to stop the provider configuration from loading; the env file contains the API key and must remain mode 0600 while present.
 
 ## Daily use
 

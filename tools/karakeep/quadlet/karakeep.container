@@ -10,6 +10,7 @@ Pull=missing
 Network=karakeep.network
 PublishPort=127.0.0.1:43130:3000
 EnvironmentFile=%h/.config/karakeep/server.env
+EnvironmentFile=%h/.config/karakeep/inference.env
 Volume=%h/.local/share/karakeep/data:/data
 NoNewPrivileges=true
 
