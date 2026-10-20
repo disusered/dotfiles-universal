@@ -1,31 +1,50 @@
 ---
 name: cfg-project-tasks
-description: Discover and run unfamiliar, parameterized, multi-process, workspace, environment-sensitive, containerized, or project-specific workflows through cfg. Do not use cfg to wrap an exact user-supplied command or an obvious standard one-step command.
+description: Discover project workflows and manage long-lived development services through cfg. Use for workspace/process lifecycle, output inspection, restart/stop, and unfamiliar or parameterized tasks. Run exact one-shot commands directly.
 ---
 
 # CFG Project Tasks
 
-Use cfg when it removes real uncertainty or coordinates a project process set. Run exact user-supplied commands and obvious standard one-step commands such as `npm run dev` or `cargo test` directly.
+Use cfg to keep delegated development services discoverable and manageable.
+Run exact one-shot commands such as `cargo test` directly.
 
-## Workflow
+## Development services
 
-1. If the user supplied an exact command, or the repository exposes an obvious standard one-step command, run it directly without consulting cfg.
-2. For a workspace declared by `.cfg/workspace.toml`, use `cfg up --workspace` and `cfg down --workspace`. At the workspace root, bare `cfg up` and `cfg down` auto-select it; from a nested repository or worktree, keep the explicit selector. Add workspace-wide environment files with repeated `--env-file PATH` when required.
-3. For Procfile or Compose project lifecycle, use `cfg up` and `cfg down`, adding an explicit backend selector only when discovery is ambiguous.
-4. When command selection, parameters, working directory, environment, or container context is genuinely uncertain, run `cfg run --list --json` from the relevant project directory.
-5. Read the returned `project_root`, `default_task`, task names, descriptions, command templates, and parameter schemas, then choose an exact task. Supply declared values with repeated `--param KEY=VALUE`; put task-specific extra arguments after `--`.
-6. Use bare `cfg run` only when the user's intent is the project's configured/default action and the returned `default_task` is non-null. If it is null, choose an exact listed task instead of guessing.
-7. Preserve the command's exit status and report the actual output. Do not claim success when the task failed.
+1. Inspect `cfg process list --json` from the project or workspace. Use `--all`
+   when locating an existing process outside that scope.
+2. Read the intended ID with `cfg process read ID --json`. Check process state,
+   exit status, attempt and output limits before diagnosing it.
+3. After changes, use the service's existing reload mechanism. If it needs a
+   restart, use `cfg process restart ID --json`; use `stop` to leave it stopped
+   and inspectable. Verify the updated behavior at its normal address before
+   reporting completion.
+4. For a new workspace, use `cfg up --workspace`; for a Procfile or Compose
+   process set, use `cfg up`, selecting a backend when discovery is ambiguous.
+   Stop the set through its corresponding `cfg down` command.
+5. For an additional long-lived command, use
+   `cfg process start --name NAME -- COMMAND...`. Select a destination with
+   `--into ID` if multiple Kitty sessions exist. Supply repeated `--env-file`
+   paths when needed; base environment comes from Kitty's recorded source pane.
 
-If cfg is unavailable or returns no matching tasks, fall back to repository instructions and manifests. Do not invent a cfg task name or add task configuration unless the user asks.
+Keep the managed ID in the work handoff. A successful restart request or running
+PID does not establish application readiness. Kitty history is bounded combined
+terminal text; inspect truncation and attempt-boundary fields. Old panes acquire
+control endpoints after their normal restart. A missing endpoint is not a reason
+to silently launch a duplicate service or change its port.
 
-## Examples
+## Task discovery
 
-```sh
-cfg up --procfile --env-file .env.local
-cfg down --compose
-cfg up --workspace
-cfg down --workspace --env-file .env.local
-cfg run --list --json
-cfg run "docker compose exec" --param service=web --param command="bin/rails test"
-```
+1. When command selection, parameters, cwd, environment or container context is
+   uncertain, run `cfg run --list --json` from the relevant project.
+2. Read the returned project root, default task, exact names and parameter
+   schemas. Supply declared values with repeated `--param KEY=VALUE`; place extra
+   arguments after `--`.
+3. Use bare `cfg run` only for the configured/default action when `default_task`
+   is non-null. Run an exact task directly for one-shot work, or place
+   `cfg run "exact task name"` after `cfg process start ... --` for a service.
+4. Preserve exit status and report failures. If no matching task exists, consult
+   repository instructions and manifests instead of inventing a task.
+
+At a workspace root, bare `cfg up/down` auto-selects `.cfg/workspace.toml`.
+From a nested repository, use `--workspace` explicitly. Foreground `cfg run`
+remains a one-shot interface; it does not register a persistent service.
