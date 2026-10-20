@@ -20,7 +20,13 @@ Run exact one-shot commands such as `cargo test` directly.
    reporting completion.
 4. For a new workspace, use `cfg up --workspace`; for a Procfile or Compose
    process set, use `cfg up`, selecting a backend when discovery is ambiguous.
-   Stop the set through its corresponding `cfg down` command.
+   Outside Kitty, bootstrap with `cfg up --workspace --kitty-socket SOCKET
+   --source-window ID` (omit `--workspace` for a project process set). Select the
+   existing session's socket and exact pane ID from its Kitty inventory, using
+   `kitty @ --to SOCKET ls` when needed. This works with an empty process registry
+   and copies the selected pane's recorded environment. A managed process ID is
+   not required. Keep these live destination values in the handoff.
+   Stop the set through its corresponding `cfg down --kitty-socket SOCKET`.
 5. For an additional long-lived command, use
    `cfg process start --name NAME -- COMMAND...`. Select a destination with
    `--into ID` if multiple Kitty sessions exist. Supply repeated `--env-file`
@@ -31,6 +37,12 @@ PID does not establish application readiness. Kitty history is bounded combined
 terminal text; inspect truncation and attempt-boundary fields. Old panes acquire
 control endpoints after their normal restart. A missing endpoint is not a reason
 to silently launch a duplicate service or change its port.
+
+Unix socket access can be denied by an agent sandbox. On `Operation not permitted`,
+retry the same cfg command with the harness's supported escalation. Entries under
+`unavailable` report failed inspection; they do not establish that a service died.
+An `exited` launcher with code 0 still needs output and application checks before
+claiming readiness.
 
 ## Task discovery
 
