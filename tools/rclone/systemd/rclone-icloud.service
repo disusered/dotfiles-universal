@@ -1,0 +1,14 @@
+[Unit]
+Description=Mount iCloud Drive
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/rclone mount iCloud: "%h/iCloud Drive" --config=%h/.config/rclone/rclone.conf --vfs-cache-mode writes --dir-cache-time 5m --umask 022
+ExecStop=/usr/bin/fusermount3 -uz "%h/iCloud Drive"
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

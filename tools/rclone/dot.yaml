@@ -1,3 +1,9 @@
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm --needed rclone
+    cmd: |
+      set -euo pipefail
+      sudo pacman -S --noconfirm --needed rclone fuse3
+      mkdir -p "$HOME/iCloud Drive"
+      systemctl --user daemon-reload
+  links:
+    systemd/rclone-icloud.service: ~/.config/systemd/user/rclone-icloud.service
