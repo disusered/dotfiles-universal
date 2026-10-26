@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Package the skills our claude.ai plugins carry as one zip per skill for the Gemini web app's
-# Skills page (gemini.google.com → Skills → Upload). Gemini takes one skill per upload, with
-# SKILL.md in the zip's main folder and that folder named after the skill.
+# Skills page (gemini.google.com → Skills → Upload). Gemini takes one skill per upload and
+# rejects a zip unless SKILL.md sits at its root, so each zip holds the skill's files directly.
 #
 # The skill set follows ai/claude-plugins, so Claude and Gemini get the same skills. The generic
 # okf-knowledge-ops skill ships in the Iteramind organization's OKF Knowledge plugin rather than
@@ -24,9 +24,9 @@ package() {
   artifact="${artifact_dir}/${name}.zip"
   stage="$(mktemp -d)"
   # Skill folders are links into ai/agent-skills; copy what they point to.
-  cp -RL -- "${source_dir}" "${stage}/${name}"
+  cp -RL -- "${source_dir}/." "${stage}/"
   rm -f -- "${artifact}"
-  (cd -- "${stage}" && zip -q -r "${artifact}" "${name}")
+  (cd -- "${stage}" && zip -q -r "${artifact}" .)
   rm -rf -- "${stage}"
   printf '%s\n' "${artifact}"
 }
