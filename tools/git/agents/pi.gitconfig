@@ -1,0 +1,8 @@
+# Global config for Pi sessions, selected with GIT_CONFIG_GLOBAL.
+# Signs with an on-disk key so commits need no 1Password approval.
+[include]
+  path = ~/.gitconfig
+[user]
+  signingkey = ~/.ssh/agents/pi
+[gpg "ssh"]
+  program = ssh-keygen

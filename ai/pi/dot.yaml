@@ -1,6 +1,7 @@
 linux:
   links:
     themes: ~/.pi/agent/themes
+    pi.zsh: ~/.config/zsh/5008_pi.zsh
   installs:
     cmd: |
       set -eu

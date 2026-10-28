@@ -11,7 +11,7 @@ mkdir -p "$key_dir"
 chmod 700 "$key_dir"
 touch "$signers"
 
-for agent in claude codex antigravity; do
+for agent in claude codex antigravity pi; do
   key="$key_dir/$agent"
   if [ ! -f "$key" ]; then
     ssh-keygen -q -t ed25519 -N "" -C "$agent-signing" -f "$key"
