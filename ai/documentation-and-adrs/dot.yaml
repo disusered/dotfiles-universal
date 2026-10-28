@@ -1,0 +1,17 @@
+linux|darwin:
+  installs:
+    cmd: |
+      set -eu
+      REF=aeac41d4d005999432bb7312f7ff06383a91d59d
+      SHA256=b60d503925bbaacee7fd63935db70b9ced5b2514ff5a56a672130e01b9690bc5
+      skill="$HOME/.agents/skills/documentation-and-adrs"
+      if ! echo "$SHA256  $skill/SKILL.md" | sha256sum -c - >/dev/null 2>&1; then
+        tmp=$(mktemp -d)
+        trap 'rm -rf "$tmp"' EXIT
+        curl -fsSL "https://codeload.github.com/addyosmani/agent-skills/tar.gz/$REF" | tar xz -C "$tmp" "agent-skills-$REF/skills/documentation-and-adrs"
+        echo "$SHA256  $tmp/agent-skills-$REF/skills/documentation-and-adrs/SKILL.md" | sha256sum -c -
+        mkdir -p "$HOME/.agents/skills"
+        rm -rf "$skill"
+        cp -r "$tmp/agent-skills-$REF/skills/documentation-and-adrs" "$skill"
+      fi
+      ln -sfn ../../../../.agents/skills/documentation-and-adrs "$HOME/.claude/skills/documentation-and-adrs"
