@@ -25,6 +25,8 @@ both harness paths are symlinks. Project instructions supply local conventions.
   block with exactly one raw URL per line, each prefixed by literal `- `. Keep
   labels, linked titles, and commentary outside that block so it copies directly
   into Slack. Apply this by default without requiring a reminder.
+- When asked for links, ids or values already established in the conversation,
+  give them at once; do not re-check what has already been verified.
 - Complete the authorized task at its intended scope. Make routine choices from
   context; ask when missing information would materially change the result.
 - Carry the objective, decisions, and corrections through follow-ups. Apply
