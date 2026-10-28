@@ -197,6 +197,9 @@ trust_level = "trusted"
 [projects."/home/carlos/Development/ME/STUDY/sicp"]
 trust_level = "trusted"
 
+[projects."/home/carlos/Documents/Codex/2026-10-19/st"]
+trust_level = "trusted"
+
 [plugins."codex-security@openai-curated"]
 enabled = true
 
@@ -247,14 +250,20 @@ command = "/home/carlos/.local/bin/stitch-mcp-wrapper"
 [mcp_servers.blender]
 command = "/usr/bin/uvx"
 args = ["--python", "3.11", "blender-mcp==1.9.1"]
-startup_timeout_sec = 120
+startup_timeout_sec = 120.0
 
 [mcp_servers.blender.env]
-DISABLE_TELEMETRY = "true"
 BLENDER_HOST = "localhost"
 BLENDER_PORT = "9876"
+DISABLE_TELEMETRY = "true"
 
 [mcp_servers.blender.tools.execute_blender_code]
+approval_mode = "approve"
+
+[mcp_servers.blender.tools.get_hunyuan3d_status]
+approval_mode = "approve"
+
+[mcp_servers.blender.tools.get_hyper3d_status]
 approval_mode = "approve"
 
 [mcp_servers.blender.tools.get_scene_info]
@@ -263,21 +272,15 @@ approval_mode = "approve"
 [mcp_servers.blender.tools.get_viewport_screenshot]
 approval_mode = "approve"
 
-[mcp_servers.blender.tools.get_hyper3d_status]
-approval_mode = "approve"
-
-[mcp_servers.blender.tools.get_hunyuan3d_status]
-approval_mode = "approve"
-
 [mcp_servers.rea]
 command = "npx"
 args = ["-y", "rea-agents@3.2.1", "mcp"]
-startup_timeout_sec = 30
+startup_timeout_sec = 30.0
 
 [mcp_servers.rea.env]
-PATH = "/usr/bin:/bin"
 GHIDRA_INSTALL_DIR = "/home/carlos/.local/opt/ghidra_12.1.4_PUBLIC"
 JAVA_HOME = "/home/carlos/.sdkman/candidates/java/21.0.12+1.1-tem"
+PATH = "/usr/bin:/bin"
 
 [mcp_servers.node_repl]
 args = []
@@ -299,11 +302,14 @@ BROWSER_USE_CODEX_APP_VERSION = "26.917.61114"
 NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/carlos/.codex/plugins/cache/openai-bundled/browser/26.917.61114/scripts/browser-service.mjs"}'
 CODEX_CLI_PATH = "/usr/lib/chatgpt/resources/codex"
 
+[mcp_servers.figma]
+url = "https://mcp.figma.com/mcp"
+
 [apps.connector_76869538009648d5b282a4bb21c3d157.tools."github.create_pull_request"]
 approval_mode = "approve"
 
 [apps.asdk_app_693a0a79ffe48191901173077edcf914]
-enabled = false
+enabled = true
 
 [apps.asdk_app_69d3e5ee6a708191baa733f7b8931995]
 enabled = false
@@ -423,7 +429,7 @@ enabled = true
 enabled = true
 
 [plugins."skyrim-courier@personal"]
-enabled = true
+enabled = false
 
 [plugins."unified-computer-use@openai-bundled"]
 enabled = true
