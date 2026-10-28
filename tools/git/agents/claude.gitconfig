@@ -1,0 +1,8 @@
+# Global config for Claude Code sessions, selected with GIT_CONFIG_GLOBAL.
+# Signs with an on-disk key so commits need no 1Password approval.
+[include]
+  path = ~/.gitconfig
+[user]
+  signingkey = ~/.ssh/agents/claude
+[gpg "ssh"]
+  program = ssh-keygen

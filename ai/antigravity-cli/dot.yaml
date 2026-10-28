@@ -74,5 +74,6 @@ linux|darwin:
   links:
     skills.json: ~/.gemini/config/skills.json
     title.sh: ~/.gemini/antigravity-cli/title.sh
+    agy.zsh: ~/.config/zsh/5007_agy.zsh
     plugins/okf-shared: ~/Development/ITERAMIND/.agents/plugins/okf-shared
     plugins/xbol-knowledge: ~/Development/XBOL/.agents/plugins/xbol-knowledge

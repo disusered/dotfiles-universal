@@ -19,7 +19,9 @@ linux[whoami.distro^="Fedora"]:
     sshexe.zsh: ~/.config/zsh/0016_sshexe.zsh
 linux[whoami.distro^="Arch"]:
   installs:
-    cmd: sudo pacman -S --noconfirm --needed git
+    cmd: |
+      sudo pacman -S --noconfirm --needed git
+      bash "$HOME/.dotfiles/tools/git/agent-signing-keys.sh"
     depends:
       - /tools/ssh
       - /tools/1password

@@ -19,6 +19,7 @@ memories = false
 
 [shell_environment_policy]
 inherit = "core"
+set = { GIT_CONFIG_GLOBAL = "/home/carlos/.dotfiles/tools/git/agents/codex.gitconfig" }
 
 [agents]
 max_threads = 8
